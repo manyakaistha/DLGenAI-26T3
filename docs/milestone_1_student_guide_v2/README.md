@@ -1,4 +1,4 @@
-# Milestone 1 Student Study Guides — Assessment Edition (v2)
+# Milestone 1 Student Study Guides
 ## Industrial Surface Anomaly Segmentation
 
 Welcome to Milestone 1! This curriculum prepares you to understand the data, master the evaluation metrics, and build your baseline segmentation models from scratch.
