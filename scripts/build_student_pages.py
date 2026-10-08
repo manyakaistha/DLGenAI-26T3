@@ -136,7 +136,7 @@ def build(output: Path):
 <main id="main"><div class="content"><div class="topline"><span>Milestone 1 · Student learning resources</span><a href="milestone-1.html">View questions ↗</a></div>
 <span class="section-label">{label}</span><details class="toc"><summary>On this page</summary>{md.toc}</details>
 <article>{body}</article><nav class="pagination" aria-label="Previous and next page">{pager}</nav>
-<p class="endnote">Study the concepts. Practice on toy examples. Compute your own assessment results.</p></div></main></div></body></html>'''
+<footer class="endnote">Created by manaykaistha.<br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>'''
         (output / urls[i]).write_text(page)
         parsed = Inspect()
         parsed.feed(body)
