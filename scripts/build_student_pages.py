@@ -141,6 +141,7 @@ def build(output: Path):
         mapping[(STARTERS / name).resolve()] = "downloads/" + name
     (output / "site.css").write_text(CSS)
     (output / "site.js").write_text(JS)
+    shutil.copytree(ROOT / "styles/generative", output / "styles/generative", dirs_exist_ok=True)
     (output / ".nojekyll").touch()
     search = []
     for i, source in enumerate(sources):
@@ -187,19 +188,34 @@ def build(output: Path):
             pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
         label = "Study guide overview" if i == 0 else "Revised assessment" if i == 1 else "Starter code · Questions 11 & 12" if i == len(sources) - 1 else f"Concept guide {i-1:02d} / 09"
         page = f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(titles[i])} · Industrial Surface Anomaly Segmentation</title>
 <meta name="description" content="Milestone 1 student study guides: industrial surface anomaly segmentation, data understanding, evaluation and baseline modeling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try {{ const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; }} catch {{}}</script>
 <link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js"></script></head><body>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="{str(i == 0).lower()}">
+<div class="reading-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a><div class="layout">
 <aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
 <p>A guided path from raw annotations to your first segmentation baseline.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
 <div class="desktop-nav">{nav}</div><details class="mobile-menu"><summary>Browse & search the guides</summary>{nav}</details>
 <footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
 <main id="main"><div class="content"><div class="topline"><span>Milestone 1 · Student learning resources</span><a href="milestone-1.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">A closer look at the details</span><p class="hero-title">From pixels<br>to patterns.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">{label}</span><details class="toc"><summary>On this page</summary>{md.toc}</details>
 <article>{body}</article><nav class="pagination" aria-label="Previous and next page">{pager}</nav>
 <footer class="endnote">Created by manaykaistha.<br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>'''
