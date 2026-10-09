@@ -3,11 +3,6 @@
 
 Welcome to Milestone 1! This curriculum prepares you to understand the data, master the evaluation metrics, and build your baseline segmentation models from scratch.
 
-This is the **assessment edition**: like the learning edition, it teaches you the **underlying engineering and mathematical principles** of every milestone question — but it deliberately **contains no computed answers or answer hints for the 12 graded questions**. Instead, each guide ends with:
-
-1. **Practice Problems** — fully worked exercises on small *toy* datasets that teach you the exact method and intuition you need, with different numbers from the graded task.
-2. **Your Assignment Task** — a short pointer telling you which question the guide prepares you for, so you apply the practiced method to the real data yourself.
-
 ---
 
 ## Concept Guides & Reading Modules
