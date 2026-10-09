@@ -1,8 +1,8 @@
 # Generative guide style: feasibility study
 
-Status: implemented as an isolated style experiment. All lesson Markdown and starter downloads are unchanged. The live website and main branch are unchanged.
+Status: approved for merge into main and publication. All lesson Markdown and starter downloads remain unchanged. Existing page URLs are preserved.
 
-Local branch: `experiment/generative-guide-style`, based on publication commit `b115673`. Isolated checkout: `runs/student_pages_style_experiment`. The experiment is maintained on its own branch; it is not deployed to GitHub Pages.
+Local branch: `experiment/generative-guide-style`, based on publication commit `b115673`. Isolated checkout: `runs/student_pages_style_experiment`. The experiment was developed on its own branch and is now merged into main for GitHub Pages publication.
 
 ## What is feasible
 
