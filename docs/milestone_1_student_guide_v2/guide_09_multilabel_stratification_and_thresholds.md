@@ -111,3 +111,12 @@ Open the graded assignment: [`MILESTONE_1.md`](../../MILESTONE_1.md)
 * **Question 12** asks you to train your baseline on the 80% partition, sweep thresholds on the 20% holdout (no min-area filtering), describe both metrics' trends, and analyze which metric prefers the higher thresholds and why — using the prediction framework from Section 3 and Practice Problem 9.2.
 
 The holdout counts, the training run, and the sweep curves are all things you must produce; this guide gives you the reasoning scaffold and verifies your statistical mechanics on toy numbers only.
+
+
+## Starter Notebook for Questions 11 and 12
+
+**[Open in Google Colab](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing)**
+
+Save a copy in Drive, choose a GPU runtime, install the dependencies, and set `DATA_ROOT` to your competition data folder. Then run the notebook cells in order: complete the Q11 calculations, inspect the masks, train for 5–10 epochs, and evaluate thresholds 0.3, 0.5, 0.7 and 0.9 without minimum-area filtering. Write your Q12 bullet points from your own results.
+
+[Full setup instructions and notebook downloads](../starter_code_q11_q12/README.md) include the Colab dependency cell, data-path examples, and how to save your experiment outputs.

@@ -4,6 +4,8 @@ Industrial Surface Anomaly Segmentation · Revised assessment
 
 Read the [student study guides](docs/milestone_1_student_guide_v2/README.md) before attempting the questions. Use the competition data in `data/public/` and compute your own results. This document contains questions and response formats only.
 
+For Questions 11 and 12, use the [Colab starter notebook](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing) and follow the [setup instructions](docs/starter_code_q11_q12/README.md).
+
 Questions 1–11 use short answers. Question 12 requires a descriptive answer in bullet points. Image dimensions below are height × width unless stated otherwise.
 
 ## Question 1: Global Class Distribution & Clean Sample Mass

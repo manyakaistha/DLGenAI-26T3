@@ -19,6 +19,7 @@ import markdown
 ROOT = Path(__file__).resolve().parents[1]
 GUIDES = ROOT / "docs/milestone_1_student_guide_v2"
 QUESTION = ROOT / "MILESTONE_1.md"
+STARTERS = ROOT / "docs/starter_code_q11_q12"
 LABELS = [
     "Data sparsity & cardinality", "Spatial exclusivity & output heads",
     "RLE decoding & boundary checks", "Aspect ratios & aliasing",
@@ -125,13 +126,19 @@ def normalize_markdown(source: str) -> str:
 
 def build(output: Path):
     output.mkdir(parents=True, exist_ok=True)
-    sources = [GUIDES / "README.md", QUESTION, *sorted(GUIDES.glob("guide_*.md"))]
-    if len(sources) != 11:
-        raise ValueError("Expected the guide index, revised assignment and nine modules")
-    urls = ["index.html", "milestone-1.html", *[p.stem + ".html" for p in sources[2:]]]
-    titles = ["Study guide overview", "Milestone 1 questions", *LABELS]
+    modules = sorted(GUIDES.glob("guide_*.md"))
+    if len(modules) != 9:
+        raise ValueError("Expected nine concept modules")
+    sources = [GUIDES / "README.md", QUESTION, *modules, STARTERS / "README.md"]
+    urls = ["index.html", "milestone-1.html", *[p.stem + ".html" for p in modules], "starter-code.html"]
+    titles = ["Study guide overview", "Milestone 1 questions", *LABELS, "Q11–Q12 starter notebook"]
     mapping = {p.resolve(): url for p, url in zip(sources, urls)}
     shutil.copytree(GUIDES / "assets", output / "assets", dirs_exist_ok=True)
+    downloads = output / "downloads"
+    downloads.mkdir(exist_ok=True)
+    for name in ("starter.ipynb", "starter.py"):
+        shutil.copy2(STARTERS / name, downloads / name)
+        mapping[(STARTERS / name).resolve()] = "downloads/" + name
     (output / "site.css").write_text(CSS)
     (output / "site.js").write_text(JS)
     (output / ".nojekyll").touch()
@@ -168,7 +175,7 @@ def build(output: Path):
         nav = '<input class="search" aria-label="Search guides" placeholder="Search the full guide…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Study guide">'
         for j, (url, title) in enumerate(zip(urls, titles)):
             active = ' aria-current="page"' if i == j else ""
-            label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else f"GUIDE {j-1:02d}"
+            label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else "STARTER CODE · Q11–Q12" if j == len(sources) - 1 else f"GUIDE {j-1:02d}"
             nav += f'<a href="{url}"{active}><span class="num">{label}</span>{html.escape(title)}</a>'
         nav += "</nav>"
         pager = ""
@@ -178,7 +185,7 @@ def build(output: Path):
             pager += "<span></span>"
         if i + 1 < len(urls):
             pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
-        label = "Study guide overview" if i == 0 else "Revised assessment" if i == 1 else f"Concept guide {i-1:02d} / 09"
+        label = "Study guide overview" if i == 0 else "Revised assessment" if i == 1 else "Starter code · Questions 11 & 12" if i == len(sources) - 1 else f"Concept guide {i-1:02d} / 09"
         page = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(titles[i])} · Industrial Surface Anomaly Segmentation</title>

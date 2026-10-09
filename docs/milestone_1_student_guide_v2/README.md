@@ -27,3 +27,12 @@ Welcome to Milestone 1! This curriculum prepares you to understand the data, mas
 3. **Write your own Python scripts** against `data/public/` to solve the real task pointed to in the "Your Assignment Task" section.
 4. Enter your answers into the assignment form:
    👉 [`MILESTONE_1.md`](../../MILESTONE_1.md)
+
+
+## Starter Notebook for Questions 11 and 12
+
+**[Open in Google Colab](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing)**
+
+Save a copy in Drive, choose a GPU runtime, install the dependencies, and set `DATA_ROOT` to your competition data folder. Then run the notebook cells in order: complete the Q11 calculations, inspect the masks, train for 5–10 epochs, and evaluate thresholds 0.3, 0.5, 0.7 and 0.9 without minimum-area filtering. Write your Q12 bullet points from your own results.
+
+[Full setup instructions and notebook downloads](../starter_code_q11_q12/README.md) include the Colab dependency cell, data-path examples, and how to save your experiment outputs.
