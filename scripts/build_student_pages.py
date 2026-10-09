@@ -71,6 +71,58 @@ class Inspect(HTMLParser):
         self.text.append(data)
 
 
+def normalize_markdown(source: str) -> str:
+    """Adapt the guide's GitHub-style spacing to Python-Markdown block rules."""
+    lines = []
+    fence_char, fence_length = "", 0
+    in_display = False
+    for line in source.splitlines():
+        fence = re.match(r"^\s*(`{3,}|~{3,})", line)
+        if fence:
+            marker = fence.group(1)
+            if not fence_char:
+                fence_char, fence_length = marker[0], len(marker)
+            elif marker[0] == fence_char and len(marker) >= fence_length:
+                fence_char, fence_length = "", 0
+            lines.append(line)
+            continue
+        if fence_char:
+            lines.append(line)
+            continue
+        # Display math must form its own block. Otherwise $$ is consumed by
+        # two inline-math matches, leaving nested wrappers and visible \( \).
+        if in_display:
+            lines.append(line)
+            if line.rstrip().endswith("$$"):
+                in_display = False
+                lines.append("")
+            continue
+        display = re.match(r"^(\s*)\$\$", line)
+        if display:
+            if lines and lines[-1].strip():
+                lines.append("")
+            # Lists use two-space nesting; a leftover third/fifth space keeps
+            # the math block from matching after Markdown removes list indent.
+            indent = " " * (len(display.group(1)) // 2 * 2)
+            lines.append(indent + line.lstrip())
+            in_display = not (line.strip().endswith("$$") and len(line.strip()) > 2)
+            if not in_display:
+                lines.append("")
+            continue
+        # GitHub permits lists to interrupt paragraphs; Python-Markdown needs
+        # a blank line. Keep adjacent items together and preserve indentation.
+        item = re.match(r"^(\s*)(?:[-+*]|\d+[.)])\s+", line)
+        if item and lines and lines[-1].strip():
+            previous = lines[-1]
+            previous_item = re.match(r"^\s*(?:[-+*]|\d+[.)])\s+", previous)
+            indent = len(item.group(1))
+            previous_indent = len(previous) - len(previous.lstrip())
+            if not previous_item and (indent <= previous_indent or previous.rstrip().endswith(":")):
+                lines.append("")
+        lines.append(line)
+    return "\n".join(lines)
+
+
 def build(output: Path):
     output.mkdir(parents=True, exist_ok=True)
     sources = [GUIDES / "README.md", QUESTION, *sorted(GUIDES.glob("guide_*.md"))]
@@ -86,14 +138,17 @@ def build(output: Path):
     search = []
     for i, source in enumerate(sources):
         md = markdown.Markdown(
-            extensions=["tables", "toc", "md_in_html", "pymdownx.superfences", "pymdownx.arithmatex"],
+            tab_length=2,
+            extensions=["tables", "toc", "sane_lists", "md_in_html", "pymdownx.superfences", "pymdownx.arithmatex"],
             extension_configs={"pymdownx.arithmatex": {"generic": True}, "toc": {"toc_depth": "2-2"}},
         )
-        markdown_source = source.read_text()
+        markdown_source = normalize_markdown(source.read_text())
         # Python-Markdown treats raw HTML blocks as opaque; opt <details> into
         # Markdown parsing so worked solutions render emphasis, lists and math.
         markdown_source = re.sub(r"<details(?=\s|>)", '<details markdown="1"', markdown_source)
         body = md.convert(markdown_source)
+        if re.search(r'<(?:span|div) class="arithmatex">\\[\[(]\s*<(?:span|div) class="arithmatex">', body):
+            raise ValueError(f"Nested math delimiters in {source}")
         def link(match):
             attr, raw = match.groups()
             parts = urlsplit(html.unescape(raw))
