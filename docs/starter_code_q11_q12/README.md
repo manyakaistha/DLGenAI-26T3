@@ -13,9 +13,7 @@ The starter supplies image-level combination stratification, native-resolution i
 3. Add a setup cell **before the notebook's imports** and run:
 
 ```python
-!curl -LsSf https://astral.sh/uv/install.sh | sh
-import sys
-!~/.local/bin/uv pip install --python {sys.executable} torch torchvision segmentation-models-pytorch numpy pandas pillow scikit-learn matplotlib tqdm
+%pip install torch torchvision segmentation-models-pytorch numpy pandas pillow scikit-learn matplotlib tqdm
 ```
 
 4. Download the competition data using your own competition access. Upload the dataset archive to the Colab Files panel and extract it into a local runtime folder. For example, after uploading an archive named `public.zip`:
@@ -43,25 +41,17 @@ archive = shutil.make_archive("/content/milestone_1_outputs", "zip", OUTPUT_DIR)
 files.download(archive)
 ```
 
-Colab runtime files are temporary. Saving your notebook to Drive does not also save its dataset, checkpoint or CSV files. See the [Colab FAQ](https://research.google.com/colaboratory/faq.html) for runtime storage and GPU details, and the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) for the installer used above.
+Colab runtime files are temporary. Saving your notebook to Drive does not also save its dataset, checkpoint or CSV files. See the [Colab FAQ](https://research.google.com/colaboratory/faq.html) for runtime storage and GPU details.
 
 ## Run locally or in Kaggle
 
-Run from a working directory containing `data/public/train.csv` and `data/public/train/`, or edit `DATA_ROOT` in the first code cell. In Kaggle, point it at the competition's mounted `public` folder. The notebook has no imports from this project's `src/`, fold files, trained models, or reports.
+Run from a working directory containing `data/public/train.csv` and `data/public/train/`, or edit `DATA_ROOT` in the first code cell. In Kaggle, point it at the competition's mounted `public` folder. If a package is missing, install the dependencies in a notebook cell with:
 
-For a standalone environment with `uv` installed:
-
-```bash
-uv venv --python 3.11
-uv pip install --python .venv/bin/python torch torchvision segmentation-models-pytorch numpy pandas pillow scikit-learn matplotlib tqdm jupyterlab
-uv run --no-project --python .venv/bin/python python -m jupyterlab
+```python
+%pip install torch torchvision segmentation-models-pytorch numpy pandas pillow scikit-learn matplotlib tqdm
 ```
 
-Select the environment's Python kernel, then open the notebook. For this project's existing environment, run from the project root:
-
-```bash
-uv run --with jupyterlab jupyter lab docs/starter_code_q11_q12/starter.ipynb
-```
+Open the notebook in Jupyter or Kaggle and run its cells in order. The notebook has no imports from this project's `src/`, fold files, trained models, or reports.
 
 The model's ImageNet weights download on first use. A GPU is recommended for the full run; reduce `BATCH_SIZE` if necessary. CUDA, Apple MPS, and CPU are detected automatically. CPU execution is supported but slower. Results depend on hardware, training, and the chosen seed.
 
