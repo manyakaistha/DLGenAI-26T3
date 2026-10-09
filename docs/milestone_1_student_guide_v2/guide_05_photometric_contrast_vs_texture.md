@@ -1,4 +1,4 @@
-# Guided Learning: Photometric Separation vs. Pure Texture Anomalies (Cohen's $d$)
+# Photometric Separation vs. Pure Texture Anomalies (Cohen's $d$)
 *(Preparing for Milestone 1: Question 6)*
 
 ---

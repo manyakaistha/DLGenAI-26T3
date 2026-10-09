@@ -1,4 +1,4 @@
-# Guided Learning: Multi-Label Stratification and Decision Threshold Sweeps
+# Multi-Label Stratification and Decision Threshold Sweeps
 *(Preparing for Milestone 1: Questions 11 & 12)*
 
 ---

@@ -1,4 +1,4 @@
-# Guided Learning: Morphological Post-Processing, Connected Components, and Recall Ceilings
+# Morphological Post-Processing, Connected Components, and Recall Ceilings
 *(Preparing for Milestone 1: Question 10)*
 
 ---

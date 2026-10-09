@@ -1,4 +1,4 @@
-# Guided Learning: Spatial Mutual Exclusivity and Output Architecture
+# Spatial Mutual Exclusivity and Output Architecture
 *(Preparing for Milestone 1: Question 3)*
 
 ---

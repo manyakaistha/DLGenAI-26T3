@@ -1,4 +1,4 @@
-# Guided Learning: Run-Length Encoding (RLE) and Memory Layouts
+# Run-Length Encoding (RLE) and Memory Layouts
 *(Preparing for Milestone 1: Question 4)*
 
 ---

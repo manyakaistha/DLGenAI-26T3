@@ -1,4 +1,4 @@
-# Guided Learning: The Competition Scorer and The "All-Empty Baseline Paradox"
+# The Competition Scorer and The "All-Empty Baseline Paradox"
 *(Preparing for Milestone 1: Questions 8 & 9)*
 
 ---

@@ -1,4 +1,4 @@
-# Guided Learning: Sensor Aspect Ratios, Line-Scan Cameras, and Aliasing
+# Sensor Aspect Ratios, Line-Scan Cameras, and Aliasing
 *(Preparing for Milestone 1: Question 5)*
 
 ---

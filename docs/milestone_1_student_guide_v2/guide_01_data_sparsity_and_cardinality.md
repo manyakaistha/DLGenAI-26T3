@@ -1,4 +1,4 @@
-# Guided Learning: Class Imbalance, Anomaly Sparsity, and Multi-Label Cardinality
+# Class Imbalance, Anomaly Sparsity, and Multi-Label Cardinality
 *(Preparing for Milestone 1: Questions 1 & 2)*
 
 ---

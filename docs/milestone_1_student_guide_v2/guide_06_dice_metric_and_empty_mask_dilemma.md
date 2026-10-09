@@ -1,4 +1,4 @@
-# Guided Learning: The Sørensen–Dice Index and Negative Step Functions
+# The Sørensen–Dice Index and Negative Step Functions
 *(Preparing for Milestone 1: Question 7)*
 
 ---
