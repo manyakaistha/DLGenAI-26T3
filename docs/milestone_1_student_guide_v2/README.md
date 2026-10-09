@@ -5,6 +5,21 @@ Welcome to Milestone 1! This curriculum prepares you to understand the data, mas
 
 ---
 
+## New to Deep Learning? Start Here
+
+**[Understanding Deep Learning by Simon J. D. Prince](https://udlbook.github.io/udlbook/)** is a good starting point if neural networks, training, and loss functions are still unfamiliar. It builds from supervised learning to neural networks, then explains how models learn and how we evaluate them. The illustrations and accompanying notebooks help connect the mathematics to code. The website provides a freely available PDF and learning resources.
+
+Use it alongside these guides. You do not need to finish the book before attempting Milestone 1.
+
+- **Start with Chapters 1–4:** build an understanding of inputs, targets, predictions, and shallow and deep neural networks.
+- **Read Chapters 5–8 as you approach Q11 and Q12:** focus on loss functions, fitting models, gradients, and measuring performance. Connect these ideas to the starter notebook's training and validation steps.
+- **Then read Chapter 10 on convolutional networks:** it provides useful background for understanding how image models extract spatial features.
+- **Read actively:** study a figure, explain the idea in your own words, and try a relevant notebook or small example. On your first pass, focus on the intuition and return to harder derivations later.
+
+This is optional background reading, not a graded task. Use the milestone guides for the dataset conventions, segmentation metrics, and specific questions you need to answer.
+
+---
+
 ## Concept Guides & Reading Modules
 
 | Milestone Question | Guided Learning Document | Theoretical Principles | Practice Focus |
