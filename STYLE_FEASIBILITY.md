@@ -49,3 +49,7 @@ Build: `uv run --no-project scripts/build_student_pages.py --output _site`
 Preview: `uv run --no-project python -m http.server 8767 --bind 127.0.0.1 --directory _site`
 
 Verification: all 12 lesson HTML bodies and both downloadable starter files match the original build byte for byte. Built-in links/anchors pass. Browser checks found no math errors, missing images, raw Markdown markers or document overflow on all 12 desktop pages and all 12 pages in a 390-pixel browser iframe. This is responsive layout verification, not a physical-device touch test. Palette persistence, motion pause and search work. Body, muted and link colors exceed 4.5:1 contrast in all six themes. JavaScript syntax check passes.
+
+## Small garden details
+
+The initial design is preserved in commit `8c760da`. Three tiny Canvas butterflies now flutter near the flowers/title, using the existing motion toggle and visibility/reduced-motion behavior. Small decorative SVG flowers flank the author attribution on each page; colors follow the selected palette and the credit remains semantic text.

@@ -57,6 +57,14 @@ document.querySelectorAll('article table').forEach(table => {
 });
 """
 
+CREDIT_ART = """<svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg>"""
+
+
 class Inspect(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -218,7 +226,7 @@ def build(output: Path):
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">A closer look at the details</span><p class="hero-title">From pixels<br>to patterns.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">{label}</span><details class="toc"><summary>On this page</summary>{md.toc}</details>
 <article>{body}</article><nav class="pagination" aria-label="Previous and next page">{pager}</nav>
-<footer class="endnote">Created by manaykaistha.<br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>'''
+<footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>'''
         (output / urls[i]).write_text(page)
         parsed = Inspect()
         parsed.feed(body)

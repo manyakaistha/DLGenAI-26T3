@@ -88,6 +88,24 @@
     }
     ctx.stroke();ctx.restore();
   }
+  // Small visitors stay in the header margins, clear of readable text.
+  function butterfly(x,y,size,phase,time,animate) {
+    const flutter=animate?.55+.45*Math.abs(Math.sin(time*.007+phase)):.86;
+    ctx.save();ctx.translate(x,y);ctx.rotate(-.3+Math.sin(time*.0007+phase)*.15);
+    ctx.fillStyle=palette.flower;ctx.strokeStyle=palette['flower-line'];ctx.lineWidth=.65;
+    for(const side of [-1,1]) {
+      ctx.save();ctx.scale(side*flutter,1);
+      ctx.beginPath();ctx.moveTo(0,0);
+      ctx.bezierCurveTo(size*.2,-size*.8,size*1.1,-size*.95,size*.92,-size*.15);
+      ctx.bezierCurveTo(size*1.05,size*.6,size*.25,size*.72,0,size*.13);
+      ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+    }
+    ctx.strokeStyle=palette.stem;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,-size*.42);ctx.lineTo(0,size*.5);
+    ctx.moveTo(0,-size*.3);ctx.quadraticCurveTo(-size*.18,-size*.65,-size*.34,-size*.62);
+    ctx.moveTo(0,-size*.3);ctx.quadraticCurveTo(size*.18,-size*.65,size*.34,-size*.62);
+    ctx.stroke();ctx.restore();
+  }
   function draw(now) {
     frame=0;ctx.clearRect(0,0,width,height);
     const animate=motion&&!reduced.matches;
@@ -112,6 +130,16 @@
       const f=Math.max(0,Math.min(1,(grow-.58)/.42));
       const spring=f>=1?1:1-Math.exp(-6*f)*Math.cos(10*f);
       if(f>0)bloom(p,x,y,spring*(width<500?.8:1),time);
+    }
+    if(grow>.8) {
+      const small=width<500?4:5.5;
+      // One beside the title, two amongst the blossoms. Slow, bounded flight.
+      const visitors=[[.425,.13,1.4],[.63,.15,3.2],[.88,.56,5.1]];
+      for(const [x,y,phase] of visitors) {
+        const dx=animate?Math.sin(time*.00045+phase)*8:0;
+        const dy=animate?Math.cos(time*.00065+phase)*5:0;
+        butterfly(width*x+dx,height*y+dy,small,phase,time,animate);
+      }
     }
     if(animate&&visible&&!document.hidden)frame=requestAnimationFrame(draw);
   }

@@ -62,3 +62,12 @@ body[data-overview="true"] .garden-hero{height:285px}body[data-overview="true"] 
 @media(max-width:420px){.hero-title{font-size:28px}body[data-overview="true"] .hero-title{font-size:37px}.hero-kicker{font-size:8px}.topline{letter-spacing:0}.theme-options{gap:4px}.theme-option{padding:8px 2px;font-size:8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.nav a:hover{transform:none}}
 @media print{.garden-hero,.palette-panel,.reading-progress{display:none}body{background:white!important;color:black!important}article{font-size:11pt}h1{font-size:25pt}h2{font-size:18pt}code,th,td,details,blockquote{background:white!important;color:black!important}pre{background:#eee!important;color:black!important}}
+
+/* Tiny, theme-aware flowers frame the author credit without covering it. */
+.author-credit{display:inline-flex;align-items:center;gap:8px;min-height:35px}
+.credit-flowers{display:block;flex:none;width:40px;height:28px;overflow:visible}
+.credit-flowers:last-child{transform:scaleX(-1)}
+.credit-stems{fill:none;stroke:var(--stem);stroke-width:.85;stroke-linecap:round}
+.credit-petals{fill:var(--flower)}
+.credit-centers{fill:none;stroke:var(--flower-line);stroke-width:.7;stroke-linecap:round}
+@media print{.credit-flowers{display:none}}
