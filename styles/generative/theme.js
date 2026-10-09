@@ -90,21 +90,43 @@
   }
   // Small visitors stay in the header margins, clear of readable text.
   function butterfly(x,y,size,phase,time,animate) {
-    const flutter=animate?.55+.45*Math.abs(Math.sin(time*.007+phase)):.86;
-    ctx.save();ctx.translate(x,y);ctx.rotate(-.3+Math.sin(time*.0007+phase)*.15);
-    ctx.fillStyle=palette.flower;ctx.strokeStyle=palette['flower-line'];ctx.lineWidth=.65;
+    // Separate forewings/hindwings with patterned panels and visible veins.
+    const flutter=animate?.72+.28*Math.abs(Math.sin(time*.0045+phase)):.94;
+    ctx.save();ctx.translate(x,y);ctx.rotate(-.22+Math.sin(time*.0007+phase)*.12);
+    ctx.scale(size,size);ctx.lineJoin='round';ctx.lineCap='round';
     for(const side of [-1,1]) {
       ctx.save();ctx.scale(side*flutter,1);
-      ctx.beginPath();ctx.moveTo(0,0);
-      ctx.bezierCurveTo(size*.2,-size*.8,size*1.1,-size*.95,size*.92,-size*.15);
-      ctx.bezierCurveTo(size*1.05,size*.6,size*.25,size*.72,0,size*.13);
-      ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+      ctx.fillStyle=palette.flower;ctx.strokeStyle=palette.stem;ctx.lineWidth=.065;
+      ctx.beginPath();ctx.moveTo(.04,-.12);
+      ctx.bezierCurveTo(.26,-.78,.78,-1.18,1.04,-.92);
+      ctx.bezierCurveTo(1.26,-.63,.88,-.1,.16,.13);
+      ctx.bezierCurveTo(.68,-.06,1.02,.36,.72,.7);
+      ctx.bezierCurveTo(.44,.97,.1,.57,.04,.17);
+      ctx.closePath();ctx.fill();ctx.stroke();
+      // Pale inset panels, as on a painted butterfly's wings.
+      ctx.fillStyle=palette['flower-line'];
+      ctx.beginPath();ctx.moveTo(.2,-.18);
+      ctx.bezierCurveTo(.4,-.62,.8,-.91,.91,-.77);
+      ctx.bezierCurveTo(.98,-.62,.65,-.27,.2,-.18);ctx.fill();
+      ctx.beginPath();ctx.ellipse(.45,.38,.17,.23,-.4,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle=palette.stem;ctx.lineWidth=.035;
+      ctx.beginPath();ctx.moveTo(.08,.02);ctx.quadraticCurveTo(.45,-.38,.86,-.76);
+      ctx.moveTo(.42,-.36);ctx.lineTo(.65,-.68);
+      ctx.moveTo(.08,.12);ctx.quadraticCurveTo(.3,.3,.53,.56);ctx.stroke();
+      // Tiny edge spots echo the flower linework.
+      ctx.fillStyle=palette['flower-line'];
+      for(const [px,py] of [[.94,-.5],[.79,-.24],[.66,.65]]) {
+        ctx.beginPath();ctx.arc(px,py,.047,0,Math.PI*2);ctx.fill();
+      }
+      ctx.restore();
     }
-    ctx.strokeStyle=palette.stem;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(0,-size*.42);ctx.lineTo(0,size*.5);
-    ctx.moveTo(0,-size*.3);ctx.quadraticCurveTo(-size*.18,-size*.65,-size*.34,-size*.62);
-    ctx.moveTo(0,-size*.3);ctx.quadraticCurveTo(size*.18,-size*.65,size*.34,-size*.62);
-    ctx.stroke();ctx.restore();
+    ctx.fillStyle=palette.stem;
+    ctx.beginPath();ctx.ellipse(0,.07,.07,.47,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(0,-.43,.09,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=palette.stem;ctx.lineWidth=.045;
+    ctx.beginPath();ctx.moveTo(-.03,-.46);ctx.quadraticCurveTo(-.1,-.75,-.27,-.78);
+    ctx.moveTo(.03,-.46);ctx.quadraticCurveTo(.1,-.75,.27,-.78);ctx.stroke();
+    ctx.restore();
   }
   function draw(now) {
     frame=0;ctx.clearRect(0,0,width,height);
@@ -132,9 +154,9 @@
       if(f>0)bloom(p,x,y,spring*(width<500?.8:1),time);
     }
     if(grow>.8) {
-      const small=width<500?4:5.5;
+      const small=width<500?11:15;
       // One beside the title, two amongst the blossoms. Slow, bounded flight.
-      const visitors=[[.425,.13,1.4],[.63,.15,3.2],[.88,.56,5.1]];
+      const visitors=[[.425,.14,1.4],[plants[2].x+.025,plants[2].y-.1,3.2],[plants[5].x+.035,plants[5].y-.08,5.1]];
       for(const [x,y,phase] of visitors) {
         const dx=animate?Math.sin(time*.00045+phase)*8:0;
         const dy=animate?Math.cos(time*.00065+phase)*5:0;

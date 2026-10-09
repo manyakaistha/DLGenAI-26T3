@@ -53,3 +53,5 @@ Verification: all 12 lesson HTML bodies and both downloadable starter files matc
 ## Small garden details
 
 The initial design is preserved in commit `8c760da`. Three tiny Canvas butterflies now flutter near the flowers/title, using the existing motion toggle and visibility/reduced-motion behavior. Small decorative SVG flowers flank the author attribution on each page; colors follow the selected palette and the credit remains semantic text.
+
+Butterfly refinement: responsive 15px/11px wing scale, distinct forewings/hindwings, inset panels, veins, spots and antennae. Two hover close to blossom edges.
