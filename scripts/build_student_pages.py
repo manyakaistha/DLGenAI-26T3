@@ -89,7 +89,11 @@ def build(output: Path):
             extensions=["tables", "toc", "md_in_html", "pymdownx.superfences", "pymdownx.arithmatex"],
             extension_configs={"pymdownx.arithmatex": {"generic": True}, "toc": {"toc_depth": "2-2"}},
         )
-        body = md.convert(source.read_text())
+        markdown_source = source.read_text()
+        # Python-Markdown treats raw HTML blocks as opaque; opt <details> into
+        # Markdown parsing so worked solutions render emphasis, lists and math.
+        markdown_source = re.sub(r"<details(?=\s|>)", '<details markdown="1"', markdown_source)
+        body = md.convert(markdown_source)
         def link(match):
             attr, raw = match.groups()
             parts = urlsplit(html.unescape(raw))
