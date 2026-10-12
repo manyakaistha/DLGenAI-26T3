@@ -45,7 +45,7 @@ def build(out):
     mapping={f'{m}.md':u for m,u in zip(MODULES,URLS)}
     pages={};search=[]
     for i,(module,title,url) in enumerate(zip(MODULES,TITLES,URLS)):
-        md=markdown.Markdown(tab_length=2,extensions=['tables','toc','sane_lists','md_in_html','pymdownx.superfences'])
+        md=markdown.Markdown(tab_length=2,extensions=['tables','toc','sane_lists','md_in_html','pymdownx.superfences','pymdownx.arithmatex'],extension_configs={'pymdownx.arithmatex': {'generic': True}})
         source=normalize_markdown((SOURCE/f'{module}.md').read_text())
         source=re.sub(r'<details(?=\s|>)','<details markdown="1"',source)
         body=md.convert(source)
@@ -58,6 +58,8 @@ def build(out):
 <link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try{{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}}catch{{}}</script>
+<script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><script defer src="styles/generative/live_session_interactions.js"></script></head>
 <body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">Pixels, Masks<br>& Experiments</a><p>Explore segmentation data, masks and experiment tracking.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options">{palette}</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
