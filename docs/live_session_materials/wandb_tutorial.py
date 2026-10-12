@@ -1,5 +1,5 @@
 # %% [markdown]
-# # W&B in 50 lines
+# # W&B: log a machine-learning experiment
 # Iris has 150 built-in examples. The model is just a source of values to log.
 # Run setup, then the demo. Use MODE="online" and sign in for a live dashboard;
 # offline mode records locally. No GPU or dataset download is needed.

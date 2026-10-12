@@ -1,10 +1,10 @@
-# W&B in 50 lines
+# W&B: make an experiment inspectable
 
 A tiny built-in dataset supplies the training values. Focus on the W&B calls: what they record, where the result appears, and how to reuse it.
 
 [Open in Colab](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/live_session_materials/wandb_tutorial.ipynb) · [Download notebook](wandb_tutorial.ipynb) · [Download Python](wandb_tutorial.py)
 
-The notebook has one setup cell and one **50-line demo**. Set `MODE = "online"` to see the dashboard and sign in with `wandb.login()`. The default offline mode saves logs locally. The Iris dataset is included with scikit-learn; no GPU or data download is required.
+The notebook has one setup cell and a compact example. Set `MODE = "online"` to see the dashboard and sign in with `wandb.login()`. The default offline mode saves logs locally. The Iris dataset is included with scikit-learn; no GPU or data download is required.
 
 ## The complete demo
 

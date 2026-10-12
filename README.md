@@ -27,7 +27,7 @@ This repository contains only student learning materials and their website build
 
 ## Live session: Pixels, Masks & Experiments
 
-A separate interactive teaching companion to Guides 1–5, with a 50-line W&B demo, synthetic image and mask examples, numbered RLE traces, sampling experiments and contrast/texture labs.
+A separate interactive teaching companion to Guides 1–5, with a compact W&B demo, synthetic image and mask examples, numbered RLE traces, sampling experiments and contrast/texture labs.
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session/)
 - [Notebook](docs/live_session_materials/wandb_tutorial.ipynb)
