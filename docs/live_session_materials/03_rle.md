@@ -101,30 +101,29 @@ Read the three panels from top to bottom:
 
 For the small worked example, both reshapes still contain six foreground pixels. Counting them cannot reveal the placement error. Overlay the decoded mask on the image and check a known location, such as index 6. Also compare `decode(encode(mask))` against a known mask. A round trip alone can pass if both functions share the same wrong convention, so confirm the dataset’s order with a known reference too.
 
-## Boundaries and malformed input
-
-A canvas of height H and width W has H × W pixels. Inclusive last index is `start + length - 1`. Valid runs must have positive starts and lengths and stay within the canvas. Empty masks decode to all zeros.
-
-For a 24-pixel toy canvas, run `23 4` requests 23,24,25,26. A tolerant training decoder clamps the end and keeps 23,24. A strict submission validator rejects the overflow. Inspect your own inputs for boundary violations. Clamping is a policy choice that requires a documented reason; it is not a substitute for validation.
-
-```python
-flat = np.zeros(H * W, dtype=np.uint8)
-for start, length in pairs:
-    lo = start - 1
-    hi = min(lo + length, H * W)  # optional tolerant-decoder policy
-    flat[lo:hi] = 1
-mask = flat.reshape(H, W, order="F")
-```
-
-This snippet assumes validated positive pairs. A robust parser also checks even token count, integer tokens, positive starts/lengths, ordering and bounds. Encoding uses a binary `mask.ravel(order='F')`, pads zeros at both ends, finds transitions, then writes start/length pairs.
-
 ## Compression has conditions
 
 An all-zero mask needs no runs. A compact patch is economical; a checkerboard creates many short runs and may be larger as text than packed bits. RLE is useful for long uniform sequences, not a guaranteed compression ratio.
 
-**Student task:** Paint two foreground cells at the last row of one column and first row of the next. Explain why they become one run. Then compare `decode(encode(mask))` to the original, and encode a completely empty mask.
+**Try it:** Compare the run count for a compact patch and a checkerboard in the interactive lab. Then paint foreground cells at the bottom of one column and top of the next: in F order, they are neighbors in the flattened sequence and belong to one run.
 
-## Encoder and decoder you can test
+## Encode, decode and validate safely
+
+Encoding and decoding must agree on the mask shape and traversal order. The encoder flattens a 2D binary mask down columns with F order, finds each consecutive group of ones, and writes each group as a 1-based start and a length. The decoder starts with an all-zero sequence, sets each requested range to one, and reshapes it back down columns.
+
+First validate the input. A canvas with height $H$ and width $W$ contains $H\times W$ pixels. Each run must have a positive start and length, and its last requested index is $\text{start}+\text{length}-1$. Runs must be ordered, non-overlapping, and stay inside the canvas. The text must contain complete integer start/length pairs. An empty string represents an all-zero mask.
+
+### Example: a run that extends past the canvas
+
+On a 24-pixel canvas, `23 4` requests indices 23, 24, 25 and 26. Only 23 and 24 exist. A **strict decoder rejects** this run so the malformed annotation is visible. A **tolerant decoder clips** it to the canvas, keeping 23 and 24. Choose clipping only when a documented data policy calls for it; otherwise it can hide bad input.
+
+![Strict validation rejects an overflowing run while tolerant decoding clips it](figures/rle_boundary.png)
+
+The start in RLE is 1-based, but Python positions start at zero. For `23 4`, Python starts at offset 22 and requests slice `[22:26]`. Python excludes the slice end, so the slice would cover offsets 22–25. The canvas ends at offset 23, so clipping changes it to `[22:24]`, which marks exactly two pixels.
+
+### A complete encoder and decoder
+
+The example below checks that the mask is two-dimensional and binary before encoding. The decoder checks pair structure, integer values, positive starts and lengths, order, overlap and bounds. By default, it rejects overflow; set `clamp=True` only when using the tolerant policy described above.
 
 ```python
 import numpy as np
@@ -161,11 +160,7 @@ assert np.array_equal(decode_rle(encode_rle(mask), 4, 6), mask)
 assert decode_rle("", 4, 6).sum() == 0
 ```
 
-Normalize CSV NaN/blank values to an empty string before calling this teaching decoder. Strict validation rejects bad tokens and out-of-bounds runs; enable `clamp=True` only if your chosen data-validation policy explicitly allows clipping.
-
-![Strict validation versus clipping on a tiny canvas](figures/rle_boundary.png)
-
-**Boundary arithmetic:** `23 4` means last requested index `23+4−1=26`. The zero-based slice is `[22:26]`. On a 24-pixel buffer, tolerant decoding clips the exclusive end to 24, leaving `[22:24]`: exactly two pixels. Subtract one from the start once, not twice.
+The two assertions check that the example produces the expected string and that decoding restores the original mask. Keep a known coordinate or reference mask too: an encoder and decoder that share the same wrong traversal order can still pass a round-trip check. Normalize CSV blank/NaN values to an empty string before decoding.
 
 ## What “masked RLE” means here
 
