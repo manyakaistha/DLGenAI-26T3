@@ -17,6 +17,29 @@ function startLab(el, title, markup) {
     out: el.querySelector("output"),
   };
 }
+function showValues(out, rows) {
+  out.classList.add("current-values");
+  const wrapper = document.createElement("div");
+  wrapper.className = "current-values-scroll";
+  const table = document.createElement("table");
+  const caption = document.createElement("caption");
+  caption.textContent = "Current values";
+  table.append(caption);
+  const body = document.createElement("tbody");
+  rows.forEach(([label, value]) => {
+    const row = document.createElement("tr");
+    const heading = document.createElement("th");
+    heading.scope = "row";
+    heading.textContent = label;
+    const cell = document.createElement("td");
+    cell.textContent = String(value);
+    row.append(heading, cell);
+    body.append(row);
+  });
+  table.append(body);
+  wrapper.append(table);
+  out.replaceChildren(wrapper);
+}
 function canvas(el, key, w, h, draw) {
   const cv = el.querySelector(`[data-canvas="${key}"]`);
   const ctx = cv.getContext("2d");
@@ -75,7 +98,13 @@ const labs = {
     });
     function render() {
       let sums = data.map((r) => r.reduce((a, b) => a + b, 0));
-      out.textContent = `4 images × 4 classes = 16 CSV rows. Positive pairs: ${sums.reduce((a, b) => a + b, 0)}. Clean images: ${sums.filter((v) => !v).length}. Cardinalities: [${sums.join(", ")}]. Class counts: [${names.map((_, j) => data.reduce((a, r) => a + r[j], 0)).join(", ")}].`;
+      showValues(out, [
+        ["Images", data.length], ["Classes", names.length], ["CSV rows", data.length * names.length],
+        ["Positive image–class pairs", sums.reduce((a, b) => a + b, 0)],
+        ["Clean images", sums.filter((v) => !v).length],
+        ["Cardinality (strips 1–4)", `[${sums.join(", ")}]`],
+        ["Class counts (A, B, C, D)", `[${names.map((_, j) => data.reduce((a, r) => a + r[j], 0)).join(", ")}]`],
+      ]);
     }
     render();
   },
@@ -108,7 +137,12 @@ const labs = {
             );
           }
       });
-      out.textContent = `Image presence stays [1,0,1,0]. Overlapping pixels = ${overlap} / 40. ${overlap ? "Integer targets cannot retain both labels at those pixels." : "Each pixel has at most one class; a background-inclusive softmax target is possible."}`;
+      showValues(out, [
+        ["Image presence (A, B, C, D)", "[1, 0, 1, 0]"],
+        ["Overlapping pixels", `${overlap} of 40`],
+        ["Pixel labels", overlap ? "Overlapping" : "Disjoint"],
+        ["Single-label target", overlap ? "Cannot retain both classes at overlapping pixels" : "Background-inclusive softmax target is possible"],
+      ]);
     }
     q("input").oninput = render;
     render();
@@ -146,14 +180,13 @@ const labs = {
         "<b>Five-way softmax</b>" + rows(soft, ["BG", "A", "B", "C", "D"]);
       const selected = ["A", "B", "C", "D"].filter((_, i) => sig[i] >= 0.5);
       const winner = ["BG", "A", "B", "C", "D"][soft.indexOf(Math.max(...soft))];
-      out.classList.add("probability-summary");
-      out.innerHTML = `<div class="probability-summary-scroll"><table><caption>Current values</caption><tbody>
-        <tr><th scope="row">Logits (BG, A, B, C, D)</th><td>[${z.map((v) => v.toFixed(1)).join(", ")}]</td></tr>
-        <tr><th scope="row">Sigmoid total</th><td>${sig.reduce((a, b) => a + b, 0).toFixed(3)}</td></tr>
-        <tr><th scope="row">Sigmoid classes ≥ 0.5</th><td>${selected.join(", ") || "None"}</td></tr>
-        <tr><th scope="row">Softmax total</th><td>${soft.reduce((a, b) => a + b, 0).toFixed(3)}</td></tr>
-        <tr><th scope="row">Softmax winner (argmax)</th><td>${winner}</td></tr>
-      </tbody></table></div>`;
+      showValues(out, [
+        ["Logits (BG, A, B, C, D)", `[${z.map((v) => v.toFixed(1)).join(", ")}]`],
+        ["Sigmoid total", sig.reduce((a, b) => a + b, 0).toFixed(3)],
+        ["Sigmoid classes ≥ 0.5", selected.join(", ") || "None"],
+        ["Softmax total", soft.reduce((a, b) => a + b, 0).toFixed(3)],
+        ["Softmax winner (argmax)", winner],
+      ]);
     }
     all("input").forEach((i) => (i.oninput = render));
     render();
@@ -213,17 +246,16 @@ const labs = {
       const slices = pairs.length
         ? pairs.map(([start, length]) => `${start} ${length} → [${start - 1}:${start - 1 + length}]`).join(" · ")
         : "No foreground runs";
-      out.classList.add("rle-summary");
-      out.innerHTML = `<div class="rle-summary-scroll"><table><caption>Current mask results</caption><tbody>
-        <tr><th scope="row">Traversal order</th><td>${order === "F" ? "F: down columns" : "C: across rows"}</td></tr>
-        <tr><th scope="row">Selected flattened index</th><td>${step} (1-based)</td></tr>
-        <tr><th scope="row">Pixel coordinate</th><td>(${x}, ${y}) (zero-based x, y)</td></tr>
-        <tr><th scope="row">Pixel value</th><td>${value} (${value ? "foreground" : "background"})</td></tr>
-        <tr><th scope="row">Encoded RLE</th><td>${encoded || "(empty string)"}</td></tr>
-        <tr><th scope="row">Run pairs and decoded slices</th><td>${slices}</td></tr>
-        <tr><th scope="row">Foreground pixels</th><td>${bits.reduce((a, b) => a + b, 0)} of ${bits.length}</td></tr>
-        <tr><th scope="row">Decode round trip</th><td>${roundTrip ? "PASS" : "FAIL"}</td></tr>
-      </tbody></table></div>`;
+      showValues(out, [
+        ["Traversal order", order === "F" ? "F: down columns" : "C: across rows"],
+        ["Selected flattened index", `${step} (1-based)`],
+        ["Pixel coordinate", `(${x}, ${y}) (zero-based x, y)`],
+        ["Pixel value", `${value} (${value ? "foreground" : "background"})`],
+        ["Encoded RLE", encoded || "(empty string)"],
+        ["Run count", pairs.length], ["Run pairs and decoded slices", slices],
+        ["Foreground pixels", `${bits.reduce((a, b) => a + b, 0)} of ${bits.length}`],
+        ["Decode round trip", roundTrip ? "PASS" : "FAIL"],
+      ]);
     }
     all("[data-preset]").forEach(
       (b) =>
@@ -303,7 +335,17 @@ const labs = {
       }
       draw("native", 600, 100, source);
       draw("target", w, h, (xx, yy) => target[yy * w + xx]);
-      out.textContent = `Target ${w} × ${h}. sx=${(w / 600).toFixed(3)}, sy=${(h / 100).toFixed(3)}, R=${(h / 100 / (w / 600)).toFixed(3)}. Geometric crack width=${((n * w) / 600).toFixed(3)}px. Target foreground=${target.reduce((a, b) => a + b, 0)}px. Restored foreground=${pred}px vs native ${gt}px. Round-trip Dice=${((2 * both) / (gt + pred)).toFixed(3)}. Change x by one pixel to test phase.`;
+      showValues(out, [
+        ["Target size (width × height)", `${w} × ${h}`],
+        ["Crack position x", x], ["Native crack width", `${n} px`],
+        ["Horizontal scale sx", (w / 600).toFixed(3)], ["Vertical scale sy", (h / 100).toFixed(3)],
+        ["Distortion ratio R", (h / 100 / (w / 600)).toFixed(3)],
+        ["Geometric crack width", `${((n * w) / 600).toFixed(3)} px`],
+        ["Target foreground", `${target.reduce((a, b) => a + b, 0)} px`],
+        ["Restored foreground", `${pred} px`], ["Native foreground", `${gt} px`],
+        ["Round-trip Dice", ((2 * both) / (gt + pred)).toFixed(3)],
+        ["Try next", "Change x by one pixel to test sampling phase"],
+      ]);
     }
     all("input").forEach((i) => (i.oninput = render));
     all("[data-size]").forEach(
@@ -380,9 +422,14 @@ const labs = {
         c.fillStyle = "#087f8c";
         c.fillText("Outside", 135, 22);
       });
-      out.textContent = pool
-        ? `Pooled SD=${pool.toFixed(3)}. Mean difference=${v.mi - v.mo}. d=${((v.mi - v.mo) / pool).toFixed(3)}. Positive means brighter, negative darker. Conventional effect-size labels describe mean separation, not segmentation success.`
-        : "Pooled SD=0: Cohen’s d is undefined. No arbitrary epsilon is substituted.";
+      showValues(out, [
+        ["Inside / outside mean", `${v.mi} / ${v.mo}`], ["Inside / outside SD", `${v.si} / ${v.so}`],
+        ["Inside / outside sample count", `${v.ni} / ${v.no}`],
+        ["Pooled SD", pool.toFixed(3)], ["Mean difference (inside − outside)", v.mi - v.mo],
+        ["Cohen’s d", pool ? ((v.mi - v.mo) / pool).toFixed(3) : "Undefined (pooled SD is zero)"],
+        ["Direction", v.mi > v.mo ? "Inside is brighter on average" : v.mi < v.mo ? "Inside is darker on average" : "Means are equal"],
+        ["Interpretation", "Mean separation alone does not establish segmentation success"],
+      ]);
     }
     all("input").forEach((i) => (i.oninput = render));
     render();
@@ -427,7 +474,15 @@ const labs = {
               c.fillRect(x * 8, y * 8, 8, 8);
             }
         });
-      out.textContent = `Both contain 1,024 pixels at 75 and 1,024 at 175. Mean=125; population SD=50; mean difference d=0. Mean horizontal neighbor difference: ordered=${edges(orig).toFixed(2)}, swapped=${edges(vals).toFixed(2)}. A spatial feature responds while a histogram cannot.`;
+      showValues(out, [
+        ["Pixel swapping setting", `${q("input").value}%`],
+        ["Pixels at intensity 75 (each image)", "1,024"], ["Pixels at intensity 175 (each image)", "1,024"],
+        ["Mean (both images)", 125], ["Population SD (both images)", 50],
+        ["Mean difference d", 0],
+        ["Horizontal neighbor difference: ordered", edges(orig).toFixed(2)],
+        ["Horizontal neighbor difference: swapped", edges(vals).toFixed(2)],
+        ["Interpretation", "Spatial features change while the histogram stays the same"],
+      ]);
     }
     q("input").oninput = render;
     render();
