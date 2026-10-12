@@ -1,6 +1,6 @@
 # W&B: make an experiment inspectable
 
-**Live: 17 minutes.** Download [the executable notebook](wandb_tutorial.ipynb) or [its paired Python cells](wandb_tutorial.py). The notebook is the main lesson; this page is the desk reference.
+Download [the executable notebook](wandb_tutorial.ipynb) or [its paired Python cells](wandb_tutorial.py). Use this page as a reference while working through the notebook.
 
 [Open the student notebook in Colab](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/live_session_materials/wandb_tutorial.ipynb). Install dependencies before the timed session, then choose online mode for the dashboard.
 
@@ -10,7 +10,7 @@
 
 A **run** is one execution of a recipe. **Config** records inputs to the experiment: architecture, learning rate, sample counts, seed, threshold. **History** records measured values over time. **Summary** records a final or best result. An **artifact** versions a file and connects it to the producing run.
 
-## The live click path
+## Explore your run
 
 1. Set online mode and authenticate securely. Initialize the run; open its URL.
 2. Show the tiny synthetic dataset and held-out split. Explain the background label before logging overlays.
@@ -31,7 +31,7 @@ run.log_artifact(artifact, aliases=["best"])
 run.finish()
 ```
 
-The full notebook adds separate metric axes, a held-out evaluator, rich plots, checkpoint metadata and upload completion checks. A local save and a successful cloud upload are different events. Offline recording must be synced before students can see a dashboard or download an artifact from W&B.
+The full notebook adds separate metric axes, a held-out evaluator, rich plots, checkpoint metadata and upload completion checks. A local save and a successful cloud upload are different events. Offline recording must be synced before you can view a dashboard or download an artifact from W&B.
 
 ## Read metrics together
 
@@ -58,6 +58,6 @@ Repeat with learning rate 0.001 and a distinct name. Keep the split, seed, datas
 
 The default recipe trains a **193-parameter CNN**, using 48 training strips and 16 separately generated validation strips for 20 epochs. One measured CPU run reached foreground Dice **0.984**, foreground recall **0.974**, and clean-strip accuracy **1.0**. It initially spent several epochs at **0 Dice** despite **98.14% pixel accuracy**. These are synthetic lesson results; hardware and library versions can affect numerical details.
 
-The notebook also logs false-positive pixel count, a pixel confusion matrix, parameter count and the all-background baseline. Media are from the final epoch; the model artifact records the best measured epoch. With the default recipe those happen to coincide. Local plots are saved for a network fallback.
+The notebook also logs false-positive pixel count, a pixel confusion matrix, parameter count and the all-background baseline. Media are from the final epoch; the model artifact records the best measured epoch. With the default recipe those happen to coincide. Plots are also saved locally for later review.
 
 Official API references: [logging metrics and media](https://docs.wandb.ai/guides/track/log/), [tables](https://docs.wandb.ai/guides/track/log/log-tables), [image masks](https://docs.wandb.ai/ref/python/data-types/image/), and [downloading artifacts](https://docs.wandb.ai/models/artifacts/download-and-use-an-artifact).

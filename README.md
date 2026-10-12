@@ -31,6 +31,5 @@ A separate interactive teaching companion to Guides 1–5, with a tiny W&B train
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session/)
 - [Notebook](docs/live_session_materials/wandb_tutorial.ipynb)
-- [Instructor timing and deeper practice](docs/live_session_materials/instructor.md)
 
-Prepared walkthrough: 60–70 minutes. Independent coding and full derivations: 90–120 minutes. Notebook needs no competition data or GPU; default tracking is offline.
+The notebook uses a small synthetic dataset and needs no competition data or GPU.

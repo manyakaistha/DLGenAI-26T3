@@ -1,6 +1,6 @@
 # 3 · Turn masks into numbers
 
-**Live: 12 minutes · Guide 3.** RLE describes a binary mask. It does not encode the photograph, a bounding box, or defect intensity.
+**Guide 3.** RLE describes a binary mask. It does not encode the photograph, a bounding box, or defect intensity.
 
 ## Paint → flatten → find runs → serialize
 

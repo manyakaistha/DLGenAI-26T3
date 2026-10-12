@@ -1,6 +1,6 @@
 # 1 · Count the right things
 
-**Live: 8 minutes · Guide 1.** Three units matter: images, image–class pairs, and pixels. Their imbalance can be very different.
+**Guide 1.** Three units matter: images, image–class pairs, and pixels. Their imbalance can be very different.
 
 ## A strip is not a CSV row
 

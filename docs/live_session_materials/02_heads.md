@@ -1,6 +1,6 @@
 # 2 · Decide what a pixel can mean
 
-**Live: 8 minutes · Guide 2.** Multiple labels in an image and multiple labels at a pixel are separate questions.
+**Guide 2.** Multiple labels in an image and multiple labels at a pixel are separate questions.
 
 ## Co-occurrence is not overlap
 

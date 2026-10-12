@@ -1,6 +1,6 @@
 # 5 · See beyond average brightness
 
-**Live: 8 minutes · Guide 5.** A region can look structurally different while having the same average brightness as its surroundings.
+**Guide 5.** A region can look structurally different while having the same average brightness as its surroundings.
 
 ## Contrast as a standardized mean difference
 

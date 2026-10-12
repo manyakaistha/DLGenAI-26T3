@@ -1,6 +1,6 @@
 # 4 · Preserve geometry and evidence
 
-**Live: 9 minutes · Guide 4.** Input width is 800, height is 128; shape in arrays is `(128,800)`. Keep this order explicit.
+**Guide 4.** Input width is 800, height is 128; shape in arrays is `(128,800)`. Keep this order explicit.
 
 ## Square resizing changes shape
 

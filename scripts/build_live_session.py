@@ -10,9 +10,9 @@ import markdown
 from build_student_pages import CSS, JS, CREDIT_ART, Inspect, normalize_markdown
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'docs/live_session_materials'
-MODULES=['README','wandb','01_data','02_heads','03_rle','04_geometry','05_texture','instructor']
-TITLES=['Session overview','W&B notebook lab','1 · Count the right things','2 · Decide what a pixel means','3 · Turn masks into numbers','4 · Preserve geometry','5 · See beyond brightness','Instructor notes']
-URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html','04_geometry.html','05_texture.html','instructor.html']
+MODULES=['README','wandb','01_data','02_heads','03_rle','04_geometry','05_texture']
+TITLES=['Session overview','W&B notebook lab','1 · Count the right things','2 · Decide what a pixel means','3 · Turn masks into numbers','4 · Preserve geometry','5 · See beyond brightness']
+URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html','04_geometry.html','05_texture.html']
 
 def notebook():
     cells=[]
@@ -32,6 +32,8 @@ def notebook():
 
 def build(out):
     notebook(); out.mkdir(parents=True,exist_ok=True)
+    # Remove a previously generated instructor page from reused output directories.
+    (out / "instructor.html").unlink(missing_ok=True)
     shutil.copytree(SOURCE/'figures',out/'figures',dirs_exist_ok=True)
     shutil.copytree(ROOT/'styles/generative',out/'styles/generative',dirs_exist_ok=True)
     for name in ['wandb_tutorial.ipynb','wandb_tutorial.py']: shutil.copy2(SOURCE/name,out/name)
@@ -55,10 +57,10 @@ def build(out):
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try{{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}}catch{{}}</script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><script defer src="styles/generative/live_session_interactions.js"></script></head>
-<body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">Pixels, Masks<br>& Experiments</a><p>A 65-minute walkthrough, with deeper notes to revisit.</p>
+<body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">Pixels, Masks<br>& Experiments</a><p>Explore segmentation data, masks and experiment tracking.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options">{palette}</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
 <div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div>{nav}</div><details class="mobile-menu"><summary>Browse session</summary>{nav}</details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
-<main id="main"><div class="content"><div class="topline"><span>Separate companion · Guides 1–5</span><a href="wandb_tutorial.ipynb" download>Download notebook ↓</a></div>
+<main id="main"><div class="content"><div class="topline"><span>Industrial surface segmentation</span><a href="wandb_tutorial.ipynb" download>Download notebook ↓</a></div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Observe. Represent. Measure.</span><p class="hero-title">From pixels<br>to experiments.</p><p class="hero-caption">A live lab in industrial segmentation.</p></div></div>
 <span class="section-label">{html.escape(title)}</span><details class="toc"><summary>On this page</summary>{md.toc}</details><article>{body}</article><nav class="pagination">{pager}</nav><footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span></footer></div></main></div></body></html>'''
         (out/url).write_text(page)
