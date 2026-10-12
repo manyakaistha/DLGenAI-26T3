@@ -144,7 +144,16 @@ const labs = {
         "<b>Independent sigmoids</b>" + rows(sig, ["A", "B", "C", "D"]);
       q(".soft").innerHTML =
         "<b>Five-way softmax</b>" + rows(soft, ["BG", "A", "B", "C", "D"]);
-      out.textContent = `Logits [${z.map((v) => v.toFixed(1)).join(", ")}]. Sigmoid sum=${sig.reduce((a, b) => a + b, 0).toFixed(3)}; classes ≥0.5: ${["A", "B", "C", "D"].filter((_, i) => sig[i] >= 0.5).join(", ") || "none"}. Softmax sum=${soft.reduce((a, b) => a + b, 0).toFixed(3)}; argmax=${["BG", "A", "B", "C", "D"][soft.indexOf(Math.max(...soft))]}.`;
+      const selected = ["A", "B", "C", "D"].filter((_, i) => sig[i] >= 0.5);
+      const winner = ["BG", "A", "B", "C", "D"][soft.indexOf(Math.max(...soft))];
+      out.classList.add("probability-summary");
+      out.innerHTML = `<div class="probability-summary-scroll"><table><caption>Current values</caption><tbody>
+        <tr><th scope="row">Logits (BG, A, B, C, D)</th><td>[${z.map((v) => v.toFixed(1)).join(", ")}]</td></tr>
+        <tr><th scope="row">Sigmoid total</th><td>${sig.reduce((a, b) => a + b, 0).toFixed(3)}</td></tr>
+        <tr><th scope="row">Sigmoid classes ≥ 0.5</th><td>${selected.join(", ") || "None"}</td></tr>
+        <tr><th scope="row">Softmax total</th><td>${soft.reduce((a, b) => a + b, 0).toFixed(3)}</td></tr>
+        <tr><th scope="row">Softmax winner (argmax)</th><td>${winner}</td></tr>
+      </tbody></table></div>`;
     }
     all("input").forEach((i) => (i.oninput = render));
     render();

@@ -155,3 +155,48 @@ noscript {
     transition: none !important;
   }
 }
+
+.lab output.probability-summary {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  overflow-wrap: normal;
+}
+.lab .probability-summary-scroll {
+  overflow-x: auto;
+  margin: 14px 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+}
+.lab .probability-summary table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.lab .probability-summary caption {
+  padding: 9px 12px;
+  text-align: left;
+  font: 600 12px/1.4 "DM Sans", system-ui, sans-serif;
+  color: var(--muted);
+}
+.lab .probability-summary th,
+.lab .probability-summary td {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.lab .probability-summary th {
+  width: 48%;
+  font-weight: 600;
+}
+.lab .probability-summary td {
+  font-family: "DM Mono", ui-monospace, monospace;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 550px) {
+  .lab .probability-summary table { min-width: 320px; }
+}
