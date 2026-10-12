@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" role="img" aria-label="Change one variable, then compare the evidence">
+<rect width="1200" height="480" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">Change one variable, then compare the evidence</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">A controlled ablation keeps data, seed, budget and metric definition fixed.</text>
+<rect x="45" y="145" width="340" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="61" y="162" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="78" y="186" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">0</text>
+<text x="107" y="187" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Baseline</text>
+<text x="65" y="227" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">same train/validation IDs</text>
+<text x="65" y="255" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">same metric + threshold protocol</text>
+<text x="65" y="283" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">same training budget</text>
+<rect x="428" y="145" width="340" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="444" y="162" width="34" height="34" rx="9" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="461" y="186" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="490" y="187" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Run A</text>
+<text x="448" y="227" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">new loss</text>
+<text x="448" y="255" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">everything else fixed</text>
+<text x="448" y="283" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">compare per-class + errors</text>
+<path d="M392 255 L420 255" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M411.2 261.6 L420 255 L411.2 248.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="803" y="145" width="340" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="819" y="162" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="836" y="186" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="865" y="187" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Run B</text>
+<text x="823" y="227" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">new sampler</text>
+<text x="823" y="255" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">everything else fixed</text>
+<text x="823" y="283" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">compare per-class + errors</text>
+<path d="M767 255 L795 255" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M786.2 261.6 L795 255 L786.2 248.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="45" y="404" width="1100" height="48" rx="8" fill="#eaf2ef" stroke="#c8dbd3" stroke-width="2"/>
+<text x="64" y="435" fill="#087e83" font-size="17" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Keep an experiment log: change → hypothesis → metric → failure cases → decision.</text>
+</svg>

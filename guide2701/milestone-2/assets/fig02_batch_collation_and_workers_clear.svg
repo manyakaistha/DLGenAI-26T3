@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-label="How a DataLoader makes a batch">
+<rect width="1200" height="520" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">How a DataLoader makes a batch</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">The main process owns the iterator; workers load samples, then collation stacks them.</text>
+<rect x="42" y="142" width="220" height="224" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="58" y="159" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="75" y="183" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="104" y="184" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Image IDs</text>
+<text x="62" y="224" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">One image ID selects</text>
+<text x="62" y="252" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">one image + four masks.</text>
+<text x="62" y="280" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Split IDs first.</text>
+<rect x="336" y="145" width="235" height="110" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="352" y="162" width="34" height="34" rx="9" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="369" y="186" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="398" y="187" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">worker 0</text>
+<text x="356" y="227" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">decode • transform</text>
+<rect x="336" y="270" width="235" height="110" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="352" y="287" width="34" height="34" rx="9" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="369" y="311" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="398" y="312" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">worker 1</text>
+<text x="356" y="352" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">decode • transform</text>
+<path d="M262 250 L326 200" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M323.1 210.6 L326 200 L315.0 200.2" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M262 250 L326 325" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M315.3 322.6 L326 325 L325.3 314.0" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M571 200 L633 250" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M622.0 249.6 L633 250 L630.3 239.3" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M571 325 L633 250" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M632.5 261.0 L633 250 L622.3 252.6" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="643" y="167" width="230" height="190" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="659" y="184" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="676" y="208" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">3</text>
+<text x="705" y="209" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Collate</text>
+<text x="663" y="249" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Stack B samples into:</text>
+<text x="663" y="277" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">images [B,1,H,W]</text>
+<text x="663" y="305" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">masks [B,4,H,W]</text>
+<path d="M873 261 L917 261" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M908.2 267.6 L917 261 L908.2 254.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="927" y="167" width="230" height="190" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="943" y="184" width="34" height="34" rx="9" fill="#d95a40" stroke="#d95a40" stroke-width="2"/>
+<text x="960" y="208" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">4</text>
+<text x="989" y="209" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Train step</text>
+<text x="947" y="249" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Optional pinned RAM</text>
+<text x="947" y="277" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">then transfer to GPU.</text>
+<text x="947" y="305" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">One batch → one update.</text>
+<rect x="43" y="420" width="1114" height="57" rx="8" fill="#eaf2ef" stroke="#c8dbd3" stroke-width="2"/>
+<text x="62" y="455" fill="#087e83" font-size="18" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Worker count changes throughput, not which image IDs belong to training or validation.</text>
+</svg>

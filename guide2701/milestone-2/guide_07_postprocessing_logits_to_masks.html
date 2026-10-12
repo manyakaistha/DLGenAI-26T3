@@ -50,10 +50,6 @@
 <hr />
 <h2 id="1-motivation-the-post-processing-pipeline">1. Motivation: The Post-Processing Pipeline</h2>
 <p>The post-processing pipeline transforms raw logits into clean binary masks through four sequential stages:</p>
-<pre class="highlight"><code>┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│   1. Raw Logits │ ────► │ 2. Probabilities│ ────► │ 3. Thresholding │ ────► │ 4. Area Filter  │
-│  Z ∈ [-∞, +∞]   │       │  P = σ(Z) ∈[0,1]│       │  P ≥ τ → {0, 1} │       │ Blob Area ≥ Amin│
-└─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘</code></pre>
 <p><img alt="Decision Pipeline Thresholds" src="assets/fig07_decision_pipeline_thresholds.png" />
 <em>Figure 7.1: The decision pipeline. (1) Model logits. (2) Probabilities mapped via Sigmoid. (3) Raw binary mask at <span class="arithmatex">\(\tau=0.5\)</span> containing noise speckles. (4) Clean defect mask after 8-connected component area filtering (<span class="arithmatex">\(A_{\min}=50\text{ px}\)</span>).</em></p>
 <hr />
@@ -73,12 +69,7 @@
 <li>False positives on empty images are severely penalized because clean images represent a massive fraction of industrial production.</li>
 <li>False negatives on positive images destroy Foreground Dice on rare defects.</li>
 </ul>
-<pre class="highlight"><code>                      The Decision Threshold Spectrum
-◄─────────────────────────────────────────────────────────────────────────────►
-Low Threshold (τ = 0.2 - 0.3)                    High Threshold (τ = 0.7 - 0.8)
-• High Recall                                    • High Specificity
-• Detects faint, low-contrast flaws              • Suppresses noisy false alarms
-• High risk of false positives on clean steel    • Risks missing thin or subtle defects</code></pre>
+<p><img alt="Threshold and decision trade-off" src="assets/fig_threshold_spectrum_clear.svg" /></p>
 <hr />
 <h2 id="3-connected-component-analysis-and-minimum-area-filtering">3. Connected Component Analysis and Minimum Area Filtering</h2>
 <p>Even with an optimal probability threshold <span class="arithmatex">\(\tau\)</span>, segmentation networks frequently predict isolated, high-frequency false-alarm "speckles"—clusters of 1 to 10 pixels triggered by sensor noise, glare, or dust particles.</p>

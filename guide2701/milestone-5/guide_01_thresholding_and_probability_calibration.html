@@ -72,11 +72,6 @@
 <hr />
 <h2 id="2-mathematical-formulation-from-logits-to-binary-decisions">2. Mathematical Formulation: From Logits to Binary Decisions</h2>
 <p>The transformation pipeline from model activations to binary masks follows a deterministic mathematical flow:</p>
-<pre class="highlight"><code>┌────────────────────────┐      ┌────────────────────────┐      ┌────────────────────────┐
-│     1. Raw Logits      │ ───► │  2. Probabilities P    │ ───► │  3. Binary Mask M      │
-│  z ∈ (-∞, +∞)          │      │  Sigmoid / Softmax     │      │  P ≥ τ → {0, 1}        │
-│  Shape: (C, 128, 800)  │      │  P ∈ [0.0, 1.0]        │      │  Shape: (C, 128, 800)  │
-└────────────────────────┘      └────────────────────────┘      └────────────────────────┘</code></pre>
 <p><img alt="Threshold Precision Recall Tradeoff" src="assets/fig02_threshold_precision_recall_tradeoff.png" />
 <em>Figure 1.1: (Left) Empirical probability distributions for clean background vs true defect pixels. (Right) Metric divergence across the threshold spectrum: notice how the competition score peak differs from naive mean Dice.</em></p>
 <h3 id="sigmoid-vs-softmax-head-mechanics">Sigmoid vs. Softmax Head Mechanics</h3>
@@ -96,6 +91,7 @@
 <div class="arithmatex">\[\hat{M}(c, y, x) = \begin{cases} 1 &amp; \text{if } \operatorname{argmax}_{k} \hat{P}(k, y, x) = c \quad \text{and} \quad \hat{P}(c, y, x) \ge \tau_c \\ 0 &amp; \text{otherwise} \end{cases}\]</div>
 <hr />
 <h2 id="3-worked-numerical-example-the-toy-grid">3. Worked Numerical Example: The Toy Grid</h2>
+<p><img alt="One map at three thresholds" src="assets/fig_threshold_grid_clear.svg" /></p>
 <p>To observe how thresholding alters mask geometry, examine this fictional <span class="arithmatex">\(4 \times 5\)</span> probability grid <span class="arithmatex">\(\hat{P}\)</span> for a single defect channel near a strip boundary:</p>
 <pre class="highlight"><code>Row / Col     Col 0    Col 1    Col 2    Col 3    Col 4
 Row 0        [ 0.05     0.08     0.12     0.04     0.02 ]
@@ -106,20 +102,20 @@ Row 3        [ 0.04     0.12     0.38     0.15     0.03 ]</code></pre>
 <h3 id="threshold-evaluation-comparison">Threshold Evaluation Comparison</h3>
 <pre class="highlight"><code>At τ = 0.35 (Permissive / High Recall):
 [ 0  0  0  0  0 ]
-[ 0  1  1  1  0 ]  --&gt; 6 active pixels: captures weak boundary pixels (0.42, 0.48, 0.38).
+[ 0  1  1  1  0 ]  --&gt; 7 active pixels: captures weak boundary pixels (0.42, 0.48, 0.38).
 [ 0  1  1  1  0 ]      High recall, but boundary expansion may add false positive pixels.
 [ 0  0  1  0  0 ]
 
 At τ = 0.50 (Standard Default):
 [ 0  0  0  0  0 ]
-[ 0  0  1  0  0 ]  --&gt; 3 active pixels: (Row 1, Col 2=0.68), (Row 2, Col 1=0.52), (Row 2, Col 2=0.88), (Row 2, Col 3=0.71).
+[ 0  0  1  0  0 ]  --&gt; 4 active pixels: (Row 1, Col 2=0.68), (Row 2, Col 1=0.52), (Row 2, Col 2=0.88), (Row 2, Col 3=0.71).
 [ 0  1  1  1  0 ]      Boundary pixel (0.42) and tail pixel (0.38) are zeroed out.
 [ 0  0  0  0  0 ]
 
 At τ = 0.70 (Conservative / High Precision):
 [ 0  0  0  0  0 ]
 [ 0  0  0  0  0 ]  --&gt; 2 active pixels: only high-confidence core pixels (0.88, 0.71) survive.
-[ 0  0  1  1  0 ]      High specificity, but defect area is truncated by 66%!
+[ 0  0  1  1  0 ]      High specificity, but much of the labeled defect is missed.
 [ 0  0  0  0  0 ]</code></pre>
 <h3 id="worked-dice-calculation-against-ground-truth">Worked Dice Calculation Against Ground Truth</h3>
 <p>Suppose the true defect mask <span class="arithmatex">\(Y\)</span> consists of the 4 pixels:</p>
@@ -129,10 +125,10 @@ At τ = 0.70 (Conservative / High Precision):
 <li>
 <p><strong>At <span class="arithmatex">\(\tau = 0.35\)</span></strong>:</p>
 <ul>
-<li>Predicted <span class="arithmatex">\(|\hat{X}| = 6\)</span>.</li>
-<li>Intersection <span class="arithmatex">\(|\hat{X} \cap Y| = 4\)</span> (all true pixels detected, plus 2 false positive pixels at <span class="arithmatex">\((1, 3)\)</span> and <span class="arithmatex">\((3, 2)\)</span>).</li>
+<li>Predicted <span class="arithmatex">\(|\hat{X}| = 7\)</span>.</li>
+<li>Intersection <span class="arithmatex">\(|\hat{X} \cap Y| = 4\)</span> (all true pixels detected, plus 3 false positive pixels at <span class="arithmatex">\((1, 3)\)</span>, <span class="arithmatex">\((2, 3)\)</span>, and <span class="arithmatex">\((3, 2)\)</span>).</li>
 </ul>
-<div class="arithmatex">\[\text{Dice}_{\tau=0.35} = \frac{2 \times 4}{6 + 4} = \frac{8}{10} = \mathbf{0.800}\]</div>
+<div class="arithmatex">\[\text{Dice}_{\tau=0.35} = \frac{2 \times 4}{7 + 4} = \frac{8}{11} \approx \mathbf{0.727}\]</div>
 </li>
 <li>
 <p><strong>At <span class="arithmatex">\(\tau = 0.50\)</span></strong>:</p>
@@ -151,7 +147,7 @@ At τ = 0.70 (Conservative / High Precision):
 <div class="arithmatex">\[\text{Dice}_{\tau=0.70} = \frac{2 \times 1}{2 + 4} = \frac{2}{6} = \mathbf{0.333}\]</div>
 </li>
 </ol>
-<p>On this defect, <span class="arithmatex">\(\tau = 0.35\)</span> achieves the highest Dice (<span class="arithmatex">\(0.800\)</span>) because capturing faint boundary pixels outweighs the minor area penalty.</p>
+<p>On this toy defect, <span class="arithmatex">\(\tau = 0.50\)</span> achieves the highest Dice (<span class="arithmatex">\(0.750\)</span>). The lower threshold captures one more true boundary pixel, but it also adds enough false-positive area to reduce Dice. That balance must be measured on held-out data.</p>
 <hr />
 <h2 id="4-tensor-shapes-and-data-types">4. Tensor Shapes and Data Types</h2>
 <p>Trace the tensor transformations through every operation in the decision step:</p>

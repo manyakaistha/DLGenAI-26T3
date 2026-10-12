@@ -50,11 +50,7 @@
 <h2 id="1-the-transfer-learning-advantage-in-industrial-anomaly-detection">1. The Transfer Learning Advantage in Industrial Anomaly Detection</h2>
 <p>Why should a neural network trained to identify golden retrievers, freight trains, and espresso makers help you segment microscopic cracks on cold-rolled steel?</p>
 <p>The answer lies in the <strong>hierarchical nature of visual representations</strong> discovered by deep convolutional networks (Yosinski et al., 2014):</p>
-<pre class="highlight"><code>Visual Hierarchy in Pretrained CNNs:
-Early Layers (Stage 1-2):   General Visual Primitives (Gabor edges, blobs, local gradients)
-Mid Layers (Stage 3-4):     Complex Textural Patterns (grain textures, junctions, lattices)
-Deep Layers (Stage 5):      High-Level Semantic Motifs (parts, global context, objects)</code></pre>
-<p><img alt="Pretrained Feature Hierarchies" src="assets/fig02_pretrained_feature_hierarchies.png" />
+<p><img alt="Pretrained Feature Hierarchies" src="assets/fig02_pretrained_feature_hierarchies_clear.svg" />
 <em>Figure 2.1: Multi-scale feature tap points in a pretrained backbone. Early layers supply high-resolution edge maps to the decoder, while deep layers provide semantic anomaly classification.</em></p>
 <h3 id="1-general-visual-primitives-are-domain-agnostic">1. General Visual Primitives Are Domain-Agnostic</h3>
 <p>The filters learned in the first two stages of an ImageNet model are almost indistinguishable from classical Gabor wavelets and Sobel gradient operators. They detect high-contrast boundaries, directional ridges, and color/intensity transitions. A hairline scratch on steel triggers the exact same edge-detection neurons as the outline of a violin in ImageNet!</p>

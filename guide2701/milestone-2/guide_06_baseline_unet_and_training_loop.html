@@ -60,13 +60,7 @@
 <hr />
 <h2 id="2-u-net-architecture-and-spatial-dimension-tracing">2. U-Net Architecture and Spatial Dimension Tracing</h2>
 <p>A standard U-Net comprises three main functional stages:</p>
-<pre class="highlight"><code>Input [1, 128, 800]
-   │
-   ▼
-[Encoder (Contracting Path)] ──(High-Resolution Skips)──► [Decoder (Expanding Path)] ──► Output [K, 128, 800]
-   │                                                             ▲
-   └────────────────────► [Bottleneck] ──────────────────────────┘</code></pre>
-<p><img alt="U-Net Architecture Shapes" src="assets/fig06_unet_architecture_shapes.png" />
+<p><img alt="U-Net Architecture Shapes" src="assets/fig06_unet_architecture_shapes_clear.svg" />
 <em>Figure 6.1: U-Net architecture and exact tensor dimensions for an industrial strip (<span class="arithmatex">\(128 \times 800\)</span>). Skip connections preserve fine boundary detail from early encoder stages.</em></p>
 <h3 id="detailed-spatial-stage-breakdown">Detailed Spatial Stage Breakdown:</h3>
 <ol>

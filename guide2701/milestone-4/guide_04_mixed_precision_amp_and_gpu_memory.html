@@ -62,8 +62,8 @@ transfers of standard 32-bit floating-point tensors.</code></pre>
 <p>To resolve both challenges, we must understand exactly where GPU bytes are spent during forward and backward passes.</p>
 <hr />
 <h2 id="2-anatomy-of-gpu-memory-where-do-the-gigabytes-go">2. Anatomy of GPU Memory: Where Do the Gigabytes Go?</h2>
-<p><img alt="GPU Memory Breakdown and Numerical Precision" src="assets/fig05_amp_memory_breakdown.png" />
-<em>Figure 4.1: Breakdown of GPU VRAM consumption for a 15M-parameter segmentation model in pure FP32 versus PyTorch AMP, accompanied by IEEE-754 bit representations for FP32, FP16, and BF16.</em></p>
+<p><img alt="GPU memory categories and AMP" src="assets/fig_amp_memory_explainer_clear.svg" />
+<em>Figure 4.1: The main categories of training memory. The widths are illustrative, not measured proportions; profile your own model and batch size.</em></p>
 <p>GPU memory during training is partitioned into five distinct categories:</p>
 <h3 id="1-model-parameters-weights">1. Model Parameters (Weights)</h3>
 <p>For a network with <span class="arithmatex">\(M\)</span> parameters stored in standard single-precision float32 (4 bytes per parameter):</p>

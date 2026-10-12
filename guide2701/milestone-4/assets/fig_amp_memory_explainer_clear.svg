@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 430" role="img" aria-label="Where GPU memory goes during training">
+<rect width="1200" height="430" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">Where GPU memory goes during training</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">Mixed precision changes tensor storage; batch size and optimizer state still matter.</text>
+<rect x="70" y="159" width="190" height="74" rx="4" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="165.0" y="204" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">Model parameters</text>
+<rect x="268" y="159" width="315" height="74" rx="4" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="425.5" y="204" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">Optimizer state</text>
+<rect x="591" y="159" width="440" height="74" rx="4" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="811.0" y="204" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">Saved activations</text>
+<rect x="1039" y="159" width="155" height="74" rx="4" fill="#d95a40" stroke="#d95a40" stroke-width="2"/>
+<text x="1116.5" y="204" fill="#ffffff" font-size="17" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">Batch + workspace</text>
+<text x="70" y="275" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Illustrative memory composition — proportions depend on architecture, optimizer and batch size.</text>
+<rect x="70" y="320" width="1050" height="64" rx="9" fill="#eaf2ef" stroke="#c8dbd3" stroke-width="2"/>
+<text x="88" y="357" fill="#087e83" font-size="18" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">AMP may reduce activation memory; measure peak allocated memory on your own GPU.</text>
+</svg>

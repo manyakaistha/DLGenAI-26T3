@@ -55,17 +55,7 @@
 <li><strong>Process</strong>: Training dynamics, loss curves, gradient norms, learning rate decay.</li>
 <li><strong>Outputs</strong>: Quantitative validation metrics (per-class Dice, IoU, empty-image accuracy), qualitative mask overlays, and saved model weights.</li>
 </ol>
-<pre class="highlight"><code>┌─────────────────────────────────────────────────────────────────────────────┐
-│                             The W&amp;B Run Cycle                               │
-├─────────────────────┬───────────────────────────┬───────────────────────────┤
-│    1. Initialize    │       2. Log Epoch        │        3. Finalize        │
-│  wandb.init(...)    │   wandb.log({metrics})    │      wandb.finish()       │
-├─────────────────────┼───────────────────────────┼───────────────────────────┤
-│ • Model config      │ • Train loss (BCE, Dice)  │ • Log best model artifact │
-│ • Hyperparameters   │ • Val Dice &amp; IoU per-class│ • Record run summary      │
-│ • Split seed &amp; fold │ • Qualitative mask images │ • Flush telemetry buffer  │
-└─────────────────────┴───────────────────────────┴───────────────────────────┘</code></pre>
-<p><img alt="W&amp;B Experiment Dashboard" src="assets/fig05_wandb_experiment_dashboard.png" />
+<p><img alt="W&amp;B Experiment Dashboard" src="assets/fig05_wandb_experiment_dashboard_clear.svg" />
 <em>Figure 5.1: Weights &amp; Biases run lifecycle: configuration logging, synchronized metric tracking, qualitative mask overlay inspection, and versioned model artifact storage.</em></p>
 <hr />
 <h2 id="2-safe-credential-handling-never-hardcode-api-keys">2. Safe Credential Handling: Never Hardcode API Keys</h2>

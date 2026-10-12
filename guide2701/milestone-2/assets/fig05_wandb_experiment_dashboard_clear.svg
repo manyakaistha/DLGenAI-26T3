@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" role="img" aria-label="One run, four kinds of evidence">
+<rect width="1200" height="540" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">One run, four kinds of evidence</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">Each record answers a different question about the same experiment.</text>
+<rect x="42" y="154" width="252" height="206" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="58" y="171" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="75" y="195" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="104" y="196" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Config</text>
+<text x="62" y="236" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">What was tried?</text>
+<text x="62" y="264" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">seed, split, model, LR</text>
+<path d="M294 255 L325 255" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M316.2 261.6 L325 255 L316.2 248.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="331" y="154" width="252" height="206" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="347" y="171" width="34" height="34" rx="9" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="364" y="195" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="393" y="196" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">History</text>
+<text x="351" y="236" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">How did it train?</text>
+<text x="351" y="264" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">loss, Dice, learning rate</text>
+<path d="M583 255 L614 255" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M605.2 261.6 L614 255 L605.2 248.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="620" y="154" width="252" height="206" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="636" y="171" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="653" y="195" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">3</text>
+<text x="682" y="196" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Media</text>
+<text x="640" y="236" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Where did it fail?</text>
+<text x="640" y="264" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">prediction + target overlays</text>
+<path d="M872 255 L903 255" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M894.2 261.6 L903 255 L894.2 248.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="909" y="154" width="252" height="206" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="925" y="171" width="34" height="34" rx="9" fill="#d95a40" stroke="#d95a40" stroke-width="2"/>
+<text x="942" y="195" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">4</text>
+<text x="971" y="196" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Artifact</text>
+<text x="929" y="236" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Which weights produced it?</text>
+<text x="929" y="264" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">versioned best checkpoint</text>
+<rect x="43" y="407" width="1114" height="74" rx="8" fill="#eaf2ef" stroke="#c8dbd3" stroke-width="2"/>
+<text x="62" y="440" fill="#087e83" font-size="18" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Compare runs only on the same validation split and metric definition.</text>
+<text x="62" y="467" fill="#52635d" font-size="16" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">The artifact should retain the checkpoint and the configuration needed to reproduce it.</text>
+</svg>

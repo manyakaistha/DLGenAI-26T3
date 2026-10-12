@@ -87,7 +87,7 @@ assert len(train_ids.intersection(val_ids)) == 0, "FATAL DATA LEAK: Overlapping 
 <hr />
 <h2 id="3-the-dataloader-architecture">3. The DataLoader Architecture</h2>
 <p>The PyTorch <code>DataLoader</code> manages asynchronous multi-process loading and tensor collation.</p>
-<p><img alt="Batch Collation and Workers" src="assets/fig02_batch_collation_and_workers.png" />
+<p><img alt="Batch Collation and Workers" src="assets/fig02_batch_collation_and_workers_clear.svg" />
 <em>Figure 2.1: Multi-process DataLoader execution flow: worker processes load and transform samples in parallel, passing them to the main process for collation, memory pinning, and non-blocking GPU transfer.</em></p>
 <h3 id="key-dataloader-parameters">Key DataLoader Parameters:</h3>
 <h4 id="1-batch_size">1. <code>batch_size</code></h4>
