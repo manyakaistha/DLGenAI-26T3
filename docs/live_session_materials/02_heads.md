@@ -75,7 +75,7 @@ Watch the totals beneath the chart: softmax always sums to 1, while the sum of t
 
 <div class="lab" data-lab="heads"></div>
 
-## Tensor and target choices
+## Choose a head, target and loss
 
 | Design | Output logits | Training target | Typical loss | Binary decision |
 |---|---|---|---|---|
@@ -87,17 +87,11 @@ The head, target format and loss have to agree:
 - **Four sigmoid channels + `BCEWithLogitsLoss`:** use this when each class is an independent yes/no label and pixels may carry more than one class. The model returns logits shaped `[B, 4, H, W]`; the target is a floating point stack of four binary masks with the same shape. The loss compares each class decision independently.
 - **Five softmax channels + `CrossEntropyLoss`:** use this when each pixel has exactly one category: background, A, B, C or D. The model returns logits shaped `[B, 5, H, W]`; the target is an integer map shaped `[B, H, W]` whose values are class IDs 0–4. The loss trains the categories to compete for that one label.
 
-In both cases, give the loss the **raw logits**. `BCEWithLogitsLoss` and `CrossEntropyLoss` apply numerically stable sigmoid and softmax calculations internally. Applying those activations first would be the wrong input and can make training less stable. For softmax targets, first confirm masks do not overlap: converting overlapping masks to one integer ID (often with `argmax`) silently drops one of the labels.
+In both cases, give the loss the **raw logits**. `BCEWithLogitsLoss` and `CrossEntropyLoss` apply numerically stable sigmoid and softmax calculations internally. Applying those activations first would be the wrong input and can make training less stable.
 
-A sigmoid head can represent disjoint labels too, but its independent outputs can select several classes at one pixel. You then need a clear decision rule, such as validated per-class thresholds or a documented tie-breaking policy. A softmax head already enforces one winner, including the option of background.
+**Choose from the pixel labels.** If your audit finds disjoint masks, softmax with background-inclusive argmax matches the target structure by assigning exactly one category to each pixel. Four independent sigmoids can also represent disjoint labels, but may predict several classes at one pixel; you need validated thresholds or a clear tie-breaking rule. If your audit finds overlap, separate sigmoid outputs can preserve it. A standard softmax target has one integer ID per pixel, so converting overlapping masks to one ID (often with `argmax`) silently drops a label. Seeing two defect types in one photograph does not establish pixel overlap; use the mask audit.
 
-## What the constraint does and does not buy
-
-A softmax head followed by argmax produces **exactly one category per pixel**. This is a useful constraint when the audited annotations assign each pixel to either background or one defect class: the output has the same structure as the target. The constraint only controls which labels can be represented. A model can still choose the wrong class, place a boundary incorrectly, or miss a rare defect. Measure those errors on held-out images.
-
-If the annotations allow A and C at the same pixel, one integer class ID cannot preserve both labels. A standard softmax/argmax design over background and the four individual defects would discard one of them. Independent sigmoid outputs with separate binary masks can represent that overlap, because each class has its own yes/no decision. They can also be used on disjoint data, but they may predict competing labels at one pixel; decide how to handle those predictions and validate that rule.
-
-Choose the output representation from what the **pixel annotations** permit, then compare performance on validation data. Seeing two defect types somewhere in the same photograph is insufficient to make that choice.
+Either head can still make poor predictions: the constraint only determines which label combinations it can express. It does not guarantee correct boundaries, recall for rare classes or a good validation score. Measure those outcomes on held-out images.
 
 **Check:** Why does a mutually exclusive head need five channels here? Background must be a learnable category; four defect-only softmax channels would force even pristine pixels into a defect category.
 
