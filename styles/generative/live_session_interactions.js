@@ -232,12 +232,12 @@ const labs = {
   geometry(el) {
     const { q, all, out } = startLab(
       el,
-      "Resample a real binary buffer",
-      range("width", "Target width", 128, 800, 256, 16) +
-        range("height", "Target height", 32, 256, 256, 16) +
-        range("position", "Crack left edge x", 0, 790, 101) +
+      "Resample a synthetic binary buffer",
+      range("width", "Target width", 120, 600, 240, 20) +
+        range("height", "Target height", 25, 250, 240, 5) +
+        range("position", "Crack left edge x", 0, 590, 101) +
         range("crack", "Native crack width", 1, 10, 2) +
-        `<div class="controls"><button data-size="800,128">Native</button><button data-size="256,256">Square</button><button data-size="400,64">Isotropic half-size</button></div><p>Top: native mask. Bottom: resized target in its actual aspect ratio. Nearest-neighbor pixel-center sampling is explicit.</p><canvas data-canvas="native" role="img" aria-label="Native 800 by 128 binary crack mask"></canvas><canvas data-canvas="target" role="img" aria-label="Resampled binary crack mask"></canvas>`,
+        `<div class="controls"><button data-size="600,100">Native</button><button data-size="240,240">Square</button><button data-size="300,50">Isotropic half-size</button></div><p>Top: native mask. Bottom: resized target in its actual aspect ratio. Nearest-neighbor pixel-center sampling is explicit.</p><canvas data-canvas="native" role="img" aria-label="Native 600 by 100 binary crack mask"></canvas><canvas data-canvas="target" role="img" aria-label="Resampled binary crack mask"></canvas>`,
     );
     function get(k) {
       return +q(`[data-control=${k}]`).value;
@@ -247,24 +247,24 @@ const labs = {
         h = get("height"),
         x = get("position"),
         n = get("crack");
-      const source = (xx, yy) => xx >= x && xx < x + n && yy >= 16 && yy < 112;
+      const source = (xx, yy) => xx >= x && xx < x + n && yy >= 12 && yy < 88;
       let target = new Uint8Array(w * h);
       for (let yy = 0; yy < h; yy++)
         for (let xx = 0; xx < w; xx++)
           target[yy * w + xx] = source(
-            Math.min(799, Math.floor(((xx + 0.5) * 800) / w)),
-            Math.min(127, Math.floor(((yy + 0.5) * 128) / h)),
+            Math.min(599, Math.floor(((xx + 0.5) * 600) / w)),
+            Math.min(99, Math.floor(((yy + 0.5) * 100) / h)),
           );
       let gt = 0,
         pred = 0,
         both = 0;
-      for (let yy = 0; yy < 128; yy++)
-        for (let xx = 0; xx < 800; xx++) {
+      for (let yy = 0; yy < 100; yy++)
+        for (let xx = 0; xx < 600; xx++) {
           let a = source(xx, yy),
             b =
               target[
-                Math.min(h - 1, Math.floor(((yy + 0.5) * h) / 128)) * w +
-                  Math.min(w - 1, Math.floor(((xx + 0.5) * w) / 800))
+                Math.min(h - 1, Math.floor(((yy + 0.5) * h) / 100)) * w +
+                  Math.min(w - 1, Math.floor(((xx + 0.5) * w) / 600))
               ];
           gt += a;
           pred += b;
@@ -280,9 +280,9 @@ const labs = {
               if (value(xx, yy)) c.fillRect(xx, yy, 1, 1);
         });
       }
-      draw("native", 800, 128, source);
+      draw("native", 600, 100, source);
       draw("target", w, h, (xx, yy) => target[yy * w + xx]);
-      out.textContent = `Target ${w} × ${h}. sx=${(w / 800).toFixed(3)}, sy=${(h / 128).toFixed(3)}, R=${(h / 128 / (w / 800)).toFixed(3)}. Geometric crack width=${((n * w) / 800).toFixed(3)}px. Target foreground=${target.reduce((a, b) => a + b, 0)}px. Restored foreground=${pred}px vs native ${gt}px. Round-trip Dice=${((2 * both) / (gt + pred)).toFixed(3)}. Change x by one pixel to test phase.`;
+      out.textContent = `Target ${w} × ${h}. sx=${(w / 600).toFixed(3)}, sy=${(h / 100).toFixed(3)}, R=${(h / 100 / (w / 600)).toFixed(3)}. Geometric crack width=${((n * w) / 600).toFixed(3)}px. Target foreground=${target.reduce((a, b) => a + b, 0)}px. Restored foreground=${pred}px vs native ${gt}px. Round-trip Dice=${((2 * both) / (gt + pred)).toFixed(3)}. Change x by one pixel to test phase.`;
     }
     all("input").forEach((i) => (i.oninput = render));
     all("[data-size]").forEach(

@@ -67,11 +67,11 @@ fig,axs=plt.subplots(1,2,figsize=(13,4))
 ax=axs[0];ax.axis('off');ax.set_xlim(0,10);ax.set_ylim(0,6)
 for i in range(12):ax.add_patch(Rectangle((.8+i*.6,1),.4,3.6,facecolor=plt.cm.Greys(.3+i*.04)))
 ax.annotate('successive capture times →',xy=(8,5.2),xytext=(.8,5.2),arrowprops=dict(arrowstyle='->'));ax.text(.1,.2,'One captured line per time step → a 2D strip\nIllustrative acquisition, not verified camera metadata',fontsize=11);ax.set_title('Line scans build a surface view')
-axs[1].bar(['Horizontal sx','Vertical sy'],[.32,2],color=[TEAL,RED]);axs[1].set_title('800 × 128 → 256 × 256');axs[1].set_ylabel('Scale factor');axs[1].text(-.15,1.55,'Relative stretch\nR = 2 / 0.32 = 6.25',fontsize=13);save(fig,'sensor_geometry')
+axs[1].bar(['Horizontal sx','Vertical sy'],[.4,2.4],color=[TEAL,RED]);axs[1].set_title('600 × 100 → 240 × 240');axs[1].set_ylabel('Scale factor');axs[1].text(-.15,1.55,'Relative stretch\nR = 2.4 / 0.4 = 6',fontsize=13);save(fig,'sensor_geometry')
 # Geometric coordinate illustrations — vector shapes separate from sampling experiment.
 fig,axs=plt.subplots(1,3,figsize=(14,6))
-for ax,(W,H,title) in zip(axs,[(800,128,'Native: 800 × 128'),(256,256,'Square warp: 256 × 256'),(400,64,'Isotropic: 400 × 64')]):
-    sx,sy=W/800,H/128;ax.set_xlim(0,W);ax.set_ylim(H,0);ax.set_aspect('equal');ax.set_facecolor('#e2e7e5');ax.add_patch(Ellipse((200*sx,64*sy),80*sx,80*sy,facecolor=TEAL));ax.add_patch(Rectangle((500*sx,16*sy),2*sx,96*sy,facecolor=RED));ax.set_title(title);ax.set_xlabel(f'sx={sx:g}, sy={sy:g}, R={sy/sx:g}\nGeometric crack width={2*sx:g}px');ax.set_xticks([]);ax.set_yticks([])
+for ax,(W,H,title) in zip(axs,[(600,100,'Native: 600 × 100'),(240,240,'Square warp: 240 × 240'),(300,50,'Isotropic: 300 × 50')]):
+    sx,sy=W/600,H/100;ax.set_xlim(0,W);ax.set_ylim(H,0);ax.set_aspect('equal');ax.set_facecolor('#e2e7e5');ax.add_patch(Ellipse((200*sx,50*sy),80*sx,80*sy,facecolor=TEAL));ax.add_patch(Rectangle((500*sx,12*sy),2*sx,76*sy,facecolor=RED));ax.set_title(title);ax.set_xlabel(f'sx={sx:g}, sy={sy:g}, R={sy/sx:g}\nGeometric crack width={2*sx:g}px');ax.set_xticks([]);ax.set_yticks([])
 fig.suptitle('Geometry shown continuously; survival requires a discrete sampling experiment',fontsize=14);save(fig,'geometry_comparison')
 # Contrast cases
 fig,axs=plt.subplots(1,3,figsize=(14,4));x=np.linspace(-4,4,500);gauss=lambda sd:np.exp(-.5*(x/sd)**2)/(sd*np.sqrt(2*np.pi))
@@ -83,4 +83,39 @@ fig,axs=plt.subplots(1,4,figsize=(14,4));texture=np.indices((11,11)).sum(0)%2
 for ax,r in zip(axs,[1,3,5,7]):
     ax.imshow(texture,cmap='gray',vmin=0,vmax=2);ax.add_patch(Rectangle((5-r/2,5-r/2),r,r,fill=False,edgecolor=RED,lw=3));ax.set_title(f'{r} × {r} receptive field');ax.set_xticks([]);ax.set_yticks([])
 fig.suptitle('1 × 1 observes brightness; 3 × 3 layers expand neighborhood context',fontsize=14);save(fig,'receptive_field')
-print('Generated 10 synthetic teaching figures:',OUT)
+
+
+# Fully synthetic grayscale image, native toy pixels and numbered mask overlay.
+rng=np.random.default_rng(42)
+image=rng.normal(90,8,(6,8));mask=np.zeros((6,8),int);mask[1:5,3:5]=1;image+=mask*65
+rgb=np.repeat((image/255)[...,None],3,axis=2);rgb[mask>0]=rgb[mask>0]*.4+np.array([1,.25,.1])*.6
+fig,axes=plt.subplots(1,2,figsize=(12,5))
+for ax,arr,title in zip(axes,[image,rgb],['Synthetic intensities','Same pixels + binary mask']):
+    ax.imshow(arr,cmap='gray',vmin=0,vmax=255)
+    for y in range(6):
+        for x in range(8): ax.text(x,y,str(x*6+y+1),ha='center',va='center',color='white',bbox=dict(facecolor='black',alpha=.5,pad=1))
+    ax.set_xticks(np.arange(-.5,8,1),minor=True);ax.set_yticks(np.arange(-.5,6,1),minor=True);ax.grid(which='minor',color='white');ax.set_xticks([]);ax.set_yticks([]);ax.set_title(title)
+fig.suptitle('F-order indices on a fictional 8 × 6 image: k = 6x + y + 1');save(fig,'synthetic_pixel_grid')
+# Correct vs scrambled decode on a generated toy strip.
+image=rng.normal(90,9,(32,192));mask=np.zeros((32,192),int);mask[6:27,70:73]=1;mask[13:18,125:145]=1;image+=mask*65
+fig,axes=plt.subplots(3,1,figsize=(12,6))
+for ax,m,title in zip(axes,[np.zeros_like(mask),mask,mask.ravel(order='F').reshape(mask.shape)],['Synthetic strip','F-order decode matches the signal','Same buffer, C-order reshape: wrong positions']):
+    rgb=np.repeat((image/255)[...,None],3,axis=2);rgb[m>0]=rgb[m>0]*.4+np.array([1,.25,.1])*.6;ax.imshow(rgb);ax.axis('off');ax.set_title(title)
+save(fig,'synthetic_rle_order')
+# Phase experiment on fictional 600 × 100 sensor geometry, matching the lab.
+fig,axes=plt.subplots(1,2,figsize=(12,4));scores=[]
+for x in range(20):
+    m=np.zeros((100,600),int);m[12:88,x:x+2]=1
+    ys=np.floor((np.arange(240)+.5)*100/240).astype(int);xs=np.floor((np.arange(240)+.5)*600/240).astype(int);small=m[np.ix_(ys,xs)]
+    back=small[np.ix_(np.floor((np.arange(100)+.5)*240/100).astype(int),np.floor((np.arange(600)+.5)*240/600).astype(int))]
+    scores.append(2*(m*back).sum()/(m.sum()+back.sum()))
+axes[0].bar(range(20),scores,color=RED);axes[0].set(xlabel='Toy crack x-position',ylabel='Round-trip Dice',ylim=(0,1),title='Same 2px width, different phase')
+widths=np.array([1,2,3,4,5,6,8,10]);axes[1].plot(widths,widths*240/600,'o-',color=TEAL);axes[1].axhline(1,color=RED,ls='--');axes[1].set(xlabel='Toy source width (px)',ylabel='Geometric target width (px)',title='Fictional resize: 600 → 240');save(fig,'sampling_phase')
+# Same multiset of intensities, different arrangements: no project examples.
+checker=((np.indices((32,64)).sum(0)%2)*100+75).astype(np.uint8);shuffled=rng.permutation(checker.ravel()).reshape(checker.shape)
+fig,axes=plt.subplots(1,3,figsize=(13,4))
+for ax,img,title in zip(axes[:2],[checker,shuffled],['Ordered synthetic texture','Shuffled synthetic texture']):ax.imshow(img,cmap='gray',vmin=0,vmax=255);ax.axis('off');ax.set_title(title)
+axes[2].hist(checker.ravel(),bins=np.arange(0,260,10),alpha=.5,label='ordered');axes[2].hist(shuffled.ravel(),bins=np.arange(0,260,10),histtype='step',lw=2,label='shuffled');axes[2].legend();axes[2].set(title='Identical histogram',xlabel='Intensity');save(fig,'texture_same_histogram')
+import json
+(OUT/'manifest.json').write_text(json.dumps({'source':'Deterministic synthetic teaching examples only','seed':42,'sensor_example':{'width':600,'height':100},'figures':[p.name for p in sorted(OUT.glob('*.png'))]},indent=2))
+print('Generated synthetic-only figures:',OUT)

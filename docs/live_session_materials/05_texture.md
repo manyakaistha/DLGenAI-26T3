@@ -1,5 +1,6 @@
 # 5 · See beyond average brightness
 
+Examples, masks, statistics and sensor dimensions on this page are synthetic teaching examples.
 **Guide 5.** A region can look structurally different while having the same average brightness as its surroundings.
 
 ## Contrast as a standardized mean difference
@@ -14,11 +15,9 @@ Positive d means the defect is brighter on average; negative means darker. Magni
 
 <div class="lab" data-lab="contrast"></div>
 
-## One measured real example
+## Specify what you measure
 
-![Intensity distributions and Cohen's d for one real labeled defect](figures/real_contrast.png)
-
-This is a single-image descriptive statistic, recomputed from the image and decoded label. It is not a dataset-wide class estimate. Pooling all pixels across images weights large masks and lighting conditions differently from averaging per-image d. Report the aggregation and sampling protocol when comparing classes. Pixels are correlated; treat images, not individual pixels, as independent units for uncertainty estimates.
+Use the fictional values in the calculator to explore d before collecting your own measurements. Pooling all pixels across images weights large masks and lighting conditions differently from averaging per-image d. Report the aggregation and sampling protocol. Pixels are correlated; treat images as independent units for uncertainty estimates.
 
 ## Same histogram, different arrangement
 

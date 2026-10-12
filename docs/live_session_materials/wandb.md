@@ -1,63 +1,91 @@
-# W&B: make an experiment inspectable
+# W&B in 50 lines
 
-Download [the executable notebook](wandb_tutorial.ipynb) or [its paired Python cells](wandb_tutorial.py). Use this page as a reference while working through the notebook.
+A tiny built-in dataset supplies the training values. Focus on the W&B calls: what they record, where the result appears, and how to reuse it.
 
-[Open the student notebook in Colab](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/live_session_materials/wandb_tutorial.ipynb). Install dependencies before the timed session, then choose online mode for the dashboard.
+[Open in Colab](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/live_session_materials/wandb_tutorial.ipynb) · [Download notebook](wandb_tutorial.ipynb) · [Download Python](wandb_tutorial.py)
 
-## The experiment record
+The notebook has one setup cell and one **50-line demo**. Set `MODE = "online"` to see the dashboard and sign in with `wandb.login()`. The default offline mode saves logs locally. The Iris dataset is included with scikit-learn; no GPU or data download is required.
 
-<div class="flow" role="img" aria-label="Configuration defines the recipe; training produces history and examples; the best checkpoint becomes a versioned artifact."><span>Recipe<br><b>config + seed + split</b></span><span>→ Training<br><b>metric history</b></span><span>→ Inspect<br><b>plots + masks</b></span><span>→ Preserve<br><b>checkpoint + artifact</b></span></div>
-
-A **run** is one execution of a recipe. **Config** records inputs to the experiment: architecture, learning rate, sample counts, seed, threshold. **History** records measured values over time. **Summary** records a final or best result. An **artifact** versions a file and connects it to the producing run.
-
-## Explore your run
-
-1. Set online mode and authenticate securely. Initialize the run; open its URL.
-2. Show the tiny synthetic dataset and held-out split. Explain the background label before logging overlays.
-3. Run training. Open batch loss and epoch validation Dice. The custom axes keep batch steps and epochs separate.
-4. Open the validation table. Sort by Dice; inspect a clean strip and a positive strip. Toggle prediction and ground-truth layers.
-5. Open the histogram and threshold curve. A threshold changes a binary decision without retraining weights.
-6. Open Artifacts. Inspect `best.pt`, config, history, metadata and producing run. Show the local restore check.
-
-## Four API patterns to remember
+## The complete demo
 
 ```python
-run = wandb.init(project="pixels-masks-experiments", config=config)
-run.log({"epoch": epoch, "val/foreground_dice": measured_dice})
-run.log({"example": wandb.Image(image, masks=mask_layers)})
-artifact = wandb.Artifact("tiny-strip-segmenter", type="model")
-artifact.add_file("runs/live_session_demo/best.pt")
-run.log_artifact(artifact, aliases=["best"])
-run.finish()
+# W&B demo: metrics, media, tables and a versioned model.
+import time
+import joblib
+import matplotlib.pyplot as plt
+import wandb
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import accuracy_score, log_loss
+
+MODE = "offline"  # Use "online" to see the live W&B dashboard.
+if MODE == "online":
+    wandb.login()  # Sign in securely; never paste a key into this file.
+data = load_iris()  # 150 built-in examples; no dataset download.
+X_train, X_val, y_train, y_val = train_test_split(
+    data.data, data.target, test_size=0.2, stratify=data.target, random_state=42)
+scaler = StandardScaler().fit(X_train)
+x_train, x_val = scaler.transform(X_train), scaler.transform(X_val)
+config = {"lr": 0.03, "epochs": 15, "seed": 42, "dataset": "iris"}
+run = wandb.init(project="wandb-first-run", config=config, mode=MODE,
+                 settings=wandb.Settings(x_disable_stats=True))
+run.define_metric("epoch")
+run.define_metric("val/*", step_metric="epoch")
+model = SGDClassifier(loss="log_loss", learning_rate="constant",
+                      eta0=run.config.lr, random_state=run.config.seed)
+started = time.perf_counter()
+for epoch in range(1, run.config.epochs + 1):
+    model.partial_fit(x_train, y_train, classes=[0, 1, 2])
+    probs = model.predict_proba(x_val)
+    preds = probs.argmax(axis=1)
+    run.log({"epoch": epoch, "val/loss": log_loss(y_val, probs),
+             "val/accuracy": accuracy_score(y_val, preds)})
+run.summary["training_seconds"] = time.perf_counter() - started
+run.summary["final_accuracy"] = accuracy_score(y_val, preds)
+run.log({"confidence": wandb.Histogram(probs.max(axis=1))})
+table = wandb.Table(columns=["true", "predicted", "confidence"])
+for truth, pred, confidence in zip(y_val, preds, probs.max(axis=1)):
+    table.add_data(data.target_names[truth], data.target_names[pred], float(confidence))
+run.log({"predictions": table})
+fig, ax = plt.subplots(figsize=(5, 3))
+ax.scatter(X_val[:, 0], X_val[:, 1], c=preds, vmin=0, vmax=2)
+ax.set(xlabel=data.feature_names[0], ylabel=data.feature_names[1], title="Predicted class")
+run.log({"plot": wandb.Image(fig)}); plt.close(fig)
+joblib.dump({"model": model, "scaler": scaler, "config": config}, "model.joblib")
+artifact = wandb.Artifact("iris-model", type="model", metadata={"accuracy": float(run.summary["final_accuracy"])})
+artifact.add_file("model.joblib")
+run.log_artifact(artifact, aliases=["latest"])
+print("Run:", run.url if MODE == "online" else "Offline logs:", run.dir)
+run.finish()  # Close the run and complete queued logging.
 ```
 
-The full notebook adds separate metric axes, a held-out evaluator, rich plots, checkpoint metadata and upload completion checks. A local save and a successful cloud upload are different events. Offline recording must be synced before you can view a dashboard or download an artifact from W&B.
+## Find each API pattern in the run
 
-## Read metrics together
-
-| Evidence | What it answers | What it cannot prove |
+| API | What it records | Where to inspect it |
 |---|---|---|
-| Train loss | Is optimization progressing on training batches? | Generalization |
-| Held-out foreground Dice | Are positive validation masks localized? | Clean-image behavior |
-| Empty accuracy | Do clean validation strips remain clean? | Positive defect recall |
-| Pixel accuracy | How many pixel decisions are correct? | Success on rare foreground |
-| Overlay / table | Where are false positives and misses? | Dataset-wide averages |
-| Threshold sweep | How sensitive is the validation result to a decision rule? | A fresh unbiased test score |
+| `wandb.init(config=...)` | One execution and its settings | Run overview and config |
+| `run.define_metric(...)` | Epoch as the metric axis | Chart x-axis |
+| `run.log({...})` | Loss and accuracy over time | Metric charts |
+| `run.summary[...]` | Final accuracy and elapsed training time | Run summary |
+| `wandb.Histogram(...)` | Distribution of prediction confidence | Histogram panel |
+| `wandb.Table(...)` | True class, prediction and confidence per example | Predictions table |
+| `wandb.Image(fig)` | A Matplotlib plot | Plot panel |
+| `wandb.Artifact(...)`, `add_file`, `log_artifact` | A versioned saved model and preprocessing | Artifacts |
+| `run.finish()` | Completes queued logging and closes the run | Finished run status |
 
-This is a toy binary task. Its foreground Dice and empty accuracy are diagnostics, **not the official competition score**. An unweighted average dominated by empty cases can conceal a detector that misses defects.
+## Try one change
 
-## Compare two runs fairly
+Change `lr`, rerun, and compare the two accuracy/loss curves. Keep the split and other settings fixed. The table helps you inspect individual errors; a single average does not show which examples were missed.
 
-Repeat with learning rate 0.001 and a distinct name. Keep the split, seed, dataset, epochs and metric definitions fixed. In W&B, compare loss and Dice curves, then inspect examples. Do not declare a general winner from a 16-image toy holdout. Record what changed and what remains uncertain.
+The artifact contains the model, fitted scaler and configuration. `latest` is a movable alias; use a fixed version such as `v0` when reproducing a result. To download your saved version later:
 
-`best` is a movable alias; `v0`, `v1`, … identify versions. Save the full artifact path when reproducing a result. Restore model architecture and preprocessing as well as weights. Download code and offline-sync commands are at the end of the notebook.
+```python
+saved = wandb.Api().artifact("YOUR_ENTITY/wandb-first-run/iris-model:v0")
+folder = saved.download()
+```
 
-**Check:** If loss improves but Dice stays zero, inspect probabilities, threshold, foreground frequency and overlays before assuming the logger is broken.
+Offline runs must be uploaded with `wandb sync wandb/offline-run-*` before their dashboards or artifacts are available online.
 
-## Prepared example and sources
-
-The default recipe trains a **193-parameter CNN**, using 48 training strips and 16 separately generated validation strips for 20 epochs. One measured CPU run reached foreground Dice **0.984**, foreground recall **0.974**, and clean-strip accuracy **1.0**. It initially spent several epochs at **0 Dice** despite **98.14% pixel accuracy**. These are synthetic lesson results; hardware and library versions can affect numerical details.
-
-The notebook also logs false-positive pixel count, a pixel confusion matrix, parameter count and the all-background baseline. Media are from the final epoch; the model artifact records the best measured epoch. With the default recipe those happen to coincide. Plots are also saved locally for later review.
-
-Official API references: [logging metrics and media](https://docs.wandb.ai/guides/track/log/), [tables](https://docs.wandb.ai/guides/track/log/log-tables), [image masks](https://docs.wandb.ai/ref/python/data-types/image/), and [downloading artifacts](https://docs.wandb.ai/models/artifacts/download-and-use-an-artifact).
+Official references: [logging](https://docs.wandb.ai/guides/track/log/), [tables](https://docs.wandb.ai/guides/track/log/log-tables), [artifacts](https://docs.wandb.ai/models/artifacts/download-and-use-an-artifact).

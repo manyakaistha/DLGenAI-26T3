@@ -25,7 +25,7 @@ def notebook():
         if kind=='code': cell.update(execution_count=None,outputs=[])
         cells.append(cell)
     # A separate installation cell lets Colab/Jupyter users actually run setup.
-    cells.insert(2,dict(cell_type='code',metadata={},execution_count=None,outputs=[],source=['%pip install torch==2.8.0 numpy==2.2.6 matplotlib==3.10.9 wandb==0.23.1\n']))
+    cells.insert(1,dict(cell_type='code',metadata={},execution_count=None,outputs=[],source=['%pip install scikit-learn==1.7.2 joblib==1.5.2 matplotlib==3.10.9 wandb==0.23.1\n']))
     doc=dict(cells=cells,metadata=dict(kernelspec=dict(display_name='Python 3',language='python',name='python3'),language_info=dict(name='python',version='3.11')),nbformat=4,nbformat_minor=5)
     for i,c in enumerate(cells): c['id']=f'session-{i:02d}'
     (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
@@ -34,7 +34,9 @@ def build(out):
     notebook(); out.mkdir(parents=True,exist_ok=True)
     # Remove a previously generated instructor page from reused output directories.
     (out / "instructor.html").unlink(missing_ok=True)
-    shutil.copytree(SOURCE/'figures',out/'figures',dirs_exist_ok=True)
+    # Generated asset directory is replaced to remove superseded lesson figures.
+    if (out/'figures').exists(): shutil.rmtree(out/'figures')
+    shutil.copytree(SOURCE/'figures',out/'figures')
     shutil.copytree(ROOT/'styles/generative',out/'styles/generative',dirs_exist_ok=True)
     for name in ['wandb_tutorial.ipynb','wandb_tutorial.py']: shutil.copy2(SOURCE/name,out/name)
     (out/'site.css').write_text(CSS+'\n'+(ROOT/'styles/generative/session.css').read_text())

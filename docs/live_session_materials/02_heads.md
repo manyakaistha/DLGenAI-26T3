@@ -1,5 +1,6 @@
 # 2 · Decide what a pixel can mean
 
+Examples, masks, statistics and sensor dimensions on this page are synthetic teaching examples.
 **Guide 2.** Multiple labels in an image and multiple labels at a pixel are separate questions.
 
 ## Co-occurrence is not overlap
@@ -14,7 +15,7 @@ occupancy = masks.sum(axis=0)
 overlap_pixels = (occupancy > 1).sum()
 ```
 
-Audit all images with multiple positive class rows; single-label images cannot have cross-class overlap. This dataset's audit found disjoint labels. That is evidence about these annotations, not a universal law of defect physics. Annotation policies, mixed materials or another dataset may allow overlap. Check before choosing a head.
+Audit all images with multiple positive class rows; single-label images cannot have cross-class overlap. Determine whether the annotations in your own dataset overlap; do not assume the outcome from these toy examples. Annotation policies, mixed materials or another dataset may allow overlap. Check before choosing a head.
 
 ## From logits to probabilities
 
@@ -28,8 +29,8 @@ Softmax uses `p_k = exp(z_k) / sum_j exp(z_j)`. Five channels include background
 
 | Design | Output logits | Training target | Typical loss | Binary decision |
 |---|---|---|---|---|
-| Four sigmoids | B × 4 × 128 × 800 | Four binary masks, same shape | BCEWithLogitsLoss | Independent class thresholds |
-| Five-way softmax | B × 5 × 128 × 800 | B × 128 × 800 integer labels 0–4 | CrossEntropyLoss | Background-inclusive argmax |
+| Four sigmoids | B × 4 × H × W | Four binary masks, same shape | BCEWithLogitsLoss | Independent class thresholds |
+| Five-way softmax | B × 5 × H × W | B × H × W integer labels 0–4 | CrossEntropyLoss | Background-inclusive argmax |
 
 Feed raw logits to these losses; their implementations apply the appropriate stable activation internally. For disjoint targets, construct integer labels only after checking overlap. Otherwise converting with argmax silently erases a label. A four-sigmoid design can still be used on disjoint data, but competing predictions require explicit decision rules.
 
@@ -62,6 +63,6 @@ Take A logit=2 and B logit=1. Their independent sigmoid probabilities are approx
 
 ![Output tensor shapes and corresponding targets](figures/head_tensors.png)
 
-**Implementation check:** BCE targets are floating binary masks with the same shape as logits. Cross-entropy targets are integer class IDs and omit the channel dimension. Apply `sigmoid` or `softmax` when inspecting predictions, while feeding raw logits into the corresponding stable loss. A one-channel softmax is always 1, so it cannot solve the notebook’s binary foreground/background task.
+**Implementation check:** BCE targets are floating binary masks with the same shape as logits. Cross-entropy targets are integer class IDs and omit the channel dimension. Apply `sigmoid` or `softmax` when inspecting predictions, while feeding raw logits into the corresponding stable loss. A one-channel softmax is always 1; it cannot represent a foreground/background choice.
 
 <noscript>Interactive controls require JavaScript. The numbered figures, worked examples and code on this page provide the same concepts for static reading.</noscript>

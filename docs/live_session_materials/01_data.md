@@ -1,5 +1,6 @@
 # 1 · Count the right things
 
+Examples, masks, statistics and sensor dimensions on this page are synthetic teaching examples.
 **Guide 1.** Three units matter: images, image–class pairs, and pixels. Their imbalance can be very different.
 
 ## A strip is not a CSV row
@@ -17,15 +18,11 @@ There are 16 rows, 4 images, 6 positive image–class pairs and one clean image.
 
 <div class="lab" data-lab="cardinality"></div>
 
-## Three views of the actual data
+## Use three different denominators
 
-![Positive-image counts, cardinality and foreground pixel prevalence](figures/data_units.png)
+The table counts above refer only to the four fictional strips. Image prevalence uses four images as its denominator. Pair prevalence uses sixteen image–class pairs. Pixel prevalence requires the decoded foreground area divided by all canvas pixels. These quantities need not agree.
 
-These charts are recomputed from local `train.csv` by the figure generator. The population is 11,393 images; class counts may sum above the number of defective images because classes co-occur. Pixel percentages use every native sensor pixel as the denominator. A rare image-level class can also occupy especially few pixels.
-
-![Raw strip and label overlay for each of the four defect classes](figures/real_defects.png)
-
-Red is annotation, not an intrinsic image color. Examples are the first positive row for each class in CSV order; they are illustrations, not representative random samples. IDs and provenance are in the figure manifest.
+A class can occur in several images yet occupy very little area in each one. Draw your own tiny masks to test that idea before analyzing a dataset.
 
 ## Compute presence without losing clean images
 

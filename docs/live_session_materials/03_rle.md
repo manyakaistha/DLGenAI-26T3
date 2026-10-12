@@ -1,10 +1,11 @@
 # 3 · Turn masks into numbers
 
+Examples, masks, statistics and sensor dimensions on this page are synthetic teaching examples.
 **Guide 3.** RLE describes a binary mask. It does not encode the photograph, a bounding box, or defect intensity.
 
 ## Paint → flatten → find runs → serialize
 
-Each consecutive foreground sequence becomes a pair: **1-based start, number of pixels**. This dataset walks down each column, then begins at the top of the next column. NumPy calls this Fortran order (`F`). It is a dataset convention, not a universal camera or Kaggle standard.
+Each consecutive foreground sequence becomes a pair: **1-based start, number of pixels**. In this teaching example, traversal walks down each column, then begins at the top of the next column. NumPy calls this Fortran order (`F`). It is a dataset convention, not a universal camera or Kaggle standard.
 
 <div class="lab" data-lab="rle"></div>
 
@@ -18,29 +19,29 @@ For zero-based coordinates `(x,y)`:
 
 - Encode index: `k = x * H + y + 1`.
 - Decode coordinate: `x = (k - 1) // H`, `y = (k - 1) % H`.
-- On the real strip, index 130 means `(x=1,y=1)`, not row 0 column 129.
+- On the height-4 toy canvas, index 6 means `(x=1,y=1)`, not row 0 column 5.
 
-![Actual image crop with native pixel indices and labeled pixels](figures/real_pixel_grid.png)
+![Synthetic grayscale pixels with a numbered mask overlay](figures/synthetic_pixel_grid.png)
 
-Each number is a native image pixel's actual global 1-based index. The crop is enlarged for reading; it is not a downsampled grid. The overlay uses the original annotation.
+This deliberately small synthetic image shows intensity underneath the binary label. The numbers follow the toy image’s own height and F-order convention; they are not project image coordinates.
 
 ## Correct pixels, wrong locations
 
-![Raw image, correct column-major mask and incorrect row-major mask](figures/rle_order.png)
+![Synthetic image, correct column-major mask and incorrect row-major mask](figures/synthetic_rle_order.png)
 
 Reshaping the same flat buffer with `order='C'` keeps the foreground count but changes locations. A pixel-count sanity check cannot detect this bug. Always overlay on the photograph, test a known coordinate, and verify encode/decode round trips.
 
 ## Boundaries and malformed input
 
-A native canvas has 102,400 pixels. Inclusive last index is `start + length - 1`. Valid runs must have positive starts and lengths and stay within the canvas. Empty masks decode to all zeros.
+A canvas of height H and width W has H × W pixels. Inclusive last index is `start + length - 1`. Valid runs must have positive starts and lengths and stay within the canvas. Empty masks decode to all zeros.
 
-For a 24-pixel toy canvas, run `23 4` requests 23,24,25,26. A tolerant training decoder clamps the end and keeps 23,24. A strict submission validator rejects the overflow. Two training rows in this dataset extend one pixel beyond the native canvas; record this known exception rather than silently treating arbitrary malformed annotations as valid.
+For a 24-pixel toy canvas, run `23 4` requests 23,24,25,26. A tolerant training decoder clamps the end and keeps 23,24. A strict submission validator rejects the overflow. Inspect your own inputs for boundary violations. Clamping is a policy choice that requires a documented reason; it is not a substitute for validation.
 
 ```python
 flat = np.zeros(H * W, dtype=np.uint8)
 for start, length in pairs:
     lo = start - 1
-    hi = min(lo + length, H * W)  # documented training-only tolerance
+    hi = min(lo + length, H * W)  # optional tolerant-decoder policy
     flat[lo:hi] = 1
 mask = flat.reshape(H, W, order="F")
 ```
@@ -96,9 +97,9 @@ assert np.array_equal(decode_rle(encode_rle(mask), 4, 6), mask)
 assert decode_rle("", 4, 6).sum() == 0
 ```
 
-Normalize CSV NaN/blank values to an empty string before calling this teaching decoder. Strict validation rejects bad tokens and out-of-bounds runs; enable `clamp=True` only for the documented training annotation exception.
+Normalize CSV NaN/blank values to an empty string before calling this teaching decoder. Strict validation rejects bad tokens and out-of-bounds runs; enable `clamp=True` only if your chosen data-validation policy explicitly allows clipping.
 
-![Strict validation versus a documented clamp on a tiny canvas](figures/rle_boundary.png)
+![Strict validation versus clipping on a tiny canvas](figures/rle_boundary.png)
 
 **Boundary arithmetic:** `23 4` means last requested index `23+4−1=26`. The zero-based slice is `[22:26]`. On a 24-pixel buffer, tolerant decoding clips the exclusive end to 24, leaving `[22:24]`: exactly two pixels. Subtract one from the start once, not twice.
 

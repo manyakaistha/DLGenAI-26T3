@@ -6,7 +6,7 @@ Explore how surface images become segmentation masks, how data representation af
 
 ### Track an experiment with W&B
 
-Train a small model in a notebook, log training and validation metrics, inspect predictions with mask overlays and plots, and save a model as a versioned artifact.
+Use a 50-line notebook example to start a run, log metrics, tables and plots, and save a versioned model artifact. A tiny built-in dataset supplies values to track.
 
 [Open the W&B lab](wandb.md) · [Download the notebook](wandb_tutorial.ipynb)
 
