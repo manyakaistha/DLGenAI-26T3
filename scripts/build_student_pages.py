@@ -186,7 +186,7 @@ def build(output: Path):
             active = ' aria-current="page"' if i == j else ""
             label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else "STARTER CODE · Q11–Q12" if j == len(sources) - 1 else f"GUIDE {j-1:02d}"
             nav += f'<a href="{url}"{active}><span class="num">{label}</span>{html.escape(title)}</a>'
-        nav += '<a href="session/index.html"><span class="num">LIVE LAB</span>Pixels, Masks &amp; Experiments</a>'
+        nav += '<a href="session/index.html"><span class="num">Live session 12/10/26</span>Pixels, Masks &amp; Experiments</a>'
         nav += "</nav>"
         pager = ""
         if i > 0:
