@@ -10,9 +10,9 @@ import markdown
 from build_student_pages import CSS, JS, CREDIT_ART, Inspect, normalize_markdown
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'docs/live_session_materials'
-MODULES=['README','wandb','01_data','02_heads','03_rle','04_geometry','05_texture']
-TITLES=['Session overview','W&B notebook lab','1 · Count the right things','2 · Decide what a pixel means','3 · Turn masks into numbers','4 · Preserve geometry','5 · See beyond brightness']
-URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html','04_geometry.html','05_texture.html']
+MODULES=['README','wandb','01_data','02_heads','03_rle']
+TITLES=['Session overview','W&B notebook lab','1 · Count the right things','2 · Decide what a pixel means','3 · Turn masks into numbers']
+URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html']
 
 def notebook():
     cells=[]
@@ -32,11 +32,16 @@ def notebook():
 
 def build(out):
     notebook(); out.mkdir(parents=True,exist_ok=True)
-    # Remove a previously generated instructor page from reused output directories.
-    (out / "instructor.html").unlink(missing_ok=True)
-    # Generated asset directory is replaced to remove superseded lesson figures.
+    # Keep optional lessons in source, but never leave their old rendered pages published.
+    for hidden in ['04_geometry.html', '05_texture.html', 'instructor.html']:
+        (out / hidden).unlink(missing_ok=True)
+    # Publish only figures referenced by the active student pages.
     if (out/'figures').exists(): shutil.rmtree(out/'figures')
-    shutil.copytree(SOURCE/'figures',out/'figures')
+    (out/'figures').mkdir(parents=True)
+    for module in MODULES:
+        text=(SOURCE/f'{module}.md').read_text()
+        for asset in re.findall(r'!\[[^\]]*\]\((figures/[^)]+)\)', text):
+            shutil.copy2(SOURCE/asset, out/asset)
     shutil.copytree(ROOT/'styles/generative',out/'styles/generative',dirs_exist_ok=True)
     for name in ['wandb_tutorial.ipynb','wandb_tutorial.py']: shutil.copy2(SOURCE/name,out/name)
     (out/'site.css').write_text(CSS+'\n'+(ROOT/'styles/generative/session.css').read_text())
@@ -54,7 +59,7 @@ def build(out):
         palette=''.join(f'<button class="theme-option" data-palette="{p}" aria-pressed="{str(p=="paper").lower()}">{p.title()}</button>' for p in ['paper','midnight','moss','butter','blush','mono'])
         pager=(f'<a href="{URLS[i-1]}">← {TITLES[i-1]}</a>' if i else '<span></span>')+(f'<a href="{URLS[i+1]}">{TITLES[i+1]} →</a>' if i+1<len(URLS) else '')
         page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · Pixels, Masks & Experiments</title>
-<meta name="description" content="Interactive live lab: experiment tracking, label sparsity, output heads, RLE, sensor geometry and texture.">
+<meta name="description" content="Interactive live lab: experiment tracking, label sparsity, output heads and run-length encoding.">
 <link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try{{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}}catch{{}}</script>
