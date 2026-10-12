@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 04 · Output Heads &amp; Semantics · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 04 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-two-competing-paradigms-architectures-and-contracts">1. Two Competing Paradigms: Architectures and Contracts</a></li>
+<li><a href="#2-the-synthetic-two-defect-pixel-experiment">2. The Synthetic Two-Defect Pixel Experiment</a></li>
+<li><a href="#3-co-occurrence-vs-overlap-the-mask-audit-protocol">3. Co-occurrence vs. Overlap: The Mask Audit Protocol</a></li>
+<li><a href="#4-the-information-loss-hazard-forcing-overlaps-into-integers">4. The Information Loss Hazard: Forcing Overlaps into Integers</a></li>
+<li><a href="#5-the-competing-output-hazard-in-independent-heads">5. The Competing Output Hazard in Independent Heads</a></li>
+<li><a href="#6-comparative-decision-matrix">6. Comparative Decision Matrix</a></li>
+<li><a href="#7-common-implementation-pitfalls-and-diagnostics">7. Common Implementation Pitfalls and Diagnostics</a></li>
+<li><a href="#8-ungraded-try-it-activity-trace-a-multi-channel-collision">8. Ungraded Try-It Activity: Trace a Multi-Channel Collision</a></li>
+<li><a href="#9-primary-sources-further-reading">9. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="output-heads-target-semantics-multi-label-sigmoid-vs-multi-class-softmax">Output Heads &amp; Target Semantics: Multi-Label Sigmoid vs. Multi-Class Softmax</h1>
+<p>In deep learning segmentation, the final layer of your network—the <strong>output head</strong>—translates high-level spatial feature maps into class predictions. While this layer is often just a simple <span class="arithmatex">\(1 \times 1\)</span> convolution, your architectural choices here dictate <strong>your target representation, your activation function, your loss formulation, and your post-processing decision pipeline</strong>.</p>
+<p>In this competition, students frequently debate two competing formulations:</p>
+<ol>
+<li><strong>The 4-Channel Multi-Label Formulation</strong>: Four independent binary defect channels activated by <strong>Sigmoid</strong>.</li>
+<li><strong>The 5-Channel Multi-Class Formulation</strong>: A background-inclusive categorical partition activated by <strong>Softmax</strong>.</li>
+</ol>
+<p>Does one formulation hold a universal theoretical advantage? What happens if two defect classes occur on the same image? And how can you verify whether ground truth annotations physically overlap before committing to an architecture?</p>
+<p>This guide examines both output heads in detail. You will trace tensor flows through both pipelines, walk through a concrete numerical demonstration of a competing-defect pixel, conduct a rigorous <strong>pixel-level mask overlap audit</strong>, analyze the risk of permanent information loss, and learn how to resolve multi-channel predictions at test time.</p>
+<hr />
+<h2 id="1-two-competing-paradigms-architectures-and-contracts">1. Two Competing Paradigms: Architectures and Contracts</h2>
+<p>Every output head requires strict mathematical consistency between five components: <strong>output tensor shape, activation function, target tensor encoding, loss function, and inference decision rule</strong>. Mixing components across paradigms leads to fatal training failures or silent metric degradation.</p>
+<p><img alt="Output Head Semantics" src="assets/fig04_output_head_semantics.png" />
+<em>Figure 4.1: The 4-Channel Multi-Label Sigmoid head vs. the 5-Channel Multi-Class Softmax head. Sigmoid evaluates each defect channel independently, while Softmax enforces mutual exclusivity across classes.</em></p>
+<h3 id="paradigm-a-the-4-channel-multi-label-sigmoid-head">Paradigm A: The 4-Channel Multi-Label Sigmoid Head</h3>
+<p>In this formulation, the model treats each defect type as an independent binary detection task.</p>
+<pre class="highlight"><code>Paradigm A Pipeline:
+Decoder Features [B, C, H, W]
+  │
+  ▼
+1×1 Conv Head ──► Raw Logits Z: [B, 4, 128, 800]  (Unbounded in (-∞, +∞))
+  │
+  ├─► Training Flow:   Fed directly to nn.BCEWithLogitsLoss() against Binary Target Y: [B, 4, 128, 800]
+  │
+  └─► Inference Flow:  P_k = σ(z_k) = 1 / (1 + e^(-z_k)) ──► Threshold τ ──► Binary Mask M_k ∈ {0, 1}</code></pre>
+<ul>
+<li><strong>Output Tensor</strong>: <span class="arithmatex">\([B, 4, 128, 800]\)</span> representing defect channels <span class="arithmatex">\([a, b, c, d]\)</span>. There is <strong>no explicit background channel</strong>; background is implicitly represented when all four channels equal 0.</li>
+<li><strong>Target Tensor</strong>: <span class="arithmatex">\([B, 4, 128, 800]\)</span> float32 tensor with binary values <span class="arithmatex">\(\{0.0, 1.0\}\)</span>.</li>
+<li>
+<p><strong>Activation</strong>: Independent elementwise Sigmoid:</p>
+<div class="arithmatex">\[P_k(y, x) = \sigma(z_k(y, x)) = \frac{1}{1 + e^{-z_k(y, x)}} \in (0, 1)\]</div>
+</li>
+<li>
+<p><strong>Semantics</strong>: Channels do not compete. The probability of Defect A has zero mathematical influence on the probability of Defect C.</p>
+</li>
+<li><strong>Inference Rule</strong>: Per-channel thresholding: <span class="arithmatex">\(\hat{Y}_k(y, x) = \mathbb{I}(P_k(y, x) \ge \tau_k)\)</span>.</li>
+</ul>
+<hr />
+<h3 id="paradigm-b-the-5-channel-multi-class-softmax-head">Paradigm B: The 5-Channel Multi-Class Softmax Head</h3>
+<p>In this formulation, the model treats every pixel as belonging to exactly one mutually exclusive category.</p>
+<pre class="highlight"><code>Paradigm B Pipeline:
+Decoder Features [B, C, H, W]
+  │
+  ▼
+1×1 Conv Head ──► Raw Logits Z: [B, 5, 128, 800]  (Unbounded in (-∞, +∞))
+  │               (Class 0: Background, Classes 1..4: Defects A, B, C, D)
+  │
+  ├─► Training Flow:   Fed to nn.CrossEntropyLoss() against Integer Target Y: [B, 128, 800] ∈ {0, 1, 2, 3, 4}
+  │
+  └─► Inference Flow:  P_k = e^(z_k) / Σ_j e^(z_j) ──► Argmax / Score Filter ──► Categorical Map</code></pre>
+<ul>
+<li><strong>Output Tensor</strong>: <span class="arithmatex">\([B, 5, 128, 800]\)</span>. An explicit <strong>Channel 0 represents Background (clean steel)</strong>, while Channels 1 through 4 represent defects <span class="arithmatex">\([a, b, c, d]\)</span>.</li>
+<li><strong>Target Tensor</strong>: <span class="arithmatex">\([B, 128, 800]\)</span> int64 tensor where each pixel contains a single class index: <span class="arithmatex">\(\{0, 1, 2, 3, 4\}\)</span>.</li>
+<li>
+<p><strong>Activation</strong>: Channel-wise Softmax:</p>
+<div class="arithmatex">\[P_k(y, x) = \frac{e^{z_k(y, x)}}{\sum_{j=0}^{4} e^{z_j(y, x)}}, \quad \text{such that } \sum_{k=0}^{4} P_k(y, x) = 1.0\]</div>
+</li>
+<li>
+<p><strong>Semantics</strong>: Channels compete directly. If logit <span class="arithmatex">\(z_a\)</span> rises, it directly forces down the probabilities <span class="arithmatex">\(P_{\text{bg}}\)</span> and <span class="arithmatex">\(P_c\)</span>.</p>
+</li>
+<li>
+<p><strong>Inference Rule</strong>: Pixel-wise argmax or background-gated thresholding:</p>
+<div class="arithmatex">\[\hat{C}(y, x) = \arg\max_{k \in \{0..4\}} P_k(y, x)\]</div>
+</li>
+</ul>
+<hr />
+<h2 id="2-the-synthetic-two-defect-pixel-experiment">2. The Synthetic Two-Defect Pixel Experiment</h2>
+<p>To see the practical consequence of this choice, let us trace a single fictional pixel <span class="arithmatex">\([y=45, x=320]\)</span> where the neural network detects strong visual evidence for <strong>both Defect A (a scratch) and Defect C (an inclusion)</strong>.</p>
+<p>Suppose the network's final layer outputs the following raw unbounded logits across all five potential categories:</p>
+<div class="arithmatex">\[z_{\text{bg}} = -1.0, \quad z_a = +2.5, \quad z_b = -4.0, \quad z_c = +2.1, \quad z_d = -3.0\]</div>
+<h3 id="case-1-interpreting-under-4-channel-multi-label-sigmoid">Case 1: Interpreting Under 4-Channel Multi-Label Sigmoid</h3>
+<p>Under the multi-label paradigm, we ignore <span class="arithmatex">\(z_{\text{bg}}\)</span> and compute independent probabilities for the four defect classes:</p>
+<div class="arithmatex">\[P_a = \sigma(2.5) = \frac{1}{1 + e^{-2.5}} \approx \mathbf{0.9241} \quad (92.4\%)\]</div>
+<div class="arithmatex">\[P_b = \sigma(-4.0) = \frac{1}{1 + e^{4.0}} \approx \mathbf{0.0180} \quad (1.8\%)\]</div>
+<div class="arithmatex">\[P_c = \sigma(2.1) = \frac{1}{1 + e^{-2.1}} \approx \mathbf{0.8909} \quad (89.1\%)\]</div>
+<div class="arithmatex">\[P_d = \sigma(-3.0) = \frac{1}{1 + e^{3.0}} \approx \mathbf{0.0474} \quad (4.7\%)\]</div>
+<h4 id="mathematical-observations">Mathematical Observations:</h4>
+<ol>
+<li>
+<p><strong>Sum of Probabilities</strong>:</p>
+<div class="arithmatex">\[\sum_{k=a}^d P_k = 0.9241 + 0.0180 + 0.8909 + 0.0474 = \mathbf{1.8804} \quad (\gg 1.0!)\]</div>
+<p>Sigmoid probabilities <strong>do not sum to 1.0</strong>. Each channel operates as an independent Bernoulli probability trial.</p>
+</li>
+<li>
+<p><strong>Decision Outcome</strong>:
+   If we apply a standard decision threshold <span class="arithmatex">\(\tau = 0.5\)</span>:</p>
+<ul>
+<li>Defect A is <strong>ACTIVE</strong> (<span class="arithmatex">\(0.9241 \ge 0.5\)</span>).</li>
+<li>Defect C is <strong>ACTIVE</strong> (<span class="arithmatex">\(0.8909 \ge 0.5\)</span>).</li>
+<li>The model predicts that this single pixel simultaneously contains <strong>both a scratch and an inclusion</strong>!</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h3 id="case-2-interpreting-under-5-channel-multi-class-softmax">Case 2: Interpreting Under 5-Channel Multi-Class Softmax</h3>
+<p>Now let us interpret the exact same logits using the categorical Softmax formulation (including <span class="arithmatex">\(z_{\text{bg}} = -1.0\)</span>):</p>
+<ol>
+<li>
+<p>Compute exponents <span class="arithmatex">\(e^{z_j}\)</span>:</p>
+<div class="arithmatex">\[e^{-1.0} \approx 0.3679, \quad e^{2.5} \approx 12.1825, \quad e^{-4.0} \approx 0.0183, \quad e^{2.1} \approx 8.1662, \quad e^{-3.0} \approx 0.0498\]</div>
+</li>
+<li>
+<p>Sum of exponents:</p>
+<div class="arithmatex">\[\sum_{j=0}^{4} e^{z_j} = 0.3679 + 12.1825 + 0.0183 + 8.1662 + 0.0498 = \mathbf{20.7847}\]</div>
+</li>
+<li>
+<p>Compute normalized probabilities <span class="arithmatex">\(P_k = e^{z_k} / \sum e^z\)</span>:</p>
+<div class="arithmatex">\[P_{\text{bg}} = \frac{0.3679}{20.7847} \approx \mathbf{0.0177} \quad (1.8\%)\]</div>
+<div class="arithmatex">\[P_a = \frac{12.1825}{20.7847} \approx \mathbf{0.5861} \quad (58.6\%)\]</div>
+<div class="arithmatex">\[P_b = \frac{0.0183}{20.7847} \approx \mathbf{0.0009} \quad (0.1\%)\]</div>
+<div class="arithmatex">\[P_c = \frac{8.1662}{20.7847} \approx \mathbf{0.3929} \quad (39.3\%)\]</div>
+<div class="arithmatex">\[P_d = \frac{0.0498}{20.7847} \approx \mathbf{0.0024} \quad (0.2\%)\]</div>
+</li>
+</ol>
+<h4 id="mathematical-observations_1">Mathematical Observations:</h4>
+<ol>
+<li>
+<p><strong>Sum of Probabilities</strong>:</p>
+<div class="arithmatex">\[\sum_{k=0}^{4} P_k = 0.0177 + 0.5861 + 0.0009 + 0.3929 + 0.0024 \equiv \mathbf{1.0000} \quad (\text{Exactly } 1.0)\]</div>
+</li>
+<li>
+<p><strong>The Suppression Effect (Cross-Channel Competition)</strong>:
+   Notice what happened to Defect C: under Sigmoid, its confidence was <strong><span class="arithmatex">\(89.1\%\)</span></strong>. But under Softmax, because it had to compete against Defect A's slightly stronger logit (<span class="arithmatex">\(2.5 &gt; 2.1\)</span>), Defect C was <strong>suppressed down to <span class="arithmatex">\(39.3\%\)</span></strong>!</p>
+</li>
+<li>
+<p><strong>Decision Outcome</strong>:
+   If applying argmax:</p>
+<div class="arithmatex">\[\hat{C} = \arg\max \{0.018, 0.586, 0.001, 0.393, 0.002\} = \mathbf{\text{Class 1 (Defect A)}}\]</div>
+<p>Defect A claims the pixel exclusively. Defect C is completely zeroed out.</p>
+</li>
+</ol>
+<hr />
+<h3 id="why-neither-activation-proves-accuracy-or-calibration">Why Neither Activation Proves Accuracy or Calibration</h3>
+<p>Students often believe that Softmax probabilities are "more reliable" because they sum to 1.0, or that Sigmoid is "more honest" because channels do not compete.</p>
+<p><strong>Both beliefs are incorrect</strong>:</p>
+<ul>
+<li>Softmax outputs are notoriously <strong>overconfident</strong>: even when an input is out-of-distribution or noisy, the exponentiation forces probabilities to sum to 1.0, often assigning <span class="arithmatex">\(99\%\)</span> probability to an incorrect class simply because one logit happened to be slightly less negative than the others.</li>
+<li>Sigmoid outputs can be <strong>severely uncalibrated</strong>: a model can predict <span class="arithmatex">\(P=0.85\)</span> on hundreds of false-alarm background speckles if class imbalance is not properly compensated in the loss.</li>
+<li><strong>Calibration is a property of the model's training dynamics and loss function, not the activation function.</strong></li>
+</ul>
+<hr />
+<h2 id="3-co-occurrence-vs-overlap-the-mask-audit-protocol">3. Co-occurrence vs. Overlap: The Mask Audit Protocol</h2>
+<p>A dangerous trap in exploratory data analysis is assuming that <strong>image-level co-occurrence implies pixel-level overlap</strong>:</p>
+<blockquote>
+<p><strong>WARNING</strong>: Just because an image contains annotations for both <code>defect_a</code> and <code>defect_c</code> in <code>train.csv</code> does <strong>NOT</strong> mean they share a single physical pixel!</p>
+</blockquote>
+<p>Consider an industrial steel strip:</p>
+<ul>
+<li>A mechanical scratch (<code>defect_a</code>) may run along the top edge of the sheet from <span class="arithmatex">\(x=100\)</span> to <span class="arithmatex">\(x=300\)</span>, <span class="arithmatex">\(y=10\text{--}15\)</span>.</li>
+<li>A chemical inclusion cluster (<code>defect_c</code>) may sit near the bottom edge from <span class="arithmatex">\(x=600\)</span> to <span class="arithmatex">\(x=700\)</span>, <span class="arithmatex">\(y=90\text{--}110\)</span>.</li>
+<li><strong>Both defects exist on the same strip</strong>, but their masks are <strong><span class="arithmatex">\(100\%\)</span> spatially disjoint</strong> (they share zero pixels).</li>
+</ul>
+<p><img alt="Mask Overlap Audit Methodology" src="assets/fig05_mask_overlap_audit_methodology.png" />
+<em>Figure 4.2: The empirical mask overlap audit flowchart. You must audit your own training dataset to verify whether ground truth masks physically intersect before choosing a target representation.</em></p>
+<hr />
+<h3 id="how-to-audit-your-own-annotations">How to Audit Your Own Annotations</h3>
+<p>Before choosing between a 4-channel multi-label head and a 5-channel softmax head, <strong>you must execute an empirical pixel-level overlap audit on your dataset</strong>.</p>
+<p>Here is the exact mathematical audit procedure:</p>
+<ol>
+<li>Identify all training images that contain <strong>two or more active defect annotations</strong> (<span class="arithmatex">\(N_{\text{defects}} \ge 2\)</span>).</li>
+<li>
+<p>For each multi-defect image, decode the RLE strings into separate binary masks:</p>
+<div class="arithmatex">\[M_a, M_b, M_c, M_d \in \{0, 1\}^{128 \times 800}\]</div>
+</li>
+<li>
+<p>For every unique pair of classes <span class="arithmatex">\((i, j)\)</span> where <span class="arithmatex">\(i \ne j\)</span>, compute the <strong>pixel-wise intersection</strong>:</p>
+<div class="arithmatex">\[\text{Intersection}(i, j) = \sum_{y=1}^{128} \sum_{x=1}^{800} \left( M_i(y, x) \cdot M_j(y, x) \right)\]</div>
+</li>
+<li>
+<p>Sum the intersections across your entire training dataset.</p>
+</li>
+</ol>
+<pre class="highlight"><code class="language-python"># Educational Audit Snippet: How to verify mask overlap yourself
+def audit_mask_overlap(dataset):
+    total_multi_label_images = 0
+    total_overlapping_pixels = 0
+    pairwise_overlaps = {}
+
+    for sample in dataset:
+        masks = sample["mask"] # Tensor shape: [4, 128, 800]
+        active_channels = (masks.sum(dim=(1, 2)) &gt; 0).nonzero().flatten().tolist()
+
+        if len(active_channels) &gt;= 2:
+            total_multi_label_images += 1
+            # Check pairwise intersection
+            for i in range(len(active_channels)):
+                for j in range(i + 1, len(active_channels)):
+                    c1, c2 = active_channels[i], active_channels[j]
+                    intersection = (masks[c1] * masks[c2]).sum().item()
+                    pair_key = f"{c1}_vs_{c2}"
+                    pairwise_overlaps[pair_key] = pairwise_overlaps.get(pair_key, 0) + intersection
+                    total_overlapping_pixels += intersection
+
+    print(f"Audit Summary:")
+    print(f"  • Multi-defect images audited: {total_multi_label_images}")
+    print(f"  • Total overlapping pixels found: {total_overlapping_pixels}")
+    return pairwise_overlaps</code></pre>
+<hr />
+<h2 id="4-the-information-loss-hazard-forcing-overlaps-into-integers">4. The Information Loss Hazard: Forcing Overlaps into Integers</h2>
+<p>What happens if you skip this audit and blindly convert multi-label masks into a single categorical integer target <code>[B, 128, 800]</code>?</p>
+<p>Suppose two defects <strong>genuinely overlap</strong> at pixel <span class="arithmatex">\((y, x)\)</span>, such that:</p>
+<div class="arithmatex">\[M_a(y, x) = 1.0 \quad \text{AND} \quad M_c(y, x) = 1.0\]</div>
+<p>To feed this into <code>nn.CrossEntropyLoss()</code>, you must map each pixel to a single integer class index <span class="arithmatex">\(Y \in \{0, 1, 2, 3, 4\}\)</span>.
+If you use <code>argmax</code> or priority ordering (e.g., assigning the pixel to Class 1):</p>
+<div class="arithmatex">\[Y(y, x) = 1 \quad (\text{Defect A})\]</div>
+<h3 id="the-permanent-information-loss">The Permanent Information Loss:</h3>
+<ol>
+<li><strong>Defect C is Completely Erased</strong>: The ground truth that Defect C exists at <span class="arithmatex">\((y, x)\)</span> is permanently deleted from the target tensor.</li>
+<li><strong>Contradictory Gradient Penalty</strong>: When the model forward pass runs, if the network correctly detects visual features of Defect C and outputs a high logit <span class="arithmatex">\(z_c\)</span>, <code>CrossEntropyLoss</code> will <strong>actively penalize the model for being right</strong>! The loss will backpropagate negative gradients into the Defect C channels because the integer target says the pixel is <em>only</em> Defect A.</li>
+<li><strong>Metric Degradation</strong>: At evaluation time, your ground truth evaluation mask still contains Defect C. The model, having been trained never to predict Defect C at that location, will suffer false negatives.</li>
+</ol>
+<p><strong>Core Principle</strong>:</p>
+<ul>
+<li><strong>If the audit reveals overlapping pixels</strong>: You <strong>must</strong> use the 4-channel multi-label Sigmoid formulation to preserve full ground truth fidelity.</li>
+<li><strong>If the audit reveals zero overlapping pixels</strong>: Then the ground truth forms a strict physical partition. In that case, both 4-Sigmoid and 5-Softmax are mathematically valid, and you should compare them empirically on your validation set.</li>
+</ul>
+<hr />
+<h2 id="5-the-competing-output-hazard-in-independent-heads">5. The Competing Output Hazard in Independent Heads</h2>
+<p>Suppose your audit shows that ground truth masks are <span class="arithmatex">\(100\%\)</span> disjoint, and you choose to train with a 4-channel independent Sigmoid head.</p>
+<p>Are you completely safe? <strong>No!</strong></p>
+<p>Because the four channels are trained independently, <strong>the model has no architectural constraint preventing it from predicting multiple defects at the same pixel during test inference</strong>:</p>
+<ul>
+<li>At training time, the loss separately encourages Channel A and Channel C to match their respective targets.</li>
+<li>At test time, an ambiguous defect (such as an inclusion surrounded by scratch marks) might produce <span class="arithmatex">\(P_a = 0.72\)</span> and <span class="arithmatex">\(P_c = 0.68\)</span>.</li>
+<li>Both probabilities exceed the threshold <span class="arithmatex">\(\tau = 0.5\)</span>.</li>
+</ul>
+<h3 id="the-kaggle-submission-evaluation-hazard">The Kaggle Submission &amp; Evaluation Hazard</h3>
+<p>If the competition evaluation metric assumes that masks are mutually exclusive, or if multi-class collisions are heavily penalized by false positive metrics, predicting two overlapping defect masks on the same pixel damages your score.</p>
+<h3 id="collision-resolution-strategies-for-sigmoid-heads">Collision Resolution Strategies for Sigmoid Heads</h3>
+<p>If you use independent sigmoid channels, you must implement an explicit <strong>post-processing collision resolution rule</strong>:</p>
+<ol>
+<li>
+<p><strong>Highest Probability Wins (Argmax over Active Channels)</strong>:
+   If a pixel has <span class="arithmatex">\(P_a \ge \tau\)</span> and <span class="arithmatex">\(P_c \ge \tau\)</span>, assign the pixel exclusively to whichever class has the higher probability (<span class="arithmatex">\(\max(P_a, P_c)\)</span>) and zero out the other channel.</p>
+</li>
+<li>
+<p><strong>Area-Based Precedence</strong>:
+   Assign the pixel to the defect class with the smaller overall component area (since small rare defects like <code>defect_b</code> are more vulnerable to recall penalties).</p>
+</li>
+</ol>
+<hr />
+<h2 id="6-comparative-decision-matrix">6. Comparative Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">4-Channel Multi-Label Sigmoid</th>
+<th style="text-align: left;">5-Channel Multi-Class Softmax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Output Logits</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 4, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 5, 128, 800]\)</span> (includes background)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Target Tensor</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 4, 128, 800]\)</span> float32 binary</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 800]\)</span> int64 categorical</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mathematical Assumption</strong></td>
+<td style="text-align: left;">Channels are independent.</td>
+<td style="text-align: left;">Classes are strictly mutually exclusive.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ground Truth Overlap Safe?</strong></td>
+<td style="text-align: left;"><strong>Yes</strong>: Preserves overlapping labels losslessly.</td>
+<td style="text-align: left;"><strong>No</strong>: Causes permanent ground truth information loss.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Test-Time Collision Risk</strong></td>
+<td style="text-align: left;"><strong>Yes</strong>: Can predict overlapping masks unless resolved.</td>
+<td style="text-align: left;"><strong>Zero</strong>: Softmax guarantees mutually exclusive output.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Empty Clean Image Handling</strong></td>
+<td style="text-align: left;">Implicit: all 4 channels <span class="arithmatex">\(&lt; \tau\)</span>.</td>
+<td style="text-align: left;">Explicit: Channel 0 (<span class="arithmatex">\(P_{\text{bg}}\)</span>) exceeds defect channels.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Loss Compatibility</strong></td>
+<td style="text-align: left;"><code>BCEWithLogitsLoss</code> + Soft Dice.</td>
+<td style="text-align: left;"><code>CrossEntropyLoss</code> + Multiclass Dice.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-common-implementation-pitfalls-and-diagnostics">7. Common Implementation Pitfalls and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Diagnostic &amp; Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Missing Background Channel in Softmax</strong></td>
+<td style="text-align: left;">Outputting 4 channels with <code>CrossEntropyLoss</code> without a background class.</td>
+<td style="text-align: left;">Network is forced to assign every clean background pixel to one of the 4 defects! Loss explodes.</td>
+<td style="text-align: left;">Softmax heads must output <strong>5 channels</strong> (<span class="arithmatex">\(C_0 = \text{background}\)</span>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Double Activation Bug</strong></td>
+<td style="text-align: left;">Calling <code>torch.sigmoid(logits)</code> before passing to <code>nn.BCEWithLogitsLoss()</code>.</td>
+<td style="text-align: left;">Loss plateaus near <span class="arithmatex">\(\approx 0.693\)</span>; gradients vanish.</td>
+<td style="text-align: left;">Pass raw unbounded logits directly to <code>BCEWithLogitsLoss</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Target Type Error in CrossEntropy</strong></td>
+<td style="text-align: left;">Passing float targets <code>[B, 5, H, W]</code> to <code>nn.CrossEntropyLoss()</code>.</td>
+<td style="text-align: left;"><code>RuntimeError: Expected floating point target with same shape, or int64 target</code>.</td>
+<td style="text-align: left;">Pass <code>[B, H, W]</code> with <code>dtype=torch.long</code> (int64) containing class indices.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Silent Overlap Erasure</strong></td>
+<td style="text-align: left;">Converting multi-label masks to integers using <code>torch.argmax()</code> without checking for ties or overlaps.</td>
+<td style="text-align: left;">Certain defect classes lose up to <span class="arithmatex">\(20\%\)</span> of their positive training pixels.</td>
+<td style="text-align: left;">Run the overlap audit (Section 3) before creating integer targets.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-ungraded-try-it-activity-trace-a-multi-channel-collision">8. Ungraded Try-It Activity: Trace a Multi-Channel Collision</h2>
+<p>Try this small calculation on paper:</p>
+<p>Suppose a pixel outputs the following 5 logits:</p>
+<div class="arithmatex">\[z_{\text{bg}} = 0.5, \quad z_a = 1.8, \quad z_b = -2.0, \quad z_c = 1.2, \quad z_d = -1.5\]</div>
+<ol>
+<li>Calculate the Sigmoid probability for Defect A (<span class="arithmatex">\(z_a = 1.8\)</span>) and Defect C (<span class="arithmatex">\(z_c = 1.2\)</span>).</li>
+<li>Using threshold <span class="arithmatex">\(\tau = 0.5\)</span>, which defects are active under the Sigmoid head?</li>
+<li>Calculate the Softmax probabilities for all 5 classes. Which class wins the argmax?</li>
+<li>What happened to Defect C's decision between the two heads?</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li><strong>Sigmoid probabilities</strong>:<ul>
+<li><span class="arithmatex">\(P_a = \sigma(1.8) = \frac{1}{1 + e^{-1.8}} \approx \frac{1}{1 + 0.1653} \approx \mathbf{0.858}\)</span></li>
+<li><span class="arithmatex">\(P_c = \sigma(1.2) = \frac{1}{1 + e^{-1.2}} \approx \frac{1}{1 + 0.3012} \approx \mathbf{0.768}\)</span></li>
+</ul>
+</li>
+<li><strong>Sigmoid decision (<span class="arithmatex">\(\tau = 0.5\)</span>)</strong>:<ul>
+<li>Both <span class="arithmatex">\(P_a \ge 0.5\)</span> and <span class="arithmatex">\(P_c \ge 0.5\)</span>.</li>
+<li><strong>Both Defect A and Defect C are active!</strong></li>
+</ul>
+</li>
+<li><strong>Softmax probabilities</strong>:<ul>
+<li>Exponents: <span class="arithmatex">\(e^{0.5} \approx 1.649\)</span>, <span class="arithmatex">\(e^{1.8} \approx 6.050\)</span>, <span class="arithmatex">\(e^{-2.0} \approx 0.135\)</span>, <span class="arithmatex">\(e^{1.2} \approx 3.320\)</span>, <span class="arithmatex">\(e^{-1.5} \approx 0.223\)</span>.</li>
+<li>Sum of exponents: <span class="arithmatex">\(1.649 + 6.050 + 0.135 + 3.320 + 0.223 = \mathbf{11.377}\)</span>.</li>
+<li><span class="arithmatex">\(P_{\text{bg}} = 1.649 / 11.377 \approx \mathbf{0.145}\)</span></li>
+<li><span class="arithmatex">\(P_a = 6.050 / 11.377 \approx \mathbf{0.532}\)</span></li>
+<li><span class="arithmatex">\(P_b = 0.135 / 11.377 \approx \mathbf{0.012}\)</span></li>
+<li><span class="arithmatex">\(P_c = 3.320 / 11.377 \approx \mathbf{0.292}\)</span></li>
+<li><span class="arithmatex">\(P_d = 0.223 / 11.377 \approx \mathbf{0.020}\)</span></li>
+<li>Argmax Winner: <strong>Class 1 (Defect A) with <span class="arithmatex">\(53.2\%\)</span></strong>.</li>
+</ul>
+</li>
+<li><strong>Comparison</strong>:
+   Under Sigmoid, Defect C was confidently predicted as present (<span class="arithmatex">\(76.8\%\)</span>). Under Softmax, Defect C was suppressed (<span class="arithmatex">\(29.2\%\)</span>) and completely discarded by argmax!</li>
+</ol>
+</details>
+<p>To run this experiment interactively on synthetic tensors with PyTorch, run:
+👉 <a href="examples/toy_head_comparison.py"><code>docs/milestone_3_student_guide/examples/toy_head_comparison.py</code></a></p>
+<hr />
+<h2 id="9-primary-sources-further-reading">9. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>PyTorch Documentation: <code>torch.nn.BCEWithLogitsLoss</code></strong>. Mathematical formulation, log-sum-exp stabilization, and positive weighting. <a href="https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">PyTorch Docs</a>.</li>
+<li><strong>PyTorch Documentation: <code>torch.nn.CrossEntropyLoss</code></strong>. Multi-class categorical cross-entropy and class-weighting mechanics. <a href="https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html">PyTorch Docs</a>.</li>
+<li><strong>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016)</strong>. <em>Deep Learning</em> (Chapter 6: Deep Feedforward Networks). MIT Press. Explains cross-entropy, softmax saturation, and log-likelihood optimization.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_03_grayscale_input_adaptation.html">← Guide 03 · Grayscale Input Adaptation</a><a href="guide_05_bce_dice_and_compound_losses.html">Guide 05 · BCE, Dice, &amp; Compound Losses →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

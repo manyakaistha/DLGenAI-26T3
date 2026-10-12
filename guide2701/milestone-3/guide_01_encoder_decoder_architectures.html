@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 01 · Encoder–Decoder Architectures · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 01 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-spatial-dilemma-why-classification-features-cannot-segment">1. The Spatial Dilemma: Why Classification Features Cannot Segment</a></li>
+<li><a href="#2-the-encoderdecoder-paradigm">2. The Encoder–Decoder Paradigm</a></li>
+<li><a href="#3-spatial-mechanics-tracing-an-industrial-strip-128-times-800">3. Spatial Mechanics: Tracing an Industrial Strip (\(128 \times 800\))</a></li>
+<li><a href="#4-the-spatial-detail-crisis-skip-connections">4. The Spatial Detail Crisis &amp; Skip Connections</a></li>
+<li><a href="#5-skip-fusion-mechanics-concatenation-vs-addition">5. Skip Fusion Mechanics: Concatenation vs. Addition</a></li>
+<li><a href="#6-spatial-alignment-stride-traps-diagnosing-shape-incompatibilities">6. Spatial Alignment &amp; Stride Traps: Diagnosing Shape Incompatibilities</a></li>
+<li><a href="#7-simple-u-net-vs-pretrained-encoder-u-net-a-conceptual-shift">7. Simple U-Net vs. Pretrained-Encoder U-Net: A Conceptual Shift</a></li>
+<li><a href="#8-comparative-decision-matrix">8. Comparative Decision Matrix</a></li>
+<li><a href="#9-common-implementation-pitfalls-and-diagnostics">9. Common Implementation Pitfalls and Diagnostics</a></li>
+<li><a href="#10-ungraded-try-it-activity-trace-receptive-field-and-tensor-shapes">10. Ungraded Try-It Activity: Trace Receptive Field and Tensor Shapes</a></li>
+<li><a href="#11-primary-sources-further-reading">11. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="encoderdecoder-architectures-for-industrial-segmentation">Encoder–Decoder Architectures for Industrial Segmentation</h1>
+<p>In Milestone 2, you assembled a foundational segmentation pipeline: feeding line-scan strips through a basic convolutional network, thresholding probabilities, and packaging predictions into run-length encodings. However, industrial anomaly detection poses a severe spatial paradox: <strong>how can a neural network capture global contextual information across an <span class="arithmatex">\(800\)</span>-pixel wide steel sheet while simultaneously preserving the sub-millimeter edge boundaries of a 2-pixel wide hairline scratch?</strong></p>
+<p>Standard classification networks solve recognition by discarding spatial resolution through pooling and strided convolutions. If you apply that strategy directly to segmentation, boundary localization is permanently destroyed.</p>
+<p>This guide explores the architectural engine designed to resolve this paradox: the <strong>encoder–decoder network with lateral skip connections</strong>. You will learn how feature hierarchies contract and expand, trace exact tensor shapes through an anisotropic industrial strip (<span class="arithmatex">\(128 \times 800\)</span>), dissect the mathematical differences between skip concatenation and addition, and diagnose spatial misalignment bugs before they degrade your validation scores.</p>
+<hr />
+<h2 id="1-the-spatial-dilemma-why-classification-features-cannot-segment">1. The Spatial Dilemma: Why Classification Features Cannot Segment</h2>
+<p>To understand why segmentation models require a two-part architecture, consider what happens inside a standard image classification model (such as an ImageNet classifier):</p>
+<pre class="highlight"><code>Classification Paradigm (Translation Invariant):
+Input [1, 128, 800] ──► Downsample (32×) ──► Global Average Pooling ──► Class Vector [C]
+                                              (All spatial coordinates destroyed!)</code></pre>
+<p>Classification networks are deliberately engineered to be <strong>translation invariant</strong>: whether an inclusion defect sits at the far left edge (<span class="arithmatex">\(x=12\)</span>) or near the center (<span class="arithmatex">\(x=400\)</span>), the classification label is still <code>"defect_c"</code>. To achieve this invariance, the network repeatedly pools features, expanding the receptive field until each neuron summarizes the entire image into a 1D vector.</p>
+<p>In contrast, semantic segmentation is fundamentally <strong>translation equivariant</strong>: if a scratch shifts 10 pixels to the right, the predicted mask must shift by exactly 10 pixels to the right. Global pooling is fatal to segmentation because spatial coordinates <span class="arithmatex">\([y, x]\)</span> cannot be recovered from a single scalar summary.</p>
+<pre class="highlight"><code>Segmentation Paradigm (Translation Equivariant):
+Input [1, 128, 800] ──► Feature Extraction ──► Spatial Reconstruction ──► Pixel Mask [K, 128, 800]
+                        (Contracting Path)      (Expanding Path)          (Every pixel localized)</code></pre>
+<p>To output a pixel-aligned mask, a model must achieve two opposing objectives:</p>
+<ol>
+<li><strong>High Semantic Abstraction</strong>: Distinguish true metallurgical anomalies from harmless surface glare, rolling oil stains, and sensor noise (requiring a large receptive field).</li>
+<li><strong>Millimeter Spatial Precision</strong>: Delineate exact defect borders, preserving thin cracks that may span only 1 to 3 pixels in width (requiring high spatial resolution).</li>
+</ol>
+<hr />
+<h2 id="2-the-encoderdecoder-paradigm">2. The Encoder–Decoder Paradigm</h2>
+<p>The universal solution to this dual requirement is the <strong>encoder–decoder architecture</strong> (pioneered by Long et al., 2015 with Fully Convolutional Networks, and refined by Ronneberger et al., 2015 with U-Net).</p>
+<p><img alt="Encoder–Decoder Architecture" src="assets/fig01_encoder_decoder_mechanics.png" />
+<em>Figure 1.1: The Encoder–Decoder architecture for industrial strip segmentation (<span class="arithmatex">\(128 \times 800\)</span>). The contracting path captures semantic defect context, the expanding path restores spatial dimensions, and lateral skip connections preserve high-frequency boundary details.</em></p>
+<p>An encoder–decoder comprises three distinct functional zones:</p>
+<h3 id="1-the-contracting-path-encoder">1. The Contracting Path (Encoder)</h3>
+<p>The encoder acts as a hierarchical feature extractor. As input tensors propagate through successive convolutional blocks and downsampling layers (typically <span class="arithmatex">\(2\times 2\)</span> max pooling or strided convolutions with stride 2):</p>
+<ul>
+<li><strong>Spatial Resolution Decreases</strong>: Height and width are progressively halved (<span class="arithmatex">\(H \to H/2 \to H/4 \dots\)</span>, <span class="arithmatex">\(W \to W/2 \to W/4 \dots\)</span>).</li>
+<li><strong>Channel Depth Increases</strong>: The number of feature channels grows (<span class="arithmatex">\(1 \to 64 \to 128 \to 256 \to 512\)</span>).</li>
+<li><strong>Receptive Field Expands</strong>: Early layers respond only to tiny local patches (edges, gradients), whereas deep layers view large regions of the strip (textural irregularities, long structural defects).</li>
+</ul>
+<h3 id="2-the-bottleneck">2. The Bottleneck</h3>
+<p>The bottleneck represents the transition point between contraction and expansion. It possesses the <strong>smallest spatial resolution</strong> and the <strong>largest channel capacity</strong> (e.g., <span class="arithmatex">\(8 \times 50\)</span> pixels with <span class="arithmatex">\(512\)</span> channels for a <span class="arithmatex">\(128 \times 800\)</span> input).
+At this stage, spatial coordinate fidelity is at its lowest, but semantic feature density is at its highest. The bottleneck computes global context: it "knows" whether an anomaly exists and what type of surface disruption has occurred, but its spatial boundaries are blurry and coarse.</p>
+<h3 id="3-the-expanding-path-decoder">3. The Expanding Path (Decoder)</h3>
+<p>The decoder is responsible for <strong>spatial recovery</strong>. Through a sequence of upsampling operators (such as bilinear interpolation or transposed convolutions) paired with convolutional refinement blocks:</p>
+<ul>
+<li><strong>Spatial Resolution Increases</strong>: Dimensions are progressively doubled (<span class="arithmatex">\(8 \times 50 \to 16 \times 100 \to 32 \to 64 \to 128 \times 800\)</span>).</li>
+<li><strong>Channel Depth Decreases</strong>: Feature maps are projected back to manageable channel widths.</li>
+<li><strong>Output Projection</strong>: A final <span class="arithmatex">\(1 \times 1\)</span> convolution maps the refined feature maps to the desired number of output logits (<span class="arithmatex">\(K\)</span> channels at <span class="arithmatex">\(128 \times 800\)</span>).</li>
+</ul>
+<hr />
+<h2 id="3-spatial-mechanics-tracing-an-industrial-strip-128-times-800">3. Spatial Mechanics: Tracing an Industrial Strip (<span class="arithmatex">\(128 \times 800\)</span>)</h2>
+<p>In industrial inspection, images are rarely square. In our line-scan setting, images have an anisotropic resolution of <strong><span class="arithmatex">\(128 \times 800\)</span> pixels</strong> (aspect ratio <span class="arithmatex">\(6.25:1\)</span>).</p>
+<p>Let us trace a fictional grayscale strip tensor through an educational 4-stage encoder–decoder.</p>
+<h3 id="progressive-tensor-shape-and-resolution-table">Progressive Tensor Shape and Resolution Table</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Stage</th>
+<th style="text-align: left;">Operation / Layer</th>
+<th style="text-align: left;">Input Shape <span class="arithmatex">\([B, C, H, W]\)</span></th>
+<th style="text-align: left;">Output Shape <span class="arithmatex">\([B, C, H, W]\)</span></th>
+<th style="text-align: left;">Downsampling Factor</th>
+<th style="text-align: left;">Spatial Resolution per Feature Cell</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Input</strong></td>
+<td style="text-align: left;">Grayscale Strip</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 1, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 \times 1\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Encoder 1</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times \text{Conv}(3\times 3) + \text{BN} + \text{ReLU}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 1, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 \times 1\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pool 1</strong></td>
+<td style="text-align: left;">MaxPool2d (stride 2)</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2 \times 2\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Encoder 2</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times \text{Conv}(3\times 3) + \text{BN} + \text{ReLU}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2 \times 2\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pool 2</strong></td>
+<td style="text-align: left;">MaxPool2d (stride 2)</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4 \times 4\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Encoder 3</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times \text{Conv}(3\times 3) + \text{BN} + \text{ReLU}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4 \times 4\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pool 3</strong></td>
+<td style="text-align: left;">MaxPool2d (stride 2)</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8 \times 8\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Encoder 4</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times \text{Conv}(3\times 3) + \text{BN} + \text{ReLU}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8 \times 8\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Pool 4</strong></td>
+<td style="text-align: left;">MaxPool2d (stride 2)</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 8, 50]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16 \times 16\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Bottleneck</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times \text{Conv}(3\times 3) + \text{BN} + \text{ReLU}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 8, 50]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 8, 50]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16 \times 16\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Upsample 4</strong></td>
+<td style="text-align: left;">Bilinear <span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 8, 50]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8 \times 8\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Decoder 4</strong></td>
+<td style="text-align: left;">Cat(Skip 4) + Conv Block</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 512+512, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8 \times 8\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Upsample 3</strong></td>
+<td style="text-align: left;">Bilinear <span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 16, 100]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4 \times 4\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Decoder 3</strong></td>
+<td style="text-align: left;">Cat(Skip 3) + Conv Block</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 256+256, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4 \times 4\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Upsample 2</strong></td>
+<td style="text-align: left;">Bilinear <span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 32, 200]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2 \times 2\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Decoder 2</strong></td>
+<td style="text-align: left;">Cat(Skip 2) + Conv Block</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 128+128, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2 \times 2\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Upsample 1</strong></td>
+<td style="text-align: left;">Bilinear <span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 64, 400]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 \times 1\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Decoder 1</strong></td>
+<td style="text-align: left;">Cat(Skip 1) + Conv Block</td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64+64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 \times 1\text{ px}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Final Head</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times 1\text{ Conv}(64 \to K)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 64, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, K, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 \times 1\text{ px}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Notice why the strip dimensions <span class="arithmatex">\(128 \times 800\)</span> work cleanly:</p>
+<div class="arithmatex">\[128 / 2^4 = 128 / 16 = 8, \quad 800 / 2^4 = 800 / 16 = 50\]</div>
+<p>Both dimensions divide cleanly by <span class="arithmatex">\(2^4 = 16\)</span> (and even by <span class="arithmatex">\(2^5 = 32\)</span>, yielding <span class="arithmatex">\(4 \times 25\)</span>). There are no fractional spatial boundaries, ensuring that every upsampled feature map matches its corresponding skip connection exactly.</p>
+<hr />
+<h2 id="4-the-spatial-detail-crisis-skip-connections">4. The Spatial Detail Crisis &amp; Skip Connections</h2>
+<p>Why can a decoder not simply upsample bottleneck features using bilinear interpolation without skip connections?</p>
+<p>Consider a thin longitudinal scratch (<code>defect_a</code>) that is <strong>2 pixels wide</strong> on the original canvas:</p>
+<ol>
+<li>At <strong><span class="arithmatex">\(2\times\)</span> downsampling</strong> (<span class="arithmatex">\(64 \times 400\)</span>), the crack occupies 1 feature cell.</li>
+<li>At <strong><span class="arithmatex">\(4\times\)</span> downsampling</strong> (<span class="arithmatex">\(32 \times 200\)</span>), the crack occupies <span class="arithmatex">\(0.5\)</span> feature cells. The signal blurs into the surrounding background pixels.</li>
+<li>At <strong><span class="arithmatex">\(16\times\)</span> downsampling</strong> (<span class="arithmatex">\(8 \times 50\)</span>), a single feature cell corresponds to a <span class="arithmatex">\(16 \times 16 = 256\)</span> pixel patch of the physical steel sheet. The 2-pixel wide scratch represents less than <span class="arithmatex">\(1\%\)</span> of the spatial energy in that cell!</li>
+</ol>
+<pre class="highlight"><code>Physical Defect Cross-Section Across Contracting Stages:
+Stage 0 (Input 1×):        [0, 0, 0, 1, 1, 0, 0, 0]  &lt;-- 2 pixels wide, perfectly distinct
+Stage 1 (Downsampled 2×):  [0, 0, 0.5, 1, 0.5, 0, 0] &lt;-- Boundary begins to spread
+Stage 2 (Downsampled 4×):  [0, 0.2, 0.8, 0.2, 0]     &lt;-- Sub-pixel blurring
+Stage 4 (Bottleneck 16×):  [0.05, 0.05]              &lt;-- Spatial boundary dissolved into average</code></pre>
+<p>When the decoder attempts to upsample from <span class="arithmatex">\(8 \times 50\)</span> back to <span class="arithmatex">\(128 \times 800\)</span>, standard bilinear interpolation can only create smooth, blurry gradients. It cannot recreate the sharp high-frequency edge of the 2-pixel crack because that information was mathematically destroyed during pooling.</p>
+<h3 id="the-skip-connection-solution">The Skip Connection Solution</h3>
+<p><strong>Skip connections</strong> bridge this information gap. They take the high-resolution feature maps generated in the early encoder stages (before pooling occurs) and route them directly across to the corresponding decoder stage.</p>
+<p>When the decoder combines upsampled contextual features with early skip features:</p>
+<ul>
+<li>The upsampled features provide the answer to: <em>"Is this an anomaly, and what type is it?"</em></li>
+<li>The skip features provide the answer to: <em>"Where exactly is the physical boundary of this anomaly?"</em></li>
+</ul>
+<hr />
+<h2 id="5-skip-fusion-mechanics-concatenation-vs-addition">5. Skip Fusion Mechanics: Concatenation vs. Addition</h2>
+<p>How should the decoder merge the skip feature map <span class="arithmatex">\(X_{\text{skip}}\)</span> with the upsampled feature map <span class="arithmatex">\(X_{\text{up}}\)</span>? In modern architectures, two primary fusion mechanisms exist:</p>
+<pre class="highlight"><code>Mechanism A: Concatenation (U-Net Standard)
+X_up   [B, C_up, H, W]   ┐
+                         ├─► torch.cat([X_up, X_skip], dim=1) ──► [B, C_up + C_skip, H, W]
+X_skip [B, C_skip, H, W] ┘
+
+Mechanism B: Elementwise Addition (ResNet / LinkNet / FPN)
+X_up   [B, C, H, W]      ┐
+                         ├─► X_up + X_skip ──────────────────────► [B, C, H, W]
+X_skip [B, C, H, W]      ┘  (Requires C_up == C_skip)</code></pre>
+<h3 id="mathematical-formulation">Mathematical Formulation</h3>
+<h4 id="1-concatenation-fusion">1. Concatenation Fusion</h4>
+<div class="arithmatex">\[X_{\text{fused}} = \left[ X_{\text{up}} \;\|\; X_{\text{skip}} \right] \in \mathbb{R}^{B \times (C_{\text{up}} + C_{\text{skip}}) \times H \times W}\]</div>
+<p>Followed by a convolution layer:</p>
+<div class="arithmatex">\[Y = \text{ReLU}\left( \text{BatchNorm}\left( W * X_{\text{fused}} + b \right) \right)\]</div>
+<ul>
+<li><strong>Mechanism</strong>: The feature maps are stacked along the channel axis.</li>
+<li><strong>Advantage</strong>: Preserves distinct representations. The network does not force high-level abstract features and low-level edge features to share the same channel space; the subsequent convolution can learn custom linear combinations of both.</li>
+<li><strong>Cost</strong>: Channel count doubles (<span class="arithmatex">\(C_{\text{up}} + C_{\text{skip}}\)</span>), increasing GPU VRAM consumption and decoder parameter counts.</li>
+</ul>
+<h4 id="2-elementwise-addition-fusion">2. Elementwise Addition Fusion</h4>
+<div class="arithmatex">\[X_{\text{fused}} = X_{\text{up}} + X_{\text{skip}} \in \mathbb{R}^{B \times C \times H \times W}\]</div>
+<ul>
+<li><strong>Mechanism</strong>: Corresponding feature cells are summed.</li>
+<li><strong>Advantage</strong>: Highly parameter-efficient and memory-frugal. Channel counts do not expand (<span class="arithmatex">\(C\)</span> remains constant), reducing memory bandwidth during backpropagation.</li>
+<li><strong>Cost</strong>: Requires strict channel agreement (<span class="arithmatex">\(C_{\text{up}} = C_{\text{skip}}\)</span>). If channel counts differ, a <span class="arithmatex">\(1 \times 1\)</span> projection convolution must be applied first. Furthermore, adding feature maps forces the representation spaces to align, potentially overwriting subtle high-frequency signals.</li>
+</ul>
+<hr />
+<h2 id="6-spatial-alignment-stride-traps-diagnosing-shape-incompatibilities">6. Spatial Alignment &amp; Stride Traps: Diagnosing Shape Incompatibilities</h2>
+<p>A common source of silent failure in segmentation is <strong>dimension misalignment</strong>. Because segmentation involves multiple downsampling and upsampling operations, an incompatible image dimension or improper padding can cause feature maps to differ by 1 pixel.</p>
+<h3 id="the-odd-dimension-hazard">The Odd-Dimension Hazard</h3>
+<p>Suppose a dataset contains images of dimension <span class="arithmatex">\(H = 125, W = 800\)</span>:</p>
+<ol>
+<li>Input: <span class="arithmatex">\(125 \times 800\)</span>.</li>
+<li>Level 1 MaxPool (stride 2): <span class="arithmatex">\(\lfloor 125 / 2 \rfloor = 62 \times 400\)</span>.</li>
+<li>Level 2 MaxPool (stride 2): <span class="arithmatex">\(\lfloor 62 / 2 \rfloor = 31 \times 200\)</span>.</li>
+<li>Level 3 MaxPool (stride 2): <span class="arithmatex">\(\lfloor 31 / 2 \rfloor = 15 \times 100\)</span>.</li>
+<li>Decoder Level 3 Upsample (<span class="arithmatex">\(2\times\)</span>): <span class="arithmatex">\(15 \times 2 = 30 \times 200\)</span>.</li>
+</ol>
+<p>When the decoder attempts to concatenate the upsampled tensor (<span class="arithmatex">\(30 \times 200\)</span>) with the Level 2 skip connection (<span class="arithmatex">\(31 \times 200\)</span>), PyTorch throws a fatal error:
+<pre class="highlight"><code class="language-text">RuntimeError: Sizes of tensors must match except in dimension 1. Expected size 31 but got size 30 for dimension 2.</code></pre></p>
+<h3 id="the-dangerous-anti-pattern-blind-resizing">The Dangerous Anti-Pattern: Blind Resizing</h3>
+<p>A frequent student mistake when encountering this runtime error is to insert an ad-hoc resize:
+<pre class="highlight"><code class="language-python"># DANGEROUS ANTI-PATTERN: DO NOT DO THIS!
+d3_upsampled = F.interpolate(d3, size=s2.shape[2:], mode="bilinear") # Silently stretches!</code></pre>
+While this silences the PyTorch exception, it introduces <strong>spatial phase distortion</strong>. Bilinear stretching shifts feature coordinates relative to the physical steel canvas. When predictions are mapped back to ground truth, defect edges are systematically misaligned by 1 to 2 pixels, causing severe drops in the Dice score on thin scratches.</p>
+<h3 id="the-correct-engineering-solution">The Correct Engineering Solution</h3>
+<p>For our competition dataset (<span class="arithmatex">\(128 \times 800\)</span>), dimensions are powers of two (<span class="arithmatex">\(128 = 2^7, 800 = 2^5 \times 25\)</span>). If you ever crop or patch your images, <strong>ensure every crop dimension is divisible by <span class="arithmatex">\(2^D\)</span></strong>, where <span class="arithmatex">\(D\)</span> is the maximum downsampling depth of your architecture (for <span class="arithmatex">\(D=5\)</span>, crops must be multiples of 32).</p>
+<hr />
+<h2 id="7-simple-u-net-vs-pretrained-encoder-u-net-a-conceptual-shift">7. Simple U-Net vs. Pretrained-Encoder U-Net: A Conceptual Shift</h2>
+<p>In Milestone 2, you explored a basic U-Net where both encoder and decoder were initialized randomly and trained from scratch. In Milestone 3, you make a conceptual transition: <strong>decoupling the feature extractor from the reconstruction engine</strong>.</p>
+<pre class="highlight"><code>Milestone 2 Baseline (Symmetric, From-Scratch):
+[Simple Conv Encoder] ──(Skips)──► [Simple Conv Decoder]
+(Initialized randomly; must learn edges, textures, and anomalies simultaneously)
+
+Milestone 3 Pretrained Architecture (Asymmetric, Transfer Learning):
+[Pretrained Backbone (e.g. ResNet34)] ──(Skips)──► [Task-Specific Decoder]
+(Pretrained on 1.2M ImageNet images;                 (Custom decoder tailored to
+ rich edge &amp; texture filters ready on Day 1)          industrial strip geometry)</code></pre>
+<p>In a pretrained encoder–decoder:</p>
+<ol>
+<li><strong>The Encoder is Standardized</strong>: We replace custom convolution stacks with proven computer vision backbones (such as <code>resnet34</code>, <code>efficientnet-b0</code>, or <code>convnext</code>).</li>
+<li><strong>Feature Taps are Heterogeneous</strong>: Unlike a symmetric U-Net where every encoder stage has identical layer counts, pretrained backbones feature asymmetric stage depths and non-uniform channel distributions (e.g., ResNet stages have channels <span class="arithmatex">\(64, 128, 256, 512\)</span>).</li>
+<li><strong>The Decoder Adapts to the Backbone</strong>: The decoder's skip input channels must be explicitly configured to match the channel output of each tapped backbone stage.</li>
+</ol>
+<hr />
+<h2 id="8-comparative-decision-matrix">8. Comparative Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Architectural Feature</th>
+<th style="text-align: left;">Concatenation Skips (U-Net)</th>
+<th style="text-align: left;">Addition Skips (FPN / LinkNet)</th>
+<th style="text-align: left;">No Skips (Dilated / DeepLab)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Thin Defect Boundary Fidelity</strong></td>
+<td style="text-align: left;"><strong>Excellent</strong>: Direct routing of raw pixel coordinates.</td>
+<td style="text-align: left;"><strong>Good</strong>: Combines features with minimal distortion.</td>
+<td style="text-align: left;"><strong>Poor</strong>: Coarse boundaries; misses hairline scratches.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>GPU Memory Footprint</strong></td>
+<td style="text-align: left;"><strong>High</strong>: Decoder channel counts double at each level.</td>
+<td style="text-align: left;"><strong>Low</strong>: Channel count remains constant.</td>
+<td style="text-align: left;"><strong>Moderate</strong>: Requires atrous spatial pyramid pooling.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Receptive Field Growth</strong></td>
+<td style="text-align: left;">Moderate (governed by downsampling depth).</td>
+<td style="text-align: left;">Moderate.</td>
+<td style="text-align: left;"><strong>Very High</strong>: Dilated convolutions expand receptive field without resolution loss.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Recommended Regime</strong></td>
+<td style="text-align: left;">Primary baseline for industrial defect segmentation.</td>
+<td style="text-align: left;">High-throughput, memory-constrained environments.</td>
+<td style="text-align: left;">Large amorphous defects (e.g., broad stains, rolling marks).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-common-implementation-pitfalls-and-diagnostics">9. Common Implementation Pitfalls and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Diagnostic &amp; Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Channel Axis Mismatch in <code>torch.cat</code></strong></td>
+<td style="text-align: left;">Concatenating along spatial axis instead of channel axis (<code>dim=2</code> instead of <code>dim=1</code>).</td>
+<td style="text-align: left;"><code>RuntimeError: Sizes of tensors must match except in dimension 2</code>.</td>
+<td style="text-align: left;">Ensure <code>torch.cat([up, skip], dim=1)</code> explicitly specifies channel dimension.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spatial Off-by-One Mismatch</strong></td>
+<td style="text-align: left;">Using an odd spatial crop (e.g., <span class="arithmatex">\(125 \times 800\)</span>) with stride-2 pooling.</td>
+<td style="text-align: left;">Shape mismatch error during decoder concatenation.</td>
+<td style="text-align: left;">Pad input or ensure all dimensions are divisible by <span class="arithmatex">\(2^D\)</span> (<span class="arithmatex">\(D\)</span> = downsampling depth).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Receptive Field Starvation</strong></td>
+<td style="text-align: left;">Encoder has too few downsampling stages (e.g., only 2 levels, <span class="arithmatex">\(4\times\)</span> downsampling).</td>
+<td style="text-align: left;">Network confuses large textural background patterns with defects; cannot learn global context.</td>
+<td style="text-align: left;">Ensure encoder downsamples by at least <span class="arithmatex">\(16\times\)</span> (down to <span class="arithmatex">\(8 \times 50\)</span>) at the bottleneck.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Skipping Across Misaligned Scales</strong></td>
+<td style="text-align: left;">Routing Stage 1 skip (stride 2) into Decoder Stage 3 (stride 8).</td>
+<td style="text-align: left;">Immediate tensor shape mismatch error during forward pass.</td>
+<td style="text-align: left;">Construct a systematic shape tracing table (as in Section 3) to verify stage alignment.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-ungraded-try-it-activity-trace-receptive-field-and-tensor-shapes">10. Ungraded Try-It Activity: Trace Receptive Field and Tensor Shapes</h2>
+<p>Test your understanding of spatial mechanics with this short paper-and-pencil or scratchpad exercise:</p>
+<p>Suppose you design a 3-level encoder for a <span class="arithmatex">\(128 \times 800\)</span> strip image:</p>
+<ul>
+<li>Input: Grayscale strip <span class="arithmatex">\([1, 128, 800]\)</span>.</li>
+<li>Encoder Block 1: Two <span class="arithmatex">\(3 \times 3\)</span> convolutions (stride 1, padding 1) followed by MaxPool2d (kernel 2, stride 2).</li>
+<li>Encoder Block 2: Two <span class="arithmatex">\(3 \times 3\)</span> convolutions (stride 1, padding 1) followed by MaxPool2d (kernel 2, stride 2).</li>
+<li>Bottleneck: One <span class="arithmatex">\(3 \times 3\)</span> convolution (stride 1, padding 1).</li>
+</ul>
+<p><strong>Questions to answer:</strong></p>
+<ol>
+<li>What is the spatial resolution <span class="arithmatex">\([H, W]\)</span> of the feature map entering the bottleneck?</li>
+<li>If a defect has a bounding box of <span class="arithmatex">\(4 \times 12\)</span> pixels on the input strip, what is its maximum spatial footprint (in feature cells) at the bottleneck?</li>
+<li>If you replace the MaxPool2d in Block 2 with an anisotropic pooling operator <code>nn.MaxPool2d(kernel_size=(1, 2), stride=(1, 2))</code>, what will the bottleneck spatial dimensions be? Why might an engineer consider anisotropic pooling for an <span class="arithmatex">\(800 \times 128\)</span> strip?</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li><strong>Bottleneck spatial dimensions</strong>:<ul>
+<li>After Block 1: <span class="arithmatex">\(128 / 2 = 64\)</span>, <span class="arithmatex">\(800 / 2 = 400 \to [64, 400]\)</span>.</li>
+<li>After Block 2: <span class="arithmatex">\(64 / 2 = 32\)</span>, <span class="arithmatex">\(400 / 2 = 200 \to [32, 200]\)</span>.</li>
+<li>The bottleneck receives feature maps of shape <span class="arithmatex">\([B, C, 32, 200]\)</span>.</li>
+</ul>
+</li>
+<li><strong>Defect footprint at bottleneck</strong>:<ul>
+<li>The total downsampling factor is <span class="arithmatex">\(4\times\)</span> along both axes.</li>
+<li>Height: <span class="arithmatex">\(4\text{ px} / 4 = 1\text{ cell}\)</span>.</li>
+<li>Width: <span class="arithmatex">\(12\text{ px} / 4 = 3\text{ cells}\)</span>.</li>
+<li>The defect spans at most <span class="arithmatex">\(1 \times 3\)</span> feature cells. If downsampled by another <span class="arithmatex">\(2\times\)</span> (total <span class="arithmatex">\(8\times\)</span>), the height drops to <span class="arithmatex">\(0.5\)</span> cells and disappears into adjacent background cells.</li>
+</ul>
+</li>
+<li><strong>Anisotropic pooling</strong>:<ul>
+<li>Pooling by <span class="arithmatex">\((1, 2)\)</span> downsamples width by half while keeping height untouched.</li>
+<li>Resulting bottleneck shape: <span class="arithmatex">\(H = 64 / 1 = 64\)</span>, <span class="arithmatex">\(W = 400 / 2 = 200 \to [64, 200]\)</span>.</li>
+<li><strong>Rationale</strong>: Industrial strips are very short along the vertical axis (<span class="arithmatex">\(128\text{ px}\)</span>) but very wide along the horizontal axis (<span class="arithmatex">\(800\text{ px}\)</span>). Anisotropic pooling prevents the short vertical axis from collapsing too quickly while aggressively downsampling the wide rolling axis!</li>
+</ul>
+</li>
+</ol>
+</details>
+<p>To run a complete CPU shape-tracing forward pass on synthetic tensors, inspect:
+👉 <a href="examples/toy_feature_extractor.py"><code>docs/milestone_3_student_guide/examples/toy_feature_extractor.py</code></a></p>
+<hr />
+<h2 id="11-primary-sources-further-reading">11. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>Ronneberger, O., Fischer, P., &amp; Brox, T. (2015)</strong>. <em>U-Net: Convolutional Networks for Biomedical Image Segmentation</em>. MICCAI. <a href="https://arxiv.org/abs/1505.04597">arXiv:1505.04597</a>. The foundational paper establishing skip connections for dense spatial recovery.</li>
+<li><strong>Long, J., Shelhamer, E., &amp; Darrell, T. (2015)</strong>. <em>Fully Convolutional Networks for Semantic Segmentation</em>. CVPR. <a href="https://arxiv.org/abs/1411.4038">arXiv:1411.4038</a>. Introduced the concept of replacing fully connected layers with convolutions for pixel-dense predictions.</li>
+<li><strong>Lin, T. Y., et al. (2017)</strong>. <em>Feature Pyramid Networks for Object Detection</em>. CVPR. <a href="https://arxiv.org/abs/1612.03144">arXiv:1612.03144</a>. Explains top-down pathways and lateral connections for combining multi-scale feature hierarchies.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 3 Overview</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html">Guide 02 · Pretrained Backbones →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

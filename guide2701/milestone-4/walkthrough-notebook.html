@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Walkthrough Notebook &amp; Code Examples · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html" aria-current="page"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html" aria-current="page"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Synthetic Optimization & Examples</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#what-this-walkthrough-demonstrates">What This Walkthrough Demonstrates</a></li>
+<li><a href="#how-to-run">How to Run</a></li>
+<li><a href="#pedagogical-boundaries-guarantees">Pedagogical Boundaries &amp; Guarantees</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-4-synthetic-optimization-walkthrough-notebook">Milestone 4: Synthetic Optimization Walkthrough Notebook</h1>
+<p>This folder contains a standalone, CPU-runnable pedagogical walkthrough of training improvements and model optimization techniques:</p>
+<ul>
+<li><strong>Jupyter Notebook</strong>: <a href="downloads/synthetic_optimization_walkthrough.ipynb"><code>synthetic_optimization_walkthrough.ipynb</code></a></li>
+<li><strong>Paired Python Script</strong>: <a href="downloads/synthetic_optimization_walkthrough.py"><code>synthetic_optimization_walkthrough.py</code></a></li>
+</ul>
+<hr />
+<h2 id="what-this-walkthrough-demonstrates">What This Walkthrough Demonstrates</h2>
+<ol>
+<li><strong>Multi-Level Class Imbalance &amp; Bounded Sampling</strong>:<ul>
+<li>Synthesizes an imbalanced dataset containing clean strips (~50%), frequent defects (<code>defect_c</code>), and rare defects (<code>defect_b</code>).</li>
+<li>Implements a bounded sqrt inverse-frequency <code>WeightedRandomSampler</code> to boost rare-defect exposure without starving clean material.</li>
+</ul>
+</li>
+<li><strong>Learning Rate Schedulers (Linear Warmup + Cosine Decay)</strong>:<ul>
+<li>Configures <code>torch.optim.lr_scheduler.LambdaLR</code> to execute a 3-epoch linear warmup followed by smooth cosine decay down to 1% of initial learning rate (<code>min_lr_ratio = 0.01</code>).</li>
+</ul>
+</li>
+<li><strong>Early Stopping &amp; Checkpoint Rollback</strong>:<ul>
+<li>Implements an <code>EarlyStoppingTracker</code> with <code>mode='max'</code>, <code>min_delta</code>, and <code>patience</code>.</li>
+<li>Simulates validation metric jitter, triggers early stopping, and restores best checkpoint weights.</li>
+</ul>
+</li>
+<li><strong>PyTorch 2.x Automatic Mixed Precision (AMP) &amp; Gradient Accumulation</strong>:<ul>
+<li>Simulates <code>torch.amp.autocast</code> and <code>torch.amp.GradScaler</code> on toy tensors.</li>
+<li>Demonstrates microbatch accumulation, unscaling, gradient norm clipping (<code>clip_grad_norm_</code>), and optimizer stepping.</li>
+</ul>
+</li>
+<li><strong>Metric Governance &amp; The "Naive Dice Trap"</strong>:<ul>
+<li>Decomposes segmentation metrics into naive mean Dice, foreground-pair Dice, and clean-image specificity.</li>
+<li>Proves mathematically why predicting all zeros achieves a deceptive &gt;90% naive Dice while scoring 0.00 on actual defects.</li>
+</ul>
+</li>
+<li><strong>Spatial Error Auditing</strong>:<ul>
+<li>Stratifies defect recall across area bins (small 1..100 px, medium 101..500 px, large &gt;500 px).</li>
+<li>Separates presence recall from spatial overlap hit.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="how-to-run">How to Run</h2>
+<h3 id="option-a-local-terminal-execution-with-uv">Option A: Local Terminal Execution with <code>uv</code></h3>
+<p>Run the paired Python script directly from your terminal:
+<pre class="highlight"><code class="language-bash">uv run python docs/milestone_4_student_guide/notebooks/synthetic_optimization_walkthrough.py</code></pre>
+Execution finishes in under 3 seconds on CPU.</p>
+<h3 id="option-b-jupyter-lab-notebook">Option B: Jupyter Lab / Notebook</h3>
+<p>Launch your local Jupyter server:
+<pre class="highlight"><code class="language-bash">uv run jupyter lab docs/milestone_4_student_guide/notebooks/synthetic_optimization_walkthrough.ipynb</code></pre></p>
+<h3 id="option-c-google-colab">Option C: Google Colab</h3>
+<ol>
+<li>Upload <code>synthetic_optimization_walkthrough.ipynb</code> to Google Colab.</li>
+<li>Select a CPU runtime (no GPU is required for this synthetic demonstration).</li>
+<li>Run the cells in sequential order.</li>
+</ol>
+<hr />
+<h2 id="pedagogical-boundaries-guarantees">Pedagogical Boundaries &amp; Guarantees</h2>
+<ul>
+<li><strong>100% Synthetic Data</strong>: This notebook generates all images and annotations procedurally.</li>
+<li><strong>Zero Competition Leaks</strong>: No raw images, real test IDs, private EDA numbers, or competition results are included.</li>
+<li><strong>Hardware Agnostic</strong>: Fully tested on standard CPU environments using PyTorch 2.8.0.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_controlled_experimentation_and_iteration.html">← Guide 07 · Controlled Experimentation</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

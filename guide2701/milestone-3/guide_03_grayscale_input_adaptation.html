@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 03 · Grayscale Input Adaptation · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 03 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-dilemma-color-channels-vs-monochromatic-physics">1. The Core Dilemma: Color Channels vs. Monochromatic Physics</a></li>
+<li><a href="#2-strategy-1-channel-duplication-1-to-3-repeat">2. Strategy 1: Channel Duplication (\(1 \to 3\) Repeat)</a></li>
+<li><a href="#3-strategy-2-first-layer-convolution-modification-3-to-1-weight-collapse">3. Strategy 2: First-Layer Convolution Modification (\(3 \to 1\) Weight Collapse)</a></li>
+<li><a href="#3-strategy-3-learned-1-to-3-input-adapter">3. Strategy 3: Learned \(1 \to 3\) Input Adapter</a></li>
+<li><a href="#4-normalization-physics-imagenet-statistics-vs-local-z-score">4. Normalization Physics: ImageNet Statistics vs. Local Z-Score</a></li>
+<li><a href="#5-comparative-decision-matrix">5. Comparative Decision Matrix</a></li>
+<li><a href="#6-common-implementation-pitfalls-and-diagnostics">6. Common Implementation Pitfalls and Diagnostics</a></li>
+<li><a href="#7-ungraded-try-it-activity-verify-activation-equivalence-by-hand">7. Ungraded Try-It Activity: Verify Activation Equivalence by Hand</a></li>
+<li><a href="#8-primary-sources-further-reading">8. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="adapting-pretrained-rgb-backbones-to-single-channel-grayscale">Adapting Pretrained RGB Backbones to Single-Channel Grayscale</h1>
+<p>When you initialize a computer vision backbone from an ImageNet checkpoint (such as a ResNet or an EfficientNet), the network arrives with an uncompromising architectural contract: <strong>it expects 3-channel RGB image tensors</strong>:</p>
+<div class="arithmatex">\[\text{Input Tensor} \in \mathbb{R}^{B \times 3 \times H \times W}\]</div>
+<p>However, industrial surface anomaly inspection takes place under monochromatic illumination. High-speed industrial line-scan cameras capture intensity strips containing <strong>only 1 grayscale channel</strong>:</p>
+<div class="arithmatex">\[\text{Grayscale Strip} \in \mathbb{R}^{B \times 1 \times 128 \times 800}\]</div>
+<p>If you attempt to feed a 1-channel tensor directly into an off-the-shelf ImageNet backbone, PyTorch will halt with an immediate shape incompatibility error:
+<pre class="highlight"><code class="language-text">RuntimeError: Given groups=1, weight of size [64, 3, 7, 7], expected input[1, 1, 128, 800] to have 3 channels, but got 1 channels instead.</code></pre></p>
+<p>How should you bridge this architectural mismatch? Repeating the channel? Modifying the first convolution layer? Or prepending a learned projection adapter?</p>
+<p>This guide examines <strong>three defensible grayscale adaptation strategies</strong>, proves their mathematical relationships, analyzes their impact on GPU memory and normalization physics, and equips you to make a principled choice for your pipeline.</p>
+<hr />
+<h2 id="1-the-core-dilemma-color-channels-vs-monochromatic-physics">1. The Core Dilemma: Color Channels vs. Monochromatic Physics</h2>
+<p>Before examining code, consider what color channels mean to a convolutional neural network.</p>
+<p>In natural image photography (ImageNet), red, green, and blue channels represent distinct spectral wavelengths:</p>
+<ul>
+<li>A ripe tomato has high red values and low green/blue values.</li>
+<li>The sky has high blue values and low red values.</li>
+<li>Pretrained first-layer filters (often <span class="arithmatex">\(7 \times 7\)</span> kernels in ResNet or <span class="arithmatex">\(3 \times 3\)</span> in EfficientNet) have learned <strong>color-opponent receptive fields</strong> (e.g., green-magenta or blue-yellow transitions) as well as <strong>achromatic luminance edge detectors</strong>.</li>
+</ul>
+<p>In industrial steel manufacturing, there is no chromatic variation. The surface of a cold-rolled steel strip is entirely monochromatic:</p>
+<ul>
+<li>Rolling marks, scratches, scale inclusions, and oil spots are defined strictly by <strong>photometric intensity variations</strong> (darker or lighter shades of gray) and <strong>spatial micro-textures</strong>.</li>
+<li><strong>Repeating a grayscale channel three times does not create color information</strong>. It simply feeds three identical copies of the monochromatic signal into the three RGB input sockets of the network.</li>
+</ul>
+<p><img alt="Grayscale Adaptation Strategies" src="assets/fig03_grayscale_adaptation_strategies.png" />
+<em>Figure 3.1: The three architectural strategies for adapting a 3-channel pretrained backbone to single-channel industrial strips. Each strategy offers different trade-offs in GPU memory, parameter overhead, and implementation complexity.</em></p>
+<hr />
+<h2 id="2-strategy-1-channel-duplication-1-to-3-repeat">2. Strategy 1: Channel Duplication (<span class="arithmatex">\(1 \to 3\)</span> Repeat)</h2>
+<p>The simplest and most common approach in competitive computer vision is <strong>channel duplication</strong>: replicating the single grayscale channel across all three input channels before passing it to the backbone.</p>
+<h3 id="implementation-mechanics">Implementation Mechanics</h3>
+<p>In PyTorch, duplication is performed either in the <code>DataLoader</code> or at the start of the model's <code>forward()</code> method:</p>
+<pre class="highlight"><code class="language-python"># In Dataset / DataLoader:
+image_rgb = np.repeat(image_gray, 3, axis=0)  # Shape: [3, 128, 800]
+
+# Or inside PyTorch Model forward():
+def forward(self, x_gray):
+    # x_gray shape: [B, 1, 128, 800]
+    x_rgb = x_gray.repeat(1, 3, 1, 1)        # Shape: [B, 3, 128, 800]
+    return self.backbone(x_rgb)</code></pre>
+<h3 id="mathematical-filter-response">Mathematical Filter Response</h3>
+<p>Let <span class="arithmatex">\(x\)</span> be a single-channel grayscale image patch. The first convolution layer possesses weights <span class="arithmatex">\(W \in \mathbb{R}^{C_{\text{out}} \times 3 \times K \times K}\)</span> with filter slices <span class="arithmatex">\(W_{\text{R}}, W_{\text{G}}, W_{\text{B}}\)</span> and bias <span class="arithmatex">\(b \in \mathbb{R}^{C_{\text{out}}}\)</span>.</p>
+<p>When the duplicated input is convolved with filter <span class="arithmatex">\(W\)</span>:</p>
+<div class="arithmatex">\[\text{Output} = W_{\text{R}} * x + W_{\text{G}} * x + W_{\text{B}} * x + b = \left( W_{\text{R}} + W_{\text{G}} + W_{\text{B}} \right) * x + b\]</div>
+<p>Each output feature cell simply computes the <strong>sum of the three color filter slices</strong> convolved with the grayscale patch!</p>
+<h3 id="trade-offs">Trade-Offs</h3>
+<ul>
+<li><strong>Advantages</strong>:<ul>
+<li><strong>Zero parameter changes</strong>: The pretrained backbone is preserved in its exact original state.</li>
+<li><strong>Zero weight modification bugs</strong>: Pretrained weights load seamlessly without custom checkpoint manipulation.</li>
+</ul>
+</li>
+<li><strong>Disadvantages</strong>:<ul>
+<li><strong>Memory Overhead</strong>: Input tensors occupy <span class="arithmatex">\(3\times\)</span> the memory in RAM, DataLoader inter-process communication (IPC), and GPU VRAM before the first layer.</li>
+<li><strong>Compute Inefficiency</strong>: The first convolutional layer executes <span class="arithmatex">\(3\times\)</span> more multiplication and addition operations than strictly necessary.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-strategy-2-first-layer-convolution-modification-3-to-1-weight-collapse">3. Strategy 2: First-Layer Convolution Modification (<span class="arithmatex">\(3 \to 1\)</span> Weight Collapse)</h2>
+<p>Instead of inflating the input data to fit the model, <strong>Strategy 2 modifies the model's first convolutional layer to fit the data</strong>.</p>
+<p>We replace the initial 3-channel convolution with a 1-channel convolution:</p>
+<div class="arithmatex">\[\text{Original Conv: } \text{Conv2d}(3, 64, \text{kernel}=7) \quad \longrightarrow \quad \text{Adapted Conv: } \text{Conv2d}(1, 64, \text{kernel}=7)\]</div>
+<p>The challenge is: <strong>how should the new 1-channel weights <span class="arithmatex">\(W_{\text{new}} \in \mathbb{R}^{64 \times 1 \times 7 \times 7}\)</span> be initialized from the pretrained RGB weights <span class="arithmatex">\(W_{\text{orig}} \in \mathbb{R}^{64 \times 3 \times 7 \times 7}\)</span>?</strong></p>
+<p>Two primary mathematical formulations exist:</p>
+<h3 id="a-weight-summing-w_textnew-w_textr-w_textg-w_textb">A. Weight Summing (<span class="arithmatex">\(W_{\text{new}} = W_{\text{R}} + W_{\text{G}} + W_{\text{B}}\)</span>)</h3>
+<div class="arithmatex">\[W_{\text{new}}[c, 0, :, :] = \sum_{j=0}^{2} W_{\text{orig}}[c, j, :, :]\]</div>
+<ul>
+<li>
+<p><strong>Mathematical Property</strong>: As proven in Section 2, summing the three filter slices produces the <strong>exact same numerical activation output</strong> as repeating the input across three channels:</p>
+<div class="arithmatex">\[\text{Output}_{\text{sum}} = \left( \sum_{j} W_j \right) * x + b \equiv W_{\text{orig}} * [x, x, x]^T + b\]</div>
+</li>
+<li>
+<p>This guarantees <span class="arithmatex">\(100\%\)</span> mathematical equivalence to Strategy 1 without storing or transferring 3-channel tensors!</p>
+</li>
+</ul>
+<h3 id="b-weight-averaging-w_textnew-frac13-w_textr-w_textg-w_textb">B. Weight Averaging (<span class="arithmatex">\(W_{\text{new}} = \frac{1}{3} (W_{\text{R}} + W_{\text{G}} + W_{\text{B}})\)</span>)</h3>
+<div class="arithmatex">\[W_{\text{new}}[c, 0, :, :] = \frac{1}{3} \sum_{j=0}^{2} W_{\text{orig}}[c, j, :, :]\]</div>
+<ul>
+<li><strong>Mathematical Property</strong>: Averaging divides the sum by 3.</li>
+<li><strong>Why do some engineers prefer averaging?</strong> In natural RGB images, the red, green, and blue channels have variance <span class="arithmatex">\(\sigma^2\)</span> but are not perfectly correlated. In grayscale duplication, all three channels have correlation <span class="arithmatex">\(r = 1.0\)</span>. If a filter was trained assuming uncorrelated inputs, summing can increase the variance of the first-layer activations by up to <span class="arithmatex">\(3\times\)</span>. Averaging dampens the activation magnitude, keeping the activation distribution closer to standard variance.</li>
+<li><strong>Note</strong>: Subsequent Batch Normalization layers will automatically rescale and re-center activations during training, diminishing this difference after a few training epochs.</li>
+</ul>
+<h3 id="implementation-code-pattern">Implementation Code Pattern</h3>
+<pre class="highlight"><code class="language-python">import torch
+import torch.nn as nn
+
+def adapt_conv1_to_grayscale(conv1_rgb: nn.Conv2d, mode: str = "sum") -&gt; nn.Conv2d:
+    """Adapts a pretrained 3-channel Conv2d layer to accept 1-channel grayscale inputs."""
+    out_channels = conv1_rgb.out_channels
+    kernel_size = conv1_rgb.kernel_size
+    stride = conv1_rgb.stride
+    padding = conv1_rgb.padding
+    bias = conv1_rgb.bias is not None
+
+    # Instantiate new 1-channel Conv2d
+    conv1_gray = nn.Conv2d(
+        in_channels=1,
+        out_channels=out_channels,
+        kernel_size=kernel_size,
+        stride=stride,
+        padding=padding,
+        bias=bias,
+    )
+
+    with torch.no_grad():
+        w_rgb = conv1_rgb.weight.data  # Shape: [out_ch, 3, k, k]
+        if mode == "sum":
+            conv1_gray.weight.data = w_rgb.sum(dim=1, keepdim=True)
+        elif mode == "average":
+            conv1_gray.weight.data = w_rgb.mean(dim=1, keepdim=True)
+        else:
+            raise ValueError(f"Unknown mode: {mode}")
+
+        if bias:
+            conv1_gray.bias.data = conv1_rgb.bias.data.clone()
+
+    return conv1_gray</code></pre>
+<h3 id="trade-offs_1">Trade-Offs</h3>
+<ul>
+<li><strong>Advantages</strong>:<ul>
+<li><strong>Memory and Compute Optimal</strong>: The entire pipeline operates on native <span class="arithmatex">\([B, 1, 128, 800]\)</span> tensors.</li>
+<li><strong>No Data Duplication</strong>: Saves bandwidth in CPU-to-GPU memory copies and DataLoader workers.</li>
+</ul>
+</li>
+<li><strong>Disadvantages</strong>:<ul>
+<li><strong>State Dict Incompatibility</strong>: The model's state dictionary key <code>conv1.weight</code> now has shape <code>[64, 1, 7, 7]</code> instead of <code>[64, 3, 7, 7]</code>. If you attempt to load a raw ImageNet checkpoint without adapting the keys, PyTorch will raise a <code>size mismatch</code> exception.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-strategy-3-learned-1-to-3-input-adapter">3. Strategy 3: Learned <span class="arithmatex">\(1 \to 3\)</span> Input Adapter</h2>
+<p>A third defensible architecture is to insert a <strong>small learned projection layer</strong> immediately before the pretrained backbone:</p>
+<pre class="highlight"><code>Strategy 3 Architecture:
+Grayscale Input [B, 1, 128, 800] ──► [Adapter: 1×1 Conv (1 -&gt; 3)] ──► RGB Tensor [B, 3, 128, 800] ──► Pretrained Backbone</code></pre>
+<h3 id="implementation-mechanics_1">Implementation Mechanics</h3>
+<pre class="highlight"><code class="language-python">class GrayscaleAdapterModel(nn.Module):
+    def __init__(self, pretrained_backbone):
+        super().__init__()
+        # 1x1 convolution mapping 1 channel to 3 channels without bias
+        self.adapter = nn.Conv2d(in_channels=1, out_channels=3, kernel_size=1, bias=False)
+        # Initialize adapter weights to 1.0 (equivalent to 3x repeat)
+        nn.init.constant_(self.adapter.weight, 1.0)
+        self.backbone = pretrained_backbone
+
+    def forward(self, x_gray):
+        x_adapted = self.adapter(x_gray)  # Learns optimal linear projection to RGB space
+        return self.backbone(x_adapted)</code></pre>
+<h3 id="mathematical-interpretation">Mathematical Interpretation</h3>
+<p>The adapter learns three scalar weights: <span class="arithmatex">\(w_{\text{R}}, w_{\text{G}}, w_{\text{B}}\)</span>.
+During forward propagation:</p>
+<div class="arithmatex">\[x_{\text{R}} = w_{\text{R}} \cdot x_{\text{gray}}, \quad x_{\text{G}} = w_{\text{G}} \cdot x_{\text{gray}}, \quad x_{\text{B}} = w_{\text{B}} \cdot x_{\text{gray}}\]</div>
+<p>Instead of forcing the network to treat red, green, and blue equally, the optimizer can learn to weight the three channels differently, allowing the backbone to favor whichever color filter pathways are most sensitive to surface texture anomalies.</p>
+<h3 id="trade-offs_2">Trade-Offs</h3>
+<ul>
+<li><strong>Advantages</strong>:<ul>
+<li>Keeps the pretrained backbone completely pristine and unmodified.</li>
+<li>Adds only <strong>3 trainable parameters</strong> (<span class="arithmatex">\(3 \times 1 \times 1 \times 1 = 3\)</span> weights).</li>
+</ul>
+</li>
+<li><strong>Disadvantages</strong>:<ul>
+<li>Still produces an intermediate 3-channel feature map in GPU memory.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="4-normalization-physics-imagenet-statistics-vs-local-z-score">4. Normalization Physics: ImageNet Statistics vs. Local Z-Score</h2>
+<p>Regardless of which adaptation strategy you choose, you must address <strong>input normalization</strong>.</p>
+<p>Vision backbones expect inputs normalized according to the channel statistics of ImageNet:</p>
+<div class="arithmatex">\[\mu_{\text{ImageNet}} = [0.485, 0.456, 0.406], \quad \sigma_{\text{ImageNet}} = [0.229, 0.224, 0.225]\]</div>
+<h3 id="the-single-channel-normalization-question">The Single-Channel Normalization Question</h3>
+<p>If you duplicate a grayscale image <span class="arithmatex">\(x \in [0, 1]\)</span> into three channels and apply ImageNet normalization:</p>
+<div class="arithmatex">\[x_{\text{norm}, 0} = \frac{x - 0.485}{0.229}, \quad x_{\text{norm}, 1} = \frac{x - 0.456}{0.224}, \quad x_{\text{norm}, 2} = \frac{x - 0.406}{0.225}\]</div>
+<p>Notice a subtle phenomenon: <strong>the three channels are no longer identical!</strong>
+Because the ImageNet channel means and standard deviations differ slightly across R, G, and B, applying ImageNet normalization transforms identical grayscale pixels into three slightly shifted channels:</p>
+<ul>
+<li>Channel 0 (Red) receives an offset of <span class="arithmatex">\(-0.485 / 0.229 = -2.118\)</span>.</li>
+<li>Channel 1 (Green) receives an offset of <span class="arithmatex">\(-0.456 / 0.224 = -2.036\)</span>.</li>
+<li>Channel 2 (Blue) receives an offset of <span class="arithmatex">\(-0.406 / 0.225 = -1.804\)</span>.</li>
+</ul>
+<h3 id="what-if-you-use-local-dataset-z-score-normalization">What If You Use Local Dataset Z-Score Normalization?</h3>
+<p>Many segmentation practitioners normalize each image individually using its own sample statistics:</p>
+<div class="arithmatex">\[x_{\text{zscore}} = \frac{x - \mu_{\text{strip}}}{\sigma_{\text{strip}} + \epsilon}\]</div>
+<ul>
+<li><strong>Advantage</strong>: Eliminates camera lighting drift and exposure differences between different inspection cameras.</li>
+<li><strong>Pretrained Caution</strong>: The resulting values have mean 0.0 and variance 1.0. This does not match ImageNet's normalized distribution. If you use local z-scores, you <strong>must allow the first layer (or the input adapter) to fine-tune</strong> so the network can adjust its bias terms to accommodate the shifted mean.</li>
+</ul>
+<hr />
+<h2 id="5-comparative-decision-matrix">5. Comparative Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">Strategy 1: Repeat (3×)</th>
+<th style="text-align: left;">Strategy 2: First Conv Collapse</th>
+<th style="text-align: left;">Strategy 3: Learned Adapter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>New Parameters</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(0\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0\)</span> (weights replaced)</td>
+<td style="text-align: left;"><span class="arithmatex">\(3\)</span> weights</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Input Tensor Shape</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 3, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 1, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([B, 1, 128, 800]\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RAM / DataLoader Memory</strong></td>
+<td style="text-align: left;">High (<span class="arithmatex">\(3\times\)</span> volume)</td>
+<td style="text-align: left;"><strong>Minimal</strong> (<span class="arithmatex">\(1\times\)</span> native)</td>
+<td style="text-align: left;"><strong>Minimal</strong> (<span class="arithmatex">\(1\times\)</span> native)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>First-Layer FLOPs</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(3\times\)</span></td>
+<td style="text-align: left;"><strong><span class="arithmatex">\(1\times\)</span> (Lowest)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span> conv + adapter overhead</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>State Dict Checkpoint Loading</strong></td>
+<td style="text-align: left;">Seamless</td>
+<td style="text-align: left;">Requires manual weight remap</td>
+<td style="text-align: left;">Seamless</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mathematical Parity</strong></td>
+<td style="text-align: left;">Baseline reference</td>
+<td style="text-align: left;">Exact match (with Sum)</td>
+<td style="text-align: left;">Flexible generalization</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Recommended Use Case</strong></td>
+<td style="text-align: left;">Fast experimentation</td>
+<td style="text-align: left;">Production / Resource efficiency</td>
+<td style="text-align: left;">Systematic ablation studies</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-common-implementation-pitfalls-and-diagnostics">6. Common Implementation Pitfalls and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Diagnostic &amp; Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Random Re-Initialization of Conv1</strong></td>
+<td style="text-align: left;">Replacing <code>conv1</code> with <code>nn.Conv2d(1, 64, ...)</code> without copying pretrained weights.</td>
+<td style="text-align: left;">Model trains significantly slower; early validation Dice is much lower than Strategy 1.</td>
+<td style="text-align: left;">Verify that <code>conv1.weight</code> is populated using <code>w_rgb.sum(dim=1)</code> or <code>w_rgb.mean(dim=1)</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Channel Axis Mismatch in Repeat</strong></td>
+<td style="text-align: left;">Using <code>x.repeat(3, 1, 1, 1)</code> instead of <code>x.repeat(1, 3, 1, 1)</code>.</td>
+<td style="text-align: left;">Batch size becomes <span class="arithmatex">\(3B\)</span>, causing immediate batch dimension errors.</td>
+<td style="text-align: left;">Assert <code>x_rep.shape == (B, 3, H, W)</code> after duplication.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>State Dict Key Collision on Resume</strong></td>
+<td style="text-align: left;">Loading an unmodified 3-channel checkpoint into an adapted 1-channel model.</td>
+<td style="text-align: left;"><code>RuntimeError: Error(s) in loading state_dict: size mismatch for conv1.weight</code>.</td>
+<td style="text-align: left;">Strip <code>conv1.weight</code> from checkpoint or adapt checkpoint weights prior to loading.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Scale Shock from Zero Initialization</strong></td>
+<td style="text-align: left;">Initializing learned adapter weights to zero (<code>nn.init.zeros_</code>).</td>
+<td style="text-align: left;">Gradients vanish on forward pass 1; initial loss is completely flat.</td>
+<td style="text-align: left;">Initialize adapter weights to <code>1.0</code> or <code>1/3</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-ungraded-try-it-activity-verify-activation-equivalence-by-hand">7. Ungraded Try-It Activity: Verify Activation Equivalence by Hand</h2>
+<p>Work through this small numerical calculation to confirm why weight summing matches channel repetition:</p>
+<p>Suppose you have a tiny <span class="arithmatex">\(1 \times 1\)</span> image patch where the grayscale pixel value is <span class="arithmatex">\(x = 2.0\)</span>.
+A 3-channel convolution has three weights and a bias:</p>
+<div class="arithmatex">\[W_{\text{R}} = 0.5, \quad W_{\text{G}} = -0.2, \quad W_{\text{B}} = 0.8, \quad b = 0.1\]</div>
+<ol>
+<li>
+<p>Calculate the output using <strong>Strategy 1 (Repeat 3×)</strong>:</p>
+<div class="arithmatex">\[x_{\text{in}} = [2.0, 2.0, 2.0]^T\]</div>
+<div class="arithmatex">\[\text{Output}_1 = W_{\text{R}} \cdot x_{\text{in}}[0] + W_{\text{G}} \cdot x_{\text{in}}[1] + W_{\text{B}} \cdot x_{\text{in}}[2] + b\]</div>
+</li>
+<li>
+<p>Calculate the adapted weight <span class="arithmatex">\(W_{\text{new}}\)</span> using <strong>Strategy 2 (Summing)</strong>:</p>
+<div class="arithmatex">\[W_{\text{new}} = W_{\text{R}} + W_{\text{G}} + W_{\text{B}}\]</div>
+<div class="arithmatex">\[\text{Output}_2 = W_{\text{new}} \cdot x + b\]</div>
+</li>
+<li>
+<p>Do the two outputs match?</p>
+</li>
+<li>What would the output be under <strong>Strategy 2 (Averaging)</strong>? How does it differ?</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li>
+<p><strong>Strategy 1 (Repeat 3×)</strong>:</p>
+<div class="arithmatex">\[\text{Output}_1 = 0.5(2.0) + (-0.2)(2.0) + 0.8(2.0) + 0.1 = 1.0 - 0.4 + 1.6 + 0.1 = 2.30\]</div>
+</li>
+<li>
+<p><strong>Strategy 2 (Summing)</strong>:</p>
+<div class="arithmatex">\[W_{\text{new}} = 0.5 + (-0.2) + 0.8 = 1.10\]</div>
+<div class="arithmatex">\[\text{Output}_2 = 1.10(2.0) + 0.1 = 2.20 + 0.1 = 2.30\]</div>
+<div class="arithmatex">\[\text{Output}_1 \equiv \text{Output}_2 \text{ (Exact Equality!)}\]</div>
+</li>
+<li>
+<p><strong>Matching Confirmation</strong>:
+   Yes, they match identically down to the last decimal place (<span class="arithmatex">\(2.30\)</span>).</p>
+</li>
+<li>
+<p><strong>Strategy 2 (Averaging)</strong>:</p>
+<div class="arithmatex">\[W_{\text{avg}} = \frac{1.10}{3} \approx 0.3667\]</div>
+<div class="arithmatex">\[\text{Output}_{\text{avg}} = 0.3667(2.0) + 0.1 = 0.7333 + 0.1 = 0.8333\]</div>
+<p>Notice that the activation magnitude before bias is scaled down by exactly a factor of 3 (<span class="arithmatex">\(2.20 / 3 = 0.7333\)</span>).</p>
+</li>
+</ol>
+</details>
+<p>To verify all three strategies numerically on synthetic tensors using PyTorch on CPU, run:
+👉 <a href="examples/toy_grayscale_adaptation.py"><code>docs/milestone_3_student_guide/examples/toy_grayscale_adaptation.py</code></a></p>
+<hr />
+<h2 id="8-primary-sources-further-reading">8. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>PyTorch Documentation: <code>torch.nn.Conv2d</code></strong>. Official reference for convolution layer weights and parameter specifications. <a href="https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html">PyTorch Docs</a>.</li>
+<li><strong>Ioffe, S., &amp; Szegedy, C. (2015)</strong>. <em>Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift</em>. ICML. <a href="https://arxiv.org/abs/1502.03167">arXiv:1502.03167</a>. Details running statistics and scaling behavior in convolutional layers.</li>
+<li><strong>Segmentation Models PyTorch (SMP)</strong>. Documentation on backbone channel customization and input channel configuration (<code>in_channels=1</code>). <a href="https://smp.readthedocs.io/en/latest/">SMP Docs</a>.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_02_pretrained_backbones_and_transfer_learning.html">← Guide 02 · Pretrained Backbones</a><a href="guide_04_output_heads_and_target_semantics.html">Guide 04 · Output Heads &amp; Semantics →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

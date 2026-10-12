@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 07 · Inference Ablation Ladders · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 07 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-confounded-inference-submission">1. Concrete Failure Case: The Confounded Inference Submission</a></li>
+<li><a href="#2-the-principle-of-causal-attribution-the-ablation-ladder">2. The Principle of Causal Attribution: The Ablation Ladder</a></li>
+<li><a href="#3-beyond-a-single-scalar-the-multi-objective-comparison-matrix">3. Beyond a Single Scalar: The Multi-Objective Comparison Matrix</a></li>
+<li><a href="#4-qualitative-error-auditing-inspecting-masks">4. Qualitative Error Auditing: Inspecting Masks</a></li>
+<li><a href="#5-experiment-tracking-schema-logging-inference-runs">5. Experiment Tracking Schema: Logging Inference Runs</a></li>
+<li><a href="#6-how-to-select-your-final-2-competition-submissions">6. How to Select Your Final 2 Competition Submissions</a></li>
+<li><a href="#7-diagnostic-checklist-final-inference-verification">7. Diagnostic Checklist: Final Inference Verification</a></li>
+<li><a href="#8-ungraded-activity-spot-the-flawed-selection-rationale">8. Ungraded Activity: Spot the Flawed Selection Rationale</a></li>
+<li><a href="#9-authoritative-references-further-reading">9. Authoritative References &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-07-inference-experimentation-discipline-ablation-ladders-trade-off-analysis">Guide 07: Inference Experimentation Discipline: Ablation Ladders &amp; Trade-Off Analysis</h1>
+<p>In the final week of a machine learning competition, panic and impatience frequently displace scientific discipline. Students frequently adjust four inference hyperparameters simultaneously: tweaking decision thresholds <span class="arithmatex">\(\tau\)</span>, increasing minimum area cutoffs <span class="arithmatex">\(A_{\min}\)</span>, enabling 4-view Test-Time Augmentation (TTA), and blending two newly trained model checkpoints in a single speculative submission.</p>
+<p>When the Kaggle public leaderboard score shifts from <span class="arithmatex">\(0.635\)</span> to <span class="arithmatex">\(0.648\)</span>, the student celebrates. But they have <strong>zero causal knowledge</strong>:</p>
+<ul>
+<li>Did the threshold change improve the score by <span class="arithmatex">\(+0.025\)</span>, while TTA actually degraded it by <span class="arithmatex">\(-0.012\)</span>?</li>
+<li>Did the aggressive minimum area filter inflate clean-sheet accuracy while wiping out rare defects like <code>defect_b</code>?</li>
+<li>Will this complex, fragile pipeline shake down catastrophically on the private test set?</li>
+</ul>
+<p>In this final guide, you will establish rigorous <strong>inference experimentation discipline</strong>. You will learn how to construct an <strong>ablation ladder</strong> to isolate causal factors, track multi-objective trade-offs across foreground Dice, false-positive penalties, and latency, perform qualitative visual audits, and make sound, evidence-based submission decisions.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-confounded-inference-submission">1. Concrete Failure Case: The Confounded Inference Submission</h2>
+<p>Consider a student who implements the following changes in a single evening:</p>
+<ol>
+<li>Lowers threshold from <span class="arithmatex">\(\tau = 0.50\)</span> to <span class="arithmatex">\(\tau = 0.35\)</span> on all classes.</li>
+<li>Increases minimum area cutoff from <span class="arithmatex">\(A_{\min} = 0\)</span> to <span class="arithmatex">\(A_{\min} = 150\text{ px}\)</span>.</li>
+<li>Adds 4-view TTA (<span class="arithmatex">\(H + V + HV\)</span> flips).</li>
+<li>Ensembles a baseline ResNet34 with a newly trained EfficientNet-B2.</li>
+</ol>
+<p>The student submits to the public leaderboard and observes a modest <span class="arithmatex">\(+0.009\)</span> bump.</p>
+<h3 id="the-hidden-catastrophe-under-the-hood">The Hidden Catastrophe Under the Hood:</h3>
+<p>When private test evaluation takes place after the competition ends:</p>
+<ul>
+<li>The aggressive area cutoff <span class="arithmatex">\(A_{\min} = 150\text{ px}\)</span> permanently eliminated every instance of <code>defect_b</code> in the private test set (since genuine <code>defect_b</code> flaws rarely exceed 100 pixels). The <code>defect_b</code> positive Dice dropped to <strong>0.000</strong>.</li>
+<li>The 4-view TTA caused the notebook to run for 8 hours and 52 minutes, perilously close to the 9-hour hard timeout.</li>
+<li>The threshold reduction <span class="arithmatex">\(\tau = 0.35\)</span> was the <em>only</em> component that genuinely helped, but its true gain (<span class="arithmatex">\(+0.035\)</span>) was masked and diluted by the <span class="arithmatex">\(-0.026\)</span> penalty caused by the area filter!</li>
+</ul>
+<p>Because the student changed everything at once, they had no way of diagnosing the failure. They submitted a slow, brittle pipeline that cratered on private data.</p>
+<hr />
+<h2 id="2-the-principle-of-causal-attribution-the-ablation-ladder">2. The Principle of Causal Attribution: The Ablation Ladder</h2>
+<p>In scientific deep learning, <strong>causal attribution</strong> requires isolating one variable at a time. You must construct an <strong>Ablation Ladder</strong> where each rung adds exactly one hypothesis to an invariant baseline:</p>
+<pre class="highlight"><code>                                The Inference Ablation Ladder
+▲
+│  Rung 5: + Multi-Model Ensemble       (Combines diverse backbones)
+│  Rung 4: + Test-Time Augmentation     (Tests geometric invariance &amp; variance reduction)
+│  Rung 3: + Minimum-Area Filtering     (Tests morphological noise suppression)
+│  Rung 2: + Calibrated Thresholds      (Tests per-class precision–recall trade-offs)
+│  Rung 1: Raw Baseline Model           (Single checkpoint, τ = 0.50, Amin = 0, no TTA)
+└────────────────────────────────────────────────────────────────────────────────────────►</code></pre>
+<p><img alt="Inference Ablation Ladder" src="assets/fig09_inference_ablation_ladder.png" />
+<em>Figure 7.1: The Inference Ablation Ladder. (Left) Multi-metric progression across ablation stages: Foreground Dice (70%), False Positive score (20%), and weighted competition score. (Right) The computational cost axis: measuring performance gains against inference latency.</em></p>
+<h3 id="the-protocol-for-climbing-the-ladder">The Protocol for Climbing the Ladder:</h3>
+<ol>
+<li><strong>Fix the Validation Protocol</strong>: Keep your validation split (e.g. Fold 0 combination-stratified holdout) completely frozen. Never switch validation sets between rungs!</li>
+<li><strong>Step One Rung at a Time</strong>:<ul>
+<li>Run Rung 1 (Baseline). Record all component metrics and latency.</li>
+<li>Run Rung 2 (Tune <span class="arithmatex">\(\boldsymbol{\tau}\)</span> on Rung 1 probabilities). If it improves the weighted competition metric, adopt it as the new baseline.</li>
+<li>Run Rung 3 (Apply <span class="arithmatex">\(A_{\min}\)</span> search on Rung 2 outputs). If it improves the metric without harming rare defect recall, adopt it.</li>
+<li>Run Rung 4 (Enable TTA). Test 2-view (<span class="arithmatex">\(H\)</span>-flip) first. If it improves the metric within latency budget, keep it.</li>
+<li>Run Rung 5 (Blend with second model). Evaluate soft weights.</li>
+</ul>
+</li>
+<li><strong>If a Rung Fails, Discard It</strong>: If 4-view TTA increases runtime by <span class="arithmatex">\(4\times\)</span> but improves validation score by only <span class="arithmatex">\(+0.0005\)</span>, <strong>discard it</strong>. Do not accumulate computational complexity without meaningful statistical evidence.</li>
+</ol>
+<hr />
+<h2 id="3-beyond-a-single-scalar-the-multi-objective-comparison-matrix">3. Beyond a Single Scalar: The Multi-Objective Comparison Matrix</h2>
+<p>A single aggregated scalar score obscures critical trade-offs. You must evaluate every inference candidate against a multi-objective matrix:</p>
+<h3 id="fictional-ablation-comparison-matrix">Fictional Ablation Comparison Matrix</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Rung</th>
+<th style="text-align: left;">Configuration Description</th>
+<th style="text-align: left;">Foreground Dice (<span class="arithmatex">\(70\%\)</span>)</th>
+<th style="text-align: left;">FP Penalty Score (<span class="arithmatex">\(20\%\)</span>)</th>
+<th style="text-align: left;">Empty Accuracy (<span class="arithmatex">\(10\%\)</span>)</th>
+<th style="text-align: left;">Rare <code>defect_b</code> Dice</th>
+<th style="text-align: left;">Inference Latency (ms/img)</th>
+<th style="text-align: left;">Competition Composite Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1</strong></td>
+<td style="text-align: left;">Raw Baseline (Single model, <span class="arithmatex">\(\tau=0.5, A_{\min}=0\)</span>)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.512\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.724\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.852\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.380\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.2\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.5884\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2</strong></td>
+<td style="text-align: left;">+ Calibrated <span class="arithmatex">\(\boldsymbol{\tau}\)</span> (<span class="arithmatex">\([0.45, 0.40, 0.55, 0.50]\)</span>)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.548\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.741\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.864\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.442\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.3\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.6182\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3a</strong></td>
+<td style="text-align: left;">+ Gentle <span class="arithmatex">\(A_{\min}\)</span> (<span class="arithmatex">\([30, 0, 50, 40]\text{ px}\)</span>)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.546\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.812\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.895\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.442\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(5.1\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathbf{0.6341}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3b</strong></td>
+<td style="text-align: left;">+ Aggressive <span class="arithmatex">\(A_{\min}\)</span> (<span class="arithmatex">\([100, 100, 150, 100]\text{ px}\)</span>)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.501\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.895\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.940\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathbf{0.000}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(5.3\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.6237\)</span> (TRAP!)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4</strong></td>
+<td style="text-align: left;">+ 2-View TTA (<span class="arithmatex">\(H\)</span>-Flip on Rung 3a)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.561\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.815\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.898\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.465\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8.6\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathbf{0.6455}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5</strong></td>
+<td style="text-align: left;">+ 2-Model Ensemble (U-Net + FPN + TTA)</td>
+<td style="text-align: left;"><span class="arithmatex">\(0.578\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.832\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.902\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.490\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16.8\text{ ms}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathbf{0.6612}\)</span></td>
+</tr>
+</tbody>
+</table>
+<h3 id="critical-analytical-lessons-from-the-table">Critical Analytical Lessons from the Table:</h3>
+<ul>
+<li><strong>Notice Rung 3b (The Aggressive Filtering Trap)</strong>: False Positive score jumped from <span class="arithmatex">\(0.812\)</span> to <span class="arithmatex">\(0.895\)</span>, and Empty Accuracy reached <span class="arithmatex">\(0.940\)</span>. A superficial look at clean sheets would suggest a massive win. But look at <strong>Rare <code>defect_b</code> Dice</strong>: it collapsed to <strong><span class="arithmatex">\(0.000\)</span></strong>! The overall competition score fell from <span class="arithmatex">\(0.6341\)</span> to <span class="arithmatex">\(0.6237\)</span> because losing foreground recall destroyed 70% of the metric.</li>
+<li>
+<p><strong>Notice Rung 4 vs Rung 5 Latency</strong>: Ensembling two models with TTA increases latency from <span class="arithmatex">\(4.2\text{ ms}\)</span> to <span class="arithmatex">\(16.8\text{ ms}\)</span> (<span class="arithmatex">\(4.0\times\)</span>). Across 3,000 images, total inference takes:</p>
+<div class="arithmatex">\[3000 \times 16.8\text{ ms} = 50.4\text{ seconds}\]</div>
+<p>This is well within Kaggle’s 9-hour limit, proving that the computational cost of Rung 5 is fully justified by the <span class="arithmatex">\(+0.0157\)</span> metric improvement.</p>
+</li>
+</ul>
+<hr />
+<h2 id="4-qualitative-error-auditing-inspecting-masks">4. Qualitative Error Auditing: Inspecting Masks</h2>
+<p>Quantitative tables tell you <em>what</em> the score is, but qualitative visual inspections tell you <em>why</em> a model is failing.</p>
+<p>Set aside 10 validation images representing key diagnostic categories and inspect their prediction overlays before and after post-processing:</p>
+<pre class="highlight"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        The Qualitative Visual Inspection Suite                         │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ Canary Image 1: Faint Longitudinal Scratch (`defect_a`)  ──► Did threshold erase edges?│
+│ Canary Image 2: Isolated Rare Inclusion (`defect_b`)      ──► Did area filter purge it?│
+│ Canary Image 3: Dense Oxide Scale Patch (`defect_c`)      ──► Are boundaries sharp?    │
+│ Canary Image 4: Fine Transverse Crack (`defect_d`)        ──► Did 8-connectivity hold? │
+│ Canary Image 5: Spotless Clean Steel Strip                ──► Are false alarms zero?   │
+│ Canary Image 6: Strip with Bright Specular Reflection     ──► Did glare trigger false P?│
+└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<pre class="highlight"><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+def visualize_inference_ablation(
+    image: np.ndarray,
+    gt_mask: np.ndarray,
+    raw_pred: np.ndarray,
+    clean_pred: np.ndarray,
+    defect_name: str
+):
+    """Plot side-by-side diagnostic overlays for a single test strip."""
+    fig, axs = plt.subplots(4, 1, figsize=(14, 8), sharex=True)
+
+    # 1. Input Image
+    axs[0].imshow(image, cmap="gray", aspect="auto")
+    axs[0].set_title(f"1. Raw Industrial Strip (128 × 800) - Target: {defect_name}")
+
+    # 2. Ground Truth Mask Overlay
+    axs[1].imshow(image, cmap="gray", aspect="auto")
+    axs[1].imshow(gt_mask, cmap="Reds", alpha=0.5, aspect="auto")
+    axs[1].set_title(f"2. Ground Truth Mask ({gt_mask.sum()} active px)")
+
+    # 3. Raw Prediction (τ = 0.50, no filter)
+    axs[2].imshow(image, cmap="gray", aspect="auto")
+    axs[2].imshow(raw_pred, cmap="Blues", alpha=0.5, aspect="auto")
+    axs[2].set_title(f"3. Raw Baseline Prediction (τ=0.50, Amin=0: {raw_pred.sum()} px)")
+
+    # 4. Calibrated Prediction (+τ, +Amin, +TTA)
+    axs[3].imshow(image, cmap="gray", aspect="auto")
+    axs[3].imshow(clean_pred, cmap="Greens", alpha=0.5, aspect="auto")
+    axs[3].set_title(f"4. Calibrated Post-Processed Mask ({clean_pred.sum()} px)")
+
+    for ax in axs:
+        ax.set_yticks([])
+    plt.tight_layout()
+    plt.show()</code></pre>
+<hr />
+<h2 id="5-experiment-tracking-schema-logging-inference-runs">5. Experiment Tracking Schema: Logging Inference Runs</h2>
+<p>When tuning inference, log every hyperparameter setting alongside your validation metrics in Weights &amp; Biases or a structured local JSON file. Never leave settings undocumented!</p>
+<h3 id="structured-metadata-schema">Structured Metadata Schema</h3>
+<pre class="highlight"><code class="language-json">{
+  "inference_run_id": "inf_eval_run_042",
+  "base_checkpoints": [
+    {"architecture": "unet_resnet34", "fold": 0, "sha256": "a3f89b..."},
+    {"architecture": "fpn_efficientnet_b2", "fold": 0, "sha256": "c71e04..."}
+  ],
+  "ensemble_weights": [0.50, 0.50],
+  "tta_policy": "hflip",
+  "native_restoration": "bilinear_interp_native_128x800",
+  "thresholds": {"defect_a": 0.45, "defect_b": 0.40, "defect_c": 0.55, "defect_d": 0.50},
+  "min_areas": {"defect_a": 30, "defect_b": 0, "defect_c": 50, "defect_d": 40},
+  "validation_metrics": {
+    "composite_competition_score": 0.6612,
+    "foreground_dice": 0.5780,
+    "false_positive_score": 0.8320,
+    "empty_accuracy": 0.9020,
+    "positive_dice_defect_b": 0.4900
+  },
+  "runtime_profiling": {
+    "latency_ms_per_image": 16.8,
+    "peak_gpu_vram_mb": 4520,
+    "total_test_extrapolation_minutes": 0.84
+  }
+}</code></pre>
+<p>Binding your post-processing parameters directly to the model checkpoint's SHA256 checksum guarantees that you will never accidentally apply Model A's thresholds to Model B!</p>
+<hr />
+<h2 id="6-how-to-select-your-final-2-competition-submissions">6. How to Select Your Final 2 Competition Submissions</h2>
+<p>Kaggle allows you to select <strong>exactly two final submissions</strong> for private leaderboard scoring:</p>
+<pre class="highlight"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        The Dual-Submission Selection Strategy                          │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ Submission 1: The Safe Consensus Leader (Highest Local Out-of-Fold Score)              │
+│ • Best validated ensemble with conservative post-processing                            │
+│ • Moderate thresholds and gentle minimum area filters ($A_{\min, b} = 0$)              │
+│ • Prioritizes stability, high recall on rare defects, and zero over-filtering          │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ Submission 2: The High-Precision Challenger                                            │
+│ • Slightly more aggressive false-positive suppression or alternative backbone          │
+│ • Validated on OOF, but slightly more optimized for false alarm reduction              │
+│ • Provides healthy diversification without sacrificing statistical soundness          │
+└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="what-you-must-never-do">What You Must NEVER Do:</h3>
+<ul>
+<li>❌ Do <strong>not</strong> select a submission based purely on a high public leaderboard score if its local cross-validation score was mediocre. (This is the definition of public leaderboard overfitting).</li>
+<li>❌ Do <strong>not</strong> select a submission that was never validated locally.</li>
+<li>❌ Do <strong>not</strong> select two identical submissions with a tiny 0.01 threshold difference. Make your two submissions represent genuinely distinct, justified modeling decisions.</li>
+</ul>
+<hr />
+<h2 id="7-diagnostic-checklist-final-inference-verification">7. Diagnostic Checklist: Final Inference Verification</h2>
+<p>Before you push the final "Submit" button on Kaggle, verify these five items:</p>
+<ol>
+<li>
+<p><strong>Deterministic Reproducibility</strong>: Run inference twice on 20 test images with identical random seeds. Verify that the resulting RLE strings match character-for-character:</p>
+<div class="arithmatex">\[\text{Hash}(\text{CSV}_1) == \text{Hash}(\text{CSV}_2)\]</div>
+</li>
+<li>
+<p><strong>Kaggle Internet Independence</strong>: In code competitions, internet access is disabled during submission evaluation! Ensure your inference notebook does <strong>not</strong> download pretrained weights or pip packages at runtime. All weights must be loaded from local attached Kaggle datasets.</p>
+</li>
+<li><strong>Execution Latency Buffer</strong>: Confirm that total test inference takes less than <strong>3 hours</strong>, leaving a 6-hour safety margin below Kaggle’s 9-hour timeout.</li>
+<li><strong>Valid Row &amp; Schema Verification</strong>: Run <code>validate_submission_file()</code> to confirm exactly 12,001 lines, correct headers, single-space sentinels, and clamped indices.</li>
+<li><strong>No Confidential Leaks</strong>: Ensure no private internal training logs or unverified conclusions are exposed in markdown comments.</li>
+</ol>
+<hr />
+<h2 id="8-ungraded-activity-spot-the-flawed-selection-rationale">8. Ungraded Activity: Spot the Flawed Selection Rationale</h2>
+<p>Read the following statements from three fictional students preparing their final Kaggle submissions. Determine which student has the soundest methodology, and identify the fatal flaw in the other two:</p>
+<ul>
+<li><strong>Student Alpha</strong>: <em>"My single U-Net scored 0.650 on local 5-fold CV and 0.642 on the public leaderboard. My 4-model ensemble scored 0.672 on local CV and 0.655 on the public leaderboard. I will select the 4-model ensemble as my primary submission because local CV reliably aggregates all folds."</em></li>
+<li><strong>Student Beta</strong>: <em>"I tested a speculative threshold <span class="arithmatex">\(\tau = 0.85\)</span> with <span class="arithmatex">\(A_{\min} = 300\text{ px}\)</span>. My local validation score plummeted from 0.65 to 0.52, but my public leaderboard score jumped to 0.665! I am selecting this submission because the public leaderboard is the real test data."</em></li>
+<li><strong>Student Gamma</strong>: <em>"I have 20 different submissions. I will pick the two that scored highest on the public leaderboard, regardless of what my local CV said."</em></li>
+</ul>
+<p><em>(Hint: Reflect on why the public leaderboard represents only a small fraction of the test set, and why optimizing against it without validation support leads to catastrophic leaderboard shakeup.)</em></p>
+<hr />
+<h2 id="9-authoritative-references-further-reading">9. Authoritative References &amp; Further Reading</h2>
+<ul>
+<li><strong>Kaggle Documentation</strong>: <a href="https://www.kaggle.com/docs/competitions#the-leaderboard">How Competitions Work: Public vs. Private Leaderboards and Overfitting</a></li>
+<li><strong>Varoquaux (2018)</strong>: <em>Cross-validation failure: Small sample sizes lead to competition artifacts</em>, NeuroImage.</li>
+<li><strong>Sculley et al. (2015)</strong>: <em>Hidden Technical Debt in Machine Learning Systems</em>, Advances in Neural Information Processing Systems (NeurIPS).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_submission_integrity_and_the_competition_contract.html">← Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="walkthrough-notebook.html">Walkthrough Notebook &amp; Code Examples →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

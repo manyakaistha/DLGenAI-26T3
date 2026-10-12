@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 01 · Thresholds &amp; Probability Calibration · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 01 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-uncalibrated-threshold-trap">1. Concrete Failure Case: The Uncalibrated Threshold Trap</a></li>
+<li><a href="#2-mathematical-formulation-from-logits-to-binary-decisions">2. Mathematical Formulation: From Logits to Binary Decisions</a></li>
+<li><a href="#3-worked-numerical-example-the-toy-grid">3. Worked Numerical Example: The Toy Grid</a></li>
+<li><a href="#4-tensor-shapes-and-data-types">4. Tensor Shapes and Data Types</a></li>
+<li><a href="#5-threshold-calibration-protocol-the-search-strategy">5. Threshold Calibration Protocol: The Search Strategy</a></li>
+<li><a href="#6-decision-analysis-benefits-costs-and-risks">6. Decision Analysis: Benefits, Costs, and Risks</a></li>
+<li><a href="#7-diagnostic-checklist-has-thresholding-helped">7. Diagnostic Checklist: Has Thresholding Helped?</a></li>
+<li><a href="#8-ungraded-activity-predict-the-metric-impact">8. Ungraded Activity: Predict the Metric Impact</a></li>
+<li><a href="#9-authoritative-framework-competition-references">9. Authoritative Framework &amp; Competition References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-01-probability-maps-to-binary-masks-calibration-class-thresholds">Guide 01: Probability Maps to Binary Masks: Calibration &amp; Class Thresholds</h1>
+<p>At the conclusion of neural network training, your segmentation model emits continuous, real-valued tensors known as <strong>logits</strong>:</p>
+<div class="arithmatex">\[\mathbf{Z} \in \mathbb{R}^{B \times C \times H \times W}\]</div>
+<p>Where <span class="arithmatex">\(B\)</span> is batch size, <span class="arithmatex">\(C\)</span> is the number of defect channels, <span class="arithmatex">\(H = 128\)</span>, and <span class="arithmatex">\(W = 800\)</span>.</p>
+<p>However, downstream factory quality controllers and Kaggle's evaluation engine cannot score raw floating-point numbers. They require a discrete, binary decision at every pixel: <em>Is pixel <span class="arithmatex">\((y, x)\)</span> an active surface flaw, or is it clean metal?</em></p>
+<p>Converting continuous predictions into discrete decisions is the first critical post-processing step. Applying an uncalibrated default threshold (such as <span class="arithmatex">\(\tau = 0.5\)</span>) is rarely optimal. On an industrial inspection line, a single 2-pixel false alarm on an otherwise spotless sheet can drop an image-pair Dice score from <span class="arithmatex">\(1.0\)</span> down to <span class="arithmatex">\(0.0\)</span>, while an overly timid threshold will erase faint longitudinal scratches.</p>
+<p>In this guide, you will trace logits through model activations, understand the precision–recall trade-off across the threshold spectrum, formulate per-class threshold vectors <span class="arithmatex">\(\boldsymbol{\tau}\)</span>, and calibrate decisions strictly using held-out validation predictions against the competition's weighted evaluation metric.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-uncalibrated-threshold-trap">1. Concrete Failure Case: The Uncalibrated Threshold Trap</h2>
+<p>Consider an industrial line-scan camera inspecting a fast-moving cold-rolled steel strip.</p>
+<p>Suppose your model inspects a clean, defect-free strip (Ground Truth <span class="arithmatex">\(Y = \mathbf{0}\)</span>). A minor fluctuation in surface illumination or oil sheen produces a weak logit spike <span class="arithmatex">\(z = +0.1\)</span> over 4 neighboring pixels.</p>
+<p>If you apply a naive low threshold <span class="arithmatex">\(\tau = 0.35\)</span> (<span class="arithmatex">\(\sigma(z) \approx 0.52 \ge 0.35\)</span>):</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(|Y| = 0\)</span> pixels (Empty mask).</li>
+<li>Predicted Mask: <span class="arithmatex">\(|\hat{X}| = 4\)</span> pixels.</li>
+<li>Ground Truth is empty, so Foreground Dice is not scored, but the model has fired a false alarm on a clean pair. The false-positive penalty is incurred, dropping the pair's score from <span class="arithmatex">\(1.0\)</span> to <span class="arithmatex">\(0.0\)</span>.</li>
+</ul>
+<p>Now consider the inverse failure case on a sheet with a faint, thin scratch (<code>defect_a</code>, Ground Truth <span class="arithmatex">\(|Y| = 80\text{ px}\)</span>). Because the scratch is shallow, the model's confidence hovers around <span class="arithmatex">\(p \approx 0.42\)</span>. If you apply an aggressive default threshold <span class="arithmatex">\(\tau = 0.50\)</span>:</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(|Y| = 80\)</span> pixels.</li>
+<li>Predicted Mask: <span class="arithmatex">\(|\hat{X}| = 0\)</span> pixels (<span class="arithmatex">\(\text{since } 0.42 &lt; 0.50\)</span>).</li>
+<li>
+<p>Foreground Dice:</p>
+<div class="arithmatex">\[\text{Dice} = \frac{2 |\hat{X} \cap Y|}{|\hat{X}| + |Y|} = \frac{0}{0 + 80} = 0.0\]</div>
+</li>
+</ul>
+<p>The defect is entirely missed, destroying Foreground Dice (which commands <span class="arithmatex">\(70\%\)</span> of the competition metric).</p>
+<p>The default threshold <span class="arithmatex">\(\tau = 0.50\)</span> assumes symmetric costs and calibrated probabilities. In industrial anomaly detection, neither assumption holds.</p>
+<hr />
+<h2 id="2-mathematical-formulation-from-logits-to-binary-decisions">2. Mathematical Formulation: From Logits to Binary Decisions</h2>
+<p>The transformation pipeline from model activations to binary masks follows a deterministic mathematical flow:</p>
+<pre class="highlight"><code>┌────────────────────────┐      ┌────────────────────────┐      ┌────────────────────────┐
+│     1. Raw Logits      │ ───► │  2. Probabilities P    │ ───► │  3. Binary Mask M      │
+│  z ∈ (-∞, +∞)          │      │  Sigmoid / Softmax     │      │  P ≥ τ → {0, 1}        │
+│  Shape: (C, 128, 800)  │      │  P ∈ [0.0, 1.0]        │      │  Shape: (C, 128, 800)  │
+└────────────────────────┘      └────────────────────────┘      └────────────────────────┘</code></pre>
+<p><img alt="Threshold Precision Recall Tradeoff" src="assets/fig02_threshold_precision_recall_tradeoff.png" />
+<em>Figure 1.1: (Left) Empirical probability distributions for clean background vs true defect pixels. (Right) Metric divergence across the threshold spectrum: notice how the competition score peak differs from naive mean Dice.</em></p>
+<h3 id="sigmoid-vs-softmax-head-mechanics">Sigmoid vs. Softmax Head Mechanics</h3>
+<p>Depending on the output head architecture selected during training, continuous probabilities <span class="arithmatex">\(\hat{P}\)</span> are computed differently:</p>
+<h4 id="a-multi-label-sigmoid-head-4-output-channels">A. Multi-Label Sigmoid Head (4 Output Channels)</h4>
+<p>When the model outputs 4 independent logits <span class="arithmatex">\(\mathbf{Z} \in \mathbb{R}^{4 \times 128 \times 800}\)</span>, each channel corresponds directly to a defect class (<span class="arithmatex">\(c \in \{0, 1, 2, 3\}\)</span> for <code>defect_a</code> through <code>defect_d</code>). Probabilities are computed via the standard logistic sigmoid function:</p>
+<div class="arithmatex">\[\hat{P}(c, y, x) = \sigma(z(c, y, x)) = \frac{1}{1 + e^{-z(c, y, x)}}\]</div>
+<p>Under this formulation, channels are mathematically independent: pixel <span class="arithmatex">\((y, x)\)</span> can theoretically predict probabilities <span class="arithmatex">\(&gt; 0.5\)</span> for both <code>defect_a</code> and <code>defect_c</code> simultaneously.</p>
+<h4 id="b-5-way-categorical-softmax-head-5-output-channels">B. 5-Way Categorical Softmax Head (5 Output Channels)</h4>
+<p>When the model outputs 5 logits representing <code>[background, defect_a, defect_b, defect_c, defect_d]</code>, probabilities are normalized across channels at every pixel:</p>
+<div class="arithmatex">\[\hat{P}(c, y, x) = \frac{e^{z(c, y, x)}}{\sum_{k=0}^{4} e^{z(k, y, x)}}, \quad \sum_{k=0}^{4} \hat{P}(k, y, x) = 1.0\]</div>
+<p>Where <span class="arithmatex">\(c = 0\)</span> is background, and <span class="arithmatex">\(c \in \{1, 2, 3, 4\}\)</span> correspond to the 4 defect classes. This structure enforces pixel exclusivity: increasing the probability of <code>defect_a</code> automatically decreases the probability of all other defects and background.</p>
+<h3 id="the-decision-rule">The Decision Rule</h3>
+<p>Given predicted probability <span class="arithmatex">\(\hat{P}(c, y, x) \in [0, 1]\)</span> and class threshold <span class="arithmatex">\(\tau_c \in (0, 1)\)</span>:</p>
+<div class="arithmatex">\[\hat{M}(c, y, x) = \begin{cases} 1 &amp; \text{if } \hat{P}(c, y, x) \ge \tau_c \\ 0 &amp; \text{if } \hat{P}(c, y, x) &lt; \tau_c \end{cases}\]</div>
+<p>For a 5-way softmax head, students may combine a categorical argmax filter with a foreground confidence threshold:</p>
+<div class="arithmatex">\[\hat{M}(c, y, x) = \begin{cases} 1 &amp; \text{if } \operatorname{argmax}_{k} \hat{P}(k, y, x) = c \quad \text{and} \quad \hat{P}(c, y, x) \ge \tau_c \\ 0 &amp; \text{otherwise} \end{cases}\]</div>
+<hr />
+<h2 id="3-worked-numerical-example-the-toy-grid">3. Worked Numerical Example: The Toy Grid</h2>
+<p>To observe how thresholding alters mask geometry, examine this fictional <span class="arithmatex">\(4 \times 5\)</span> probability grid <span class="arithmatex">\(\hat{P}\)</span> for a single defect channel near a strip boundary:</p>
+<pre class="highlight"><code>Row / Col     Col 0    Col 1    Col 2    Col 3    Col 4
+Row 0        [ 0.05     0.08     0.12     0.04     0.02 ]
+Row 1        [ 0.10     0.42     0.68     0.48     0.06 ]
+Row 2        [ 0.15     0.52     0.88     0.71     0.11 ]
+Row 3        [ 0.04     0.12     0.38     0.15     0.03 ]</code></pre>
+<p>Let us evaluate the resulting binary mask <span class="arithmatex">\(\hat{M}\)</span> at three distinct thresholds: <span class="arithmatex">\(\tau = 0.35\)</span>, <span class="arithmatex">\(\tau = 0.50\)</span>, and <span class="arithmatex">\(\tau = 0.70\)</span>.</p>
+<h3 id="threshold-evaluation-comparison">Threshold Evaluation Comparison</h3>
+<pre class="highlight"><code>At τ = 0.35 (Permissive / High Recall):
+[ 0  0  0  0  0 ]
+[ 0  1  1  1  0 ]  --&gt; 6 active pixels: captures weak boundary pixels (0.42, 0.48, 0.38).
+[ 0  1  1  1  0 ]      High recall, but boundary expansion may add false positive pixels.
+[ 0  0  1  0  0 ]
+
+At τ = 0.50 (Standard Default):
+[ 0  0  0  0  0 ]
+[ 0  0  1  0  0 ]  --&gt; 3 active pixels: (Row 1, Col 2=0.68), (Row 2, Col 1=0.52), (Row 2, Col 2=0.88), (Row 2, Col 3=0.71).
+[ 0  1  1  1  0 ]      Boundary pixel (0.42) and tail pixel (0.38) are zeroed out.
+[ 0  0  0  0  0 ]
+
+At τ = 0.70 (Conservative / High Precision):
+[ 0  0  0  0  0 ]
+[ 0  0  0  0  0 ]  --&gt; 2 active pixels: only high-confidence core pixels (0.88, 0.71) survive.
+[ 0  0  1  1  0 ]      High specificity, but defect area is truncated by 66%!
+[ 0  0  0  0  0 ]</code></pre>
+<h3 id="worked-dice-calculation-against-ground-truth">Worked Dice Calculation Against Ground Truth</h3>
+<p>Suppose the true defect mask <span class="arithmatex">\(Y\)</span> consists of the 4 pixels:</p>
+<div class="arithmatex">\[Y = \{(1, 1), (1, 2), (2, 1), (2, 2)\}, \quad |Y| = 4\]</div>
+<p>Let us compute Foreground Dice for each threshold:</p>
+<ol>
+<li>
+<p><strong>At <span class="arithmatex">\(\tau = 0.35\)</span></strong>:</p>
+<ul>
+<li>Predicted <span class="arithmatex">\(|\hat{X}| = 6\)</span>.</li>
+<li>Intersection <span class="arithmatex">\(|\hat{X} \cap Y| = 4\)</span> (all true pixels detected, plus 2 false positive pixels at <span class="arithmatex">\((1, 3)\)</span> and <span class="arithmatex">\((3, 2)\)</span>).</li>
+</ul>
+<div class="arithmatex">\[\text{Dice}_{\tau=0.35} = \frac{2 \times 4}{6 + 4} = \frac{8}{10} = \mathbf{0.800}\]</div>
+</li>
+<li>
+<p><strong>At <span class="arithmatex">\(\tau = 0.50\)</span></strong>:</p>
+<ul>
+<li>Predicted <span class="arithmatex">\(|\hat{X}| = 4\)</span>: <span class="arithmatex">\(\{(1, 2), (2, 1), (2, 2), (2, 3)\}\)</span>.</li>
+<li>Intersection <span class="arithmatex">\(|\hat{X} \cap Y| = 3\)</span> (missed <span class="arithmatex">\((1, 1)\)</span>, added false positive <span class="arithmatex">\((2, 3)\)</span>).</li>
+</ul>
+<div class="arithmatex">\[\text{Dice}_{\tau=0.50} = \frac{2 \times 3}{4 + 4} = \frac{6}{8} = \mathbf{0.750}\]</div>
+</li>
+<li>
+<p><strong>At <span class="arithmatex">\(\tau = 0.70\)</span></strong>:</p>
+<ul>
+<li>Predicted <span class="arithmatex">\(|\hat{X}| = 2\)</span>: <span class="arithmatex">\(\{(2, 2), (2, 3)\}\)</span>.</li>
+<li>Intersection <span class="arithmatex">\(|\hat{X} \cap Y| = 1\)</span> (only <span class="arithmatex">\((2, 2)\)</span> matches).</li>
+</ul>
+<div class="arithmatex">\[\text{Dice}_{\tau=0.70} = \frac{2 \times 1}{2 + 4} = \frac{2}{6} = \mathbf{0.333}\]</div>
+</li>
+</ol>
+<p>On this defect, <span class="arithmatex">\(\tau = 0.35\)</span> achieves the highest Dice (<span class="arithmatex">\(0.800\)</span>) because capturing faint boundary pixels outweighs the minor area penalty.</p>
+<hr />
+<h2 id="4-tensor-shapes-and-data-types">4. Tensor Shapes and Data Types</h2>
+<p>Trace the tensor transformations through every operation in the decision step:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Stage</th>
+<th style="text-align: left;">Variable Name</th>
+<th style="text-align: left;">Shape</th>
+<th style="text-align: left;">Data Type</th>
+<th style="text-align: left;">Value Range</th>
+<th style="text-align: left;">Memory for Batch <span class="arithmatex">\(B=16\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Model Raw Output</td>
+<td style="text-align: left;"><code>logits</code></td>
+<td style="text-align: left;"><code>(16, 4, 128, 800)</code></td>
+<td style="text-align: left;"><code>torch.float32</code></td>
+<td style="text-align: left;"><span class="arithmatex">\((-\infty, +\infty)\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(26.21\text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Non-Linear Activation</td>
+<td style="text-align: left;"><code>probs</code></td>
+<td style="text-align: left;"><code>(16, 4, 128, 800)</code></td>
+<td style="text-align: left;"><code>torch.float32</code></td>
+<td style="text-align: left;"><span class="arithmatex">\([0.0, 1.0]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(26.21\text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Canvas Rescaling (if scaled)</td>
+<td style="text-align: left;"><code>probs_native</code></td>
+<td style="text-align: left;"><code>(16, 4, 128, 800)</code></td>
+<td style="text-align: left;"><code>torch.float32</code></td>
+<td style="text-align: left;"><span class="arithmatex">\([0.0, 1.0]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(26.21\text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Threshold Comparison</td>
+<td style="text-align: left;"><code>raw_mask</code></td>
+<td style="text-align: left;"><code>(16, 4, 128, 800)</code></td>
+<td style="text-align: left;"><code>torch.bool</code></td>
+<td style="text-align: left;"><code>True</code> / <code>False</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(6.55\text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">NumPy Representation</td>
+<td style="text-align: left;"><code>mask_uint8</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.uint8</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(\{0, 1\}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.10\text{ MB / image-class}\)</span></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!IMPORTANT]
+If your model forward pass uses a scaled input resolution (such as <span class="arithmatex">\(256 \times 1600\)</span>), you must interpolate the continuous logits or probability maps back to the native industrial dimensions <span class="arithmatex">\((128, 800)\)</span> <strong>before</strong> thresholding. Interpolating binary masks introduces jagged stair-stepping and boundary dilation artifacts.</p>
+</blockquote>
+<hr />
+<h2 id="5-threshold-calibration-protocol-the-search-strategy">5. Threshold Calibration Protocol: The Search Strategy</h2>
+<p>Never adjust thresholds using public leaderboard feedback. Public leaderboard feedback provides a single noisy number across an unknown subset of test data, leading directly to leaderboard overfitting.</p>
+<p>Thresholds must be calibrated strictly using <strong>held-out validation predictions</strong>:</p>
+<h3 id="step-1-precompute-validation-probabilities">Step 1: Precompute Validation Probabilities</h3>
+<p>Do not rerun model forward passes for every candidate threshold! Evaluate your validation set once with your trained checkpoint, caching the predicted probability arrays:</p>
+<div class="arithmatex">\[\mathbf{P}_{\text{val}} \in [0, 1]^{N_{\text{val}} \times 4 \times 128 \times 800}\]</div>
+<h3 id="step-2-define-the-search-resolution">Step 2: Define the Search Resolution</h3>
+<p>Define a discrete search grid for candidate thresholds:</p>
+<div class="arithmatex">\[\mathcal{T} = \{0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80\}\]</div>
+<p>Searching with a step size finer than <span class="arithmatex">\(0.02\)</span> yields negligible metric differences and risks fitting validation noise.</p>
+<h3 id="step-3-optimize-the-true-metric-objective">Step 3: Optimize the True Metric Objective</h3>
+<p>Do <strong>not</strong> optimize for naive mean Dice across all images. In this competition, submissions are evaluated using a 3-part composite metric:</p>
+<div class="arithmatex">\[\text{Score} = 0.70 \times \text{ForegroundDice} + 0.20 \times \text{FalsePositiveScore} + 0.10 \times \text{EmptyAccuracy}\]</div>
+<pre class="highlight"><code class="language-python"># Minimal validation sweep snippet
+import numpy as np
+
+def sweep_class_threshold(val_probs: np.ndarray, val_gts: np.ndarray, grid: list[float]) -&gt; tuple[float, float]:
+    """Find the threshold tau that maximizes the competition composite score for one defect class."""
+    best_score = -1.0
+    best_tau = 0.50
+
+    for tau in grid:
+        fg_dices = []
+        fp_penalties = []
+        empty_correct = 0
+        total_empty = 0
+
+        for p, y in zip(val_probs, val_gts):
+            m = (p &gt;= tau).astype(np.uint8)
+            y_sum = y.sum()
+            m_sum = m.sum()
+            inter = (m * y).sum()
+
+            if y_sum &gt; 0:
+                # Positive ground truth pair: evaluate foreground Dice
+                dice = (2.0 * inter) / (m_sum + y_sum)
+                fg_dices.append(dice)
+            else:
+                # Empty ground truth pair
+                total_empty += 1
+                if m_sum == 0:
+                    empty_correct += 1
+                    fp_penalties.append(1.0)
+                else:
+                    fp_penalties.append(0.0)
+
+        mean_fg = float(np.mean(fg_dices)) if fg_dices else 0.0
+        mean_fp = float(np.mean(fp_penalties)) if fp_penalties else 1.0
+        empty_acc = float(empty_correct / total_empty) if total_empty &gt; 0 else 1.0
+
+        comp_score = 0.70 * mean_fg + 0.20 * mean_fp + 0.10 * empty_acc
+
+        if comp_score &gt; best_score:
+            best_score = comp_score
+            best_tau = tau
+
+    return best_tau, best_score</code></pre>
+<h3 id="per-class-vs-global-shared-thresholds">Per-Class vs. Global Shared Thresholds</h3>
+<p>Different defect classes exhibit vastly different prevalence and contrast:</p>
+<ul>
+<li><code>defect_a</code>: Thin scratches often benefit from moderate thresholds (<span class="arithmatex">\(\tau \approx 0.40 - 0.50\)</span>) to maintain edge connectivity.</li>
+<li><code>defect_b</code>: Extremely rare defect. Setting <span class="arithmatex">\(\tau\)</span> too high risks erasing entire instances, dropping Foreground Dice to zero.</li>
+<li><code>defect_c</code>: Dense, high-contrast oxide scale; models often achieve high confidence, supporting higher thresholds (<span class="arithmatex">\(\tau \approx 0.55 - 0.65\)</span>) to suppress boundary noise.</li>
+</ul>
+<p>Calibrate a 4-element threshold vector <span class="arithmatex">\(\boldsymbol{\tau} = [\tau_a, \tau_b, \tau_c, \tau_d]\)</span> rather than enforcing a single global threshold.</p>
+<hr />
+<h2 id="6-decision-analysis-benefits-costs-and-risks">6. Decision Analysis: Benefits, Costs, and Risks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Strategy</th>
+<th style="text-align: left;">Primary Benefit</th>
+<th style="text-align: left;">Computational Cost</th>
+<th style="text-align: left;">Underlying Assumption</th>
+<th style="text-align: left;">Primary Risk / Failure Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Default <span class="arithmatex">\(\tau = 0.50\)</span> Global</strong></td>
+<td style="text-align: left;">Zero tuning; simplest possible code.</td>
+<td style="text-align: left;">None (<span class="arithmatex">\(O(1)\)</span>).</td>
+<td style="text-align: left;">Probabilities are well-calibrated; costs of FP and FN are equal.</td>
+<td style="text-align: left;">Suboptimal on both thin faint defects and clean sheet false alarms.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Shared Tuned <span class="arithmatex">\(\tau\)</span></strong></td>
+<td style="text-align: left;">Simple 1D sweep; boosts validation metric by <span class="arithmatex">\(0.01 - 0.03\)</span>.</td>
+<td style="text-align: left;">Low (sweep 10 values).</td>
+<td style="text-align: left;">All 4 defect classes share similar confidence profiles.</td>
+<td style="text-align: left;">Under-predicts rare defects or over-predicts noisy classes.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Per-Class Tuned <span class="arithmatex">\(\boldsymbol{\tau}\)</span> (Recommended)</strong></td>
+<td style="text-align: left;">Tailors precision–recall balance to the physical morphology of each defect.</td>
+<td style="text-align: left;">Moderate (sweep 10 values <span class="arithmatex">\(\times\)</span> 4 classes).</td>
+<td style="text-align: left;">Validation set has sufficient class support to prevent overfitting.</td>
+<td style="text-align: left;">Overfitting validation holdout on extremely rare classes (e.g. <code>defect_b</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-diagnostic-checklist-has-thresholding-helped">7. Diagnostic Checklist: Has Thresholding Helped?</h2>
+<p>When you complete your threshold search, evaluate these diagnostics before locking in your settings:</p>
+<ol>
+<li><strong>Class-Wise Foreground Dice Breakdown</strong>: Did the optimal <span class="arithmatex">\(\tau\)</span> increase Foreground Dice on positive pairs without collapsing recall on rare defects?</li>
+<li><strong>False Positive Rate on Clean Strips</strong>: Check how many clean validation images predict active pixels at your chosen <span class="arithmatex">\(\tau\)</span>. If more than <span class="arithmatex">\(5\%\)</span> of clean strips trigger detections, your threshold is too permissive.</li>
+<li><strong>Distribution of Borderline Probabilities</strong>: Plot a histogram of predicted probabilities in the interval <span class="arithmatex">\([0.3, 0.7]\)</span>. If the model is confident, most values will lie near <span class="arithmatex">\(0.0\)</span> and <span class="arithmatex">\(1.0\)</span>. A large mass between <span class="arithmatex">\(0.4\)</span> and <span class="arithmatex">\(0.6\)</span> indicates model uncertainty that post-processing alone cannot fix.</li>
+</ol>
+<hr />
+<h2 id="8-ungraded-activity-predict-the-metric-impact">8. Ungraded Activity: Predict the Metric Impact</h2>
+<p>Review the following diagnostic output from a student's threshold sweep on <code>defect_b</code>:</p>
+<pre class="highlight"><code class="language-text">Threshold τ     Positive Pair Dice    Clean Pair Accuracy    False Alarms (px)
+τ = 0.30        0.582                 0.810                  1,420
+τ = 0.45        0.564                 0.930                  310
+τ = 0.60        0.510                 0.985                  45
+τ = 0.75        0.180                 0.998                  2</code></pre>
+<p><strong>Questions to consider:</strong></p>
+<ol>
+<li>Why does Positive Pair Dice collapse so dramatically between <span class="arithmatex">\(\tau = 0.60\)</span> and <span class="arithmatex">\(\tau = 0.75\)</span>?</li>
+<li>Given that Foreground Dice commands <span class="arithmatex">\(70\%\)</span> of the competition score while Empty Accuracy commands <span class="arithmatex">\(10\%\)</span>, which threshold would you hypothesize yields the highest composite score?</li>
+<li>What risk does the student run if they choose <span class="arithmatex">\(\tau = 0.75\)</span> to maximize clean-pair accuracy?</li>
+</ol>
+<p><em>(Hint: Verify that <code>defect_b</code> instances are sparse. If an entire defect instance fails to exceed 0.75, its Dice score becomes 0.0, dragging down the average across positive pairs.)</em></p>
+<hr />
+<h2 id="9-authoritative-framework-competition-references">9. Authoritative Framework &amp; Competition References</h2>
+<ul>
+<li><strong>Scikit-Learn Documentation</strong>: <a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html">Precision-Recall and Threshold Tuning</a></li>
+<li><strong>PyTorch Documentation</strong>: <a href="https://pytorch.org/docs/stable/generated/torch.sigmoid.html"><code>torch.sigmoid</code></a> and <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html"><code>torch.nn.functional.softmax</code></a></li>
+<li><strong>Kaggle Evaluation Overview</strong>: Industrial Surface Defect Detection Competition Evaluation Metric specification.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 5 Overview</a><a href="guide_02_connected_components_and_minimum_area_filtering.html">Guide 02 · Connected Components &amp; Min-Area →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

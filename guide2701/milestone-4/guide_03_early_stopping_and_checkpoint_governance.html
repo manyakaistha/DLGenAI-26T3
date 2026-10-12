@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 03 · Early Stopping &amp; Checkpoints · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 03 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-checkpoint-dilemma">1. Observable Problem: The Checkpoint Dilemma</a></li>
+<li><a href="#2-early-stopping-dynamics">2. Early Stopping Dynamics</a></li>
+<li><a href="#3-checkpoint-governance-the-last-vs-best-contract">3. Checkpoint Governance: The "Last" vs. "Best" Contract</a></li>
+<li><a href="#4-the-holdout-overfitting-hazard-validation-drift">4. The Holdout Overfitting Hazard (Validation Drift)</a></li>
+<li><a href="#5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</a></li>
+<li><a href="#6-implementation-pattern-robust-early-stopping-class">6. Implementation Pattern: Robust Early Stopping Class</a></li>
+<li><a href="#7-ungraded-try-it-checkpoint-selection-analysis">7. Ungraded "Try It": Checkpoint Selection Analysis</a></li>
+<li><a href="#8-authoritative-references">8. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="early-stopping-checkpoint-governance-and-validation-drift">Early Stopping, Checkpoint Governance, and Validation Drift</h1>
+<p>In an ideal theoretical world, training a neural network would proceed until the training loss reaches zero and the validation metric reaches a smooth, permanent plateau. In real-world industrial surface segmentation, however, the relationship between training loss, validation loss, and task-specific overlap metrics is far more complex.</p>
+<p>A network trained for too many epochs will inevitably memorize idiosyncratic surface noise, surface reflections, and camera lighting variations, leading to <strong>overfitting</strong>. Conversely, halting training too early leaves the model in an <strong>underfitted</strong> state where fine scratch boundaries remain blurred.</p>
+<p>This guide explores the mechanics of <strong>early stopping</strong>, establishes rigorous <strong>checkpoint governance</strong>, warns against the subtle hazard of <strong>holdout overfitting (validation drift)</strong>, and provides a framework for controlled model selection.</p>
+<hr />
+<h2 id="1-observable-problem-the-checkpoint-dilemma">1. Observable Problem: The Checkpoint Dilemma</h2>
+<p>Consider the following validation history from a 30-epoch training run on a held-out validation fold:</p>
+<pre class="highlight"><code class="language-text">Training History Observation:
+Epoch 05: Val Loss = 0.420 | Val Foreground Dice = 0.380
+Epoch 10: Val Loss = 0.245 | Val Foreground Dice = 0.520
+Epoch 14: Val Loss = 0.228 | Val Foreground Dice = 0.565  &lt;-- Minimum Validation Loss!
+Epoch 18: Val Loss = 0.235 | Val Foreground Dice = 0.610
+Epoch 22: Val Loss = 0.248 | Val Foreground Dice = 0.638  &lt;-- Maximum Foreground Dice!
+Epoch 26: Val Loss = 0.285 | Val Foreground Dice = 0.615
+Epoch 30: Val Loss = 0.330 | Val Foreground Dice = 0.582  &lt;-- Final Checkpoint (Overfitted)</code></pre>
+<p>Notice the crucial divergences:</p>
+<ol>
+<li><strong>Loss vs. Metric Divergence</strong>: Validation loss reached its minimum at <strong>Epoch 14</strong>, but Foreground Dice continued climbing for another 8 epochs, peaking at <strong>Epoch 22</strong>!</li>
+<li><strong>The "Last Checkpoint" Trap</strong>: If the student deploys the weights from the final epoch (<strong>Epoch 30</strong>), their model has already degraded by 5.6 Dice points (<span class="arithmatex">\(0.638 \to 0.582\)</span>).</li>
+<li><strong>The "Premature Exit" Trap</strong>: If the student stopped training as soon as validation loss ticked upward after Epoch 14, they would have missed the best segmentation checkpoint entirely.</li>
+</ol>
+<p>To manage this, we must formalize early stopping as an explicit, rule-governed system.</p>
+<hr />
+<h2 id="2-early-stopping-dynamics">2. Early Stopping Dynamics</h2>
+<p><img alt="Early Stopping Dynamics" src="assets/fig04_early_stopping_dynamics.png" />
+<em>Figure 3.1: Annotated validation trajectory illustrating validation loss minimum versus foreground Dice peak, patience window tolerance, metric noise, and automatic rollback to the best checkpoint.</em></p>
+<p>Early stopping is governed by four core parameters:</p>
+<h3 id="1-the-monitored-quantity-m">1. The Monitored Quantity (<span class="arithmatex">\(M\)</span>)</h3>
+<p>What signal determines whether the model is improving?</p>
+<ul>
+<li><strong>Validation Loss</strong>: Standard deep learning default, but often misaligned with competition metrics due to well-calibrated background probability creep.</li>
+<li><strong>Validation Mean Dice (<code>dice_mean</code>)</strong>: Dangerous due to the "clean-pair inflation trap" (see Guide 05).</li>
+<li><strong>Validation Foreground Dice (<code>foreground_dice</code>)</strong>: Evaluates Dice overlap exclusively on ground-truth positive pairs. Highly recommended for checkpoint selection.</li>
+<li><strong>Competition Weighted Proxy Score</strong>: Balances foreground Dice (70%), clean-image false positive penalty (20%), and empty-pair accuracy (10%).</li>
+</ul>
+<h3 id="2-direction-of-improvement-mode">2. Direction of Improvement (<code>mode</code>)</h3>
+<ul>
+<li><code>mode='min'</code>: For loss functions where lower is better (<span class="arithmatex">\(M_{\text{current}} &lt; M_{\text{best}}\)</span>).</li>
+<li><code>mode='max'</code>: For Dice and accuracy metrics where higher is better (<span class="arithmatex">\(M_{\text{current}} &gt; M_{\text{best}}\)</span>).</li>
+</ul>
+<h3 id="3-minimum-improvement-delta-delta_min">3. Minimum Improvement Delta (<span class="arithmatex">\(\delta_{\min}\)</span>)</h3>
+<p>Stochastic mini-batch gradient descent introduces natural variance into validation scores. A model whose Dice fluctuates from <span class="arithmatex">\(0.6201\)</span> to <span class="arithmatex">\(0.6203\)</span> has not meaningfully improved.
+The parameter <span class="arithmatex">\(\delta_{\min}\)</span> (e.g., <span class="arithmatex">\(0.002\)</span> or <span class="arithmatex">\(0.005\)</span>) acts as a noise filter:</p>
+<div class="arithmatex">\[\text{Improved if: } M_{\text{current}} &gt; M_{\text{best}} + \delta_{\min} \quad (\text{for } \text{mode='max'})\]</div>
+<h3 id="4-patience-window-p">4. Patience Window (<span class="arithmatex">\(p\)</span>)</h3>
+<p>The number of consecutive epochs without improvement <span class="arithmatex">\(&gt; \delta_{\min}\)</span> that training is allowed to continue before being stopped:</p>
+<div class="arithmatex">\[\text{Stale Counter: } s_{t+1} = \begin{cases} 
+0 &amp; \text{if } M_t &gt; M_{\text{best}} + \delta_{\min} \\
+s_t + 1 &amp; \text{otherwise}
+\end{cases}\]</div>
+<div class="arithmatex">\[\text{Terminate if: } s_{t+1} \ge p\]</div>
+<p>Typical patience values in surface segmentation range from <strong><span class="arithmatex">\(p = 4\)</span> to <span class="arithmatex">\(p = 7\)</span> epochs</strong>. A patience window that is too short (<span class="arithmatex">\(p = 1\)</span> or <span class="arithmatex">\(2\)</span>) stops prematurely on normal validation noise; a window that is too long (<span class="arithmatex">\(p &gt; 15\)</span>) wastes expensive GPU compute on an overfitted model.</p>
+<hr />
+<h2 id="3-checkpoint-governance-the-last-vs-best-contract">3. Checkpoint Governance: The "Last" vs. "Best" Contract</h2>
+<p>A professional training loop maintains two distinct checkpoint files on disk:</p>
+<pre class="highlight"><code>checkpoints/fold0/
+├── last.pt   # Contains state from the MOST RECENT completed epoch (e.g. Epoch 26)
+└── best.pt   # Contains state from the HIGHEST SCORING epoch (e.g. Epoch 22)</code></pre>
+<h3 id="the-state-dictionary-contract">The State Dictionary Contract:</h3>
+<p>A complete checkpoint must contain more than just model weights. To allow seamless resumption and auditing, it must serialize:</p>
+<pre class="highlight"><code class="language-python">checkpoint = {
+    "epoch": epoch,
+    "best_score": best_score,
+    "stale_epochs": stale_epochs,
+    "selection_metric": "foreground_dice",
+    "model_state_dict": model.state_dict(),
+    "optimizer_state_dict": optimizer.state_dict(),
+    "scheduler_state_dict": scheduler.state_dict(),
+    "scaler_state_dict": scaler.state_dict(),  # AMP gradient scaler state
+    "rng_state": torch.get_rng_state(),        # For deterministic resumption
+    "config": cfg.snapshot(),
+}</code></pre>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Atomic Saving Protocol</strong>:
+Never overwrite <code>best.pt</code> directly. If your process runs out of disk space or is interrupted mid-write, <code>best.pt</code> will be corrupted. Always save to a temporary file (<code>best.pt.tmp</code>) and perform an atomic filesystem replacement:
+<pre class="highlight"><code class="language-python">torch.save(checkpoint, "best.pt.tmp")
+os.replace("best.pt.tmp", "best.pt")</code></pre></p>
+</blockquote>
+<hr />
+<h2 id="4-the-holdout-overfitting-hazard-validation-drift">4. The Holdout Overfitting Hazard (Validation Drift)</h2>
+<p>One of the most insidious traps in competitive machine learning is <strong>overfitting to the validation holdout</strong>.</p>
+<h3 id="the-mechanism-of-information-leakage">The Mechanism of Information Leakage:</h3>
+<ol>
+<li>You establish a clean <span class="arithmatex">\(80/20\)</span> train/validation split (Fold 0).</li>
+<li>You run 50 experiments: tuning learning rates, testing schedulers, tweaking loss weights, adjusting early stopping patience, and sweeping post-processing thresholds.</li>
+<li>In every experiment, you select the checkpoint that scores highest on Fold 0.</li>
+<li><strong>The Consequence</strong>: Even though model weights were updated only on training data, your <em>human decisions</em> (and early stopping decisions) were updated on Fold 0!</li>
+<li>Over time, your pipeline selects models that happen to fit the statistical idiosyncrasies of that specific 20% holdout sample. When submitted to the private Kaggle test set, performance drops significantly.</li>
+</ol>
+<h3 id="defensive-governance">Defensive Governance:</h3>
+<ol>
+<li>
+<p><strong>Multi-Fold Out-of-Fold (OOF) Validation</strong>:
+   Evaluate decisions across all 5 folds of your combination-stratified split. A training improvement is only genuine if the average 5-fold OOF score increases consistently.</p>
+</li>
+<li>
+<p><strong>Fixed Protocol Invariants</strong>:
+   Decide your early stopping metric, threshold grid, and patience <em>before</em> running experiments. Do not tweak stopping rules post-hoc to retroactively favor a particular run.</p>
+</li>
+<li>
+<p><strong>Record All Artifacts</strong>:
+   Store the exact checkpoint hash (<code>sha256</code>) and training log history with each saved model.</p>
+</li>
+</ol>
+<hr />
+<h2 id="5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Observable Symptom in Logs</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Verification Check</th>
+<th style="text-align: left;">Corrective Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Training stops at Epoch 3, even though model has barely begun learning.</td>
+<td style="text-align: left;"><code>mode</code> parameter inverted (e.g. <code>mode='min'</code> passed for Dice metric), or <code>min_delta</code> set excessively high (<span class="arithmatex">\(0.10\)</span>).</td>
+<td style="text-align: left;">Check early stopping initialization logs; verify score comparison logic.</td>
+<td style="text-align: left;">Set <code>mode='max'</code> for Dice; set <code>min_delta</code> to a realistic value (<span class="arithmatex">\(0.002\)</span> to <span class="arithmatex">\(0.005\)</span>).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Validation loss increases steadily while Foreground Dice continues climbing.</td>
+<td style="text-align: left;">Expected phenomenon: probability calibration drift. The model becomes more confident on easy background pixels, causing BCE loss to rise slightly, but thresholded masks improve.</td>
+<td style="text-align: left;">Inspect probability distributions; evaluate Dice vs. Loss curve divergence.</td>
+<td style="text-align: left;">Monitor <code>foreground_dice</code> or the competition weighted proxy for checkpoint selection, not raw loss.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Model performance on Kaggle test set is far worse than the best validation checkpoint.</td>
+<td style="text-align: left;">Holdout overfitting: early stopping selected a noisy outlier epoch that overfit specific validation images.</td>
+<td style="text-align: left;">Check validation score standard deviation across folds (OOF); inspect validation predictions.</td>
+<td style="text-align: left;">Evaluate 5-fold cross-validation; increase early stopping patience slightly (<span class="arithmatex">\(p = 5\)</span>); increase regularizing augmentations.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Process crashes mid-save, leaving an unreadable zero-byte <code>best.pt</code>.</td>
+<td style="text-align: left;">Non-atomic file write interrupted by GPU timeout or disk quota exhaustion.</td>
+<td style="text-align: left;">Attempt <code>torch.load('best.pt')</code> to verify archive integrity.</td>
+<td style="text-align: left;">Use the temporary write + <code>os.replace</code> atomic saving pattern.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-implementation-pattern-robust-early-stopping-class">6. Implementation Pattern: Robust Early Stopping Class</h2>
+<p>Here is a complete, production-grade <code>EarlyStopping</code> implementation in PyTorch:</p>
+<pre class="highlight"><code class="language-python">import copy
+import os
+import torch
+import torch.nn as nn
+
+class EarlyStopping:
+    """Manages early stopping logic, patience counting, and atomic checkpoint persistence."""
+
+    def __init__(
+        self,
+        patience: int = 5,
+        min_delta: float = 0.003,
+        mode: str = "max",
+        checkpoint_path: str = "best.pt",
+    ):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.mode = mode
+        self.checkpoint_path = checkpoint_path
+
+        self.stale_epochs = 0
+        self.best_score = None
+        self.best_epoch = 0
+        self.should_stop = False
+
+    def step(
+        self,
+        current_score: float,
+        epoch: int,
+        model: nn.Module,
+        checkpoint_payload: dict,
+    ) -&gt; bool:
+        """Evaluates current epoch score. Saves checkpoint atomically if score improves."""
+        if self.best_score is None:
+            self._save_new_best(current_score, epoch, model, checkpoint_payload)
+            return True
+
+        if self.mode == "max":
+            improved = current_score &gt; (self.best_score + self.min_delta)
+        else:
+            improved = current_score &lt; (self.best_score - self.min_delta)
+
+        if improved:
+            self._save_new_best(current_score, epoch, model, checkpoint_payload)
+            self.stale_epochs = 0
+            return True
+        else:
+            self.stale_epochs += 1
+            if self.stale_epochs &gt;= self.patience:
+                self.should_stop = True
+            return False
+
+    def _save_new_best(self, score: float, epoch: int, model: nn.Module, payload: dict):
+        self.best_score = score
+        self.best_epoch = epoch
+
+        # Inject model state into payload
+        payload["model_state_dict"] = model.state_dict()
+        payload["best_score"] = score
+        payload["epoch"] = epoch
+
+        # Atomic file write
+        tmp_path = f"{self.checkpoint_path}.tmp"
+        torch.save(payload, tmp_path)
+        os.replace(tmp_path, self.checkpoint_path)
+        print(f"-&gt; [NEW BEST] Epoch {epoch:02d}: {score:.4f} saved to {self.checkpoint_path}")</code></pre>
+<hr />
+<h2 id="7-ungraded-try-it-checkpoint-selection-analysis">7. Ungraded "Try It": Checkpoint Selection Analysis</h2>
+<p>Examine this fictional training run log:</p>
+<pre class="highlight"><code class="language-text">Monitored Metric: Validation Foreground Dice (mode='max')
+Patience: 4 epochs | Min Delta: 0.004
+
+Epoch 08: Score = 0.510 (Best: 0.510, Stale: 0) -&gt; New Best
+Epoch 09: Score = 0.518 (Best: 0.518, Stale: 0) -&gt; New Best (+0.008 &gt; 0.004)
+Epoch 10: Score = 0.520 (Best: 0.518, Stale: 1) -&gt; No significant gain (+0.002 &lt; 0.004)
+Epoch 11: Score = 0.517 (Best: 0.518, Stale: 2) -&gt; Score dropped
+Epoch 12: Score = 0.523 (Best: 0.523, Stale: 0) -&gt; New Best (+0.005 &gt; 0.004)
+Epoch 13: Score = 0.525 (Best: 0.523, Stale: 1) -&gt; No significant gain (+0.002 &lt; 0.004)
+Epoch 14: Score = 0.521 (Best: 0.523, Stale: 2)
+Epoch 15: Score = 0.519 (Best: 0.523, Stale: 3)
+Epoch 16: Score = 0.520 (Best: 0.523, Stale: 4) -&gt; Early stopping triggered!</code></pre>
+<p><strong>Diagnostic Questions</strong>:</p>
+<ol>
+<li>At Epoch 10, the score rose from <span class="arithmatex">\(0.518\)</span> to <span class="arithmatex">\(0.520\)</span>. Why did the stale counter increase from 0 to 1 instead of resetting?</li>
+<li>Which epoch's model weights reside in <code>best.pt</code> when training terminates at Epoch 16?</li>
+<li>If the student set <code>patience = 2</code>, at which epoch would training have been prematurely aborted, and what peak score would have been lost?</li>
+</ol>
+<hr />
+<h2 id="8-authoritative-references">8. Authoritative References</h2>
+<ul>
+<li>Prechelt, L. (1998). <em>Early Stopping — But When?</em> Neural Networks: Tricks of the Trade, Springer. (Seminal paper formalizing patience and stopping criteria).</li>
+<li>PyTorch <a href="https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html">Checkpointing Tutorial</a></li>
+<li>Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). <em>The Elements of Statistical Learning</em>, Chapter 7: Model Assessment and Selection. (Information leakage and validation overfitting).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_02_learning_rate_schedulers_and_warmup.html">← Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html">Guide 04 · Mixed Precision (AMP) &amp; Memory →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

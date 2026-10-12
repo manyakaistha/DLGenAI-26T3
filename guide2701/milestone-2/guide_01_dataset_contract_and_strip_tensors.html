@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 01 · The Dataset Contract · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 01 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-industrial-strip-imaging-context">1. Motivation: The Industrial Strip Imaging Context</a></li>
+<li><a href="#2-tracing-one-sample-the-data-contract">2. Tracing One Sample: The Data Contract</a></li>
+<li><a href="#3-shape-and-data-type-trace-table">3. Shape and Data Type Trace Table</a></li>
+<li><a href="#4-ground-truth-exclusivity-the-multi-label-audit">4. Ground Truth Exclusivity: The Multi-Label Audit</a></li>
+<li><a href="#5-dataset-architecture-interface">5. Dataset Architecture &amp; Interface</a></li>
+<li><a href="#6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</a></li>
+<li><a href="#7-design-decisions-you-must-make">7. Design Decisions You Must Make</a></li>
+<li><a href="#8-try-it-verify-sample-alignment-on-toy-data">8. Try It: Verify Sample Alignment on Toy Data</a></li>
+<li><a href="#9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="the-dataset-contract-from-annotation-rows-to-aligned-strip-tensors">The Dataset Contract: From Annotation Rows to Aligned Strip Tensors</h1>
+<p>In Milestone 1, you explored the dataset's geometry, the Fortran-order conventions of Run-Length Encoding (RLE), and the mathematical behavior of segmentation metrics on empty masks. In Milestone 2, you move from exploration to execution: building a robust, high-performance deep learning pipeline.</p>
+<p>The foundation of every deep learning pipeline is the PyTorch <code>Dataset</code>. If your data loading pipeline silently swaps image dimensions, misaligns defect masks with visual textures, or confuses defect channels, no sophisticated network architecture can rescue your model. This guide establishes the <strong>dataset contract</strong> required for industrial strip anomaly segmentation.</p>
+<hr />
+<h2 id="1-motivation-the-industrial-strip-imaging-context">1. Motivation: The Industrial Strip Imaging Context</h2>
+<p>In industrial manufacturing facilities (such as steel cold-rolling mills), surface quality is continuously monitored by high-speed line-scan cameras positioned above conveyor lines. These cameras capture optical sensor frames with extreme aspect ratios: <strong>800 pixels wide by 128 pixels high</strong> (an aspect ratio of <span class="arithmatex">\(6.25:1\)</span>).</p>
+<pre class="highlight"><code>Conveyor Motion (Strip Length / Rolling Axis) ──────────────────────────► Width = 800 px
+┌───────────────────────────────────────────────────────────────────────────────────────┐
+│                                    [Line-Scan Sensor]                                 │ Height = 128 px
+└───────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>When building a computer vision model for this domain, standard computer vision assumptions break down:</p>
+<ol>
+<li><strong>Sensors are Anisotropic</strong>: Objects do not appear in square <span class="arithmatex">\(256 \times 256\)</span> or <span class="arithmatex">\(512 \times 512\)</span> scenes. Resizing an <span class="arithmatex">\(800 \times 128\)</span> strip to a square alters physical scale ratios by over <span class="arithmatex">\(600\%\)</span>, crushing thin longitudinal scratches into aliasing artifacts.</li>
+<li><strong>Annotations are Multi-Label &amp; Long-Format</strong>: Each visual strip can contain multiple defects or none at all. In <code>train.csv</code>, annotations are provided as multiple rows per image.</li>
+<li><strong>Channels are Monochromatic</strong>: Steel strips are optically recorded as single-channel grayscale intensity values, not RGB color photos.</li>
+</ol>
+<p>The PyTorch <code>Dataset</code> must bridge this raw disk storage and the tensor format expected by 2D convolutional neural networks: converting disk images and RLE strings into perfectly aligned tensors of shape <span class="arithmatex">\([C, H, W]\)</span>.</p>
+<hr />
+<h2 id="2-tracing-one-sample-the-data-contract">2. Tracing One Sample: The Data Contract</h2>
+<p>Let us trace a single fictional sample, <code>image_id = "STRIP_0042"</code>, from disk to PyTorch tensor.</p>
+<h3 id="step-1-disk-storage-schema">Step 1: Disk Storage &amp; Schema</h3>
+<p>On disk, raw images reside as JPEG files at <code>data/public/train/{image_id}.jpg</code>. Their annotations reside in <code>data/public/train.csv</code>, where every image possesses four rows—one for each defect category:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><code>image_id</code></th>
+<th style="text-align: left;"><code>defect_type</code></th>
+<th style="text-align: left;"><code>mask_rle</code></th>
+<th style="text-align: left;"><code>width</code></th>
+<th style="text-align: left;"><code>height</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>STRIP_0042</code></td>
+<td style="text-align: left;"><code>defect_a</code></td>
+<td style="text-align: left;"><code>"25641 4 25769 4"</code></td>
+<td style="text-align: left;">800</td>
+<td style="text-align: left;">128</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>STRIP_0042</code></td>
+<td style="text-align: left;"><code>defect_b</code></td>
+<td style="text-align: left;"><code>NaN</code></td>
+<td style="text-align: left;">800</td>
+<td style="text-align: left;">128</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>STRIP_0042</code></td>
+<td style="text-align: left;"><code>defect_c</code></td>
+<td style="text-align: left;"><code>"64071 30 64201 30"</code></td>
+<td style="text-align: left;">800</td>
+<td style="text-align: left;">128</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>STRIP_0042</code></td>
+<td style="text-align: left;"><code>defect_d</code></td>
+<td style="text-align: left;"><code>NaN</code></td>
+<td style="text-align: left;">800</td>
+<td style="text-align: left;">128</td>
+</tr>
+</tbody>
+</table>
+<p>Notice that empty defects appear as <code>NaN</code> or empty strings, while active defects provide a space-delimited RLE string.</p>
+<h3 id="step-2-grayscale-image-loading">Step 2: Grayscale Image Loading</h3>
+<p>Because line-scan inspection images are monochromatic, load the image using OpenCV in grayscale mode:
+<pre class="highlight"><code class="language-python">image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)  # Returns ndarray of shape (128, 800), uint8</code></pre>
+Loading in default BGR mode (<code>cv2.imread(image_path)</code>) creates three identical redundant color channels, tripling memory bandwidth and VRAM usage without providing additional physical information.</p>
+<h3 id="step-3-fortran-order-rle-decoding">Step 3: Fortran-Order RLE Decoding</h3>
+<p>The RLE strings follow the standard Kaggle/Severstal specification:</p>
+<ul>
+<li><strong>1-indexed</strong>: Pixel counting begins at index 1 (not 0).</li>
+<li><strong>Column-Major (Fortran order, <code>order='F'</code>)</strong>: Pixels are traversed top-to-bottom down column 0, then top-to-bottom down column 1, and so forth.</li>
+<li><strong>Pairs</strong>: Alternating <code>start length</code> values.</li>
+</ul>
+<p>Mathematically, for a canvas of height <span class="arithmatex">\(H=128\)</span> and width <span class="arithmatex">\(W=800\)</span>, a 1-indexed linear index <span class="arithmatex">\(k \in \{1, \dots, H \times W\}\)</span> maps to 0-indexed row coordinate <span class="arithmatex">\(r\)</span> and column coordinate <span class="arithmatex">\(c\)</span> via:</p>
+<div class="arithmatex">\[c = \left\lfloor \frac{k - 1}{H} \right\rfloor, \quad r = (k - 1) \pmod{H}\]</div>
+<pre class="highlight"><code>Linear Pixel 1  ──► (r=0, c=0)
+Linear Pixel 2  ──► (r=1, c=0)
+...
+Linear Pixel 128 ─► (r=127, c=0)
+Linear Pixel 129 ─► (r=0, c=1)</code></pre>
+<h3 id="step-4-the-boundary-clamping-safety-rule">Step 4: The Boundary Clamping Safety Rule</h3>
+<p>When decoding real-world segmentation masks, boundary rounding can produce a run whose endpoint exceeds total pixels:</p>
+<div class="arithmatex">\[k_{\text{end}} = k_{\text{start}} + L\]</div>
+<p>On a canvas of <span class="arithmatex">\(128 \times 800 = 102,400\)</span> pixels, an index <span class="arithmatex">\(k_{\text{end}} &gt; 102,400\)</span> causes an out-of-bounds <code>IndexError</code> when reshaped. Your decoder must clamp:</p>
+<div class="arithmatex">\[k_{\text{clamped\_end}} = \min(k_{\text{start}} + L - 1, H \times W)\]</div>
+<h3 id="step-5-multi-channel-target-stacking">Step 5: Multi-Channel Target Stacking</h3>
+<p>Because each image can exhibit any combination of the four defect classes, we construct a 4-channel binary target tensor:</p>
+<div class="arithmatex">\[\mathbf{Y} \in \{0.0, 1.0\}^{4 \times 128 \times 800}\]</div>
+<p>Channels must follow a strict, deterministic ordering across your entire codebase:</p>
+<ul>
+<li>Channel 0: <code>defect_a</code></li>
+<li>Channel 1: <code>defect_b</code></li>
+<li>Channel 2: <code>defect_c</code></li>
+<li>Channel 3: <code>defect_d</code></li>
+</ul>
+<p><img alt="Dataset Tensor Pipeline" src="assets/fig01_dataset_tensor_pipeline.png" />
+<em>Figure 1.1: Tracing image <code>STRIP_0042</code> from CSV rows and JPEG disk file through RLE decoding into aligned PyTorch tensors.</em></p>
+<hr />
+<h2 id="3-shape-and-data-type-trace-table">3. Shape and Data Type Trace Table</h2>
+<p>Every sample processed by your <code>Dataset</code> must strictly conform to these shapes, dtypes, and value ranges:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Processing Stage</th>
+<th style="text-align: left;">Object</th>
+<th style="text-align: left;">Shape / Dimensions</th>
+<th style="text-align: left;">Data Type</th>
+<th style="text-align: left;">Numeric Range</th>
+<th style="text-align: left;">Memory Footprint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Raw Disk File</strong></td>
+<td style="text-align: left;"><code>STRIP_0042.jpg</code></td>
+<td style="text-align: left;">Compressed JPEG</td>
+<td style="text-align: left;">File Bytes</td>
+<td style="text-align: left;">Compressed</td>
+<td style="text-align: left;">~15–30 KB</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>OpenCV Decode</strong></td>
+<td style="text-align: left;"><code>raw_image</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.uint8</code></td>
+<td style="text-align: left;"><span class="arithmatex">\([0, 255]\)</span></td>
+<td style="text-align: left;">102.4 KB</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>RLE Decode</strong></td>
+<td style="text-align: left;"><code>mask_channel</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.uint8</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(\{0, 1\}\)</span></td>
+<td style="text-align: left;">102.4 KB</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mask Stacking</strong></td>
+<td style="text-align: left;"><code>stacked_masks</code></td>
+<td style="text-align: left;"><code>(4, 128, 800)</code></td>
+<td style="text-align: left;"><code>np.float32</code></td>
+<td style="text-align: left;"><span class="arithmatex">\(\{0.0, 1.0\}\)</span></td>
+<td style="text-align: left;">409.6 KB</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Normalized Image</strong></td>
+<td style="text-align: left;"><code>norm_image</code></td>
+<td style="text-align: left;"><code>(1, 128, 800)</code></td>
+<td style="text-align: left;"><code>torch.float32</code></td>
+<td style="text-align: left;">Standardized (<span class="arithmatex">\(\mu \approx 0, \sigma \approx 1\)</span>)</td>
+<td style="text-align: left;">409.6 KB</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><code>__getitem__</code> Return</strong></td>
+<td style="text-align: left;"><code>dict</code> sample</td>
+<td style="text-align: left;">Image + Mask + ID</td>
+<td style="text-align: left;">Tensors + str</td>
+<td style="text-align: left;">Normalized floats</td>
+<td style="text-align: left;">~820 KB</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-ground-truth-exclusivity-the-multi-label-audit">4. Ground Truth Exclusivity: The Multi-Label Audit</h2>
+<p>Before deciding whether your network should use 4 independent Sigmoid outputs or a 5-class mutually-exclusive Softmax output (background + 4 defects), you must answer an empirical question:</p>
+<div class="arithmatex">\[\text{Do ground-truth defect masks ever overlap at the exact same pixel?}\]</div>
+<p>For any pair of active masks <span class="arithmatex">\(M_i, M_j \in \{0, 1\}^{H \times W}\)</span> on image <span class="arithmatex">\(k\)</span>:</p>
+<div class="arithmatex">\[\text{Overlap}_{i, j} = \sum_{r=0}^{H-1} \sum_{c=0}^{W-1} \left( M_i(r, c) \cdot M_j(r, c) \right)\]</div>
+<ul>
+<li>If <span class="arithmatex">\(\text{Overlap}_{i, j} = 0\)</span> for all pairs across all images, the defect masks are strictly <strong>pixel-disjoint</strong>.</li>
+<li>If <span class="arithmatex">\(\text{Overlap}_{i, j} &gt; 0\)</span> for some images, the defect masks are <strong>spatially overlapping</strong>.</li>
+</ul>
+<p>Do not assume either outcome based on intuition or past Kaggle competitions. Write an audit script that iterates through every multi-defect image in <code>train.csv</code> and computes pairwise mask intersections. Your empirical finding will dictate whether a 5-channel Softmax head is mathematically permissible.</p>
+<hr />
+<h2 id="5-dataset-architecture-interface">5. Dataset Architecture &amp; Interface</h2>
+<p>In PyTorch, a clean <code>Dataset</code> encapsulates storage access and exposes two required methods: <code>__len__</code> and <code>__getitem__</code>.</p>
+<h3 id="the-__getitem__-interface-contract">The <code>__getitem__</code> Interface Contract</h3>
+<p>When <code>dataset[idx]</code> is evaluated, it should return a structured dictionary:
+<pre class="highlight"><code class="language-python">sample = {
+    "image_id": str,          # Fictional ID for tracking and validation
+    "image": torch.Tensor,    # Shape: [1, 128, 800], dtype: torch.float32
+    "mask": torch.Tensor,     # Shape: [4, 128, 800], dtype: torch.float32
+}</code></pre></p>
+<pre class="highlight"><code>PyTorch Tensor Convention: [Channels, Height, Width]
+- Image: [1, 128, 800] ──► 1 grayscale channel, 128 rows, 800 columns
+- Mask:  [4, 128, 800] ──► 4 defect channels, 128 rows, 800 columns</code></pre>
+<h3 id="image-normalization-strategy">Image Normalization Strategy</h3>
+<p>Raw sensor pixels range from 0 to 255. Feeding unnormalized integers into neural networks destabilizes weight initialization and gradient descent. Two standard normalization strategies exist:</p>
+<ol>
+<li>
+<p><strong>Min-Max Scaling to <span class="arithmatex">\([0, 1]\)</span></strong>:</p>
+<div class="arithmatex">\[x_{\text{norm}} = \frac{x}{255.0}\]</div>
+</li>
+<li>
+<p><strong>Per-Dataset Standardization (Z-score)</strong>:</p>
+<div class="arithmatex">\[x_{\text{norm}} = \frac{x / 255.0 - \mu}{\sigma}\]</div>
+<p>where <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> are the empirical mean and standard deviation of your training partition.</p>
+</li>
+</ol>
+<p>Whichever strategy you select, <strong>compute <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> only on the training partition</strong>, never across the full dataset, to prevent subtle data leakage.</p>
+<hr />
+<h2 id="6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Transposed Dimensions</strong></td>
+<td style="text-align: left;">Passing shape as <code>(800, 128)</code> instead of <code>(128, 800)</code>.</td>
+<td style="text-align: left;">Reshape error or vertically stretched, sheared masks.</td>
+<td style="text-align: left;">Assert <code>sample["image"].shape == (1, 128, 800)</code> in <code>__getitem__</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>C-Order RLE Decode</strong></td>
+<td style="text-align: left;">Using <code>order='C'</code> instead of <code>order='F'</code> in NumPy reshape.</td>
+<td style="text-align: left;">Defect mask appears diagonally sheared and misaligned with the visual flaw.</td>
+<td style="text-align: left;">Overlay decoded mask onto the image and verify visual alignment on defect features.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Silent Channel Permutation</strong></td>
+<td style="text-align: left;">Iterating over an unsorted dictionary of defect rows.</td>
+<td style="text-align: left;">Channel 0 is sometimes <code>defect_a</code>, sometimes <code>defect_c</code>. Loss fails to converge.</td>
+<td style="text-align: left;">Enforce a fixed class list: <code>CLASSES = ["defect_a", "defect_b", "defect_c", "defect_d"]</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mask Blurring</strong></td>
+<td style="text-align: left;">Loading masks with bilinear interpolation during preprocessing.</td>
+<td style="text-align: left;">Binary masks contain fractional values (<span class="arithmatex">\(0.34, 0.78\)</span>).</td>
+<td style="text-align: left;">Check <code>torch.unique(sample["mask"])</code> contains only <span class="arithmatex">\(\{0.0, 1.0\}\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Off-by-One RLE Shift</strong></td>
+<td style="text-align: left;">Forgetting that Kaggle RLE is 1-indexed (<code>start - 1</code>).</td>
+<td style="text-align: left;">Mask is shifted by 1 pixel along the column traversal.</td>
+<td style="text-align: left;">Decode a toy RLE string <code>"1 2"</code> and check that pixels at index 0 and 1 are active.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-design-decisions-you-must-make">7. Design Decisions You Must Make</h2>
+<p>Before proceeding to batching and model training, collect empirical evidence to guide these decisions:</p>
+<ol>
+<li><strong>Target Semantics</strong>: Will you format ground truth targets as four independent binary channels <code>[4, 128, 800]</code> (for Sigmoid/BCE), or as a single multi-class integer map <code>[128, 800]</code> with class indices <span class="arithmatex">\(\{0, 1, 2, 3, 4\}\)</span> (for Softmax/Cross-Entropy)?<ul>
+<li><em>Evidence required</em>: Your empirical pairwise mask overlap audit.</li>
+</ul>
+</li>
+<li>
+<p><strong>Caching Strategy</strong>: The training set contains 11,393 images (<span class="arithmatex">\(128 \times 800\)</span> uint8). Uncompressed, all images occupy:</p>
+<div class="arithmatex">\[11,393 \times 128 \times 800 \text{ bytes} \approx 1.17 \text{ GB}\]</div>
+<p>Can your system RAM comfortably hold ~1.2 GB of raw image arrays in memory to eliminate disk I/O bottlenecks during training epochs?</p>
+</li>
+<li>
+<p><strong>Channel Ordering</strong>: Document your channel index mapping in a centralized configuration file to guarantee model heads, metric calculators, and submission encoders agree.</p>
+</li>
+</ol>
+<hr />
+<h2 id="8-try-it-verify-sample-alignment-on-toy-data">8. Try It: Verify Sample Alignment on Toy Data</h2>
+<p>Run this self-contained diagnostic snippet in your terminal or scratch script to inspect mask decoding and tensor alignment on a toy <span class="arithmatex">\(4 \times 6\)</span> canvas:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+import torch
+
+def decode_toy_rle(rle_str, shape=(4, 6)):
+    tokens = [int(x) for x in rle_str.split()]
+    starts = np.array(tokens[0::2]) - 1  # Convert 1-indexed to 0-indexed
+    lengths = np.array(tokens[1::2])
+    flat = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for s, l in zip(starts, lengths):
+        flat[s : s + l] = 1
+    return flat.reshape(shape, order="F")
+
+# Toy defect in column 2 (rows 1 and 2): linear indices 10 and 11
+toy_rle = "10 2"
+mask_2d = decode_toy_rle(toy_rle, shape=(4, 6))
+
+print("Decoded 4x6 Mask (order='F'):")
+print(mask_2d)
+assert mask_2d[1, 2] == 1 and mask_2d[2, 2] == 1, "Pixel alignment failed!"
+assert mask_2d.sum() == 2, "Decoded pixel count mismatch!"
+print("✓ Toy alignment verified successfully!")</code></pre>
+<p>For the complete standalone PyTorch <code>Dataset</code> implementation on synthetic data, inspect:
+👉 <a href="examples/toy_dataset_loader.py"><code>docs/milestone_2_student_guide/examples/toy_dataset_loader.py</code></a></p>
+<hr />
+<h2 id="9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>PyTorch <code>torch.utils.data.Dataset</code></strong>: <a href="https://pytorch.org/tutorials/beginner/basics/data_tutorial.html">PyTorch Dataset Tutorial</a></li>
+<li><strong>OpenCV Grayscale Decoding</strong>: <a href="https://docs.opencv.org/4.x/d4/da8/group__imgcodecs.html"><code>cv2.imread</code> Flag Documentation</a></li>
+<li><strong>NumPy Fortran vs. C Memory Ordering</strong>: <a href="https://numpy.org/doc/stable/reference/internals.html#multidimensional-array-indexing-order-issues">NumPy Array Memory Layout</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 2 Overview</a><a href="guide_02_batching_dataloaders_and_isolation.html">Guide 02 · Batching &amp; DataLoaders →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

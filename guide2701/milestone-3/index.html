@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milestone 3 Overview · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="true">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Milestone 3 Overview</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#transfer-learning-stronger-segmentation-models-4-november-2026">Transfer Learning &amp; Stronger Segmentation Models (4 November 2026)</a></li>
+<li><a href="#1-prerequisites-from-milestones-1-and-2">1. Prerequisites from Milestones 1 and 2</a></li>
+<li><a href="#2-curriculum-map-milestone-3-topics-study-guides">2. Curriculum Map: Milestone 3 Topics &amp; Study Guides</a></li>
+<li><a href="#3-guide-overviews-learning-sequence">3. Guide Overviews &amp; Learning Sequence</a></li>
+<li><a href="#4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</a></li>
+<li><a href="#5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-3-student-study-guides">Milestone 3 Student Study Guides</h1>
+<h2 id="transfer-learning-stronger-segmentation-models-4-november-2026">Transfer Learning &amp; Stronger Segmentation Models (4 November 2026)</h2>
+<p>Welcome to Milestone 3 of the Industrial Surface Anomaly Segmentation curriculum!</p>
+<p>In <strong>Milestone 1</strong>, you inspected the physical and statistical characteristics of industrial line-scan sensors: unraveling 1-indexed Fortran-order Run-Length Encodings (RLE), analyzing extreme anomaly sparsity across steel strips, and examining the metric penalties imposed by empty, defect-free material.</p>
+<p>In <strong>Milestone 2</strong>, you constructed your end-to-end baseline systems: establishing clean PyTorch <code>Dataset</code> contracts, implementing industrial geometric and photometric augmentations, setting up combination-stratified cross-validation splits, logging experiments to Weights &amp; Biases, training a baseline from-scratch U-Net, and calibrating post-processing decision pipelines.</p>
+<p>In <strong>Milestone 3</strong>, you elevate your modeling capability from simple baseline networks to state-of-the-art transfer learning architectures: <strong>adapting pretrained vision backbones to single-channel industrial strips, contrasting independent multi-label sigmoid heads against mutually exclusive multi-class softmax partitions, mastering compound loss formulations (BCE + Soft Dice), and conducting rigorous, controlled ablation experiments</strong>.</p>
+<hr />
+<h2 id="1-prerequisites-from-milestones-1-and-2">1. Prerequisites from Milestones 1 and 2</h2>
+<p>Before beginning Milestone 3, ensure you are comfortable with these core concepts established in earlier milestones:</p>
+<ol>
+<li><strong>Industrial Aspect Ratio Awareness</strong>: Line-scan sensor images are <span class="arithmatex">\(128 \times 800\)</span> pixels (anisotropic <span class="arithmatex">\(6.25:1\)</span> ratio). You understand why square resizing (<span class="arithmatex">\(256 \times 256\)</span>) distorts thin longitudinal defects and why native resolutions must be preserved.</li>
+<li><strong>PyTorch Tensor Contracts</strong>: You understand the standard segmentation tensor conventions: image inputs of shape <code>[B, 1, 128, 800]</code> and multi-label target masks of shape <code>[B, 4, 128, 800]</code>.</li>
+<li><strong>Combination Stratification &amp; Leakage Isolation</strong>: You know how to group rare defect occurrences into multi-label combination signatures to guarantee stable representation across validation folds without data leakage.</li>
+<li><strong>The Decision Pipeline</strong>: You understand how raw continuous logits map to thresholded binary masks (<span class="arithmatex">\(\tau\)</span>) and how connected-component minimum area filtering (<span class="arithmatex">\(A_{\min}\)</span>) suppresses high-frequency sensor noise.</li>
+<li><strong>RLE Submission Format</strong>: You know how to encode binary masks into 1-indexed column-major Fortran strings with the mandatory single-space sentinel (<code>" "</code>) for empty predictions.</li>
+</ol>
+<hr />
+<h2 id="2-curriculum-map-milestone-3-topics-study-guides">2. Curriculum Map: Milestone 3 Topics &amp; Study Guides</h2>
+<p>The Milestone 3 curriculum is organized into six focused, progressive learning modules:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Milestone 3 Core Topic</th>
+<th style="text-align: left;">Primary Study Guide</th>
+<th style="text-align: left;">Theoretical Principles</th>
+<th style="text-align: left;">Practical Implementation Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Encoder–Decoder Architectures</strong></td>
+<td style="text-align: left;"><a href="guide_01_encoder_decoder_architectures.html">Guide 01: Encoder–Decoder Architectures</a></td>
+<td style="text-align: left;">Contracting path, bottleneck, expanding path, receptive fields, skip connections (concatenation vs. addition), spatial dimension alignment on <span class="arithmatex">\(128 \times 800\)</span>.</td>
+<td style="text-align: left;">Trace feature tensor shapes through progressive downsampling stages; diagnose spatial phase distortion bugs.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Pretrained Backbones</strong></td>
+<td style="text-align: left;"><a href="guide_02_pretrained_backbones_and_transfer_learning.html">Guide 02: Pretrained Backbones &amp; Transfer Learning</a></td>
+<td style="text-align: left;">ImageNet visual feature hierarchies, ResNet residual highways vs. EfficientNet compound MBConv scaling, multi-scale feature taps, freezing vs. fine-tuning, BatchNorm drift.</td>
+<td style="text-align: left;">Extract multi-scale feature hierarchies from standard backbones; configure decoders to consume heterogeneous stage channels.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Grayscale Input Adaptation</strong></td>
+<td style="text-align: left;"><a href="guide_03_grayscale_input_adaptation.html">Guide 03: Grayscale Input Adaptation</a></td>
+<td style="text-align: left;">Single-channel sensor physics, 3-channel RGB impedance mismatch, 3x channel repeat, first-layer conv weight collapse (sum vs. average), learned <span class="arithmatex">\(1\times 1\)</span> adapter.</td>
+<td style="text-align: left;">Implement and numerically verify activation equivalence across the 3 grayscale adaptation strategies on CPU.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Output Heads &amp; Target Semantics</strong></td>
+<td style="text-align: left;"><a href="guide_04_output_heads_and_target_semantics.html">Guide 04: Output Heads &amp; Target Semantics</a></td>
+<td style="text-align: left;">4-channel independent Sigmoid vs. 5-channel mutually exclusive Softmax, target representations, mathematical activations, empirical mask overlap audit (<span class="arithmatex">\(\sum m_i \cdot m_j\)</span>).</td>
+<td style="text-align: left;">Audit ground truth masks for pixel-level overlap before choosing a target format; resolve test-time multi-channel collisions.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Loss Formulations</strong></td>
+<td style="text-align: left;"><a href="guide_05_bce_dice_and_compound_losses.html">Guide 05: BCE, Dice, &amp; Compound Losses</a></td>
+<td style="text-align: left;">Extreme class imbalance, numerically stable BCE with logits, differentiable Soft Dice loss, smoothing factor <span class="arithmatex">\(\epsilon\)</span>, compound <span class="arithmatex">\(\text{BCE} + \lambda \text{Dice}\)</span>, loss vs. metric separation.</td>
+<td style="text-align: left;">Compare BCE and Soft Dice responses on tiny <span class="arithmatex">\(4\times 4\)</span> synthetic masks under missed defects, false alarms, and clean sheets.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Controlled Experimentation</strong></td>
+<td style="text-align: left;"><a href="guide_06_experimental_design_and_model_evaluation.html">Guide 06: Systematic Model Exploration</a></td>
+<td style="text-align: left;">Scientific single-variable ablation, head and loss compatibility matrix, training trajectory triage (overfitting, erosion, collapse), debugging protocols.</td>
+<td style="text-align: left;">Design and execute a 3-phase controlled exploration matrix holding splits, budgets, and post-processing strictly constant.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-guide-overviews-learning-sequence">3. Guide Overviews &amp; Learning Sequence</h2>
+<p>Follow this recommended reading and implementation sequence:</p>
+<ul>
+<li>
+<p><strong><a href="guide_01_encoder_decoder_architectures.html">Guide 01: Encoder–Decoder Architectures for Industrial Segmentation</a></strong>:
+  Explains why standard classification features cannot output pixel-aligned masks. Traces a fictional <span class="arithmatex">\(128 \times 800\)</span> strip through a 4-stage contracting path, bottleneck, and expanding path. Dissects skip connections (concatenation vs. addition), receptive field expansion, and why odd dimensions cause fatal shape errors.</p>
+</li>
+<li>
+<p><strong><a href="guide_02_pretrained_backbones_and_transfer_learning.html">Guide 02: Pretrained Backbones &amp; Transfer Learning: ResNet to EfficientNet</a></strong>:
+  Explores what pretrained backbones learn on ImageNet and why low-level edge filters transfer seamlessly to industrial anomaly detection. Compares the architectural building blocks of ResNet (residual shortcuts) and EfficientNet (MBConv, depthwise convolutions, SE attention), and details fine-tuning dynamics and BatchNorm stability.</p>
+</li>
+<li>
+<p><strong><a href="guide_03_grayscale_input_adaptation.html">Guide 03: Adapting Pretrained RGB Backbones to Single-Channel Grayscale</a></strong>:
+  Tackles the single-channel sensor dilemma. Works through three defensible adaptation strategies: 3-channel repetition, first-layer convolution weight collapse (sum vs. average), and learned <span class="arithmatex">\(1\times 1\)</span> adapters. Proves exact numerical activation equivalence and analyzes normalization physics.</p>
+</li>
+<li>
+<p><strong><a href="guide_04_output_heads_and_target_semantics.html">Guide 04: Output Heads &amp; Target Semantics: Multi-Label Sigmoid vs. Multi-Class Softmax</a></strong>:
+  Contrasts 4-channel independent sigmoid multilabel detection with 5-channel mutually exclusive softmax partitions. Works through a concrete numerical demonstration of a competing-defect pixel, details the step-by-step empirical mask overlap audit, and analyzes permanent information loss when forcing overlapping annotations into integers.</p>
+</li>
+<li>
+<p><strong><a href="guide_05_bce_dice_and_compound_losses.html">Guide 05: Segmentation Loss Functions: BCE, Dice, &amp; Compound Objectives</a></strong>:
+  Addresses extreme class imbalance where <span class="arithmatex">\(97\%+\)</span> of pixels are clean background. Explains <code>BCEWithLogitsLoss</code>, derives the differentiable Soft Dice loss with smoothing <span class="arithmatex">\(\epsilon\)</span>, shows how each loss behaves on small missed defects and false alarm speckles, and separates continuous training loss from discrete evaluation metrics.</p>
+</li>
+<li>
+<p><strong><a href="guide_06_experimental_design_and_model_evaluation.html">Guide 06: Systematic Model Exploration &amp; Controlled Experimentation</a></strong>:
+  Establishes the single-variable ablation protocol to avoid "alchemy" in deep learning. Details the Milestone 3 Exploration Matrix (Backbone <span class="arithmatex">\(\to\)</span> Adaptation <span class="arithmatex">\(\to\)</span> Head/Loss), maps compatible head-loss pairings, and provides a diagnostic guide to triage training failure modes from learning curves.</p>
+</li>
+</ul>
+<hr />
+<h2 id="4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</h2>
+<p>To support hands-on learning without disclosing competition training results, this curriculum includes complete, self-contained educational resources built entirely on <strong>synthetic data</strong>:</p>
+<h3 id="1-interactive-walkthrough-notebook">1. Interactive Walkthrough Notebook</h3>
+<ul>
+<li><strong>Jupyter Notebook</strong>: <a href="downloads/synthetic_transfer_learning_walkthrough.ipynb"><code>notebooks/synthetic_transfer_learning_walkthrough.ipynb</code></a></li>
+<li><strong>Paired Python Script</strong>: <a href="downloads/synthetic_transfer_learning_walkthrough.py"><code>notebooks/synthetic_transfer_learning_walkthrough.py</code></a></li>
+<li><strong>Notebook Setup Guide</strong>: <a href="walkthrough-notebook.html"><code>notebooks/README.md</code></a></li>
+</ul>
+<p>This walkthrough runs on CPU in under 3 seconds and demonstrates feature extraction, grayscale adaptation equivalence, sigmoid vs. softmax probabilities, and compound loss calculation on synthetic <span class="arithmatex">\(128 \times 800\)</span> strips.</p>
+<h3 id="2-standalone-diagnostic-scripts">2. Standalone Diagnostic Scripts</h3>
+<ul>
+<li>
+<p><strong>Feature Map Shape Tracing</strong>: <a href="examples/toy_feature_extractor.py"><code>examples/toy_feature_extractor.py</code></a>
+  Validates contracting path, bottleneck, expanding path, and skip connection tensor dimensions on CPU.</p>
+</li>
+<li>
+<p><strong>Grayscale Adaptation Equivalence</strong>: <a href="examples/toy_grayscale_adaptation.py"><code>examples/toy_grayscale_adaptation.py</code></a>
+  Numerically proves that first-layer weight summing produces exact mathematical parity with 3-channel input repetition.</p>
+</li>
+<li>
+<p><strong>Output Head Semantics &amp; Competing Logits</strong>: <a href="examples/toy_head_comparison.py"><code>examples/toy_head_comparison.py</code></a>
+  Calculates independent Sigmoid vs. mutually exclusive Softmax probabilities and decision outcomes on synthetic competing logits.</p>
+</li>
+<li>
+<p><strong>BCE vs. Soft Dice Loss Behavior</strong>: <a href="examples/toy_loss_behavior.py"><code>examples/toy_loss_behavior.py</code></a>
+  Evaluates BCE and Soft Dice responses on tiny <span class="arithmatex">\(4\times 4\)</span> synthetic masks under missed defects, false alarms, and clean empty sheets.</p>
+</li>
+</ul>
+<hr />
+<h2 id="5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</h2>
+<p>These study guides are designed as a <strong>guiding hand, not a shortcut</strong>:</p>
+<ul>
+<li>They explain the underlying mathematics, tensor dimensions, software interfaces, failure modes, and debugging techniques.</li>
+<li>They do <strong>not</strong> provide a copy-paste competition training script, pre-computed hyperparameter values, or trained model checkpoints.</li>
+<li>They do <strong>not</strong> reveal confidential exploratory data analysis findings or performance benchmarks from the private training set.</li>
+<li>You must write, audit, and debug your own segmentation pipeline against <code>data/public/</code>.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="guide_01_encoder_decoder_architectures.html">Guide 01 · Encoder–Decoder Architectures →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

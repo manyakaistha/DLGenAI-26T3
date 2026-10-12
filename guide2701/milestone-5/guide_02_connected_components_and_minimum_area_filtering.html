@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 02 · Connected Components &amp; Min-Area · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 02 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-speckle-penalty-vs-the-erased-scratch">1. Concrete Failure Case: The Speckle Penalty vs. The Erased Scratch</a></li>
+<li><a href="#2-topological-foundations-4-connectivity-vs-8-connectivity">2. Topological Foundations: 4-Connectivity vs. 8-Connectivity</a></li>
+<li><a href="#3-implementation-with-opencv-cv2connectedcomponentswithstats">3. Implementation with OpenCV: cv2.connectedComponentsWithStats</a></li>
+<li><a href="#4-sequence-of-operations-why-order-matters">4. Sequence of Operations: Why Order Matters</a></li>
+<li><a href="#5-tensor-shapes-memory-and-native-coordinates">5. Tensor Shapes, Memory, and Native Coordinates</a></li>
+<li><a href="#6-the-recall-ceiling-vs-false-positive-reduction-trade-off">6. The Recall Ceiling vs. False Positive Reduction Trade-off</a></li>
+<li><a href="#7-decision-matrix-choosing-component-filtering-rules">7. Decision Matrix: Choosing Component Filtering Rules</a></li>
+<li><a href="#8-diagnostic-checklist-verifying-your-area-filter">8. Diagnostic Checklist: Verifying Your Area Filter</a></li>
+<li><a href="#9-ungraded-activity-calculate-the-lost-pixel-consequence">9. Ungraded Activity: Calculate the Lost-Pixel Consequence</a></li>
+<li><a href="#10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-02-morphological-filtering-connected-components-minimum-area">Guide 02: Morphological Filtering: Connected Components &amp; Minimum Area</h1>
+<p>Thresholding a continuous probability map converts real-valued scores into discrete binary masks. However, pixel-level thresholding evaluates each coordinate in isolation. It cannot distinguish between a coherent physical surface flaw and isolated high-frequency sensor noise.</p>
+<p>In automated industrial optical inspection, line-scan sensors operate under intense strobe illumination and high conveyor speeds. Microscopic dust motes, specular reflections, or localized optical sensor shot noise regularly cause convolutional neural networks to predict tiny clusters of 1 to 5 active pixels on completely pristine metal.</p>
+<p>On clean material, a stray 3-pixel prediction is catastrophic: it triggers a false-positive penalty that drops the empty pair's metric contribution from <span class="arithmatex">\(1.0\)</span> down to <span class="arithmatex">\(0.0\)</span>. Conversely, an excessively aggressive area filter will obliterate genuine, faint scratches.</p>
+<p>In this guide, you will master <strong>morphological post-processing via Connected Component Analysis (CCA)</strong>, understand the topological distinction between 4- and 8-connectivity, establish per-class minimum area cutoffs <span class="arithmatex">\(\mathbf{A}_{\min}\)</span>, and balance false-positive reduction against lost recall.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-speckle-penalty-vs-the-erased-scratch">1. Concrete Failure Case: The Speckle Penalty vs. The Erased Scratch</h2>
+<p>To understand the sensitivity of area filtering, examine two opposite failure cases encountered during post-processing:</p>
+<h3 id="failure-case-a-the-clean-sheet-speckle-penalty">Failure Case A: The Clean-Sheet Speckle Penalty</h3>
+<p>A line-scan camera records a clean steel strip (<span class="arithmatex">\(Y = \mathbf{0}\)</span>). A dust particle reflecting strobe light produces a localized logit spike. At threshold <span class="arithmatex">\(\tau = 0.50\)</span>, three adjacent pixels are predicted as <code>defect_c</code>:</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(|Y| = 0\)</span> pixels.</li>
+<li>Predicted Mask: <span class="arithmatex">\(|\hat{X}| = 3\)</span> pixels.</li>
+<li>Ground truth is empty, so the model has committed a false detection on clean material. The false-positive penalty is applied, and the empty accuracy score drops to <span class="arithmatex">\(0\)</span>. An entire image-pair score is destroyed by just 3 stray pixels.</li>
+</ul>
+<h3 id="failure-case-b-the-erased-scratch-over-filtering">Failure Case B: The Erased Scratch (Over-Filtering)</h3>
+<p>On another strip, a real structural scratch (<code>defect_a</code>) spans 35 pixels along the rolling direction. The student configures a blunt, global minimum area filter <span class="arithmatex">\(A_{\min} = 50\text{ px}\)</span>:</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(|Y| = 35\)</span> pixels.</li>
+<li>Predicted Component Area: <span class="arithmatex">\(35\text{ px} &lt; A_{\min} (50\text{ px})\)</span>.</li>
+<li>Filter Action: The entire component is zeroed out (<span class="arithmatex">\(|\hat{X}| \to 0\)</span>).</li>
+<li>
+<p>Resulting Foreground Dice:</p>
+<div class="arithmatex">\[\text{Dice} = \frac{2 |\hat{X} \cap Y|}{|\hat{X}| + |Y|} = \frac{0}{0 + 35} = 0.0\]</div>
+</li>
+</ul>
+<p>The model successfully recognized the defect, but post-processing wiped it from the submission!</p>
+<p>A minimum area threshold is a double-edged sword: it removes false-alarm speckles, but it also creates an <strong>absolute recall ceiling</strong> for genuine defects smaller than the cutoff.</p>
+<hr />
+<h2 id="2-topological-foundations-4-connectivity-vs-8-connectivity">2. Topological Foundations: 4-Connectivity vs. 8-Connectivity</h2>
+<p>A binary mask <span class="arithmatex">\(\hat{M} \in \{0, 1\}^{H \times W}\)</span> is a discrete 2D grid. Before we can measure the area of a defect "blob," we must define which neighboring pixels belong to the same physical object.</p>
+<pre class="highlight"><code>      4-Neighborhood (Cross)                 8-Neighborhood (Full 3x3)
+           [   (y-1, x)   ]              [(y-1, x-1) (y-1, x) (y-1, x+1)]
+[(y, x-1)      (y, x)     (y, x+1)]      [ (y, x-1)   (y, x)   (y, x+1) ]
+           [   (y+1, x)   ]              [(y+1, x-1) (y+1, x) (y+1, x+1)]</code></pre>
+<h3 id="the-adjacency-rules">The Adjacency Rules</h3>
+<ul>
+<li><strong>4-Connectivity</strong>: Two active pixels <span class="arithmatex">\(p\)</span> and <span class="arithmatex">\(q\)</span> are connected if and only if they share a horizontal or vertical edge. Diagonally adjacent pixels are considered disconnected.</li>
+<li><strong>8-Connectivity</strong>: Two active pixels <span class="arithmatex">\(p\)</span> and <span class="arithmatex">\(q\)</span> are connected if they share an edge <strong>or</strong> a diagonal vertex.</li>
+</ul>
+<p><img alt="Connected Components Connectivity" src="assets/fig03_connected_components_connectivity.png" />
+<em>Figure 2.1: The impact of neighborhood topology on a diagonal defect scratch. (1) Binary mask. (2) 4-connectivity breaks the continuous defect into fragmented 1-pixel components. (3) 8-connectivity preserves the unified physical defect blob.</em></p>
+<h3 id="the-worked-numbered-toy-grid">The Worked Numbered Toy Grid</h3>
+<p>Examine this fictional <span class="arithmatex">\(6 \times 6\)</span> binary mask containing a diagonal surface fissure and an isolated sensor speckle:</p>
+<pre class="highlight"><code>Row / Col     Col 0    Col 1    Col 2    Col 3    Col 4    Col 5
+Row 0        [  0        0        0        0        1        0  ]  &lt;-- Isolated Speckle (1 px)
+Row 1        [  0        0        0        0        0        0  ]
+Row 2        [  0        1        0        0        0        0  ]  &lt;-- Start of diagonal scratch
+Row 3        [  0        0        1        0        0        0  ]  &lt;-- Diagonal neighbor
+Row 4        [  0        0        0        1        1        0  ]  &lt;-- Diagonal + horizontal
+Row 5        [  0        0        0        0        1        0  ]  &lt;-- Vertical neighbor</code></pre>
+<p>Let us trace connected component labeling under both topologies:</p>
+<h4 id="a-under-4-connectivity">A. Under 4-Connectivity:</h4>
+<ul>
+<li>The speckle at <span class="arithmatex">\((0, 4)\)</span> is an isolated component of size <span class="arithmatex">\(1\)</span>.</li>
+<li>The pixel at <span class="arithmatex">\((2, 1)\)</span> has no horizontal or vertical neighbors <span class="arithmatex">\(\to\)</span> Component of size <span class="arithmatex">\(1\)</span>.</li>
+<li>The pixel at <span class="arithmatex">\((3, 2)\)</span> has no horizontal or vertical neighbors <span class="arithmatex">\(\to\)</span> Component of size <span class="arithmatex">\(1\)</span>.</li>
+<li>Pixels at <span class="arithmatex">\((4, 3), (4, 4), (5, 4)\)</span> share edges <span class="arithmatex">\(\to\)</span> Component of size <span class="arithmatex">\(3\)</span>.</li>
+<li><strong>Result</strong>: 4 separate components of sizes <span class="arithmatex">\(\{1, 1, 1, 3\}\)</span>.</li>
+<li>If you apply <span class="arithmatex">\(A_{\min} = 4\)</span>, <strong>all pixels are erased</strong>, including the genuine scratch!</li>
+</ul>
+<h4 id="b-under-8-connectivity">B. Under 8-Connectivity:</h4>
+<ul>
+<li>The speckle at <span class="arithmatex">\((0, 4)\)</span> is an isolated component of size <span class="arithmatex">\(1\)</span>.</li>
+<li>Pixels <span class="arithmatex">\((2, 1), (3, 2), (4, 3), (4, 4), (5, 4)\)</span> are mutually 8-connected through diagonal and orthogonal paths <span class="arithmatex">\(\to\)</span> <strong>1 unified component of size <span class="arithmatex">\(5\)</span></strong>.</li>
+<li><strong>Result</strong>: 2 components: Component 1 (speckle, size <span class="arithmatex">\(1\)</span>) and Component 2 (scratch, size <span class="arithmatex">\(5\)</span>).</li>
+<li>If you apply <span class="arithmatex">\(A_{\min} = 4\)</span>, Component 1 is erased, and Component 2 survives completely intact!</li>
+</ul>
+<blockquote>
+<p>[!IMPORTANT]
+Always use <code>connectivity=8</code> for industrial defect segmentation. Longitudinal scratches and shear cracks run diagonally across sensor rasters. 4-connectivity fragments them into tiny disconnected pieces that get erroneously purged by area filters.</p>
+</blockquote>
+<hr />
+<h2 id="3-implementation-with-opencv-cv2connectedcomponentswithstats">3. Implementation with OpenCV: <code>cv2.connectedComponentsWithStats</code></h2>
+<p>OpenCV provides a highly optimized C++ implementation for 8-connected component analysis.</p>
+<pre class="highlight"><code class="language-python">import cv2
+import numpy as np
+
+def filter_small_components(mask: np.ndarray, min_area: int) -&gt; np.ndarray:
+    """Zero out 8-connected components whose area is strictly less than min_area pixels.
+
+    Args:
+        mask: 2D binary numpy array of shape (H, W), dtype uint8 or bool.
+        min_area: Integer pixel area threshold. Blobs with area &lt; min_area are removed.
+
+    Returns:
+        clean_mask: 2D numpy array of shape (H, W), dtype uint8 containing surviving blobs.
+    """
+    if min_area &lt;= 0 or mask.sum() == 0:
+        return mask.astype(np.uint8)
+
+    mask_uint8 = mask.astype(np.uint8)
+
+    # num_labels: Total components found including background (label 0)
+    # labels: 2D array of same shape where each pixel contains its component ID
+    # stats: Matrix of shape (num_labels, 5) containing CC_STAT_LEFT, CC_STAT_TOP,
+    #        CC_STAT_WIDTH, CC_STAT_HEIGHT, CC_STAT_AREA
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(
+        mask_uint8, connectivity=8
+    )
+
+    clean_mask = np.zeros_like(mask_uint8)
+
+    # Label 0 is the background; iterate through defect components 1 .. num_labels - 1
+    for label_id in range(1, num_labels):
+        area = stats[label_id, cv2.CC_STAT_AREA]
+        if area &gt;= min_area:
+            clean_mask[labels == label_id] = 1
+
+    return clean_mask</code></pre>
+<hr />
+<h2 id="4-sequence-of-operations-why-order-matters">4. Sequence of Operations: Why Order Matters</h2>
+<p>A frequent architectural question is: <em>Can we filter small areas before thresholding, or must thresholding precede connected component analysis?</em></p>
+<pre class="highlight"><code>CORRECT ORDER:
+Probability Map P ∈ [0, 1] ──► Thresholding at τ ──► Binary Mask M ∈ {0, 1} ──► 8-Conn CC Filter ──► Clean Mask</code></pre>
+<p>Why the order cannot be inverted:</p>
+<ol>
+<li><strong>Connected Component Analysis Requires Binary Support</strong>: Connected component algorithms rely on discrete graph connectivity: a pixel either belongs to the foreground set or it does not. Continuous probability fields have non-zero values across the entire canvas; CC analysis cannot group floating-point numbers without prior binarization.</li>
+<li><strong>Thresholding Changes Component Area</strong>: Increasing <span class="arithmatex">\(\tau\)</span> shrinks the spatial footprint of defect blobs. A 60-pixel blob at <span class="arithmatex">\(\tau = 0.40\)</span> might shrink to 40 pixels at <span class="arithmatex">\(\tau = 0.60\)</span>. Therefore, <strong>connected component area filtering is conditioned on the chosen threshold <span class="arithmatex">\(\tau\)</span></strong>.</li>
+</ol>
+<hr />
+<h2 id="5-tensor-shapes-memory-and-native-coordinates">5. Tensor Shapes, Memory, and Native Coordinates</h2>
+<p>Trace the data structures during component filtering:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Step</th>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Shape</th>
+<th style="text-align: left;">Data Type</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Thresholded Mask</td>
+<td style="text-align: left;"><code>raw_mask</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.uint8</code></td>
+<td style="text-align: left;">Binary pixels before filtering</td>
+</tr>
+<tr>
+<td style="text-align: left;">Label Map</td>
+<td style="text-align: left;"><code>labels</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.int32</code></td>
+<td style="text-align: left;">Integer component ID for each pixel</td>
+</tr>
+<tr>
+<td style="text-align: left;">Statistics Table</td>
+<td style="text-align: left;"><code>stats</code></td>
+<td style="text-align: left;"><code>(K, 5)</code></td>
+<td style="text-align: left;"><code>np.int32</code></td>
+<td style="text-align: left;">Bounding box coordinates and pixel area</td>
+</tr>
+<tr>
+<td style="text-align: left;">Filtered Mask</td>
+<td style="text-align: left;"><code>clean_mask</code></td>
+<td style="text-align: left;"><code>(128, 800)</code></td>
+<td style="text-align: left;"><code>np.uint8</code></td>
+<td style="text-align: left;">Clean binary mask ready for RLE</td>
+</tr>
+</tbody>
+</table>
+<h3 id="critical-canvas-rule-measure-area-in-native-coordinates">Critical Canvas Rule: Measure Area in Native Coordinates</h3>
+<p>If your pipeline uses an enlarged or patched input tensor (e.g. <span class="arithmatex">\(256 \times 1600\)</span>), <strong>always interpolate logits back to the native <span class="arithmatex">\(128 \times 800\)</span> canvas before thresholding and filtering</strong>.</p>
+<ul>
+<li>A 30-pixel flaw on a <span class="arithmatex">\(128 \times 800\)</span> strip covers <span class="arithmatex">\(120\)</span> pixels at <span class="arithmatex">\(2 \times\)</span> scale (<span class="arithmatex">\(256 \times 1600\)</span>).</li>
+<li>If you apply an area cutoff <span class="arithmatex">\(A_{\min} = 40\)</span> on the enlarged canvas, you are effectively filtering out 10-pixel flaws at native scale!</li>
+<li>Standardize all area cutoffs <span class="arithmatex">\(A_{\min}\)</span> strictly to <strong>native <span class="arithmatex">\(128 \times 800\)</span> pixel units</strong>.</li>
+</ul>
+<hr />
+<h2 id="6-the-recall-ceiling-vs-false-positive-reduction-trade-off">6. The Recall Ceiling vs. False Positive Reduction Trade-off</h2>
+<p><img alt="Min Area Filtering Tradeoff" src="assets/fig04_min_area_filtering_tradeoff.png" />
+<em>Figure 2.2: (Left) Component area distribution: isolated sensor speckles cluster below 20 px, whereas genuine physical defects span larger areas. (Right) The trade-off curve: increasing <span class="arithmatex">\(A_{\min}\)</span> purges false positives rapidly, but setting it too high risks erasing genuine defect instances.</em></p>
+<h3 id="mathematical-trade-off-formulation">Mathematical Trade-off Formulation</h3>
+<p>Let <span class="arithmatex">\(\mathcal{C}_{\text{noise}}\)</span> denote the set of false-positive noise components on clean strips, and <span class="arithmatex">\(\mathcal{C}_{\text{true}}\)</span> denote the set of genuine defect instances.</p>
+<p>The false-positive reduction rate <span class="arithmatex">\(\Phi_{\text{FP}}(A_{\min})\)</span> is:</p>
+<div class="arithmatex">\[\Phi_{\text{FP}}(A_{\min}) = \frac{\sum_{c \in \mathcal{C}_{\text{noise}}} \mathbb{I}(\text{Area}(c) &lt; A_{\min})}{|\mathcal{C}_{\text{noise}}|}\]</div>
+<p>The lost foreground defect recall <span class="arithmatex">\(\Lambda_{\text{FN}}(A_{\min})\)</span> is:</p>
+<div class="arithmatex">\[\Lambda_{\text{FN}}(A_{\min}) = \frac{\sum_{c \in \mathcal{C}_{\text{true}}} \text{Area}(c) \cdot \mathbb{I}(\text{Area}(c) &lt; A_{\min})}{\sum_{c \in \mathcal{C}_{\text{true}}} \text{Area}(c)}\]</div>
+<p>As <span class="arithmatex">\(A_{\min}\)</span> increases:</p>
+<ol>
+<li><span class="arithmatex">\(\Phi_{\text{FP}}(A_{\min}) \to 1.0\)</span>: Clean-strip false alarms are eradicated, increasing the False Positive Score (20% weight) and Empty Accuracy (10% weight).</li>
+<li><span class="arithmatex">\(\Lambda_{\text{FN}}(A_{\min})\)</span> increases: Smaller genuine flaws are erased, causing Foreground Dice (70% weight) to drop.</li>
+</ol>
+<h3 id="class-specific-physical-morphology">Class-Specific Physical Morphology</h3>
+<p>Industrial defect classes exhibit distinct physical signatures:</p>
+<ul>
+<li><strong><code>defect_b</code> (Extremely Rare)</strong>: Physical instances of <code>defect_b</code> are sparse. If you set <span class="arithmatex">\(A_{\min, b} = 100\)</span> and your validation fold contains a valid <code>defect_b</code> instance of area 85 pixels, you erase that instance entirely. On rare classes, missing one defect can drop the class-positive Dice by 20–30 percentage points!</li>
+<li><strong><code>defect_c</code> (Common Oxide Scale)</strong>: Often appears as large, contiguous clusters (hundreds of pixels). Applying a moderate filter (<span class="arithmatex">\(A_{\min, c} \approx 50 - 100\text{ px}\)</span>) safely eliminates sensor speckles without endangering valid inclusions.</li>
+</ul>
+<hr />
+<h2 id="7-decision-matrix-choosing-component-filtering-rules">7. Decision Matrix: Choosing Component Filtering Rules</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Strategy</th>
+<th style="text-align: left;">Advantages</th>
+<th style="text-align: left;">Disadvantages</th>
+<th style="text-align: left;">When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>No Area Filtering (<span class="arithmatex">\(A_{\min} = 0\)</span>)</strong></td>
+<td style="text-align: left;">100% theoretical recall; no defect is ever erased.</td>
+<td style="text-align: left;">Highly vulnerable to sensor noise; stray speckles destroy clean sheet scores.</td>
+<td style="text-align: left;">Baseline sanity runs or debugging recall.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Global Fixed Cutoff (e.g. <span class="arithmatex">\(A_{\min} = 50\)</span>)</strong></td>
+<td style="text-align: left;">Eliminates dust speckles across all channels with one parameter.</td>
+<td style="text-align: left;">Ignores physical differences between thin scratches and large scale patches.</td>
+<td style="text-align: left;">Initial quick prototype.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Per-Class Calibrated <span class="arithmatex">\(\mathbf{A}_{\min}\)</span> (Recommended)</strong></td>
+<td style="text-align: left;">Tailors filtering threshold to class morphology and rarity.</td>
+<td style="text-align: left;">Requires sweeping an area grid per class on validation data.</td>
+<td style="text-align: left;">Production competition inference pipelines.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-diagnostic-checklist-verifying-your-area-filter">8. Diagnostic Checklist: Verifying Your Area Filter</h2>
+<p>Run these three checks on your validation predictions before deploying your area rule:</p>
+<ol>
+<li><strong>Component Size Distribution Plot</strong>: Extract all connected components from your training ground truth masks (<code>train.csv</code>). Find the <strong>minimum ground truth component area</strong> for each defect class. Ensure your chosen <span class="arithmatex">\(A_{\min, c}\)</span> is strictly below this value!</li>
+<li><strong>Pixel Survival Audit</strong>: Compute the total ground truth defect pixels in your validation fold before and after applying <span class="arithmatex">\(A_{\min}\)</span>. If more than <span class="arithmatex">\(1.0\%\)</span> of ground truth pixels are lost to filtering, reduce <span class="arithmatex">\(A_{\min}\)</span>.</li>
+<li><strong>Empty Strip Clean Rate</strong>: Count how many clean validation images predict active masks before vs. after filtering. A well-tuned <span class="arithmatex">\(A_{\min}\)</span> should eliminate over <span class="arithmatex">\(75\%\)</span> of false alarms on clean material.</li>
+</ol>
+<hr />
+<h2 id="9-ungraded-activity-calculate-the-lost-pixel-consequence">9. Ungraded Activity: Calculate the Lost-Pixel Consequence</h2>
+<p>Consider this fictional validation result for a student testing <span class="arithmatex">\(A_{\min}\)</span> values on 10 positive validation images of <code>defect_a</code>:</p>
+<pre class="highlight"><code class="language-text">Ground Truth Defect Blob Areas (pixels):
+Image 1: 42 px     Image 4: 120 px    Image 7: 85 px     Image 10: 210 px
+Image 2: 38 px     Image 5: 310 px    Image 8: 62 px
+Image 3: 54 px     Image 6: 180 px    Image 9: 95 px
+
+Total Ground Truth Pixels = 1,196 px</code></pre>
+<p><strong>Tasks:</strong></p>
+<ol>
+<li>If the student sets <span class="arithmatex">\(A_{\min} = 50\text{ px}\)</span>, which images will have their defect completely eliminated?</li>
+<li>What percentage of total ground truth defect pixels are irrevocably lost?</li>
+<li>Calculate the new theoretical upper bound on Foreground Dice if Image 1 and Image 2 are completely zeroed out.</li>
+</ol>
+<hr />
+<h2 id="10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>OpenCV Documentation</strong>: <a href="https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#ga107a78bf7cd25dec05fb4dfc5c9e765f"><code>cv2.connectedComponentsWithStats</code> C++/Python API</a></li>
+<li><strong>Rosenfeld &amp; Pfaltz (1966)</strong>: <em>Sequential Operations in Digital Picture Processing</em>, Journal of the ACM (foundational connected-component labeling algorithm).</li>
+<li><strong>Haralick &amp; Shapiro (1992)</strong>: <em>Computer and Robot Vision</em>, Chapter 2: Binary Machine Vision &amp; Morphological Neighborhoods.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_01_thresholding_and_probability_calibration.html">← Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html">Guide 03 · Test-Time Augmentation (TTA) →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

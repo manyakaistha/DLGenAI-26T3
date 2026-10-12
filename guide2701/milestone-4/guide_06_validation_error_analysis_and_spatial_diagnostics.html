@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 06 · Validation Error Analysis · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 06 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-ambiguity-of-aggregate-scores">1. Observable Problem: The Ambiguity of Aggregate Scores</a></li>
+<li><a href="#2-the-4-view-visual-audit-workflow">2. The 4-View Visual Audit Workflow</a></li>
+<li><a href="#3-the-six-spatial-error-archetypes">3. The Six Spatial Error Archetypes</a></li>
+<li><a href="#4-quantitative-diagnostics-beyond-aggregate-dice">4. Quantitative Diagnostics: Beyond Aggregate Dice</a></li>
+<li><a href="#5-fair-sampling-the-cherry-picking-trap">5. Fair Sampling: The "Cherry-Picking Trap"</a></li>
+<li><a href="#6-diagnostic-symptoms-to-experimental-hypotheses">6. Diagnostic Symptoms to Experimental Hypotheses</a></li>
+<li><a href="#7-ungraded-try-it-error-analysis-case-study">7. Ungraded "Try It": Error Analysis Case Study</a></li>
+<li><a href="#8-authoritative-references">8. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="validation-error-analysis-and-spatial-defect-diagnostics">Validation Error Analysis and Spatial Defect Diagnostics</h1>
+<p>A single scalar metric—whether it is a validation loss of <span class="arithmatex">\(0.18\)</span> or a Foreground Dice of <span class="arithmatex">\(0.56\)</span>—is a summary statistic. It tells you <em>how much</em> your model succeeded on average, but it tells you <strong>nothing about why or how it failed</strong>.</p>
+<p>Did your model achieve a low score because it completely missed hairline scratches? Because it hallucinated spurious defect blobs on clean steel strips? Because it confused surface inclusions (<code>defect_c</code>) with micro-cracks (<code>defect_b</code>)? Or because it correctly located every defect but dilated boundaries by 10 pixels?</p>
+<p>Each of these failure modes points toward a completely different engineering remedy. Tuning loss weights will not fix an encoder that downsampled thin cracks out of existence, and increasing training epochs will not eliminate speckle noise that requires connected-component filtering.</p>
+<p>This guide establishes a disciplined, repeatable methodology for <strong>visual and quantitative validation error analysis</strong>, categorizes the <strong>six spatial error archetypes</strong>, introduces <strong>defect size binning</strong>, and teaches students how to formulate testable diagnostic hypotheses.</p>
+<hr />
+<h2 id="1-observable-problem-the-ambiguity-of-aggregate-scores">1. Observable Problem: The Ambiguity of Aggregate Scores</h2>
+<p>Consider two models trained on the same validation fold, both reporting an identical aggregate metric:</p>
+<pre class="highlight"><code class="language-text">Validation Summary Comparison:
+Model Alpha:  Val Foreground Dice = 0.520
+Model Beta:   Val Foreground Dice = 0.520
+
+Looking deeper into the error decomposition:
+Model Alpha Error Profile:
+• Complete Defect Miss Rate: 48% (Misses almost half of all defects completely!)
+• When Defect is Detected: Boundary Dice = 0.88 (Sub-pixel boundary precision!)
+• Clean Strip False Alarms: 0.8% (Almost never hallucinates on clean material)
+Diagnosis: High precision, severe recall failure. Model is overly conservative.
+
+Model Beta Error Profile:
+• Complete Defect Miss Rate: 4% (Detects 96% of all defects!)
+• When Defect is Detected: Boundary Dice = 0.54 (Bloated, noisy, poorly localized borders)
+• Clean Strip False Alarms: 32.4% (Floods clean material with spurious speckles)
+Diagnosis: High recall, abysmal precision. Model is trigger-happy and noisy.</code></pre>
+<p>Treating Model Alpha and Model Beta identically because their aggregate Dice score is <span class="arithmatex">\(0.520\)</span> would be a critical mistake. Model Alpha needs threshold lowering and rare-class loss weighting; Model Beta needs minimum area filtering and stronger background regularization.</p>
+<hr />
+<h2 id="2-the-4-view-visual-audit-workflow">2. The 4-View Visual Audit Workflow</h2>
+<p>To diagnose a model's spatial behavior, you must inspect validation predictions across four aligned visual channels simultaneously:</p>
+<pre class="highlight"><code>View 1: Raw Grayscale Strip (128 x 800)
+• The unaugmented input image.
+• Check: Is the defect visible to the human eye? Are there surface artifacts or lighting gradients?
+
+View 2: Ground-Truth Mask (Binary 0 or 1)
+• The annotated reference label for the target defect channel.
+• Check: What is the defect geometry (thin scratch, clustered inclusion, diffuse patch)?
+
+View 3: Continuous Probability Heatmap (P in [0, 1])
+• The raw output of torch.sigmoid(logits) or softmax probabilities.
+• Check: Is the model confident (P &gt; 0.9), uncertain (P ≈ 0.4), or completely blind (P &lt; 0.05)?
+• Crucial: Distinguishes thresholding failures from representation failures.
+
+View 4: Post-Processed Binary Mask (P &gt;= tau and Area &gt;= A_min)
+• The final binary mask after thresholding and connected-component area filtering.
+• Check: Does this prediction match the ground truth in Quadrant 1 overlap?</code></pre>
+<hr />
+<h2 id="3-the-six-spatial-error-archetypes">3. The Six Spatial Error Archetypes</h2>
+<p><img alt="Visual Diagnostic Gallery" src="assets/fig09_validation_error_gallery.png" />
+<em>Figure 6.1: Visual gallery of the six spatial error archetypes on synthetic line-scan strips (<span class="arithmatex">\(128 \times 800\)</span>), showing the raw image, ground truth, continuous heatmap, and thresholded prediction.</em></p>
+<h3 id="archetype-a-the-completely-missed-defect-false-negative">Archetype A: The Completely Missed Defect (False Negative)</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: Ground truth shows a clear, thin longitudinal scratch; probability heatmap is completely dark (<span class="arithmatex">\(P &lt; 0.10\)</span> everywhere); binary prediction is blank.</li>
+<li><strong>Quantitative Signature</strong>: Ground-truth positive (<span class="arithmatex">\(|Y| &gt; 0\)</span>), Prediction area zero (<span class="arithmatex">\(|P| = 0\)</span>), <span class="arithmatex">\(\text{Dice} = 0.0\)</span>.</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>Downsampling Elimination</em>: If the encoder downsampled the image by <span class="arithmatex">\(16\times\)</span> (<span class="arithmatex">\(128 \to 8\)</span>, <span class="arithmatex">\(800 \to 50\)</span>) and skip connections are broken or missing, a 2-pixel wide scratch vanished from the feature maps.</li>
+<li><em>Class Starvation</em>: If the defect is rare <code>defect_b</code>, the optimizer received virtually zero gradient updates for this class.</li>
+<li><em>Excessive Area Filtering</em>: The model predicted the scratch, but connected-component post-processing discarded it because its total pixel area was below <span class="arithmatex">\(A_{\min}\)</span>.</li>
+</ol>
+</li>
+</ul>
+<h3 id="archetype-b-false-alarm-on-clean-material-spurious-artifact">Archetype B: False Alarm on Clean Material (Spurious Artifact)</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: Ground truth is completely blank; raw strip shows benign roller marks, oil droplets, or illumination falloff; probability heatmap shows high confidence (<span class="arithmatex">\(P &gt; 0.75\)</span>).</li>
+<li><strong>Quantitative Signature</strong>: Ground-truth empty (<span class="arithmatex">\(|Y| = 0\)</span>), Prediction area positive (<span class="arithmatex">\(|P| &gt; 0\)</span>), Specificity penalty.</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>Oversampling Prior Shift</em>: Training set was oversampled too aggressively with rare defect strips, teaching the model that defects are ubiquitous.</li>
+<li><em>Deficient Training Augmentation</em>: The model memorized specific camera lighting gradients because contrast jitter or CLAHE was omitted.</li>
+<li><em>Threshold Too Permissive</em>: Decision threshold <span class="arithmatex">\(\tau\)</span> set too low (e.g. <span class="arithmatex">\(\tau = 0.20\)</span>).</li>
+</ol>
+</li>
+</ul>
+<h3 id="archetype-c-channel-class-confusion">Archetype C: Channel / Class Confusion</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: A physical scratch is clearly present; the model outputs a confident prediction, but on the <strong>wrong defect channel</strong> (e.g., predicted on <code>defect_c</code> instead of <code>defect_a</code>).</li>
+<li><strong>Quantitative Signature</strong>: On channel A: False Negative (<span class="arithmatex">\(\text{Dice} = 0\)</span>). On channel C: False Positive (<span class="arithmatex">\(\text{Dice} = 0\)</span>).</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>Channel Conflict in Sigmoid Head</em>: Independent sigmoid channels allow multiple classes to claim the same pixel; abundant class C dominates rare class A.</li>
+<li><em>Feature Ambiguity</em>: The receptive field of the network is too narrow to distinguish between an isolated inclusion and a short longitudinal scratch.</li>
+</ol>
+</li>
+</ul>
+<h3 id="archetype-d-salt-and-pepper-speckle-noise">Archetype D: Salt-and-Pepper Speckle Noise</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: Scattered across the strip are dozens of tiny 1-to-5 pixel isolated activation islands.</li>
+<li><strong>Quantitative Signature</strong>: Prediction area is non-trivial (<span class="arithmatex">\(|P| = 150\text{ px}\)</span>), but intersection with ground truth is near zero.</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>High-Frequency Sensor Noise Sensitivity</em>: The model's stem convolutions are reacting to high-frequency image grain.</li>
+<li><em>Absence of Connected-Component Filtering</em>: Post-processing pipeline lacks minimum area filtering (<span class="arithmatex">\(A_{\min} = 0\)</span>).</li>
+</ol>
+</li>
+</ul>
+<h3 id="archetype-e-boundary-dilation-erosion-misplacement">Archetype E: Boundary Dilation / Erosion / Misplacement</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: The model successfully identifies the defect location, but the predicted mask is bloated (<span class="arithmatex">\(2\times\)</span> wider than ground truth) or shifted by several pixels.</li>
+<li><strong>Quantitative Signature</strong>: True positive overlap exists (<span class="arithmatex">\(|P \cap Y| &gt; 0\)</span>), but Dice is mediocre (<span class="arithmatex">\(0.40\)</span> to <span class="arithmatex">\(0.60\)</span>).</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>Receptive Field / Decoder Blur</em>: Bilinear upsampling without fine skip-connection refinement causes blurry, diffuse activation borders.</li>
+<li><em>Decision Threshold Misalignment</em>: Threshold <span class="arithmatex">\(\tau = 0.50\)</span> is cutting the probability sigmoid at the wrong slope point.</li>
+<li><em>Loss Function Imbalance</em>: Excessive <code>pos_weight</code> in BCE penalizes false negatives so heavily that the model expands borders outward to avoid missing edge pixels.</li>
+</ol>
+</li>
+</ul>
+<h3 id="archetype-f-fragmented-or-bridged-defect-components">Archetype F: Fragmented or Bridged Defect Components</h3>
+<ul>
+<li><strong>Visual Appearance</strong>: A continuous 300-pixel longitudinal crack is predicted as 5 disjoint islands with small 2-pixel gaps between them.</li>
+<li><strong>Quantitative Signature</strong>: Component count in prediction is high (<span class="arithmatex">\(N_{\text{components}} = 5\)</span>) while ground truth has <span class="arithmatex">\(N_{\text{components}} = 1\)</span>.</li>
+<li><strong>Plausible Hypotheses</strong>:<ol>
+<li><em>Lack of Longitudinal Context</em>: Convolutions lack wide horizontal receptive fields (dilated convolutions or horizontal pooling) to bridge gaps along the rolling direction (<span class="arithmatex">\(800\text{ px}\)</span>).</li>
+</ol>
+</li>
+</ul>
+<hr />
+<h2 id="4-quantitative-diagnostics-beyond-aggregate-dice">4. Quantitative Diagnostics: Beyond Aggregate Dice</h2>
+<p>To make error analysis systematic across thousands of validation images, compute these four structural metrics:</p>
+<pre class="highlight"><code>Metric 1: Presence Detection Recall
+• Formula: P(|P| &gt; 0 | |Y| &gt; 0)
+• Measures: Did the model flag ANY pixels when a defect existed?
+• Isolates: Pure detection sensitivity, independent of boundary shape.
+
+Metric 2: Overlap Detection Recall
+• Formula: P(|P ∩ Y| &gt; 0 | |Y| &gt; 0)
+• Measures: Did the model actually intersect the true defect?
+• Isolates: Distinguishes touching the defect from predicting somewhere else on the strip!
+
+Metric 3: Conditional Overlap Dice
+• Formula: Mean Dice evaluated ONLY on pairs where |P ∩ Y| &gt; 0.
+• Measures: When the model touches the defect, how well does it trace its borders?
+• Isolates: Boundary segmentation quality from presence detection capability.
+
+Metric 4: Defect Size Binning
+• Group ground-truth defects into area tiers:
+  - Small:    1 to 100 pixels
+  - Medium: 101 to 500 pixels
+  - Large:   &gt; 500 pixels
+• Measures: Overlap recall and Dice independently per size tier.</code></pre>
+<h3 id="the-power-of-defect-size-binning">The Power of Defect Size Binning:</h3>
+<p>If your model achieves <span class="arithmatex">\(0.88\)</span> Dice on large defects (<span class="arithmatex">\(&gt;500\text{ px}\)</span>), <span class="arithmatex">\(0.65\)</span> Dice on medium defects, and <strong><span class="arithmatex">\(0.00\)</span> Dice on small defects (<span class="arithmatex">\(1..100\text{ px}\)</span>)</strong>, you have isolated the exact architectural flaw: <strong>downsampling loss in early encoder layers</strong>. You do not need to change your optimizer or loss weights; you need high-resolution skip connections or higher-resolution feature maps!</p>
+<hr />
+<h2 id="5-fair-sampling-the-cherry-picking-trap">5. Fair Sampling: The "Cherry-Picking Trap"</h2>
+<p>When conducting visual error reviews, students naturally tend to sort errors by lowest Dice and inspect the 10 worst images.</p>
+<blockquote>
+<p>[!WARNING]
+<strong>The Cherry-Picking Trap</strong>:
+Reviewing only the "top-10 worst" images distorts your engineering priorities. The worst images are often annotation anomalies, ambiguous borderline samples, or extreme outliers. If you redesign your pipeline based on 5 extreme outliers, you may degrade performance across the remaining 2,000 normal validation images.</p>
+</blockquote>
+<h3 id="the-disciplined-stratified-audit-protocol">The Disciplined Stratified Audit Protocol:</h3>
+<p>Instead of inspecting only the worst cases, sample <strong>30 validation images</strong> according to an explicit stratified grid:</p>
+<pre class="highlight"><code>The 30-Image Stratified Audit Grid:
+• 6 Clean Material Strips: Sampled at random from true-negative images.
+  -&gt; Check: Is the model staying completely silent? Are roller marks causing false alarms?
+• 6 High-Performing Strips (Dice &gt; 0.75):
+  -&gt; Check: What defect textures does the model handle effortlessly?
+• 6 Boundary-Error Strips (Overlap hit, but Dice between 0.30 and 0.60):
+  -&gt; Check: Are boundaries dilated, eroded, or shifted?
+• 6 Complete Misses (GT positive, Pred area = 0):
+  -&gt; Check: What size and class are the missed defects? Faint hairline cracks?
+• 6 Rare Class Strips (Defect B):
+  -&gt; Check: Are rare defects detected, confused with other classes, or ignored?</code></pre>
+<hr />
+<h2 id="6-diagnostic-symptoms-to-experimental-hypotheses">6. Diagnostic Symptoms to Experimental Hypotheses</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Error Pattern Observed in Audit</th>
+<th style="text-align: left;">Plausible Root Causes</th>
+<th style="text-align: left;">Distinguishing Observation</th>
+<th style="text-align: left;">Formulated Testable Hypothesis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Small defects (<span class="arithmatex">\(&lt;100\text{ px}\)</span>) have <span class="arithmatex">\(0\%\)</span> recall, while large defects have <span class="arithmatex">\(85\%\)</span> recall.</td>
+<td style="text-align: left;">A. Encoder downsamples too aggressively.<br>B. Post-processing area filter (<span class="arithmatex">\(A_{\min}\)</span>) is discarding small defects.</td>
+<td style="text-align: left;">Inspect raw probability heatmap before area filtering. If <span class="arithmatex">\(P &gt; 0.5\)</span> exists before filtering, cause is B; if heatmap is dark, cause is A.</td>
+<td style="text-align: left;">"Lowering <span class="arithmatex">\(A_{\min}\)</span> for class A from 100 to 30 will increase small defect recall without sacrificing clean specificity."</td>
+</tr>
+<tr>
+<td style="text-align: left;">Defect presence is detected (<span class="arithmatex">\(P &gt; 0.7\)</span>), but predicted mask is <span class="arithmatex">\(3\times\)</span> thicker than ground truth.</td>
+<td style="text-align: left;">A. <code>pos_weight</code> in BCE is too high.<br>B. Decision threshold <span class="arithmatex">\(\tau\)</span> is too low.<br>C. Blur from decoder upsampling.</td>
+<td style="text-align: left;">Inspect sigmoid probability contour lines. If probabilities taper gradually over 15 pixels, cause is C; if sharp but thresholded at 0.2, cause is B.</td>
+<td style="text-align: left;">"Increasing decision threshold <span class="arithmatex">\(\tau\)</span> from 0.35 to 0.55 will trim dilated boundaries and increase overlap Dice."</td>
+</tr>
+<tr>
+<td style="text-align: left;">Continuous longitudinal scratches appear fragmented into 4 disjoint islands.</td>
+<td style="text-align: left;">Convolutions lack sufficient horizontal receptive field along the 800-pixel rolling axis.</td>
+<td style="text-align: left;">Measure gap distance between islands. Gaps are typically 2–5 pixels of slightly lower contrast.</td>
+<td style="text-align: left;">"Adding horizontal dilation or applying morphological closing with a <span class="arithmatex">\(1 \times 5\)</span> horizontal kernel will bridge fragmented components."</td>
+</tr>
+<tr>
+<td style="text-align: left;">Model predicts <code>defect_c</code> at the exact location of a ground-truth <code>defect_a</code> scratch.</td>
+<td style="text-align: left;">Channel confusion in multi-label head; class C has higher training prior than class A.</td>
+<td style="text-align: left;">Compare raw logits of channel A vs channel C on the defect pixels.</td>
+<td style="text-align: left;">"Switching from independent sigmoid channels to a mutually exclusive 5-way softmax head will force channels to compete explicitly."</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-ungraded-try-it-error-analysis-case-study">7. Ungraded "Try It": Error Analysis Case Study</h2>
+<p>Review this audit log of 4 validation images from a student's pipeline:</p>
+<pre class="highlight"><code class="language-text">Image STRIP_0104 (Clean Material):
+• Ground Truth: All channels empty (0 px)
+• Model Output: Channel C predicts 3 small blobs (12 px, 8 px, 18 px)
+• Probability in Blobs: P ≈ 0.62
+
+Image STRIP_0412 (Defect A Scratch):
+• Ground Truth: Defect A scratch of 140 pixels (Height 2 px, Width 70 px)
+• Model Output: Channel A predicts 0 pixels
+• Continuous Heatmap: Peak probability along scratch is P = 0.38
+
+Image STRIP_0821 (Defect D Patch):
+• Ground Truth: Defect D patch of 650 pixels
+• Model Output: Channel D predicts 1,420 pixels (Dice = 0.52)
+• Continuous Heatmap: Bloated probability halo around true boundary
+
+Image STRIP_1105 (Defect B Micro-crack):
+• Ground Truth: Defect B crack of 85 pixels
+• Model Output: Channel B predicts 0 pixels; Channel C predicts 80 pixels
+• Continuous Heatmap: Channel C probability is P = 0.82; Channel B is P = 0.04</code></pre>
+<p><strong>Diagnostic Questions</strong>:</p>
+<ol>
+<li>For <code>STRIP_0104</code>, what post-processing technique would eliminate the 3 tiny false alarm blobs without changing model weights?</li>
+<li>For <code>STRIP_0412</code>, why was the scratch missed if the heatmap showed <span class="arithmatex">\(P = 0.38\)</span>? What would happen if threshold <span class="arithmatex">\(\tau\)</span> was lowered to <span class="arithmatex">\(0.35\)</span>?</li>
+<li>For <code>STRIP_1105</code>, what error archetype occurred, and why did the model favor Channel C over Channel B?</li>
+</ol>
+<hr />
+<h2 id="8-authoritative-references">8. Authoritative References</h2>
+<ul>
+<li>Hoiem, D., Chodpathumwan, Y., &amp; Dai, Q. (2012). <em>Diagnosing Error in Object Detectors</em>. European Conference on Computer Vision (ECCV). (Foundational framework for categorized spatial error analysis).</li>
+<li>OpenCV <a href="https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#ga107a78bf7cd25dec05fb4dfc5c9e765f">Connected Components with Stats (<code>cv2.connectedComponentsWithStats</code>)</a>.</li>
+<li>Ronneberger, O., et al. (2015). <em>U-Net: Convolutional Networks for Biomedical Image Segmentation</em>. MICCAI. (Receptive fields and skip connection mechanics).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_validation_dice_and_overfitting_diagnostics.html">← Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_07_controlled_experimentation_and_iteration.html">Guide 07 · Controlled Experimentation →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

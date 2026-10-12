@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 06 · Systematic Model Exploration · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 06 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-golden-rule-of-scientific-ablation">1. The Golden Rule of Scientific Ablation</a></li>
+<li><a href="#2-the-milestone-3-exploration-matrix">2. The Milestone 3 Exploration Matrix</a></li>
+<li><a href="#3-diagnosing-training-dynamics-failure-modes">3. Diagnosing Training Dynamics &amp; Failure Modes</a></li>
+<li><a href="#4-fair-experiment-design-the-controlled-comparison-checklist">4. Fair Experiment Design: The Controlled Comparison Checklist</a></li>
+<li><a href="#5-comprehensive-debugging-matrix">5. Comprehensive Debugging Matrix</a></li>
+<li><a href="#6-ungraded-try-it-activity-design-an-unbiased-ablation-study">6. Ungraded Try-It Activity: Design an Unbiased Ablation Study</a></li>
+<li><a href="#7-primary-sources-further-reading">7. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="systematic-model-exploration-controlled-experimentation">Systematic Model Exploration &amp; Controlled Experimentation</h1>
+<p>When transitioning from a simple baseline to advanced deep learning architectures, it is tempting to change multiple components simultaneously: swapping to a larger backbone, modifying the loss function, adjusting learning rates, adding new augmentations, and changing decision thresholds all in a single run.</p>
+<p>In empirical machine learning, this unstructured approach is known as <strong>"alchemy"</strong>. When your validation score changes, you have no scientific way of knowing which component caused the shift:</p>
+<ul>
+<li>Did your score drop because the new backbone was too complex for your dataset, or because your learning rate was too aggressive?</li>
+<li>Did your score increase because of Soft Dice loss, or because of a lucky random initialization?</li>
+</ul>
+<p>To build a competitive, high-performing segmentation pipeline, you must replace guesswork with <strong>disciplined, controlled experimentation</strong>.</p>
+<p>This guide establishes the <strong>Milestone 3 Controlled Exploration Matrix</strong>. You will learn how to design fair single-variable ablations, properly pair output heads with compatible loss functions and target representations, diagnose subtle training failure modes from learning curves, and systematically evaluate your models against holdout validation metrics.</p>
+<hr />
+<h2 id="1-the-golden-rule-of-scientific-ablation">1. The Golden Rule of Scientific Ablation</h2>
+<p>The foundation of empirical machine learning is the <strong>single-variable ablation principle</strong>:</p>
+<blockquote>
+<p><strong>THE GOLDEN RULE</strong>: In every experiment, change exactly <strong>ONE</strong> architectural or hyperparameter choice at a time, while holding all other system variables strictly constant.</p>
+</blockquote>
+<p><img alt="Ablation Experiment Matrix" src="assets/fig07_ablation_experiment_matrix.png" />
+<em>Figure 6.1: The Milestone 3 Controlled Exploration Matrix. By holding the split, resolution, optimization schedule, and metric pipeline fixed, each experimental phase cleanly isolates the true causal impact of one design decision.</em></p>
+<h3 id="what-must-be-held-constant-across-all-experiments">What Must Be Held Constant Across All Experiments?</h3>
+<p>To guarantee fair, unconfounded comparisons:</p>
+<ol>
+<li><strong>Fixed Validation Split</strong>: Always evaluate against the exact same combination-stratified holdout fold (e.g., Fold 0 from Milestone 2). Never compare a model trained on Fold 0 against a model trained on Fold 1 or a random split.</li>
+<li><strong>Fixed Input Resolution &amp; Geometry</strong>: Maintain native <span class="arithmatex">\(128 \times 800\)</span> strip dimensions. Never compare a model trained on cropped <span class="arithmatex">\(128 \times 256\)</span> patches against one trained on full strips without standardizing evaluation.</li>
+<li><strong>Fixed Optimization Budget</strong>: Keep total epochs (e.g., 30 epochs), optimizer (AdamW), learning rate warmup duration, and effective mini-batch size identical.</li>
+<li><strong>Fixed Preprocessing &amp; Augmentations</strong>: Use the exact same data pipeline (flips, contrast adjustments) across runs.</li>
+<li><strong>Fixed Evaluation Metric &amp; Post-Processing Grid</strong>: Evaluate every candidate using the identical decision pipeline: threshold sweep <span class="arithmatex">\(\tau \in [0.3, 0.8]\)</span> and minimum connected-component area filtering (<span class="arithmatex">\(A_{\min}\)</span>).</li>
+</ol>
+<hr />
+<h2 id="2-the-milestone-3-exploration-matrix">2. The Milestone 3 Exploration Matrix</h2>
+<p>A rigorous exploration of Milestone 3 unfolds across three structured phases:</p>
+<pre class="highlight"><code>Exploration Sequence:
+Phase 1: Backbone Exploration ──► Phase 2: Grayscale Adaptation ──► Phase 3: Head &amp; Loss Pairing
+(Find optimal feature extractor)   (Optimize input mechanics)      (Determine semantic objective)</code></pre>
+<h3 id="phase-1-feature-extractor-pretraining-ablation">Phase 1: Feature Extractor &amp; Pretraining Ablation</h3>
+<p><strong>Objective</strong>: Determine how much benefit transfer learning provides over random initialization, and compare the capacity of ResNet versus EfficientNet backbones.</p>
+<ul>
+<li><strong>Fixed Variables</strong>: Grayscale Repeat (<span class="arithmatex">\(3\times\)</span>), 4-Channel Sigmoid Head, Compound Loss (<span class="arithmatex">\(\text{BCE} + 1.0 \cdot \text{Dice}\)</span>), 30 Epochs, Fold 0.</li>
+<li><strong>Controlled Independent Variable</strong>: Model Backbone &amp; Pretrained Weights.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Run ID</th>
+<th style="text-align: left;">Backbone Architecture</th>
+<th style="text-align: left;">Pretrained Weights</th>
+<th style="text-align: left;">Trainable Parameters</th>
+<th style="text-align: left;">Research Hypothesis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>EXP-1.0</code></td>
+<td style="text-align: left;">Custom Baseline U-Net</td>
+<td style="text-align: left;">None (Random Init)</td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 7.8\text{M}\)</span></td>
+<td style="text-align: left;">Baseline benchmark from Milestone 2.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-1.1</code></td>
+<td style="text-align: left;">ResNet-34</td>
+<td style="text-align: left;">ImageNet-1k</td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 21.8\text{M}\)</span></td>
+<td style="text-align: left;">Tests residual feature transfer on edge defects.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-1.2</code></td>
+<td style="text-align: left;">EfficientNet-B0</td>
+<td style="text-align: left;">ImageNet-1k</td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 5.3\text{M}\)</span></td>
+<td style="text-align: left;">Tests compact inverted residual features &amp; SE attention.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-1.3</code></td>
+<td style="text-align: left;">EfficientNet-B2</td>
+<td style="text-align: left;">ImageNet-1k</td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 9.2\text{M}\)</span></td>
+<td style="text-align: left;">Tests balanced compound scaling on texture anomalies.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Evaluation Outcome</em>: Identify the backbone that produces the strongest validation Dice and cleanest boundary localization. Carry this backbone forward into Phase 2.</p>
+<hr />
+<h3 id="phase-2-grayscale-input-adaptation-ablation">Phase 2: Grayscale Input Adaptation Ablation</h3>
+<p><strong>Objective</strong>: Evaluate whether modifying the first convolution layer or prepending a learned adapter improves efficiency or accuracy over simple channel repetition.</p>
+<ul>
+<li><strong>Fixed Variables</strong>: Winning Backbone from Phase 1, 4-Channel Sigmoid Head, Compound Loss (<span class="arithmatex">\(\text{BCE} + 1.0 \cdot \text{Dice}\)</span>), 30 Epochs, Fold 0.</li>
+<li><strong>Controlled Independent Variable</strong>: Grayscale Input Adaptation Strategy.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Run ID</th>
+<th style="text-align: left;">Adaptation Strategy</th>
+<th style="text-align: left;">Implementation</th>
+<th style="text-align: left;">GPU VRAM / Step</th>
+<th style="text-align: left;">Research Hypothesis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>EXP-2.0</code></td>
+<td style="text-align: left;">Channel Duplication</td>
+<td style="text-align: left;"><code>x.repeat(1, 3, 1, 1)</code></td>
+<td style="text-align: left;">Baseline VRAM</td>
+<td style="text-align: left;">Standard baseline reference.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-2.1</code></td>
+<td style="text-align: left;">First Conv Weight Sum</td>
+<td style="text-align: left;"><span class="arithmatex">\(W_{\text{new}} = \sum_c W_c\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 30\%\)</span> lower loader VRAM</td>
+<td style="text-align: left;">Tests exact mathematical equivalence with 1-channel tensor.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-2.2</code></td>
+<td style="text-align: left;">First Conv Weight Average</td>
+<td style="text-align: left;"><span class="arithmatex">\(W_{\text{new}} = \frac{1}{3}\sum_c W_c\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\sim 30\%\)</span> lower loader VRAM</td>
+<td style="text-align: left;">Tests variance-preserved filter initialization.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EXP-2.3</code></td>
+<td style="text-align: left;">Learned <span class="arithmatex">\(1\times 1\)</span> Adapter</td>
+<td style="text-align: left;"><code>Conv2d(1, 3, 1x1)</code></td>
+<td style="text-align: left;">Slight adapter overhead</td>
+<td style="text-align: left;">Tests whether model benefits from learned color-space projection.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Evaluation Outcome</em>: Select the adaptation strategy that provides the best trade-off between validation Dice score and GPU memory/training speed.</p>
+<hr />
+<h3 id="phase-3-head-loss-compatibility-matrix">Phase 3: Head &amp; Loss Compatibility Matrix</h3>
+<p><strong>Objective</strong>: Compare independent multi-label detection against mutually exclusive multi-class segmentation.</p>
+<ul>
+<li><strong>Fixed Variables</strong>: Winning Backbone from Phase 1, Optimal Adaptation from Phase 2, 30 Epochs, Fold 0.</li>
+<li><strong>Controlled Independent Variable</strong>: Output Head, Target Formulation, and Loss Function.</li>
+</ul>
+<blockquote>
+<p><strong>CRITICAL RULE</strong>: You cannot test a Softmax head with BCE, nor can you test a Sigmoid head with categorical CrossEntropy! Each head must be paired with its strictly compatible target format and loss function.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Configuration</th>
+<th style="text-align: left;">Output Head</th>
+<th style="text-align: left;">Target Tensor Format</th>
+<th style="text-align: left;">Compatible Loss Function</th>
+<th style="text-align: left;">Decision Rule at Inference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Setup Alpha (Multi-Label)</strong></td>
+<td style="text-align: left;">4 Logits <span class="arithmatex">\([B, 4, 128, 800]\)</span></td>
+<td style="text-align: left;">Binary Float <span class="arithmatex">\([B, 4, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathcal{L}_{\text{BCE}} + \lambda \mathcal{L}_{\text{Dice}}\)</span></td>
+<td style="text-align: left;">Per-channel threshold <span class="arithmatex">\(\tau_k \in [0.3..0.8]\)</span> + collision resolution.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Setup Beta (Multi-Class)</strong></td>
+<td style="text-align: left;">5 Logits <span class="arithmatex">\([B, 5, 128, 800]\)</span></td>
+<td style="text-align: left;">Integer Class <span class="arithmatex">\([B, 128, 800]\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\mathcal{L}_{\text{CE}} + \lambda \mathcal{L}_{\text{MultiDice}}\)</span></td>
+<td style="text-align: left;">Pixel-wise Argmax over 5 classes.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-diagnosing-training-dynamics-failure-modes">3. Diagnosing Training Dynamics &amp; Failure Modes</h2>
+<p>When training runs complete, do not look solely at the final validation Dice number. Inspect your <strong>learning curves, gradient norms, and per-class metrics</strong> in Weights &amp; Biases to diagnose what the model learned.</p>
+<pre class="highlight"><code>Common Training Trajectories in W&amp;B:
+
+Trajectory 1 (Healthy Convergence):
+Train Loss:  Steady downward slope (0.95 -&gt; 0.35)
+Val Dice:    Steady rise (0.10 -&gt; 0.65), plateaus around epoch 20-25
+
+Trajectory 2 (Overfitting):
+Train Loss:  Continues dropping to near zero (0.95 -&gt; 0.05)
+Val Dice:    Peaks at epoch 12, then steadily degrades (0.60 -&gt; 0.45)
+Diagnostic:  Model memorizing training sheet textures; increase weight decay or spatial augmentations.
+
+Trajectory 3 (Class Collapse / Trivial Shortcut):
+Train Loss:  Plummets to ~0.03 in epoch 1 and stays flat
+Val Dice:    Remains at 0.0000 across all epochs!
+Diagnostic:  Model collapsed to all-background prediction; increase Dice weight lambda or pos_weight!</code></pre>
+<h3 id="specific-failure-modes-in-industrial-strip-segmentation">Specific Failure Modes in Industrial Strip Segmentation:</h3>
+<h4 id="1-boundary-erosion">1. Boundary Erosion</h4>
+<ul>
+<li><strong>Symptom</strong>: Model detects the general location of defects, but predicted masks are systematically smaller than ground truth (undercounting pixels).</li>
+<li><strong>Root Cause</strong>: Excessive BCE weighting relative to Dice, or threshold <span class="arithmatex">\(\tau\)</span> set too high (e.g., <span class="arithmatex">\(0.8\)</span>). The network avoids false positive penalties by shrinking predicted boundaries.</li>
+<li><strong>Diagnostic</strong>: Plot precision vs. recall. High precision (<span class="arithmatex">\(95\%\)</span>) paired with low recall (<span class="arithmatex">\(40\%\)</span>) indicates boundary erosion.</li>
+</ul>
+<h4 id="2-hairline-scratch-dissolution">2. Hairline Scratch Dissolution</h4>
+<ul>
+<li><strong>Symptom</strong>: Model achieves high Dice on large inclusions (<code>defect_c</code>), but achieves near-zero Dice on thin longitudinal scratches (<code>defect_a</code>).</li>
+<li><strong>Root Cause</strong>: Receptive field downsampling without adequate skip connection fidelity, or bilinear interpolation smoothing out thin lines.</li>
+<li><strong>Diagnostic</strong>: Inspect per-class Dice scores separately. Never rely on the overall macro average!</li>
+</ul>
+<h4 id="3-false-alarm-speckle-storm">3. False Alarm Speckle Storm</h4>
+<ul>
+<li><strong>Symptom</strong>: Model predicts dozens of tiny 1-to-3 pixel defect blobs across clean background steel.</li>
+<li><strong>Root Cause</strong>: Dice loss dominates without sufficient BCE anchoring, or threshold <span class="arithmatex">\(\tau\)</span> set too low (<span class="arithmatex">\(0.2\)</span>).</li>
+<li><strong>Diagnostic</strong>: Inspect connected-component count per image. Apply minimum area filtering (<span class="arithmatex">\(A_{\min} \ge 50\text{ px}\)</span>) during post-processing to eliminate isolated sensor noise.</li>
+</ul>
+<hr />
+<h2 id="4-fair-experiment-design-the-controlled-comparison-checklist">4. Fair Experiment Design: The Controlled Comparison Checklist</h2>
+<p>Before launching an experimental run, verify that your setup satisfies this 6-point checklist:</p>
+<ul>
+<li>[ ] <strong>1. Exact Seed Control</strong>: Have you set deterministic random seeds for Python, NumPy, and PyTorch?</li>
+<li>[ ] <strong>2. Single-Variable Verification</strong>: Is exactly <strong>one</strong> component different from your baseline checkpoint?</li>
+<li>[ ] <strong>3. Data Leakage Isolation</strong>: Are training augmentations isolated from the validation set?</li>
+<li>[ ] <strong>4. Logged Artifacts</strong>: Are model checkpoints, hyperparameters, and git commit hashes logged to your experiment tracker?</li>
+<li>[ ] <strong>5. Compatible Head and Loss</strong>: If you changed the output head, did you update both the target tensor format and the loss criterion?</li>
+<li>[ ] <strong>6. Unbiased Calibration</strong>: Are post-processing thresholds evaluated across the <strong>entire validation set</strong>, without peeking at the test set?</li>
+</ul>
+<hr />
+<h2 id="5-comprehensive-debugging-matrix">5. Comprehensive Debugging Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Exploding Gradients / NaN Loss</strong></td>
+<td style="text-align: left;">Pretrained backbone receives large learning rate on epoch 1 without warmup.</td>
+<td style="text-align: left;">Loss becomes <code>NaN</code> within the first 50 batches; weights become invalid.</td>
+<td style="text-align: left;">Clip gradient norms (<code>nn.utils.clip_grad_norm_(model.parameters(), 1.0)</code>); add linear warmup.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Silent Metric Drift</strong></td>
+<td style="text-align: left;">Calculating validation Dice on mini-batches and averaging the ratios instead of accumulating global counts.</td>
+<td style="text-align: left;">Validation Dice does not match offline evaluation script.</td>
+<td style="text-align: left;">Accumulate True Positives, False Positives, and False Negatives across the full fold before computing Dice.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Dead Defect Channel</strong></td>
+<td style="text-align: left;">Rare class (<code>defect_b</code>) never receives positive gradient in early epochs.</td>
+<td style="text-align: left;">Predicted probabilities for that channel remain <span class="arithmatex">\(&lt; 0.01\)</span> everywhere.</td>
+<td style="text-align: left;">Check positive class count in mini-batches; consider rare-class batch sampling or loss weighting.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Post-Processing Misalignment</strong></td>
+<td style="text-align: left;">Post-processing thresholds tuned on training data rather than validation data.</td>
+<td style="text-align: left;">Validation score drops significantly relative to training score.</td>
+<td style="text-align: left;">Calibrate <span class="arithmatex">\(\tau\)</span> strictly on held-out validation fold predictions.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-ungraded-try-it-activity-design-an-unbiased-ablation-study">6. Ungraded Try-It Activity: Design an Unbiased Ablation Study</h2>
+<p>Put yourself in the shoes of a lead machine learning engineer:</p>
+<p>Your pair-programming partner proposes the following experiment to improve your team's baseline:</p>
+<blockquote>
+<p><em>"I updated our script! I changed our backbone from ResNet-34 to EfficientNet-B2, increased the learning rate from <span class="arithmatex">\(1 \times 10^{-4}\)</span> to <span class="arithmatex">\(5 \times 10^{-4}\)</span>, replaced BCE loss with Focal Loss, and evaluated on Fold 2 instead of Fold 0. Our validation score jumped from <span class="arithmatex">\(0.58\)</span> to <span class="arithmatex">\(0.64\)</span>! We should adopt all these changes immediately!"</em></p>
+</blockquote>
+<p><strong>Questions to answer:</strong></p>
+<ol>
+<li>Identify at least <strong>four confounding variables</strong> in your partner's experiment.</li>
+<li>Why is the comparison between Fold 0 and Fold 2 invalid?</li>
+<li>How would you redesign this investigation into a sequence of controlled, single-variable experiments that isolate the true cause of the score improvement?</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li><strong>Four Confounding Variables</strong>:<ul>
+<li>Variable 1: <strong>Backbone architecture</strong> (ResNet-34 <span class="arithmatex">\(\to\)</span> EfficientNet-B2).</li>
+<li>Variable 2: <strong>Learning rate</strong> (<span class="arithmatex">\(1 \times 10^{-4} \to 5 \times 10^{-4}\)</span>).</li>
+<li>Variable 3: <strong>Loss function</strong> (BCE <span class="arithmatex">\(\to\)</span> Focal Loss).</li>
+<li>Variable 4: <strong>Validation partition</strong> (Fold 0 <span class="arithmatex">\(\to\)</span> Fold 2).</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalidity of Cross-Fold Comparison</strong>:
+   Different folds contain different subsets of images. Fold 2 might happen to contain easier defect instances or fewer clean images than Fold 0. Comparing scores across different validation splits is scientifically meaningless because the benchmark difficulty changed!</p>
+</li>
+<li>
+<p><strong>Redesigned Single-Variable Sequence</strong>:</p>
+<ul>
+<li><strong>Step 1 (Hold Fold 0, LR <span class="arithmatex">\(1\times 10^{-4}\)</span>, BCE loss constant)</strong>: Run ResNet-34 vs. EfficientNet-B2. (Measures backbone impact alone).</li>
+<li><strong>Step 2 (Take winning backbone from Step 1, hold Fold 0 and BCE loss constant)</strong>: Sweep LR <span class="arithmatex">\(1\times 10^{-4}\)</span> vs. <span class="arithmatex">\(5\times 10^{-4}\)</span>. (Measures optimization impact alone).</li>
+<li><strong>Step 3 (Take winning backbone and LR from Step 2, hold Fold 0 constant)</strong>: Compare BCE vs. Focal Loss. (Measures loss formulation impact alone).
+ Now you know exactly which changes helped and which changes hurt!</li>
+</ul>
+</li>
+</ol>
+</details>
+<hr />
+<h2 id="7-primary-sources-further-reading">7. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>Smith, L. N. (2018)</strong>. <em>A disciplined approach to neural network hyper-parameters: Part 1 -- learning rate, batch size, momentum, and weight decay</em>. <a href="https://arxiv.org/abs/1803.09820">arXiv:1803.09820</a>. Practical methodologies for controlled hyperparameter tuning.</li>
+<li><strong>Bouthillier, X., et al. (2021)</strong>. <em>Accounting for variance in machine learning benchmarks</em>. MLSys. <a href="https://arxiv.org/abs/2103.03082">arXiv:2103.03082</a>. Discusses sources of random variation and how to conduct fair empirical comparisons.</li>
+<li><strong>Weights &amp; Biases Documentation: Best Practices for Hyperparameter Sweeps</strong>. <a href="https://docs.wandb.ai/guides/sweeps">W&amp;B Sweeps Guide</a>. Structuring multi-run experiment grids and tracking metric lineages.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_bce_dice_and_compound_losses.html">← Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="walkthrough-notebook.html">Walkthrough Notebook &amp; Code Examples →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

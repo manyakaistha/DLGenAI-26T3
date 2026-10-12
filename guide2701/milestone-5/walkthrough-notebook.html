@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Walkthrough Notebook &amp; Code Examples · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html" aria-current="page"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html" aria-current="page"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Synthetic Walkthrough & Examples</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#what-this-walkthrough-demonstrates">What This Walkthrough Demonstrates</a></li>
+<li><a href="#how-to-run">How to Run</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-5-synthetic-inference-post-processing-walkthrough">Milestone 5: Synthetic Inference &amp; Post-Processing Walkthrough</h1>
+<p>This directory contains standalone, CPU-runnable educational walkthrough materials for <strong>Milestone 5 (Post-Processing &amp; Ensembling)</strong>:</p>
+<ul>
+<li><strong>Jupyter Notebook</strong>: <a href="downloads/synthetic_inference_pipeline.ipynb"><code>synthetic_inference_pipeline.ipynb</code></a></li>
+<li><strong>Paired Python Script</strong>: <a href="downloads/synthetic_inference_pipeline.py"><code>synthetic_inference_pipeline.py</code></a></li>
+</ul>
+<hr />
+<h2 id="what-this-walkthrough-demonstrates">What This Walkthrough Demonstrates</h2>
+<ol>
+<li><strong>Synthetic Strip Generation</strong>: Synthesizes <span class="arithmatex">\(128 \times 800\)</span> line-scan test images (<span class="arithmatex">\(6.25:1\)</span> aspect ratio) with background texture and localized defect signatures.</li>
+<li><strong>Multi-Model Inference Simulation</strong>: Mocks continuous probability predictions from two distinct model backbones (e.g. U-Net and FPN).</li>
+<li><strong>Test-Time Augmentation (TTA)</strong>: Evaluates input flips and demonstrates the spatial probability map inversion cycle before aggregation.</li>
+<li><strong>Ensemble Blending</strong>: Combines predictions from multiple models via weighted soft probability averaging.</li>
+<li><strong>Post-Processing Decision Pipeline</strong>: Calibrates per-class decision thresholds <span class="arithmatex">\(\boldsymbol{\tau}\)</span> and applies 8-connected component minimum area filtering (<span class="arithmatex">\(A_{\min}\)</span>).</li>
+<li><strong>Memory-Bounded Streaming to RLE</strong>: Encodes binary masks into 1-indexed column-major Fortran RLE format with single-space sentinels (<code>" "</code>) and boundary clamping at <span class="arithmatex">\(102,400\)</span>.</li>
+<li><strong>Automated Submission Validation</strong>: Runs pre-flight integrity audits verifying header schemas, row counts, and RLE decodability.</li>
+</ol>
+<hr />
+<h2 id="how-to-run">How to Run</h2>
+<h3 id="option-a-local-execution-with-uv">Option A: Local Execution with <code>uv</code></h3>
+<p>Run the paired Python script directly from your terminal:
+<pre class="highlight"><code class="language-bash">uv run python docs/milestone_5_student_guide/notebooks/synthetic_inference_pipeline.py</code></pre>
+Execution takes under 2 seconds on CPU.</p>
+<h3 id="option-b-local-jupyter-lab-notebook">Option B: Local Jupyter Lab / Notebook</h3>
+<p>Launch your local Jupyter interface:
+<pre class="highlight"><code class="language-bash">uv run jupyter lab docs/milestone_5_student_guide/notebooks/synthetic_inference_pipeline.ipynb</code></pre></p>
+<h3 id="option-c-google-colab">Option C: Google Colab</h3>
+<ol>
+<li>Upload <code>synthetic_inference_pipeline.ipynb</code> to Google Colab.</li>
+<li>Select a CPU runtime (no GPU is required for this synthetic demonstration).</li>
+<li>Run the notebook cells sequentially from top to bottom.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html">← Guide 07 · Inference Ablation Ladders</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

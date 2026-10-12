@@ -235,6 +235,9 @@ def build(output: Path):
     (output / "search.json").write_text(json.dumps(search, ensure_ascii=False))
     from build_live_session import build as build_session
     build_session(output / "session")
+    review_source = ROOT / "guide2701"
+    if review_source.is_dir():
+        shutil.copytree(review_source, output / "guide2701", dirs_exist_ok=True)
     parsed_pages = {}
     for file in output.glob("*.html"):
         parsed = Inspect()

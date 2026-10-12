@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 02 · Pretrained Backbones · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 02 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-transfer-learning-advantage-in-industrial-anomaly-detection">1. The Transfer Learning Advantage in Industrial Anomaly Detection</a></li>
+<li><a href="#2-comparing-backbone-families-resnet-vs-efficientnet">2. Comparing Backbone Families: ResNet vs. EfficientNet</a></li>
+<li><a href="#3-how-decoders-consume-multi-scale-feature-taps">3. How Decoders Consume Multi-Scale Feature Taps</a></li>
+<li><a href="#4-fine-tuning-strategies-freezing-vs-full-fine-tuning">4. Fine-Tuning Strategies: Freezing vs. Full Fine-Tuning</a></li>
+<li><a href="#5-batch-normalization-behavior-in-fine-tuning">5. Batch Normalization Behavior in Fine-Tuning</a></li>
+<li><a href="#6-preprocessing-compatibility-normalization-alignment">6. Preprocessing Compatibility: Normalization Alignment</a></li>
+<li><a href="#7-controlled-backbone-comparison-protocol">7. Controlled Backbone Comparison Protocol</a></li>
+<li><a href="#8-common-implementation-pitfalls-and-diagnostics">8. Common Implementation Pitfalls and Diagnostics</a></li>
+<li><a href="#9-ungraded-try-it-activity-inspecting-backbone-feature-activations">9. Ungraded Try-It Activity: Inspecting Backbone Feature Activations</a></li>
+<li><a href="#10-primary-sources-further-reading">10. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="pretrained-backbones-transfer-learning-resnet-to-efficientnet">Pretrained Backbones &amp; Transfer Learning: ResNet to EfficientNet</h1>
+<p>In Milestone 2, your baseline U-Net was initialized with random Gaussian weights. When trained from scratch, the network faced a difficult optimization task: it had to discover basic visual primitives (such as edge filters, contrast gradients, and texture detectors) while simultaneously learning to identify rare metallurgical defects from a small training dataset.</p>
+<p>In computer vision, training from scratch on small or imbalanced datasets is rarely optimal. <strong>Transfer learning</strong> allows you to leverage neural networks trained on massive public corpora (such as ImageNet-1k, containing over 1.28 million natural images across 1,000 categories). By adopting a <strong>pretrained backbone</strong> as your encoder, your model begins training with an established visual vocabulary ready on day one.</p>
+<p>This guide explains what pretrained backbones learn, compares the architectural mechanics of the <strong>ResNet</strong> and <strong>EfficientNet</strong> families, details how decoders extract multi-scale feature hierarchies, examines the trade-offs of feature freezing versus full fine-tuning, and provides a rigorous, controlled experimentation protocol to verify whether transfer learning truly improves your model.</p>
+<hr />
+<h2 id="1-the-transfer-learning-advantage-in-industrial-anomaly-detection">1. The Transfer Learning Advantage in Industrial Anomaly Detection</h2>
+<p>Why should a neural network trained to identify golden retrievers, freight trains, and espresso makers help you segment microscopic cracks on cold-rolled steel?</p>
+<p>The answer lies in the <strong>hierarchical nature of visual representations</strong> discovered by deep convolutional networks (Yosinski et al., 2014):</p>
+<pre class="highlight"><code>Visual Hierarchy in Pretrained CNNs:
+Early Layers (Stage 1-2):   General Visual Primitives (Gabor edges, blobs, local gradients)
+Mid Layers (Stage 3-4):     Complex Textural Patterns (grain textures, junctions, lattices)
+Deep Layers (Stage 5):      High-Level Semantic Motifs (parts, global context, objects)</code></pre>
+<p><img alt="Pretrained Feature Hierarchies" src="assets/fig02_pretrained_feature_hierarchies.png" />
+<em>Figure 2.1: Multi-scale feature tap points in a pretrained backbone. Early layers supply high-resolution edge maps to the decoder, while deep layers provide semantic anomaly classification.</em></p>
+<h3 id="1-general-visual-primitives-are-domain-agnostic">1. General Visual Primitives Are Domain-Agnostic</h3>
+<p>The filters learned in the first two stages of an ImageNet model are almost indistinguishable from classical Gabor wavelets and Sobel gradient operators. They detect high-contrast boundaries, directional ridges, and color/intensity transitions. A hairline scratch on steel triggers the exact same edge-detection neurons as the outline of a violin in ImageNet!</p>
+<h3 id="2-feature-reusability-with-limited-data">2. Feature Reusability with Limited Data</h3>
+<p>In industrial anomaly detection, defect samples are scarce. Anomaly classes like <code>defect_b</code> appear in only a tiny fraction of images. A randomly initialized model requires thousands of positive gradient updates just to shape its early convolutional kernels into coherent edge detectors. A pretrained backbone already possesses these detectors, allowing the optimizer to focus its limited updates on learning the subtle textural signatures of anomalies.</p>
+<h3 id="3-what-parts-are-reused">3. What Parts Are Reused?</h3>
+<p>When repurposing a classification network for segmentation:</p>
+<ul>
+<li><strong>RETAINED</strong>: The convolutional stem and all convolutional feature stages (the "body").</li>
+<li><strong>DISCARDED</strong>: The global average pooling layer, the flattening operator, and the final 1,000-class fully connected classification layer (the "head").</li>
+<li><strong>ADDED</strong>: A task-specific segmentation decoder that consumes feature maps tapped from multiple intermediate stages of the backbone.</li>
+</ul>
+<hr />
+<h2 id="2-comparing-backbone-families-resnet-vs-efficientnet">2. Comparing Backbone Families: ResNet vs. EfficientNet</h2>
+<p>Rather than treating backbones as black boxes, you should understand how their internal building blocks differ. Two of the most successful and widely deployed backbone families in competitive segmentation are <strong>ResNet</strong> and <strong>EfficientNet</strong>.</p>
+<h3 id="a-the-resnet-family-residual-highway-mechanics">A. The ResNet Family: Residual Highway Mechanics</h3>
+<p>Introduced by He et al. (2016), the Residual Network (ResNet) family solved the vanishing gradient problem in very deep networks using <strong>identity skip additions</strong>.</p>
+<pre class="highlight"><code>ResNet Residual Block:
+x ──┬───────────────────────────────┐ (Identity Shortcut)
+    │                               │
+    ▼                               ▼
+ [Conv 3×3] ──► [BN] ──► [ReLU] ──► [Conv 3×3] ──► [BN] ──► (+) ──► [ReLU] ──► Output</code></pre>
+<h4 id="mathematical-formulation">Mathematical Formulation</h4>
+<div class="arithmatex">\[\mathcal{F}(x) = W_2 \cdot \sigma\left( \text{BN}\left( W_1 \cdot x + b_1 \right) \right) + b_2\]</div>
+<div class="arithmatex">\[y = \sigma\left( \text{BN}\left( \mathcal{F}(x) + x \right) \right)\]</div>
+<p>Because gradients flow directly through the identity shortcut (<span class="arithmatex">\(+ x\)</span>) during backpropagation, ResNet avoids gradient degradation even at 100+ layers.</p>
+<h4 id="structural-characteristics">Structural Characteristics</h4>
+<ul>
+<li><strong>Homogeneous Blocks</strong>: Built from uniform sequences of <span class="arithmatex">\(3 \times 3\)</span> convolutions (or bottleneck blocks <span class="arithmatex">\(1 \times 1 \to 3 \times 3 \to 1 \times 1\)</span> in ResNet-50 and deeper).</li>
+<li><strong>Predictable Striding</strong>: Consistently downsamples by exactly <span class="arithmatex">\(2\times\)</span> at the start of each stage (<span class="arithmatex">\(/4, /8, /16, /32\)</span>).</li>
+<li><strong>Clean Feature Taps</strong>: Feature map channel counts are predictable powers of two: <span class="arithmatex">\(64, 128, 256, 512\)</span> (ResNet-34) or <span class="arithmatex">\(256, 512, 1024, 2048\)</span> (ResNet-50).</li>
+<li><strong>Strengths</strong>: Highly stable gradients, low memory overhead per parameter, excellent boundary extraction on high-contrast edge defects (scratches).</li>
+</ul>
+<hr />
+<h3 id="b-the-efficientnet-family-compound-scaling-mbconv">B. The EfficientNet Family: Compound Scaling &amp; MBConv</h3>
+<p>Introduced by Tan &amp; Le (2019), the EfficientNet family redesigned backbone architecture through principled <strong>compound scaling</strong>, balancing network depth, width, and resolution using neural architecture search.</p>
+<pre class="highlight"><code>EfficientNet MBConv Block (Inverted Residual + Squeeze-and-Excitation):
+x ──┬──────────────────────────────────────────────────────────────┐ (Identity Shortcut)
+    │                                                              │
+    ▼                                                              ▼
+ [1×1 Conv (Expand)] ──► [Depthwise 3×3 Conv] ──► [SE Block] ──► [1×1 Conv (Project)] ──► (+)</code></pre>
+<h4 id="key-innovations">Key Innovations</h4>
+<ol>
+<li><strong>Depthwise Separable Convolutions</strong>: Factorizes a standard convolution into a depthwise spatial filter (1 filter per input channel) and a pointwise <span class="arithmatex">\(1 \times 1\)</span> projection filter across channels. This slashes FLOPs and parameter counts by <span class="arithmatex">\(80\%\text{--}90\%\)</span>.</li>
+<li><strong>Inverted Residuals</strong>: Unlike ResNet (which compresses channels before convolution), MBConv <em>expands</em> channel dimensions internally (<span class="arithmatex">\(6\times\)</span> expansion) to compute rich non-linear representations in high-dimensional space before projecting back down.</li>
+<li>
+<p><strong>Squeeze-and-Excitation (SE) Attention</strong>: Applies explicit channel-wise recalibration. A global average pooling step computes channel descriptors, followed by a two-layer bottleneck MLP that outputs per-channel scaling weights <span class="arithmatex">\(s_c \in [0, 1]\)</span>:</p>
+<div class="arithmatex">\[s = \sigma\left( W_2 \cdot \text{ReLU}\left( W_1 \cdot \text{GAP}(x) \right) \right), \quad \tilde{x}_c = s_c \cdot x_c\]</div>
+<p>This allows the network to dynamically amplify feature channels that correspond to anomaly textures while dampening channels that capture normal background sheen.</p>
+</li>
+</ol>
+<h4 id="structural-characteristics_1">Structural Characteristics</h4>
+<ul>
+<li><strong>High Parameter Efficiency</strong>: EfficientNet-B0 has only <span class="arithmatex">\(\sim 5.3\text{M}\)</span> parameters compared to ResNet-34's <span class="arithmatex">\(\sim 21.3\text{M}\)</span>, yet achieves comparable or higher ImageNet accuracy.</li>
+<li><strong>Heterogeneous Channels</strong>: Channel counts across stages do not follow strict powers of two (e.g., EfficientNet-B2 outputs stage channels of <span class="arithmatex">\(16, 24, 48, 120, 352\)</span>).</li>
+<li><strong>Strengths</strong>: High semantic expressiveness per parameter, strong at capturing subtle texture variations (such as metallurgical inclusions or patchy stains).</li>
+<li><strong>Costs</strong>: Slower training throughput on certain GPUs due to the fragmented memory access patterns of depthwise convolutions.</li>
+</ul>
+<hr />
+<h3 id="comparison-of-resnet-and-efficientnet-variants">Comparison of ResNet and EfficientNet Variants</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Backbone Model</th>
+<th style="text-align: left;">Family</th>
+<th style="text-align: left;">Parameters</th>
+<th style="text-align: left;">GFLOPs (<span class="arithmatex">\(224 \times 224\)</span>)</th>
+<th style="text-align: left;">Stage Channels <span class="arithmatex">\([C_1, C_2, C_3, C_4, C_5]\)</span></th>
+<th style="text-align: left;">Primary Architectural Trait</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>ResNet-18</strong></td>
+<td style="text-align: left;">ResNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(11.7\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.8\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([64, 64, 128, 256, 512]\)</span></td>
+<td style="text-align: left;">Lightweight, fast training, residual skips.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ResNet-34</strong></td>
+<td style="text-align: left;">ResNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(21.8\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(3.6\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([64, 64, 128, 256, 512]\)</span></td>
+<td style="text-align: left;">Proven segmentation workhorse; stable baseline.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ResNet-50</strong></td>
+<td style="text-align: left;">ResNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(25.6\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.1\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([64, 256, 512, 1024, 2048]\)</span></td>
+<td style="text-align: left;">Bottleneck blocks; very wide feature channels.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>EfficientNet-B0</strong></td>
+<td style="text-align: left;">EfficientNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(5.3\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.39\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([16, 24, 40, 112, 320]\)</span></td>
+<td style="text-align: left;">Ultra-compact; MBConv + SE attention.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>EfficientNet-B1</strong></td>
+<td style="text-align: left;">EfficientNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(7.8\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(0.70\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([16, 24, 40, 112, 320]\)</span></td>
+<td style="text-align: left;">Modest compound depth/width expansion.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>EfficientNet-B2</strong></td>
+<td style="text-align: left;">EfficientNet</td>
+<td style="text-align: left;"><span class="arithmatex">\(9.2\text{M}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.0\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\([16, 24, 48, 120, 352]\)</span></td>
+<td style="text-align: left;">Excellent balance of capacity and memory efficiency.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: Do not assume one backbone is universally superior for this competition. Your choice must be justified through controlled validation experiments on industrial strip data.</em></p>
+<hr />
+<h2 id="3-how-decoders-consume-multi-scale-feature-taps">3. How Decoders Consume Multi-Scale Feature Taps</h2>
+<p>In modern segmentation libraries like <code>segmentation_models_pytorch</code> (SMP), a pretrained backbone is sliced into intermediate feature stages. </p>
+<p>Consider an industrial strip input <span class="arithmatex">\([B, C_{\text{in}}, 128, 800]\)</span> fed into a ResNet-34 backbone:</p>
+<pre class="highlight"><code>Backbone Slicing &amp; Feature Tap Output:
+Input:           [B, C_in, 128, 800]
+  │
+  ├─► Stem (Conv1 + MaxPool) ──► Tap 1: [B, 64,  32, 200]  (Stride /4)  ──► Decoder Level 1 Skip
+  ├─► Stage 1 (Layer 1)      ──► Tap 2: [B, 64,  32, 200]  (Stride /4)
+  ├─► Stage 2 (Layer 2)      ──► Tap 3: [B, 128, 16, 100]  (Stride /8)  ──► Decoder Level 2 Skip
+  ├─► Stage 3 (Layer 3)      ──► Tap 4: [B, 256,  8,  50]  (Stride /16) ──► Decoder Level 3 Skip
+  └─► Stage 4 (Layer 4)      ──► Tap 5: [B, 512,  4,  25]  (Stride /32) ──► Bottleneck Input</code></pre>
+<p>When connecting a decoder (such as a U-Net or FPN decoder) to these tap points:</p>
+<ol>
+<li><strong>The Bottleneck</strong> receives Tap 5 (<span class="arithmatex">\(4 \times 25\)</span> pixels, <span class="arithmatex">\(512\)</span> channels) and refines the most abstract semantic features.</li>
+<li><strong>Decoder Upsampling Blocks</strong> progressively double spatial dimensions:<ul>
+<li><span class="arithmatex">\(4 \times 25 \to 8 \times 50\)</span>, concatenated with Tap 4 (<span class="arithmatex">\(256\)</span> channels).</li>
+<li><span class="arithmatex">\(8 \times 50 \to 16 \times 100\)</span>, concatenated with Tap 3 (<span class="arithmatex">\(128\)</span> channels).</li>
+<li><span class="arithmatex">\(16 \times 100 \to 32 \times 200\)</span>, concatenated with Tap 2 (<span class="arithmatex">\(64\)</span> channels).</li>
+<li><span class="arithmatex">\(32 \times 200 \to 128 \times 800\)</span>, restored via final upsampling convolutions to match original strip resolution.</li>
+</ul>
+</li>
+</ol>
+<p>Notice that because the backbone downsamples by <span class="arithmatex">\(32\times\)</span>, the input dimensions (<span class="arithmatex">\(128 \times 800\)</span>) must be cleanly divisible by 32:</p>
+<div class="arithmatex">\[128 / 32 = 4, \quad 800 / 32 = 25\]</div>
+<p>Both resolve to clean integer grid sizes without fractional truncation!</p>
+<hr />
+<h2 id="4-fine-tuning-strategies-freezing-vs-full-fine-tuning">4. Fine-Tuning Strategies: Freezing vs. Full Fine-Tuning</h2>
+<p>When applying a pretrained backbone, you must decide how to update its parameters during training. Three strategies exist:</p>
+<pre class="highlight"><code>Strategy 1: Frozen Feature Extractor (Linear Probing)
+Backbone Weights:  FROZEN (requires_grad = False)
+Decoder Weights:   TRAINABLE (requires_grad = True)
+
+Strategy 2: Full Fine-Tuning (End-to-End)
+Backbone Weights:  TRAINABLE with Global LR
+Decoder Weights:   TRAINABLE with Global LR
+
+Strategy 3: Discriminative Learning Rates (Differential Fine-Tuning)
+Backbone Weights:  TRAINABLE with Low LR (e.g. 1e-4)
+Decoder Weights:   TRAINABLE with High LR (e.g. 1e-3)</code></pre>
+<h3 id="trade-off-analysis">Trade-Off Analysis</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Strategy</th>
+<th style="text-align: left;">Computational Cost</th>
+<th style="text-align: left;">Risk of Catastrophic Forgetting</th>
+<th style="text-align: left;">Domain Adaptation Ability</th>
+<th style="text-align: left;">Best Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Frozen Backbone</strong></td>
+<td style="text-align: left;"><strong>Lowest</strong>: No backward gradients computed for backbone.</td>
+<td style="text-align: left;"><strong>Zero</strong>: Pretrained features remain intact.</td>
+<td style="text-align: left;"><strong>Very Poor</strong>: Cannot adapt edge/texture filters to industrial surface physics.</td>
+<td style="text-align: left;">Initial pipeline smoke tests or rapid prototyping.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Full Fine-Tuning</strong></td>
+<td style="text-align: left;">Standard.</td>
+<td style="text-align: left;"><strong>Moderate</strong>: Large initial gradients from random decoder can disrupt pretrained filters.</td>
+<td style="text-align: left;"><strong>High</strong>: Entire network adapts to strip anomalies.</td>
+<td style="text-align: left;">Standard baseline; use learning rate warmup to protect backbone.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Discriminative LR</strong></td>
+<td style="text-align: left;">Standard.</td>
+<td style="text-align: left;"><strong>Low</strong>: Backbone updates slowly while decoder learns rapidly.</td>
+<td style="text-align: left;"><strong>Highest</strong>: Preserves general filters while refining domain specifics.</td>
+<td style="text-align: left;">Advanced fine-tuning once baseline is established.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-role-of-learning-rate-warmup">The Role of Learning Rate Warmup</h3>
+<p>When training starts, the decoder is randomly initialized, producing massive random errors and chaotic gradients. If you apply full fine-tuning with a large initial learning rate, those chaotic gradients propagate back into the backbone and <strong>corrupt the pretrained weights in the very first epoch</strong>.
+To prevent this, use a <strong>learning rate warmup</strong>: start with a small learning rate (e.g., <span class="arithmatex">\(10\%\text{--}20\%\)</span> of peak LR) for the first 2 to 3 epochs, allowing the decoder to stabilize before subjecting the backbone to large gradient updates.</p>
+<hr />
+<h2 id="5-batch-normalization-behavior-in-fine-tuning">5. Batch Normalization Behavior in Fine-Tuning</h2>
+<p>Batch Normalization (<code>BatchNorm2d</code>) is one of the most common sources of subtle bugs when fine-tuning pretrained vision models.</p>
+<p>During ImageNet pretraining, <code>BatchNorm</code> computes running estimates of mean <span class="arithmatex">\(\mu\)</span> and variance <span class="arithmatex">\(\sigma^2\)</span> across millions of images with mini-batch sizes of 256 or 512.</p>
+<p>When you fine-tune on high-resolution industrial strips (<span class="arithmatex">\(128 \times 800\)</span>), GPU memory constraints often force you to train with <strong>small mini-batch sizes</strong> (such as batch size 4 or 8 per GPU):</p>
+<ul>
+<li><strong>The Small Batch Instability</strong>: In mini-batches of size 4, the batch mean and variance fluctuate wildly. If BatchNorm recalculates statistics dynamically, noisy batch statistics destabilize the pretrained feature maps.</li>
+<li><strong>Eval Mode Freezing (<code>track_running_stats=False</code>)</strong>: When training with very small batches, some practitioners freeze BatchNorm layers in evaluation mode (<code>layer.eval()</code>), forcing the network to use the stable running statistics learned from ImageNet rather than noisy local batch statistics.</li>
+</ul>
+<hr />
+<h2 id="6-preprocessing-compatibility-normalization-alignment">6. Preprocessing Compatibility: Normalization Alignment</h2>
+<p>Pretrained backbones are calibrated to expect inputs normalized according to the distribution of their original pretraining dataset.</p>
+<h3 id="imagenet-standard-statistics">ImageNet Standard Statistics</h3>
+<p>Most torchvision and SMP backbones expect inputs normalized by:</p>
+<div class="arithmatex">\[\mu_{\text{ImageNet}} = [0.485, 0.456, 0.406], \quad \sigma_{\text{ImageNet}} = [0.229, 0.224, 0.225]\]</div>
+<div class="arithmatex">\[x_{\text{norm}} = \frac{x / 255.0 - \mu}{\sigma}\]</div>
+<h3 id="the-local-dataset-z-score-dilemma">The Local Dataset Z-Score Dilemma</h3>
+<p>In industrial steel inspection, line-scan images may have very different brightness distributions (e.g., dark steel surfaces with mean <span class="arithmatex">\(0.35\)</span> and standard deviation <span class="arithmatex">\(0.12\)</span>).
+If you normalize your input strips using local z-score normalization (<span class="arithmatex">\(\mu_{\text{strip}}, \sigma_{\text{strip}}\)</span>), the input features will have zero mean and unit variance, but will not match the input scale expected by the first convolutional layer of the pretrained network.</p>
+<p><strong>Rule of Thumb</strong>:</p>
+<ul>
+<li>If using <strong>pretrained weights without an input adapter</strong>, apply the backbone's official ImageNet normalization statistics.</li>
+<li>If using <strong>local per-image z-score normalization</strong>, ensure the model's first layer has sufficient learning capacity to rescale the inputs, or train with an explicit input normalization layer.</li>
+</ul>
+<hr />
+<h2 id="7-controlled-backbone-comparison-protocol">7. Controlled Backbone Comparison Protocol</h2>
+<p>When experimenting with backbones, you must ensure that performance differences reflect true architectural advantages rather than confounding variables.</p>
+<pre class="highlight"><code>Controlled Comparison Protocol:
+Fix: Validation Split (Canonical Fold 0)
+Fix: Input Resolution (Native 128 × 800)
+Fix: Output Head &amp; Target Semantics (e.g. 4-Sigmoid, Multi-Label)
+Fix: Loss Function (e.g. BCE + Soft Dice, alpha=0.5, beta=0.5)
+Fix: Optimization Budget (30 Epochs, AdamW, Cosine Scheduler, Batch Size 16)
+Fix: Evaluation Pipeline (Same threshold sweep tau in [0.3..0.8], same Dice metric)
+
+Vary ONLY the Backbone:
+Experiment A: From-Scratch Baseline (Random Weights)
+Experiment B: Pretrained ResNet-34 (ImageNet Weights)
+Experiment C: Pretrained EfficientNet-B0 (ImageNet Weights)
+Experiment D: Pretrained EfficientNet-B2 (ImageNet Weights)</code></pre>
+<p>By keeping all other factors identical, any difference in validation Dice score directly measures the empirical benefit of that specific backbone.</p>
+<hr />
+<h2 id="8-common-implementation-pitfalls-and-diagnostics">8. Common Implementation Pitfalls and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Corrupted Pretrained Weights</strong></td>
+<td style="text-align: left;">Setting learning rate too high without warmup on epoch 1.</td>
+<td style="text-align: left;">Training loss spikes to <code>NaN</code> or plateaus immediately; validation score drops below random init.</td>
+<td style="text-align: left;">Add a 2-epoch linear LR warmup; inspect first-epoch gradient norms.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Mismatched Normalization</strong></td>
+<td style="text-align: left;">Feeding raw <span class="arithmatex">\([0, 255]\)</span> integer pixels into a pretrained backbone expecting normalized <span class="arithmatex">\([-2, +2]\)</span> floats.</td>
+<td style="text-align: left;">Activations saturate; gradients vanish in early layers.</td>
+<td style="text-align: left;">Check <code>image.min()</code> and <code>image.max()</code> before model forward pass.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Decoder Channel Misconfiguration</strong></td>
+<td style="text-align: left;">Hardcoding decoder skip channels assuming ResNet, then swapping to EfficientNet.</td>
+<td style="text-align: left;"><code>RuntimeError: Given groups=1, weight of size [128, 64, 3, 3], expected input to have 64 channels, but got 48 channels</code>.</td>
+<td style="text-align: left;">Use high-level model factories (such as SMP) that automatically configure decoder skip channels from the backbone metadata.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Evaluating with <code>model.train()</code></strong></td>
+<td style="text-align: left;">Running validation loop without calling <code>model.eval()</code>.</td>
+<td style="text-align: left;">Validation Dice fluctuates wildly across identical evaluation batches due to running batch norm updates.</td>
+<td style="text-align: left;">Explicitly call <code>model.eval()</code> and <code>with torch.no_grad():</code> during validation.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-ungraded-try-it-activity-inspecting-backbone-feature-activations">9. Ungraded Try-It Activity: Inspecting Backbone Feature Activations</h2>
+<p>Try this conceptual calculation:</p>
+<p>Suppose you pass a <span class="arithmatex">\(128 \times 800\)</span> strip through a ResNet-34 encoder.</p>
+<ol>
+<li>Recall the stage downsampling factors: Stage 1 (<span class="arithmatex">\(4\times\)</span>), Stage 2 (<span class="arithmatex">\(8\times\)</span>), Stage 3 (<span class="arithmatex">\(16\times\)</span>), Stage 4 (<span class="arithmatex">\(32\times\)</span>).</li>
+<li>What are the spatial dimensions <span class="arithmatex">\([H, W]\)</span> at each of the 4 stages?</li>
+<li>Calculate the total number of spatial feature cells (<span class="arithmatex">\(H \times W\)</span>) at Stage 1 vs. Stage 4.</li>
+<li>If a scratch has length <span class="arithmatex">\(200\text{ px}\)</span> along the horizontal rolling axis:<ul>
+<li>How many cells does it span at Stage 1?</li>
+<li>How many cells does it span at Stage 4?</li>
+</ul>
+</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li><strong>Spatial dimensions</strong>:<ul>
+<li>Stage 1 (<span class="arithmatex">\(4\times\)</span> downsampling): <span class="arithmatex">\(128 / 4 = 32\)</span>, <span class="arithmatex">\(800 / 4 = 200 \to [32, 200]\)</span>.</li>
+<li>Stage 2 (<span class="arithmatex">\(8\times\)</span> downsampling): <span class="arithmatex">\(128 / 8 = 16\)</span>, <span class="arithmatex">\(800 / 8 = 100 \to [16, 100]\)</span>.</li>
+<li>Stage 3 (<span class="arithmatex">\(16\times\)</span> downsampling): <span class="arithmatex">\(128 / 16 = 8\)</span>, <span class="arithmatex">\(800 / 16 = 50 \to [8, 50]\)</span>.</li>
+<li>Stage 4 (<span class="arithmatex">\(32\times\)</span> downsampling): <span class="arithmatex">\(128 / 32 = 4\)</span>, <span class="arithmatex">\(800 / 32 = 25 \to [4, 25]\)</span>.</li>
+</ul>
+</li>
+<li><strong>Total spatial feature cells</strong>:<ul>
+<li>Stage 1: <span class="arithmatex">\(32 \times 200 = 6,400\text{ cells}\)</span>.</li>
+<li>Stage 4: <span class="arithmatex">\(4 \times 25 = 100\text{ cells}\)</span>.</li>
+<li>Spatial resolution decreases by a factor of <span class="arithmatex">\(64\times\)</span> (<span class="arithmatex">\(6400 / 100 = 64\)</span>)!</li>
+</ul>
+</li>
+<li><strong>Scratch footprint</strong>:<ul>
+<li>Stage 1: <span class="arithmatex">\(200 / 4 = 50\text{ cells}\)</span> along the horizontal axis. The network has plenty of spatial granularity to track curved trajectories and localized breaks.</li>
+<li>Stage 4: <span class="arithmatex">\(200 / 32 = 6.25\text{ cells}\)</span>. The entire <span class="arithmatex">\(200\)</span>-pixel scratch is compressed into roughly 6 cells, providing global context but coarse localization.</li>
+</ul>
+</li>
+</ol>
+</details>
+<p>To verify how multi-scale feature maps are extracted and passed through skip connections on CPU, run:
+👉 <a href="examples/toy_feature_extractor.py"><code>docs/milestone_3_student_guide/examples/toy_feature_extractor.py</code></a></p>
+<hr />
+<h2 id="10-primary-sources-further-reading">10. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>He, K., Zhang, X., Ren, S., &amp; Sun, J. (2016)</strong>. <em>Deep Residual Learning for Image Recognition</em>. CVPR. <a href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a>. Introduced ResNet and residual learning.</li>
+<li><strong>Tan, M., &amp; Le, Q. V. (2019)</strong>. <em>EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks</em>. ICML. <a href="https://arxiv.org/abs/1905.11946">arXiv:1905.11946</a>. Formulated compound scaling and inverted bottleneck architecture.</li>
+<li><strong>Yosinski, J., Clune, J., Bengio, Y., &amp; Lipson, H. (2014)</strong>. <em>How transferable are features in deep neural networks?</em>. NeurIPS. <a href="https://arxiv.org/abs/1411.1792">arXiv:1411.1792</a>. Empirical investigation into feature generality across layers.</li>
+<li><strong>Hu, J., Shen, L., &amp; Sun, G. (2018)</strong>. <em>Squeeze-and-Excitation Networks</em>. CVPR. <a href="https://arxiv.org/abs/1709.01507">arXiv:1709.01507</a>. Introduced channel attention recalibration used in EfficientNet.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_01_encoder_decoder_architectures.html">← Guide 01 · Encoder–Decoder Architectures</a><a href="guide_03_grayscale_input_adaptation.html">Guide 03 · Grayscale Input Adaptation →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

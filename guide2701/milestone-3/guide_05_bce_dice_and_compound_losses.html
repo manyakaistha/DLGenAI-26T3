@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 05 · BCE, Dice, &amp; Compound Losses · Milestone 3 Student Guide</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning and stronger segmentation models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 3 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="guide_01_encoder_decoder_architectures.html"><span class="num">GUIDE 01</span>Guide 01 · Encoder–Decoder Architectures</a><a href="guide_02_pretrained_backbones_and_transfer_learning.html"><span class="num">GUIDE 02</span>Guide 02 · Pretrained Backbones</a><a href="guide_03_grayscale_input_adaptation.html"><span class="num">GUIDE 03</span>Guide 03 · Grayscale Input Adaptation</a><a href="guide_04_output_heads_and_target_semantics.html"><span class="num">GUIDE 04</span>Guide 04 · Output Heads &amp; Semantics</a><a href="guide_05_bce_dice_and_compound_losses.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · BCE, Dice, &amp; Compound Losses</a><a href="guide_06_experimental_design_and_model_evaluation.html"><span class="num">GUIDE 06</span>Guide 06 · Systematic Model Exploration</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 3 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Transfer Learning & Stronger Segmentation Models</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Curriculum</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Concept guide 05 / 06</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-anatomy-of-class-imbalance-why-pixel-accuracy-misleads">1. The Anatomy of Class Imbalance: Why Pixel Accuracy Misleads</a></li>
+<li><a href="#2-binary-cross-entropy-with-logits">2. Binary Cross-Entropy with Logits</a></li>
+<li><a href="#3-soft-dice-loss-differentiable-overlap-optimization">3. Soft Dice Loss: Differentiable Overlap Optimization</a></li>
+<li><a href="#4-how-bce-and-dice-respond-to-common-failure-modes">4. How BCE and Dice Respond to Common Failure Modes</a></li>
+<li><a href="#5-the-compound-loss-combining-bce-and-soft-dice">5. The Compound Loss: Combining BCE and Soft Dice</a></li>
+<li><a href="#6-reduction-strategies-pixel-vs-batch-vs-class">6. Reduction Strategies: Pixel vs. Batch vs. Class</a></li>
+<li><a href="#7-the-critical-boundary-training-loss-vs-validation-metric">7. The Critical Boundary: Training Loss vs. Validation Metric</a></li>
+<li><a href="#8-comparative-decision-matrix">8. Comparative Decision Matrix</a></li>
+<li><a href="#9-common-implementation-pitfalls-and-diagnostics">9. Common Implementation Pitfalls and Diagnostics</a></li>
+<li><a href="#10-ungraded-try-it-activity-compute-bce-and-soft-dice-by-hand">10. Ungraded Try-It Activity: Compute BCE and Soft Dice by Hand</a></li>
+<li><a href="#11-primary-sources-further-reading">11. Primary Sources &amp; Further Reading</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="segmentation-loss-functions-bce-dice-compound-objectives">Segmentation Loss Functions: BCE, Dice, &amp; Compound Objectives</h1>
+<p>In standard computer vision tasks, choosing a loss function is straightforward: classification models use Cross-Entropy, while regression models use Mean Squared Error. In industrial anomaly segmentation, however, standard loss functions fail completely because of <strong>extreme spatial class imbalance</strong>:</p>
+<ul>
+<li>In our line-scan setting, more than <strong><span class="arithmatex">\(97\%\)</span> of all pixels across the dataset belong to defect-free background steel</strong>.</li>
+<li>Certain rare anomaly types (such as <code>defect_b</code>) occupy less than <strong><span class="arithmatex">\(0.02\%\)</span></strong> of the total canvas area.</li>
+</ul>
+<p>If you train a neural network using standard, unweighted Binary Cross-Entropy, the model discovers a trivial shortcut: <strong>predict all zeros everywhere</strong>. By predicting that every single pixel is clean background, the model achieves over <span class="arithmatex">\(97\%\)</span> pixel-level accuracy while achieving a <strong>Dice score of exactly 0.0</strong> on defects!</p>
+<p>To force the network to detect hairline anomalies, you must design a loss function that balances pixel-level classification accuracy against global region overlap.</p>
+<p>This guide explores <strong>Binary Cross-Entropy with Logits</strong>, derives the differentiable <strong>Soft Dice Loss</strong>, explains how they respond to missed defects and false alarms on tiny synthetic matrices, analyzes the compound objective <span class="arithmatex">\(\mathcal{L}_{\text{BCE}} + \lambda \mathcal{L}_{\text{Dice}}\)</span>, and establishes the critical distinction between your <strong>differentiable training loss</strong> and your <strong>discrete evaluation metric</strong>.</p>
+<hr />
+<h2 id="1-the-anatomy-of-class-imbalance-why-pixel-accuracy-misleads">1. The Anatomy of Class Imbalance: Why Pixel Accuracy Misleads</h2>
+<p>Consider a single industrial strip of dimension <span class="arithmatex">\(128 \times 800\)</span>, containing <span class="arithmatex">\(102,400\)</span> pixels.
+Suppose the strip contains a small scratch (<code>defect_a</code>) spanning <strong><span class="arithmatex">\(50\)</span> pixels</strong>.</p>
+<p>Let us examine two hypothetical models:</p>
+<pre class="highlight"><code>Strip Canvas: 102,400 Pixels | Ground Truth Defect: 50 Pixels (0.049% of Canvas)
+
+Model Alpha (Trivial Background Predictor):
+- Predicts 0 on all 102,400 pixels
+- Pixel Accuracy: (102,400 - 50) / 102,400 = 99.951%
+- Dice Score:     2 * 0 / (0 + 50) = 0.0000 (Completely Useless!)
+
+Model Beta (Real Defect Detector with Slight Jitter):
+- Correctly predicts 40 defect pixels, misses 10 defect pixels, predicts 30 false positive pixels
+- Pixel Accuracy: (102,320) / 102,400 = 99.922% (Lower accuracy than Model Alpha!)
+- Dice Score:     2 * 40 / (70 + 50) = 0.6667 (High Industrial Value!)</code></pre>
+<p>If your loss function optimizes raw pixel accuracy, the optimizer will actively favor Model Alpha over Model Beta! To train a viable anomaly detector, your objective function must penalize missed foreground pixels much more heavily than background errors.</p>
+<hr />
+<h2 id="2-binary-cross-entropy-with-logits">2. Binary Cross-Entropy with Logits</h2>
+<p>Binary Cross-Entropy (BCE) measures the cross-entropy between independent Bernoulli distributions at each individual pixel.</p>
+<h3 id="mathematical-formulation">Mathematical Formulation</h3>
+<p>For a ground truth binary target <span class="arithmatex">\(y \in \{0, 1\}\)</span> and a predicted probability <span class="arithmatex">\(p = \sigma(z) \in (0, 1)\)</span>:</p>
+<div class="arithmatex">\[\ell_{\text{BCE}}(p, y) = - \left[ y \log(p) + (1 - y) \log(1 - p) \right]\]</div>
+<h3 id="the-numerical-stability-of-log-sum-exp">The Numerical Stability of Log-Sum-Exp</h3>
+<p>In naive implementations, students often compute:
+<pre class="highlight"><code class="language-python"># DANGEROUS: Susceptible to underflow and NaN!
+probs = torch.sigmoid(logits)
+loss = - (targets * torch.log(probs + 1e-7) + (1 - targets) * torch.log(1 - probs + 1e-7))</code></pre>
+When a logit is large and negative (e.g., <span class="arithmatex">\(z = -80\)</span>), <span class="arithmatex">\(\sigma(z)\)</span> underflows to <code>0.0</code>, causing <span class="arithmatex">\(\log(0.0) = -\infty\)</span> and yielding <code>NaN</code> gradients.</p>
+<p>PyTorch's <code>nn.BCEWithLogitsLoss()</code> avoids this by combining the sigmoid and the log-loss into a single mathematically equivalent expression using the <strong>log-sum-exp trick</strong>:</p>
+<div class="arithmatex">\[\ell(z, y) = \max(z, 0) - z \cdot y + \log\left( 1 + e^{-|z|} \right)\]</div>
+<p>This formula is guaranteed to be numerically stable across the entire real number line <span class="arithmatex">\((-\infty, +\infty)\)</span>.</p>
+<h3 id="positive-weighting-pos_weight">Positive Weighting (<code>pos_weight</code>)</h3>
+<p>To counteract the overwhelming background majority, <code>BCEWithLogitsLoss</code> provides a <code>pos_weight</code> parameter (<span class="arithmatex">\(w_{\text{pos}} &gt; 1\)</span>):</p>
+<div class="arithmatex">\[\ell_{\text{weighted}}(z, y) = - \left[ w_{\text{pos}} \cdot y \log(\sigma(z)) + (1 - y) \log(1 - \sigma(z)) \right]\]</div>
+<p>Setting <span class="arithmatex">\(w_{\text{pos}} = 10.0\)</span> scales the loss contribution of positive defect pixels by <span class="arithmatex">\(10\times\)</span>, preventing background pixels from dominating gradient updates.</p>
+<hr />
+<h2 id="3-soft-dice-loss-differentiable-overlap-optimization">3. Soft Dice Loss: Differentiable Overlap Optimization</h2>
+<p>While BCE evaluates each pixel independently in isolation, the <strong>Sørensen–Dice coefficient</strong> (the competition's primary evaluation metric) evaluates the <strong>global volumetric overlap</strong> between the predicted segmentation region <span class="arithmatex">\(\hat{Y}\)</span> and the ground truth mask <span class="arithmatex">\(Y\)</span>:</p>
+<div class="arithmatex">\[\text{Dice}(\hat{Y}, Y) = \frac{2 |\hat{Y} \cap Y|}{|\hat{Y}| + |Y|} = \frac{2 \sum_i \hat{Y}_i Y_i}{\sum_i \hat{Y}_i + \sum_i Y_i}\]</div>
+<p>However, the standard Dice coefficient uses discrete binary masks <span class="arithmatex">\(\hat{Y} \in \{0, 1\}\)</span>, which require a threshold step function <span class="arithmatex">\(\mathbb{I}(p \ge 0.5)\)</span>. The step function has a derivative of zero everywhere (and is undefined at the threshold), making it <strong>non-differentiable</strong>.</p>
+<h3 id="the-soft-dice-formulation">The Soft Dice Formulation</h3>
+<p>To make Dice amenable to backpropagation with gradient descent, Milletari et al. (2016) introduced <strong>Soft Dice</strong>: replacing discrete binary predictions <span class="arithmatex">\(\hat{Y}_i \in \{0, 1\}\)</span> with <strong>continuous predicted probabilities <span class="arithmatex">\(P_i = \sigma(z_i) \in [0, 1]\)</span></strong>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}}(P, Y) = 1 - \frac{2 \sum_{i} P_i Y_i + \epsilon}{\sum_{i} P_i + \sum_{i} Y_i + \epsilon}\]</div>
+<p>where <span class="arithmatex">\(\epsilon\)</span> (typically <span class="arithmatex">\(1.0\)</span>) is a <strong>smoothing constant</strong>.</p>
+<pre class="highlight"><code>Differentiable Soft Dice Flow:
+Raw Logit z ──► Sigmoid: P = σ(z) ──► Dot Product with Target: Σ(P * Y) ──► Soft Dice Loss
+                                                                            (Fully Differentiable!)</code></pre>
+<h3 id="the-crucial-role-of-the-smoothing-factor-epsilon">The Crucial Role of the Smoothing Factor <span class="arithmatex">\(\epsilon\)</span></h3>
+<p>The smoothing constant <span class="arithmatex">\(\epsilon\)</span> serves two essential mathematical purposes:</p>
+<ol>
+<li><strong>Division by Zero Protection</strong>: If both the prediction and the ground truth are completely empty (<span class="arithmatex">\(P = \vec{0}, Y = \vec{0}\)</span>), the fraction resolves to <span class="arithmatex">\(\frac{0 + \epsilon}{0 + \epsilon} = 1.0\)</span>, yielding a loss of <span class="arithmatex">\(1 - 1.0 = \mathbf{0.0}\)</span>.</li>
+<li>
+<p><strong>Gradient Regularization on Clean Images</strong>:
+   When an image has <strong>zero defects</strong> (<span class="arithmatex">\(Y_i = 0\)</span> for all pixels):</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}}(P, \vec{0}) = 1 - \frac{\epsilon}{\sum_i P_i + \epsilon} = \frac{\sum_i P_i}{\sum_i P_i + \epsilon}\]</div>
+<p>Notice that when <span class="arithmatex">\(Y = \vec{0}\)</span>, Soft Dice acts as a smooth, nonlinear <strong><span class="arithmatex">\(L_1\)</span>-like penalty on false positive probabilities</strong>! Any positive probability mass <span class="arithmatex">\(\sum P_i\)</span> pushes the loss above 0.</p>
+</li>
+</ol>
+<hr />
+<h2 id="4-how-bce-and-dice-respond-to-common-failure-modes">4. How BCE and Dice Respond to Common Failure Modes</h2>
+<p>To understand why practitioners combine both losses, let us compare how BCE and Soft Dice respond to three realistic defect failure modes on a tiny synthetic canvas of <span class="arithmatex">\(16\)</span> pixels (<span class="arithmatex">\(4 \times 4\)</span>).</p>
+<p><img alt="Loss Landscapes BCE vs Dice" src="assets/fig06_loss_landscapes_bce_vs_dice.png" />
+<em>Figure 5.1: Comparative behavior of BCE and Soft Dice under three operational scenarios: missed small defects, scattered false alarm noise, and clean empty masks.</em></p>
+<h3 id="case-1-a-missed-small-defect-1-defect-pixel-on-16-pixel-canvas">Case 1: A Missed Small Defect (1 Defect Pixel on 16-Pixel Canvas)</h3>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(1\)</span> positive pixel, <span class="arithmatex">\(15\)</span> background pixels.</li>
+<li>Prediction: The model outputs <span class="arithmatex">\(P = 0.10\)</span> on the defect pixel (a severe false negative), and <span class="arithmatex">\(P = 0.05\)</span> on background pixels.</li>
+</ul>
+<div class="arithmatex">\[\text{BCE Loss} \approx \frac{1}{16} \left[ - \log(0.10) - 15 \log(0.95) \right] = \frac{1}{16} [2.302 + 0.769] = \mathbf{0.192}\]</div>
+<div class="arithmatex">\[\text{Soft Dice Loss} = 1 - \frac{2(0.10 \times 1) + 1.0}{(0.10 + 15 \times 0.05) + 1.0 + 1.0} = 1 - \frac{1.20}{2.85} = \mathbf{0.579}\]</div>
+<p><strong>Observation</strong>:</p>
+<ul>
+<li>BCE produces a tiny loss value (<span class="arithmatex">\(0.192\)</span>) because 15 background pixels were predicted reasonably well.</li>
+<li>Soft Dice produces a massive loss penalty (<span class="arithmatex">\(0.579\)</span>) because the overlap on the defect was near zero.</li>
+<li><strong>Takeaway</strong>: Soft Dice strongly penalizes missed small defects where BCE remains indifferent.</li>
+</ul>
+<hr />
+<h3 id="case-2-scattered-false-positive-noise-4-tp-4-fp">Case 2: Scattered False Positive Noise (4 TP + 4 FP)</h3>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(4\)</span> positive pixels.</li>
+<li>Prediction: Model correctly predicts all <span class="arithmatex">\(4\)</span> defect pixels with <span class="arithmatex">\(P = 0.95\)</span>, but <strong>also predicts 4 false positive background pixels with <span class="arithmatex">\(P = 0.95\)</span></strong>.</li>
+</ul>
+<div class="arithmatex">\[\text{BCE Loss} \approx \frac{1}{16} \left[ 4(-\log(0.95)) + 4(-\log(0.05)) + 8(-\log(0.95)) \right] \approx \mathbf{0.783}\]</div>
+<div class="arithmatex">\[\text{Soft Dice Loss} = 1 - \frac{2(4 \times 0.95) + 1.0}{(8 \times 0.95) + 4.0 + 1.0} = 1 - \frac{8.60}{12.60} = \mathbf{0.317}\]</div>
+<p><strong>Observation</strong>:</p>
+<ul>
+<li>BCE produces a high loss (<span class="arithmatex">\(0.783\)</span>) because predicting <span class="arithmatex">\(P=0.95\)</span> on background carries a severe individual cross-entropy penalty (<span class="arithmatex">\(-\log(0.05) \approx 2.99\)</span>).</li>
+<li>Soft Dice produces a moderate loss (<span class="arithmatex">\(0.317\)</span>) because the numerator still captured strong true positive overlap (<span class="arithmatex">\(4 \times 0.95\)</span>).</li>
+<li><strong>Takeaway</strong>: BCE acts as a strong anchor against scattered false positive speckles.</li>
+</ul>
+<hr />
+<h3 id="case-3-completely-empty-clean-image-y-vec0">Case 3: Completely Empty Clean Image (<span class="arithmatex">\(Y = \vec{0}\)</span>)</h3>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(0\)</span> defect pixels everywhere.</li>
+<li>Prediction: Model outputs low background noise (<span class="arithmatex">\(P = 0.12\)</span>) across the entire <span class="arithmatex">\(16\)</span>-pixel canvas (<span class="arithmatex">\(\sum P_i = 1.92\)</span>).</li>
+</ul>
+<div class="arithmatex">\[\text{BCE Loss} = - \log(1 - 0.12) = - \log(0.88) \approx \mathbf{0.127}\]</div>
+<div class="arithmatex">\[\text{Soft Dice Loss} = \frac{1.92}{1.92 + 1.0} = \mathbf{0.658}\]</div>
+<p><strong>Observation</strong>:</p>
+<ul>
+<li>Soft Dice heavily penalizes accumulated background probability volume on clean sheets, pushing the model toward zero predictions on empty images.</li>
+</ul>
+<hr />
+<h2 id="5-the-compound-loss-combining-bce-and-soft-dice">5. The Compound Loss: Combining BCE and Soft Dice</h2>
+<p>Because BCE and Soft Dice possess complementary strengths, standard industry practice combines them into a <strong>compound loss objective</strong>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{BCE}} + \lambda \cdot \mathcal{L}_{\text{Dice}} \quad \text{or} \quad \mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{BCE}} + \beta \mathcal{L}_{\text{Dice}}\]</div>
+<pre class="highlight"><code>Complementary Roles in Compound Loss:
+BCE Term:       Provides smooth, well-conditioned pixel gradients; anchors background suppression.
+Soft Dice Term: Directly optimizes regional overlap; protects rare, small defect boundaries.</code></pre>
+<h3 id="the-role-of-the-balancing-coefficient-lambda">The Role of the Balancing Coefficient <span class="arithmatex">\(\lambda\)</span></h3>
+<ul>
+<li>If <span class="arithmatex">\(\lambda \ll 1\)</span> (BCE-dominated): Gradients are smooth and stable, but the model may suffer recall drops on small scratches.</li>
+<li>If <span class="arithmatex">\(\lambda \gg 1\)</span> (Dice-dominated): The model focuses heavily on foreground overlap, but training can become volatile, and predictions may develop noisy borders.</li>
+<li><strong>Do not blindly adopt a fixed <span class="arithmatex">\(\lambda = 1.0\)</span></strong>: You must inspect training logs to ensure neither term overwhelms the other. In standard multi-label setups, <span class="arithmatex">\(\mathcal{L}_{\text{BCE}}\)</span> typically starts around <span class="arithmatex">\(0.6\text{--}0.8\)</span>, while <span class="arithmatex">\(\mathcal{L}_{\text{Dice}}\)</span> starts around <span class="arithmatex">\(0.9\text{--}1.0\)</span>.</li>
+</ul>
+<hr />
+<h2 id="6-reduction-strategies-pixel-vs-batch-vs-class">6. Reduction Strategies: Pixel vs. Batch vs. Class</h2>
+<p>How should loss values be averaged across pixels, images, and defect classes?</p>
+<h3 id="1-spatial-reduction">1. Spatial Reduction</h3>
+<ul>
+<li><code>BCEWithLogitsLoss(reduction='mean')</code> averages across all pixels in the batch (<span class="arithmatex">\(B \times H \times W\)</span>).</li>
+</ul>
+<h3 id="2-dice-batch-reduction-image-level-vs-global-batch">2. Dice Batch Reduction: Image-Level vs. Global Batch</h3>
+<ul>
+<li>
+<p><strong>Image-Level Dice (Default in Segmentation)</strong>: Compute Soft Dice separately for each image <span class="arithmatex">\(b \in \{1..B\}\)</span>, then average:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = \frac{1}{B} \sum_{b=1}^{B} \mathcal{L}_{\text{Dice}}(P_b, Y_b)\]</div>
+</li>
+<li>
+<p><strong>Global Batch Dice</strong>: Sum intersections and sums across the entire mini-batch before dividing:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1 - \frac{2 \sum_{b, i} P_{b, i} Y_{b, i} + \epsilon}{\sum_{b, i} P_{b, i} + \sum_{b, i} Y_{b, i} + \epsilon}\]</div>
+<p><em>Trade-off</em>: Global batch Dice is less volatile on tiny defects, but image-level Dice aligns more closely with per-image competition scoring.</p>
+</li>
+</ul>
+<h3 id="3-class-balanced-reduction">3. Class-Balanced Reduction</h3>
+<p>In multi-label setups, common defects like <code>defect_c</code> occur in far more batches than rare defects like <code>defect_b</code>:</p>
+<ul>
+<li><strong>Unweighted Macro Average</strong>: Average across all 4 classes: <span class="arithmatex">\(\frac{1}{4} \sum_{k=1}^4 \mathcal{L}_k\)</span>.</li>
+<li>
+<p><strong>Class Weighting</strong>: Assign explicit weights <span class="arithmatex">\(w_k\)</span> to underrepresented defect classes:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{total}} = \sum_{k=a}^d w_k \left( \mathcal{L}_{\text{BCE}, k} + \lambda \mathcal{L}_{\text{Dice}, k} \right)\]</div>
+</li>
+</ul>
+<hr />
+<h2 id="7-the-critical-boundary-training-loss-vs-validation-metric">7. The Critical Boundary: Training Loss vs. Validation Metric</h2>
+<p>One of the most frequent conceptual mistakes in competitive machine learning is conflating the <strong>training loss function</strong> with the <strong>validation evaluation metric</strong>.</p>
+<pre class="highlight"><code>Training Loss (Continuous, Smooth, Differentiable):
+Input: Unbounded Logits Z ──► Soft Activations P ──► Continuous Loss Value
+Requirement: Must have non-zero, informative gradients everywhere (d L / d z ≠ 0).
+
+Validation Metric (Discrete, Non-Differentiable, Step-Based):
+Input: Probabilities P ──► Threshold τ ──► Binary Mask {0, 1} ──► Area Filter ──► Discrete Dice
+Requirement: Evaluates the exact operational decision rule of the competition.</code></pre>
+<h3 id="the-invalidation-trap-thresholding-inside-training-loss">The Invalidation Trap: Thresholding Inside Training Loss</h3>
+<p>Never threshold probabilities before feeding them into a loss function:
+<pre class="highlight"><code class="language-python"># FATAL ERROR: Non-differentiable step function breaks backpropagation!
+binary_preds = (torch.sigmoid(logits) &gt; 0.5).float()
+loss = 1.0 - (2 * (binary_preds * targets).sum() / (binary_preds.sum() + targets.sum()))
+loss.backward()  # Gradients are ZERO everywhere! Model will not learn!</code></pre>
+Gradient descent relies entirely on continuous fractional probability adjustments. The loss function must receive soft, differentiable probabilities.</p>
+<hr />
+<h2 id="8-comparative-decision-matrix">8. Comparative Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Loss Formulation</th>
+<th style="text-align: left;">Input Head Requirements</th>
+<th style="text-align: left;">Target Format</th>
+<th style="text-align: left;">Primary Strength</th>
+<th style="text-align: left;">Primary Weakness</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>BCEWithLogitsLoss</strong></td>
+<td style="text-align: left;">Raw Logits <span class="arithmatex">\([B, 4, H, W]\)</span></td>
+<td style="text-align: left;">Binary Float <span class="arithmatex">\(\{0, 1\}\)</span></td>
+<td style="text-align: left;">Smooth gradients; excellent background control.</td>
+<td style="text-align: left;">Vulnerable to foreground class imbalance.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Soft Dice Loss</strong></td>
+<td style="text-align: left;">Probabilities <span class="arithmatex">\(P \in [0, 1]\)</span></td>
+<td style="text-align: left;">Binary Float <span class="arithmatex">\(\{0, 1\}\)</span></td>
+<td style="text-align: left;">Directly optimizes region overlap; immune to pixel imbalance.</td>
+<td style="text-align: left;">Noisy gradients on small batches; can drift on empty masks.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Compound BCE + Dice</strong></td>
+<td style="text-align: left;">Logits &amp; Probabilities</td>
+<td style="text-align: left;">Binary Float <span class="arithmatex">\(\{0, 1\}\)</span></td>
+<td style="text-align: left;"><strong>Best of both worlds</strong>: balances pixel precision with region overlap.</td>
+<td style="text-align: left;">Requires tuning the balancing weight <span class="arithmatex">\(\lambda\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Categorical Cross-Entropy</strong></td>
+<td style="text-align: left;">Raw Logits <span class="arithmatex">\([B, 5, H, W]\)</span></td>
+<td style="text-align: left;">Integer Class <span class="arithmatex">\([B, H, W]\)</span></td>
+<td style="text-align: left;">Enforces strict mutual exclusivity across classes.</td>
+<td style="text-align: left;">Requires background class; causes data loss if labels overlap.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-common-implementation-pitfalls-and-diagnostics">9. Common Implementation Pitfalls and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Applying Sigmoid before BCEWithLogits</strong></td>
+<td style="text-align: left;">Passing probabilities into <code>nn.BCEWithLogitsLoss()</code>.</td>
+<td style="text-align: left;">Loss plateaus around <span class="arithmatex">\(\approx 0.693\)</span>; model fails to converge.</td>
+<td style="text-align: left;">Check input range: logits must span <span class="arithmatex">\((-\infty, +\infty)\)</span>, not <span class="arithmatex">\([0, 1]\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Omitting Smoothing <span class="arithmatex">\(\epsilon\)</span></strong></td>
+<td style="text-align: left;">Soft Dice denominator has <span class="arithmatex">\(\epsilon = 0\)</span>.</td>
+<td style="text-align: left;">Loss explodes to <code>NaN</code> on the first clean, defect-free training image.</td>
+<td style="text-align: left;">Always set <span class="arithmatex">\(\epsilon \ge 1.0\)</span> in the Soft Dice formula.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Target Dtype Mismatch in BCE</strong></td>
+<td style="text-align: left;">Passing <code>torch.long</code> targets to <code>BCEWithLogitsLoss</code>.</td>
+<td style="text-align: left;"><code>RuntimeError: result type Float can't be cast to Long</code>.</td>
+<td style="text-align: left;">Ensure targets are <code>torch.float32</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Unbalanced Loss Scales</strong></td>
+<td style="text-align: left;">BCE is <span class="arithmatex">\(\approx 0.05\)</span> while Dice is <span class="arithmatex">\(\approx 0.95\)</span>.</td>
+<td style="text-align: left;">Gradients from Dice completely overwhelm BCE, causing unstable optimization.</td>
+<td style="text-align: left;">Log both loss components separately to W&B; adjust <span class="arithmatex">\(\lambda\)</span> to balance magnitudes.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-ungraded-try-it-activity-compute-bce-and-soft-dice-by-hand">10. Ungraded Try-It Activity: Compute BCE and Soft Dice by Hand</h2>
+<p>Work through this small numerical calculation to verify your understanding:</p>
+<p>Suppose you have a tiny <span class="arithmatex">\(2 \times 2\)</span> image patch (<span class="arithmatex">\(4\)</span> pixels total):</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(Y = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 0 \end{bmatrix}\)</span> (exactly 1 defect pixel at top-left).</li>
+<li>Predicted Probabilities: <span class="arithmatex">\(P = \begin{bmatrix} 0.8 &amp; 0.2 \\ 0.1 &amp; 0.1 \end{bmatrix}\)</span>.</li>
+</ul>
+<ol>
+<li>Compute the intersection <span class="arithmatex">\(\sum P_i Y_i\)</span>.</li>
+<li>Compute the sum of predicted probabilities <span class="arithmatex">\(\sum P_i\)</span> and the ground truth sum <span class="arithmatex">\(\sum Y_i\)</span>.</li>
+<li>
+<p>Calculate <strong>Soft Dice Loss</strong> with smoothing constant <span class="arithmatex">\(\epsilon = 1.0\)</span>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1 - \frac{2 \sum P_i Y_i + 1.0}{\sum P_i + \sum Y_i + 1.0}\]</div>
+</li>
+<li>
+<p>Compute the pixel-wise BCE loss for the top-left pixel (<span class="arithmatex">\(y=1, p=0.8\)</span>) and top-right pixel (<span class="arithmatex">\(y=0, p=0.2\)</span>).</p>
+</li>
+</ol>
+<details>
+<summary>Click here to view the worked solution</summary>
+<ol>
+<li>
+<p><strong>Intersection</strong>:</p>
+<div class="arithmatex">\[\sum P_i Y_i = (0.8 \times 1) + (0.2 \times 0) + (0.1 \times 0) + (0.1 \times 0) = \mathbf{0.80}\]</div>
+</li>
+<li>
+<p><strong>Cardinalities</strong>:</p>
+<div class="arithmatex">\[\sum P_i = 0.8 + 0.2 + 0.1 + 0.1 = \mathbf{1.20}\]</div>
+<div class="arithmatex">\[\sum Y_i = 1 + 0 + 0 + 0 = \mathbf{1.00}\]</div>
+</li>
+<li>
+<p><strong>Soft Dice Loss</strong>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1 - \frac{2(0.80) + 1.0}{1.20 + 1.00 + 1.0} = 1 - \frac{1.60 + 1.0}{3.20} = 1 - \frac{2.60}{3.20} = 1 - 0.8125 = \mathbf{0.1875}\]</div>
+</li>
+<li>
+<p><strong>Pixel-wise BCE</strong>:</p>
+<ul>
+<li>Top-left (<span class="arithmatex">\(y=1, p=0.8\)</span>): <span class="arithmatex">\(-\log(0.8) \approx \mathbf{0.2231}\)</span></li>
+<li>Top-right (<span class="arithmatex">\(y=0, p=0.2\)</span>): <span class="arithmatex">\(-\log(1 - 0.2) = -\log(0.8) \approx \mathbf{0.2231}\)</span>
+ Both pixels contribute equally to the BCE loss!</li>
+</ul>
+</li>
+</ol>
+</details>
+<p>To run comparative loss simulations on synthetic masks using PyTorch on CPU, run:
+👉 <a href="examples/toy_loss_behavior.py"><code>docs/milestone_3_student_guide/examples/toy_loss_behavior.py</code></a></p>
+<hr />
+<h2 id="11-primary-sources-further-reading">11. Primary Sources &amp; Further Reading</h2>
+<ul>
+<li><strong>Milletari, F., Navab, N., &amp; Ahmadi, S. A. (2016)</strong>. <em>V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation</em>. 3DV. <a href="https://arxiv.org/abs/1606.04797">arXiv:1606.04797</a>. Introduced the differentiable Soft Dice loss for imbalanced segmentation.</li>
+<li><strong>Lin, T. Y., Goyal, P., Girshick, R., He, K., &amp; Dollár, P. (2017)</strong>. <em>Focal Loss for Dense Object Detection</em>. ICCV. <a href="https://arxiv.org/abs/1708.02002">arXiv:1708.02002</a>. Formulated dynamic scaling to prevent easy negative background dominance.</li>
+<li><strong>Sudre, C. H., et al. (2017)</strong>. <em>Generalised Dice overlap as a deep learning loss function for highly unbalanced segmentations</em>. DLMIA. <a href="https://arxiv.org/abs/1707.03237">arXiv:1707.03237</a>. Extended Dice loss with class-frequency weighting.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_output_heads_and_target_semantics.html">← Guide 04 · Output Heads &amp; Semantics</a><a href="guide_06_experimental_design_and_model_evaluation.html">Guide 06 · Systematic Model Exploration →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

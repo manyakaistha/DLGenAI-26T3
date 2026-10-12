@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 05 · Metric Governance &amp; Overfitting · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 05 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-naive-dice-trap">1. Observable Problem: The "Naive Dice Trap"</a></li>
+<li><a href="#2-deconstructing-the-evaluation-metric-the-22-contingency-grid">2. Deconstructing the Evaluation Metric: The 2×2 Contingency Grid</a></li>
+<li><a href="#3-the-official-702010-competition-score-architecture">3. The Official 70/20/10 Competition Score Architecture</a></li>
+<li><a href="#4-learning-curve-taxonomy-diagnosing-model-health">4. Learning Curve Taxonomy: Diagnosing Model Health</a></li>
+<li><a href="#5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</a></li>
+<li><a href="#6-implementation-pattern-logging-comprehensive-validation-metrics">6. Implementation Pattern: Logging Comprehensive Validation Metrics</a></li>
+<li><a href="#7-ungraded-try-it-interpreting-a-metric-report">7. Ungraded "Try It": Interpreting a Metric Report</a></li>
+<li><a href="#8-authoritative-references">8. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="metric-governance-validation-dice-empty-pairs-and-overfitting">Metric Governance: Validation Dice, Empty Pairs, and Overfitting</h1>
+<p>In computer vision competitions, the gap between local validation scores and leaderboard reality is the most frequent source of student frustration. A student might excitedly report: <em>"My validation Dice reached 0.89!"</em>—only to submit their predictions and receive a disappointing leaderboard score of 0.42.</p>
+<p>How can a model achieve a local Dice of 0.89 and yet fail on the competition leaderboard? The answer lies in the <strong>mathematical mechanics of empty masks</strong> and the <strong>composition of the official competition metric</strong>.</p>
+<p>This guide unravels the "Naive Dice Trap," decomposes the 70/20/10 competition evaluation formula, maps out six diagnostic learning curve archetypes, and establishes strict metric governance to detect overfitting before submitting.</p>
+<hr />
+<h2 id="1-observable-problem-the-naive-dice-trap">1. Observable Problem: The "Naive Dice Trap"</h2>
+<p>To understand why aggregate validation numbers can be wildly misleading, examine this mathematical paradox:</p>
+<p>Suppose you write a "lazy" baseline script that ignores all input images and outputs an <strong>empty prediction (all zeros)</strong> for every defect channel across the entire validation dataset.</p>
+<p>What is the resulting Dice score?</p>
+<pre class="highlight"><code>Dataset Setup:
+Validation Set: 2,000 image strips x 4 defect classes = 8,000 image-class pairs.
+Defect Distribution:
+• 1,200 pairs contain real defects (GT Positive: |Y| &gt; 0).
+• 6,800 pairs are completely clean (GT Empty: |Y| = 0).
+
+Lazy Model Output: All Zeros (|P| = 0 for all 8,000 pairs).
+
+Scoring the 8,000 pairs using the standard Kaggle empty-pair convention:
+1. For the 1,200 positive pairs:
+   Prediction is empty -&gt; Dice = (2 * 0) / (0 + |Y|) = 0.00
+2. For the 6,800 clean pairs:
+   Both GT and Prediction are empty -&gt; Convention defines Dice = 1.00!
+
+Aggregate Naive Mean Dice:
+Dice_mean = ( (1,200 * 0.00) + (6,800 * 1.00) ) / 8,000 = 6,800 / 8,000 = 0.8500!</code></pre>
+<blockquote>
+<p>[!CAUTION]
+<strong>The Naive Dice Trap</strong>:
+A model that predicts <strong>nothing at all</strong> achieves an <span class="arithmatex">\(85\%\)</span> Naive Mean Dice score! If you monitor <code>dice_mean</code> during training, an untrained model that predicts all background will appear to outperform a real model that detects defects but occasionally makes false alarms on clean material.</p>
+</blockquote>
+<hr />
+<h2 id="2-deconstructing-the-evaluation-metric-the-22-contingency-grid">2. Deconstructing the Evaluation Metric: The 2×2 Contingency Grid</h2>
+<p>To prevent this distortion, we must examine the <strong>contingency grid of image-class pairs</strong>:</p>
+<p><img alt="Evaluation Contingency Grid" src="assets/fig08_metric_dice_decomposition.png" />
+<em>Figure 5.1: The 2×2 contingency matrix of image-class pairs. When both ground truth and predictions are empty (Quadrant 4), the score convention assigns 1.0, diluting naive averages. True segmentation capability lives in Quadrant 1 and Quadrant 2.</em></p>
+<p>For any individual image <span class="arithmatex">\(i\)</span> and defect channel <span class="arithmatex">\(c\)</span>:</p>
+<div class="arithmatex">\[\text{Dice}(P, Y) = \begin{cases} 
+1.0 &amp; \text{if } |P| = 0 \text{ and } |Y| = 0 \text{ (True Negative Clean Pair)} \\
+0.0 &amp; \text{if } |P| &gt; 0 \text{ and } |Y| = 0 \text{ (False Positive Pair)} \\
+0.0 &amp; \text{if } |P| = 0 \text{ and } |Y| &gt; 0 \text{ (False Negative Missed Defect)} \\
+\frac{2 \sum (P \cap Y)}{\sum P + \sum Y} &amp; \text{if } |P| &gt; 0 \text{ and } |Y| &gt; 0 \text{ (True Positive Overlap)}
+\end{cases}\]</div>
+<h3 id="the-three-true-operational-metrics">The Three True Operational Metrics:</h3>
+<p>Instead of relying on a single naive average, professional segmentation pipelines track three separate quantities:</p>
+<h4 id="1-foreground-dice-foreground_dice">1. Foreground Dice (<code>foreground_dice</code>)</h4>
+<p>Evaluates Dice overlap <strong>exclusively on ground-truth positive pairs</strong> (<span class="arithmatex">\(|Y| &gt; 0\)</span>):</p>
+<div class="arithmatex">\[\text{Dice}_{\text{FG}} = \frac{1}{|\mathcal{P}|} \sum_{(i, c) \in \mathcal{P}} \text{Dice}(P_{i, c}, Y_{i, c})\]</div>
+<p>where <span class="arithmatex">\(\mathcal{P} = \{ (i, c) \mid |Y_{i, c}| &gt; 0 \}\)</span> is the set of positive pairs.</p>
+<ul>
+<li>On our "lazy all-zeros model": <span class="arithmatex">\(\text{Dice}_{\text{FG}} = \mathbf{0.0000}\)</span> (Revealing true failure!).</li>
+</ul>
+<h4 id="2-empty-pair-specificity-empty_pair_accuracy">2. Empty-Pair Specificity (<code>empty_pair_accuracy</code>)</h4>
+<p>Evaluates the model's ability to stay completely silent on clean material (<span class="arithmatex">\(|Y| = 0\)</span>):</p>
+<div class="arithmatex">\[\text{Spec}_{\text{empty}} = \frac{1}{|\mathcal{E}|} \sum_{(i, c) \in \mathcal{E}} \mathbb{I}(|P_{i, c}| = 0)\]</div>
+<p>where <span class="arithmatex">\(\mathcal{E} = \{ (i, c) \mid |Y_{i, c}| = 0 \}\)</span> is the set of empty pairs.</p>
+<h4 id="3-false-positive-pixel-penalty-false_positive_pixel_score">3. False-Positive Pixel Penalty (<code>false_positive_pixel_score</code>)</h4>
+<p>Penalizes the total canvas area of hallucinated defect pixels on clean material:</p>
+<div class="arithmatex">\[\text{Score}_{\text{FP-pixels}} = 1.0 - \frac{1}{|\mathcal{E}|} \sum_{(i, c) \in \mathcal{E}} \frac{|P_{i, c}|}{\text{Canvas Pixels}}\]</div>
+<p>where <span class="arithmatex">\(\text{Canvas Pixels} = 128 \times 800 = 102,400\)</span>.</p>
+<hr />
+<h2 id="3-the-official-702010-competition-score-architecture">3. The Official 70/20/10 Competition Score Architecture</h2>
+<p>The official competition leaderboard score balances detection overlap against false alarm suppression using a weighted composite formula:</p>
+<div class="arithmatex">\[\text{Competition Score} = 0.70 \times \text{Foreground Dice} + 0.20 \times \text{False-Positive Pixel Score} + 0.10 \times \text{Empty-Pair Accuracy}\]</div>
+<p>Let us compute the score for our "lazy all-zeros model" under the true official metric:</p>
+<div class="arithmatex">\[\text{Score}_{\text{lazy}} = (0.70 \times 0.00) + (0.20 \times 1.00) + (0.10 \times 1.00) = 0.00 + 0.20 + 0.10 = \mathbf{0.3000}\]</div>
+<p>Under the true metric, the lazy model receives an abysmal <span class="arithmatex">\(0.30\)</span>—matching its actual zero-utility reality!</p>
+<h3 id="decision-threshold-trade-offs-tau">Decision Threshold Trade-offs (<span class="arithmatex">\(\tau\)</span>)</h3>
+<p>Continuous sigmoid probabilities <span class="arithmatex">\(P \in [0, 1]\)</span> are converted to binary masks via a decision threshold <span class="arithmatex">\(\tau\)</span>:</p>
+<div class="arithmatex">\[\hat{Y}_{i, c} = \mathbb{I}(P_{i, c} \ge \tau)\]</div>
+<ul>
+<li><strong>Lowering <span class="arithmatex">\(\tau\)</span> (e.g. <span class="arithmatex">\(\tau = 0.3\)</span>)</strong>: Increases sensitivity. Catches faint, low-contrast scratches (raising <span class="arithmatex">\(\text{Dice}_{\text{FG}}\)</span>), but causes minor surface noise to be classified as defects, devastating <span class="arithmatex">\(\text{Spec}_{\text{empty}}\)</span> and <span class="arithmatex">\(\text{Score}_{\text{FP}}\)</span>.</li>
+<li><strong>Raising <span class="arithmatex">\(\tau\)</span> (e.g. <span class="arithmatex">\(\tau = 0.7\)</span>)</strong>: Increases specificity. Suppresses false alarms on clean material, but misses faint longitudinal micro-cracks.</li>
+</ul>
+<p>Calibrating <span class="arithmatex">\(\tau\)</span> against the <strong>composite competition score</strong> on held-out validation data is essential before submitting.</p>
+<hr />
+<h2 id="4-learning-curve-taxonomy-diagnosing-model-health">4. Learning Curve Taxonomy: Diagnosing Model Health</h2>
+<p><img alt="Learning Curve Archetypes" src="assets/fig07_learning_curves_archetypes.png" />
+<em>Figure 5.2: Diagnostic taxonomy of deep segmentation learning curves across 25 training epochs, contrasting healthy generalization against overfitting, underfitting, and metric-loss divergence.</em></p>
+<p>When monitoring your training and validation curves, watch for these distinct archetypes:</p>
+<h3 id="archetype-1-healthy-generalization">Archetype 1: Healthy Generalization</h3>
+<ul>
+<li><strong>Symptom</strong>: Training loss descends steadily. Validation loss descends in tandem, flattening around Epoch 18. Validation Foreground Dice rises smoothly from <span class="arithmatex">\(0.20\)</span> to <span class="arithmatex">\(0.64\)</span>.</li>
+<li><strong>Mechanism</strong>: The model is learning robust, invariant features (scratch aspect ratios, inclusion textures) that generalize across unseen strips.</li>
+<li><strong>Action</strong>: Check if a learning-rate scheduler decay can anneal boundaries further; prepare checkpoint for post-processing calibration.</li>
+</ul>
+<h3 id="archetype-2-severe-overfitting">Archetype 2: Severe Overfitting</h3>
+<ul>
+<li><strong>Symptom</strong>: Training loss plummets toward near-zero (<span class="arithmatex">\(0.04\)</span>), while validation loss reaches a minimum at Epoch 8 and surges upward (<span class="arithmatex">\(0.22 \to 0.45\)</span>). Validation Dice degrades from <span class="arithmatex">\(0.62\)</span> down to <span class="arithmatex">\(0.51\)</span>.</li>
+<li><strong>Mechanism</strong>: The high-capacity network has memorized specific sensor noise patterns and roller imperfections unique to the training fold.</li>
+<li><strong>Action</strong>: Activate early stopping; increase data augmentation (flips, contrast jitter, CLAHE); increase weight decay; consider dropping model capacity.</li>
+</ul>
+<h3 id="archetype-3-severe-underfitting-high-bias">Archetype 3: Severe Underfitting (High Bias)</h3>
+<ul>
+<li><strong>Symptom</strong>: Both training loss and validation loss flatten early at high values (<span class="arithmatex">\(0.55\)</span>). Validation Dice remains stagnant below <span class="arithmatex">\(0.25\)</span>.</li>
+<li><strong>Mechanism</strong>: The model lacks capacity or representational power, or the learning rate is trapped in a bad plateau.</li>
+<li><strong>Action</strong>: Verify data loading and target normalization; verify that skip connections are intact; switch to a more expressive backbone; verify loss function heads.</li>
+</ul>
+<h3 id="archetype-4-metric-loss-divergence-probability-calibration-drift">Archetype 4: Metric-Loss Divergence (Probability Calibration Drift)</h3>
+<ul>
+<li><strong>Symptom</strong>: Training loss and validation loss both increase slightly, yet Validation Foreground Dice continues rising!</li>
+<li><strong>Mechanism</strong>: The model's raw probability calibration is shifting (predicting higher logits on borderline pixels, incurring BCE penalty), but its rank-ordering remains superior, resulting in cleaner thresholded masks.</li>
+<li><strong>Action</strong>: Do not abort training based on loss alone. Follow the task-specific metric (<code>foreground_dice</code>) as your primary checkpoint selection signal.</li>
+</ul>
+<hr />
+<h2 id="5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Observable Symptom in Logs</th>
+<th style="text-align: left;">Root Mechanism</th>
+<th style="text-align: left;">Concrete Measurement</th>
+<th style="text-align: left;">Next Step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Local validation Dice is <span class="arithmatex">\(0.85+\)</span>, but public leaderboard score is <span class="arithmatex">\(&lt; 0.45\)</span>.</td>
+<td style="text-align: left;">The Naive Dice Trap: local code averaged all pairs including true-negative clean pairs (<span class="arithmatex">\(1.0\)</span>).</td>
+<td style="text-align: left;">Compute <code>foreground_dice</code> on positive pairs only; evaluate empty-pair false positive count.</td>
+<td style="text-align: left;">Switch checkpoint selection and reporting to <code>foreground_dice</code> or the 70/20/10 proxy.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Training loss reaches <span class="arithmatex">\(0.05\)</span>, but validation Foreground Dice plateaus at <span class="arithmatex">\(0.35\)</span>.</td>
+<td style="text-align: left;">Overfitting to training textures; model memorizing specific strips rather than invariant defect features.</td>
+<td style="text-align: left;">Calculate training vs. validation loss gap; inspect training vs. validation predicted masks.</td>
+<td style="text-align: left;">Introduce early stopping; increase geometric augmentations (horizontal/vertical flips); increase weight decay.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Validation curves oscillate violently from epoch to epoch (e.g. Dice jumps <span class="arithmatex">\(0.45 \leftrightarrow 0.62\)</span>).</td>
+<td style="text-align: left;">Small validation sample size or severe rare-class variance (the "split lottery").</td>
+<td style="text-align: left;">Check validation fold class support count; verify combination stratification.</td>
+<td style="text-align: left;">Ensure validation split uses combination stratification; increase patience <span class="arithmatex">\(p \ge 5\)</span> to ignore single-epoch jitter.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Best epoch identified by validation loss is completely different from best epoch identified by Dice.</td>
+<td style="text-align: left;">BCE loss evaluates soft uncalibrated probabilities, while Dice evaluates thresholded binary decisions.</td>
+<td style="text-align: left;">Compare correlation between validation loss and <code>foreground_dice</code> across all epochs.</td>
+<td style="text-align: left;">Select checkpoints using <code>foreground_dice</code> or <code>score_pair_proxy</code>; loss is an optimization proxy, not the competition goal.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-implementation-pattern-logging-comprehensive-validation-metrics">6. Implementation Pattern: Logging Comprehensive Validation Metrics</h2>
+<p>Here is how to structure a leak-free validation evaluation function in PyTorch:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+import torch
+
+@torch.inference_mode()
+def evaluate_validation_run(
+    model: torch.nn.Module,
+    val_loader: torch.utils.data.DataLoader,
+    threshold: float = 0.5,
+    device: torch.device = torch.device("cuda"),
+) -&gt; dict[str, float]:
+    """Computes transparent, leak-free metrics decomposed across positive and clean pairs."""
+    model.eval()
+
+    all_dices = []
+    all_pred_areas = []
+    all_gt_areas = []
+
+    for batch in val_loader:
+        images = batch["image"].to(device)
+        targets = batch["mask"].cpu().numpy().astype(bool)  # [B, 4, 128, 800]
+
+        logits = model(images)
+        probs = torch.sigmoid(logits).cpu().numpy()
+        preds = (probs &gt;= threshold)  # [B, 4, 128, 800]
+
+        # Calculate intersection and areas across spatial dimensions (axis 2, 3)
+        tp = np.logical_and(preds, targets).sum(axis=(-2, -1))
+        pa = preds.sum(axis=(-2, -1))
+        ya = targets.sum(axis=(-2, -1))
+
+        total = pa + ya
+        # Compute Dice with empty-pair convention = 1.0
+        dice = np.divide(2.0 * tp, total, out=np.ones_like(total, dtype=float), where=(total &gt; 0))
+
+        all_dices.append(dice)
+        all_pred_areas.append(pa)
+        all_gt_areas.append(ya)
+
+    dices = np.concatenate(all_dices, axis=0)       # [N, 4]
+    pred_areas = np.concatenate(all_pred_areas, axis=0)
+    gt_areas = np.concatenate(all_gt_areas, axis=0)
+
+    # Positive pairs vs. Empty pairs
+    is_positive = (gt_areas &gt; 0)
+    is_empty = (gt_areas == 0)
+
+    # 1. Naive Mean Dice (For diagnostic awareness only!)
+    dice_naive = float(dices.mean())
+
+    # 2. Foreground Dice (Only on positive pairs)
+    dice_fg = float(dices[is_positive].mean()) if is_positive.any() else 0.0
+
+    # 3. Clean-Image Specificity (Empty accuracy)
+    empty_acc = float((pred_areas[is_empty] == 0).mean()) if is_empty.any() else 1.0
+
+    # 4. FP Pixel Score
+    canvas_pixels = 128 * 800
+    fp_pixel_score = float(1.0 - (pred_areas[is_empty] / canvas_pixels).mean()) if is_empty.any() else 1.0
+
+    # 5. Official Competition Proxy Score
+    competition_proxy = (0.70 * dice_fg) + (0.20 * fp_pixel_score) + (0.10 * empty_acc)
+
+    return {
+        "val/naive_mean_dice": dice_naive,
+        "val/foreground_dice": dice_fg,
+        "val/empty_pair_accuracy": empty_acc,
+        "val/fp_pixel_score": fp_pixel_score,
+        "val/competition_proxy": competition_proxy,
+    }</code></pre>
+<hr />
+<h2 id="7-ungraded-try-it-interpreting-a-metric-report">7. Ungraded "Try It": Interpreting a Metric Report</h2>
+<p>A student shares the following metric table from their latest validation evaluation:</p>
+<pre class="highlight"><code class="language-text">Validation Report:
+• Naive Mean Dice: 0.8842
+• Foreground Dice: 0.4120
+• Empty-Pair Accuracy (Specificity): 0.9650
+• False-Positive Pixel Score: 0.9980
+• Official Competition Proxy: 0.6811</code></pre>
+<p><strong>Diagnostic Questions</strong>:</p>
+<ol>
+<li>Why is <code>Naive Mean Dice</code> (<span class="arithmatex">\(0.8842\)</span>) more than double the <code>Foreground Dice</code> (<span class="arithmatex">\(0.4120\)</span>)?</li>
+<li>If this student changes post-processing thresholds and observes that <code>Foreground Dice</code> rises to <span class="arithmatex">\(0.5200\)</span>, but <code>Empty-Pair Accuracy</code> drops to <span class="arithmatex">\(0.8100\)</span>, what is the new <code>Competition Proxy Score</code>?</li>
+<li>Did the threshold change represent a genuine overall improvement according to the competition objective?</li>
+</ol>
+<hr />
+<h2 id="8-authoritative-references">8. Authoritative References</h2>
+<ul>
+<li>Dice, L. R. (1945). <em>Measures of the Amount of Ecologic Association Between Species</em>. Ecology, 26(3), 297–302.</li>
+<li>Sørensen, T. (1948). <em>A method of establishing groups of equal amplitude in plant sociology</em>. Kongelige Danske Videnskabernes Selskab.</li>
+<li>Taha, A. A., &amp; Hanbury, A. (2015). <em>Metrics for evaluating 3D medical image segmentation: analysis, selection, and tool</em>. BMC Medical Imaging. (Comprehensive review of overlap metrics, empty set conventions, and precision-recall trade-offs).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_mixed_precision_amp_and_gpu_memory.html">← Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html">Guide 06 · Validation Error Analysis →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

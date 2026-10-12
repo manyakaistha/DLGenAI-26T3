@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 05 · W&amp;B Experiment Tracking · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 05 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-experiment-tracking-lifecycle">1. Motivation: The Experiment Tracking Lifecycle</a></li>
+<li><a href="#2-safe-credential-handling-never-hardcode-api-keys">2. Safe Credential Handling: Never Hardcode API Keys</a></li>
+<li><a href="#3-configuration-metadata-logging">3. Configuration &amp; Metadata Logging</a></li>
+<li><a href="#4-metric-synchronization-the-step-axis-trap">4. Metric Synchronization: The Step Axis Trap</a></li>
+<li><a href="#5-visualizing-predictions-segmentation-mask-overlays">5. Visualizing Predictions: Segmentation Mask Overlays</a></li>
+<li><a href="#6-model-artifacts-saving-checkpoints-with-lineage">6. Model Artifacts: Saving Checkpoints with Lineage</a></li>
+<li><a href="#7-the-fair-comparison-protocol">7. The Fair Comparison Protocol</a></li>
+<li><a href="#8-common-mistakes-and-diagnostics">8. Common Mistakes and Diagnostics</a></li>
+<li><a href="#9-try-it-simulate-an-offline-wb-tracking-loop">9. Try It: Simulate an Offline W&amp;B Tracking Loop</a></li>
+<li><a href="#10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="experiment-tracking-with-weights-biases">Experiment Tracking with Weights &amp; Biases</h1>
+<p>In machine learning research and Kaggle competitions, raw intuition is not enough. You will iterate across multiple model architectures (U-Net, FPN, DeepLabV3+), test diverse loss functions (BCE, Dice, Focal), evaluate different learning rate schedules, and sweep decision thresholds.</p>
+<p>If you track these experiments using terminal printouts, text files, or manual spreadsheets, critical details will inevitably slip through the cracks: <em>Which learning rate produced that 0.65 Dice score? Did that checkpoint use horizontal flips? What did the predicted masks look like when recall collapsed on defect_b?</em></p>
+<p><strong>Weights &amp; Biases (W&amp;B)</strong> provides an experiment tracking platform that automatically records configurations, synchronizes training and validation metrics, archives model checkpoints as versioned artifacts, and renders interactive qualitative segmentation overlays.</p>
+<p>This guide teaches the complete lifecycle of a W&amp;B tracking workflow, emphasizes <strong>step alignment and fair comparisons</strong>, and details <strong>safe credential handling</strong>.</p>
+<hr />
+<h2 id="1-motivation-the-experiment-tracking-lifecycle">1. Motivation: The Experiment Tracking Lifecycle</h2>
+<p>A deep learning experiment is more than just final validation numbers. It is a reproducible record consisting of:</p>
+<ol>
+<li><strong>Inputs</strong>: Code version (git commit), dataset partition hash, hyperparameters, random seeds.</li>
+<li><strong>Process</strong>: Training dynamics, loss curves, gradient norms, learning rate decay.</li>
+<li><strong>Outputs</strong>: Quantitative validation metrics (per-class Dice, IoU, empty-image accuracy), qualitative mask overlays, and saved model weights.</li>
+</ol>
+<pre class="highlight"><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                             The W&amp;B Run Cycle                               │
+├─────────────────────┬───────────────────────────┬───────────────────────────┤
+│    1. Initialize    │       2. Log Epoch        │        3. Finalize        │
+│  wandb.init(...)    │   wandb.log({metrics})    │      wandb.finish()       │
+├─────────────────────┼───────────────────────────┼───────────────────────────┤
+│ • Model config      │ • Train loss (BCE, Dice)  │ • Log best model artifact │
+│ • Hyperparameters   │ • Val Dice &amp; IoU per-class│ • Record run summary      │
+│ • Split seed &amp; fold │ • Qualitative mask images │ • Flush telemetry buffer  │
+└─────────────────────┴───────────────────────────┴───────────────────────────┘</code></pre>
+<p><img alt="W&amp;B Experiment Dashboard" src="assets/fig05_wandb_experiment_dashboard.png" />
+<em>Figure 5.1: Weights &amp; Biases run lifecycle: configuration logging, synchronized metric tracking, qualitative mask overlay inspection, and versioned model artifact storage.</em></p>
+<hr />
+<h2 id="2-safe-credential-handling-never-hardcode-api-keys">2. Safe Credential Handling: Never Hardcode API Keys</h2>
+<p>When setting up W&amp;B, students frequently make a critical security mistake: pasting their raw W&amp;B API key directly into Python scripts or Jupyter notebooks:</p>
+<pre class="highlight"><code class="language-python"># CRITICAL SECURITY VULNERABILITY - NEVER DO THIS!
+wandb.login(key="d83f98234a...")  # If committed to git or shared, your account is exposed!</code></pre>
+<h3 id="the-three-safe-credential-protocols">The Three Safe Credential Protocols:</h3>
+<h4 id="protocol-1-environment-variables-recommended-for-local-machines">Protocol 1: Environment Variables (Recommended for Local Machines)</h4>
+<p>Set your API key in your terminal shell environment before executing Python:
+<pre class="highlight"><code class="language-bash">export WANDB_API_KEY="your_private_api_key_here"
+uv run python src/train.py</code></pre>
+Inside Python, <code>wandb.init()</code> will automatically detect the environment variable without any key appearing in your code.</p>
+<h4 id="protocol-2-kaggle-secrets-recommended-for-cloud-notebooks">Protocol 2: Kaggle Secrets (Recommended for Cloud Notebooks)</h4>
+<p>In Kaggle Notebooks:</p>
+<ol>
+<li>Navigate to <strong>Add-ons</strong> <span class="arithmatex">\(\to\)</span> <strong>Secrets</strong>.</li>
+<li>Add a new secret with Label <code>WANDB_API_KEY</code> and your key as the Value.</li>
+<li>In your notebook initialization cell:
+   <pre class="highlight"><code class="language-python">from kaggle_secrets import UserSecretsClient
+import wandb
+user_secrets = UserSecretsClient()
+wandb_api_key = user_secrets.get_secret("WANDB_API_KEY")
+wandb.login(key=wandb_api_key)</code></pre></li>
+</ol>
+<h4 id="protocol-3-offline-mode-recommended-for-air-gapped-or-quick-smoke-tests">Protocol 3: Offline Mode (Recommended for Air-Gapped or Quick Smoke Tests)</h4>
+<p>If you are developing offline or running quick 1-epoch sanity checks, disable network communication entirely:
+<pre class="highlight"><code class="language-bash">export WANDB_MODE="offline"
+# Or inside Python:
+os.environ["WANDB_MODE"] = "offline"</code></pre>
+W&amp;B will record all metrics, charts, and artifacts locally to a <code>wandb/</code> folder on disk without attempting to contact external servers. You can later sync offline runs using <code>wandb sync wandb/offline-run-...</code>.</p>
+<hr />
+<h2 id="3-configuration-metadata-logging">3. Configuration &amp; Metadata Logging</h2>
+<p>Before training begins, log every hyperparameter and environment variable required to reproduce the run.</p>
+<pre class="highlight"><code class="language-python">import wandb
+
+config = {
+    # Architecture
+    "architecture": "unet",
+    "encoder_backbone": "resnet34",
+    "encoder_weights": "imagenet",
+    "in_channels": 1,
+    "num_classes": 4,
+    "head_type": "sigmoid",  # or "softmax"
+
+    # Optimization
+    "epochs": 15,
+    "batch_size": 8,
+    "learning_rate": 1e-3,
+    "weight_decay": 1e-4,
+    "lr_scheduler": "cosine",
+    "loss_function": "bce_dice_combo",
+
+    # Dataset &amp; Partition
+    "image_shape": [128, 800],
+    "train_split_ratio": 0.8,
+    "split_seed": 42,
+    "data_version": "v1.0_clean",
+}
+
+run = wandb.init(
+    project="industrial-surface-anomaly-segmentation",
+    name="unet-resnet34-baseline-fold0",
+    config=config,
+    notes="Initial baseline training with BCE+Dice loss on combination-stratified holdout.",
+    tags=["baseline", "unet", "fold0"],
+)</code></pre>
+<hr />
+<h2 id="4-metric-synchronization-the-step-axis-trap">4. Metric Synchronization: The Step Axis Trap</h2>
+<p>A frequent source of broken, unreadable W&amp;B dashboards is <strong>mismatched step axes</strong>.</p>
+<p>By default, every call to <code>wandb.log(...)</code> increments an internal integer counter called <code>_step</code>. If you log batch-level training losses inside your inner loop and epoch-level validation metrics in your outer loop:</p>
+<ul>
+<li>Batch training losses are logged at steps <span class="arithmatex">\(1, 2, 3, \dots, 500\)</span>.</li>
+<li>Validation metrics are logged at step <span class="arithmatex">\(501\)</span> (labeled epoch 1).</li>
+<li>Subsequent batch losses resume at steps <span class="arithmatex">\(502, \dots, 1000\)</span>.</li>
+</ul>
+<p>The resulting W&amp;B charts become jagged, discontinuous, or out-of-sync.</p>
+<h3 id="the-correct-pattern-explicit-step-synchronization">The Correct Pattern: Explicit Step Synchronization</h3>
+<p>Define an explicit step axis—typically <code>epoch</code>—or log a consolidated metric dictionary at the end of each epoch:</p>
+<pre class="highlight"><code class="language-python">for epoch in range(1, num_epochs + 1):
+    train_loss, train_bce, train_dice = train_one_epoch(model, train_loader, optimizer, criterion)
+    val_loss, val_dice_mean, val_dice_per_class = validate_one_epoch(model, val_loader, criterion)
+
+    # Log everything together with an explicit step parameter
+    wandb.log({
+        "epoch": epoch,
+        "train/loss_total": train_loss,
+        "train/loss_bce": train_bce,
+        "train/loss_dice": train_dice,
+        "val/loss_total": val_loss,
+        "val/dice_mean": val_dice_mean,
+        "val/dice_defect_a": val_dice_per_class[0],
+        "val/dice_defect_b": val_dice_per_class[1],
+        "val/dice_defect_c": val_dice_per_class[2],
+        "val/dice_defect_d": val_dice_per_class[3],
+        "learning_rate": optimizer.param_groups[0]["lr"],
+    }, step=epoch)</code></pre>
+<p>Using namespaced prefixes (like <code>train/</code> and <code>val/</code>) groups related curves into clean panels in the W&amp;B web interface.</p>
+<hr />
+<h2 id="5-visualizing-predictions-segmentation-mask-overlays">5. Visualizing Predictions: Segmentation Mask Overlays</h2>
+<p>Numbers and loss curves only tell part of the story. A model might achieve a high mean Dice score solely by predicting empty masks on clean images, while failing to detect subtle defects.</p>
+<p>W&amp;B natively supports <strong>interactive segmentation overlays</strong> using <code>wandb.Image</code>:</p>
+<pre class="highlight"><code class="language-python">def log_validation_mask_predictions(model, val_loader, epoch, device, max_samples=4):
+    model.eval()
+    images_to_log = []
+
+    class_labels = {
+        0: "background",
+        1: "defect_a",
+        2: "defect_b",
+        3: "defect_c",
+        4: "defect_d"
+    }
+
+    with torch.no_grad():
+        for batch in val_loader:
+            imgs = batch["image"].to(device)
+            masks = batch["mask"].cpu().numpy()  # Ground truth [B, 4, 128, 800]
+            logits = model(imgs)
+            probs = torch.sigmoid(logits).cpu().numpy()  # Predicted [B, 4, 128, 800]
+
+            for i in range(min(len(imgs), max_samples)):
+                # Convert normalized grayscale tensor back to [0, 255] uint8 for display
+                raw_img = (imgs[i, 0].cpu().numpy() * 0.25 + 0.5) * 255.0
+                raw_img = np.clip(raw_img, 0, 255).astype(np.uint8)
+
+                # Create discrete 2D map for GT and Prediction (channel index 1..4)
+                gt_2d = np.zeros((128, 800), dtype=np.uint8)
+                for c in range(4):
+                    gt_2d[masks[i, c] &gt; 0.5] = c + 1
+
+                pred_2d = np.zeros((128, 800), dtype=np.uint8)
+                for c in range(4):
+                    pred_2d[probs[i, c] &gt;= 0.5] = c + 1
+
+                # Assemble W&amp;B Image with mask overlay
+                wb_img = wandb.Image(
+                    raw_img,
+                    masks={
+                        "ground_truth": {"mask_data": gt_2d, "class_labels": class_labels},
+                        "prediction":   {"mask_data": pred_2d, "class_labels": class_labels},
+                    },
+                    caption=f"Sample {batch['image_id'][i]} (Epoch {epoch})"
+                )
+                images_to_log.append(wb_img)
+            break  # Only log first batch
+
+    wandb.log({"val/qualitative_masks": images_to_log}, step=epoch)</code></pre>
+<p>In the W&amp;B UI, this allows you to toggle ground truth vs. predicted masks, adjust transparency, and inspect exactly how predictions evolve from epoch 1 to epoch 15.</p>
+<hr />
+<h2 id="6-model-artifacts-saving-checkpoints-with-lineage">6. Model Artifacts: Saving Checkpoints with Lineage</h2>
+<p>Rather than saving untracked <code>.pt</code> files to arbitrary local directories, log your best checkpoints as <strong>W&amp;B Artifacts</strong>:</p>
+<pre class="highlight"><code class="language-python">def save_model_artifact(checkpoint_path: str, model_name: str, val_score: float, epoch: int):
+    artifact = wandb.Artifact(
+        name=f"{model_name}-best",
+        type="model",
+        description=f"Best model checkpoint at epoch {epoch} with Val Dice {val_score:.4f}",
+        metadata={"val_dice": val_score, "epoch": epoch}
+    )
+    # Add checkpoint file
+    artifact.add_file(checkpoint_path)
+    # Log and track version in W&amp;B
+    wandb.log_artifact(artifact)</code></pre>
+<p>Advantages:</p>
+<ul>
+<li>Checkpoints are cryptographically hashed (SHA256) and versioned (<code>v0</code>, <code>v1</code>, <code>v2</code>, <code>latest</code>).</li>
+<li>Every model checkpoint is linked directly to the training run, git commit, and hyperparameters that produced it.</li>
+<li>Downstream inference scripts can download the exact winning checkpoint directly using <code>run.use_artifact(...)</code>.</li>
+</ul>
+<hr />
+<h2 id="7-the-fair-comparison-protocol">7. The Fair Comparison Protocol</h2>
+<p>When comparing two runs in W&amp;B (e.g., Run A: <em>U-Net ResNet34</em> vs. Run B: <em>U-Net EfficientNet-B0</em>):</p>
+<pre class="highlight"><code>                                FAIR COMPARISON PROTOCOL
+┌───────────────────────────────────────┬───────────────────────────────────────┐
+│              PERMITTED                │              FORBIDDEN                │
+├───────────────────────────────────────┼───────────────────────────────────────┤
+│ • Different model architecture        │ • Different validation split IDs      │
+│ • Different learning rate / optimizer │ • Different metric formulas           │
+│ • Different loss weightings           │ • Different image normalization       │
+│ • Different augmentation strengths    │ • Comparing local smoke to full fold  │
+└───────────────────────────────────────┴───────────────────────────────────────┘</code></pre>
+<p>If Run A evaluated on a random split with 15 instances of <code>defect_b</code>, while Run B evaluated on a split with 40 instances of <code>defect_b</code>, <strong>their validation scores cannot be compared</strong>. Only runs evaluated on the exact same combination-stratified partition provide an honest scientific comparison.</p>
+<hr />
+<h2 id="8-common-mistakes-and-diagnostics">8. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Failure Mode</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Leaked Credentials</strong></td>
+<td style="text-align: left;">Hardcoding <code>wandb.login(key="...")</code> in scripts.</td>
+<td style="text-align: left;">Security alert or compromised account.</td>
+<td style="text-align: left;">Check code for raw strings; use <code>os.environ["WANDB_API_KEY"]</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Sawtooth Metric Charts</strong></td>
+<td style="text-align: left;">Logging train metrics and val metrics on unsynchronized steps.</td>
+<td style="text-align: left;">Charts jump back and forth along the x-axis.</td>
+<td style="text-align: left;">Pass explicit <code>step=epoch</code> to every <code>wandb.log(...)</code> call.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Zombie / Hanging Runs</strong></td>
+<td style="text-align: left;">Forgetting to call <code>wandb.finish()</code> before script exits.</td>
+<td style="text-align: left;">Run appears active indefinitely on dashboard.</td>
+<td style="text-align: left;">Place <code>wandb.finish()</code> in a <code>try...finally</code> block.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Network Timeout on Save</strong></td>
+<td style="text-align: left;">Uploading 500 MB model artifacts over slow internet.</td>
+<td style="text-align: left;">Script freezes at end of training.</td>
+<td style="text-align: left;">Save checkpoint locally first; upload asynchronously or save only <code>best.pt</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Excessive Media Logging</strong></td>
+<td style="text-align: left;">Logging 100+ images on every batch.</td>
+<td style="text-align: left;">Disk fills up; dashboard slows to a crawl.</td>
+<td style="text-align: left;">Restrict qualitative image logging to 4–8 fixed canaries per epoch.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-try-it-simulate-an-offline-wb-tracking-loop">9. Try It: Simulate an Offline W&amp;B Tracking Loop</h2>
+<p>Run this self-contained script to verify that W&amp;B logs configuration, metrics, and summaries in offline mode without requiring internet access or credentials:</p>
+<pre class="highlight"><code class="language-python">import os
+import wandb
+
+# 1. Force offline mode
+os.environ["WANDB_MODE"] = "offline"
+
+# 2. Initialize tracking run
+run = wandb.init(
+    project="milestone2-diagnostic",
+    name="synthetic-offline-test",
+    config={"lr": 1e-3, "batch_size": 8, "architecture": "toy-unet"}
+)
+
+# 3. Simulate 3 training epochs
+for ep in range(1, 4):
+    simulated_train_loss = 0.8 / ep
+    simulated_val_dice = 0.5 + 0.1 * ep
+
+    wandb.log({
+        "epoch": ep,
+        "train/loss": simulated_train_loss,
+        "val/dice_mean": simulated_val_dice,
+    }, step=ep)
+
+# 4. Finalize run
+wandb.finish()
+
+print("✓ Offline W&amp;B tracking loop executed and finalized successfully!")</code></pre>
+<hr />
+<h2 id="10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>W&amp;B Quickstart</strong>: <a href="https://docs.wandb.ai/quickstart">Weights &amp; Biases Python Quickstart</a></li>
+<li><strong>W&amp;B Image &amp; Mask Logging</strong>: <a href="https://docs.wandb.ai/guides/track/log/media#segmentation-masks">Logging Media: Segmentation Masks</a></li>
+<li><strong>W&amp;B Artifacts &amp; Model Versioning</strong>: <a href="https://docs.wandb.ai/guides/artifacts">Model Registry &amp; Artifacts</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_multilabel_stratification_and_leakage.html">← Guide 04 · Validation Stratification</a><a href="guide_06_baseline_unet_and_training_loop.html">Guide 06 · Baseline U-Net &amp; Training →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

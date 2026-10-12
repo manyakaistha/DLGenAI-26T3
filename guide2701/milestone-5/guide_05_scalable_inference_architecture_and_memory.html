@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 05 · Scalable Inference &amp; Memory · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html" aria-current="page"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 05 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-monolithic-cache-oom">1. Concrete Failure Case: The Monolithic Cache OOM</a></li>
+<li><a href="#2-the-streaming-architecture-o1-bounded-memory">2. The Streaming Architecture: \(O(1)\) Bounded Memory</a></li>
+<li><a href="#3-essential-pytorch-inference-primitives">3. Essential PyTorch Inference Primitives</a></li>
+<li><a href="#4-batch-size-throughput-vs-vram-allocation">4. Batch Size Throughput vs. VRAM Allocation</a></li>
+<li><a href="#5-implementation-the-memory-bounded-streaming-engine">5. Implementation: The Memory-Bounded Streaming Engine</a></li>
+<li><a href="#6-defensive-execution-resiliency">6. Defensive Execution &amp; Resiliency</a></li>
+<li><a href="#7-decision-analysis-architecture-comparison">7. Decision Analysis: Architecture Comparison</a></li>
+<li><a href="#8-diagnostic-checklist-memory-runtime-health">8. Diagnostic Checklist: Memory &amp; Runtime Health</a></li>
+<li><a href="#9-ungraded-activity-calculate-the-memory-budget">9. Ungraded Activity: Calculate the Memory Budget</a></li>
+<li><a href="#10-authoritative-framework-references">10. Authoritative Framework References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-05-scalable-inference-architecture-streaming-memory-kaggle-constraints">Guide 05: Scalable Inference Architecture: Streaming, Memory &amp; Kaggle Constraints</h1>
+<p>Building a competitive segmentation model on a local workstation or development machine is only half the engineering challenge. To submit predictions to Kaggle, your entire inference pipeline must execute autonomously within a <strong>restricted, time-bounded, and memory-constrained Kaggle notebook container</strong>.</p>
+<p>Kaggle notebooks enforce strict physical limits:</p>
+<ul>
+<li><strong>GPU Quota</strong>: 1 standard accelerator (e.g. NVIDIA T4 or P100 with ~16 GB VRAM).</li>
+<li><strong>Host System RAM</strong>: 30 GB maximum. Exceeding this triggers the Out-Of-Memory (OOM) killer, terminating the notebook immediately with <code>Exit Code 137</code> ("Kernel Died").</li>
+<li><strong>Working Disk Space</strong>: 20 GB maximum under <code>/kaggle/working</code>.</li>
+<li><strong>Execution Wall Clock</strong>: 9 hours total runtime.</li>
+</ul>
+<p>In this guide, you will learn how to design an inference pipeline as a <strong>bounded streaming sequence</strong>, prevent fatal memory leaks, use PyTorch’s optimal inference primitives, profile batch throughput, and build resilient inference loops that reliably finish within Kaggle's resource envelope.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-monolithic-cache-oom">1. Concrete Failure Case: The Monolithic Cache OOM</h2>
+<p>Consider a student who implements inference by storing all intermediate predictions in a global NumPy array:</p>
+<pre class="highlight"><code class="language-python"># FATAL FLAW: Monolithic full-test memory allocation!
+all_probs = np.zeros((3000, 4, 128, 800), dtype=np.float32)
+
+for i, image_id in enumerate(test_image_ids):
+    image = load_image(image_id)
+    # Forward pass + TTA + Ensemble
+    probs = run_ensemble(image)  # Shape: (4, 128, 800), float32
+    all_probs[i] = probs         # Store in monolithic array</code></pre>
+<p>Let us calculate the memory footprint of this single array:</p>
+<div class="arithmatex">\[\text{Memory} = 3000 \times 4 \times 128 \times 800 \times 4\text{ bytes} \approx 4,915,200,000\text{ bytes} \approx \mathbf{4.92\text{ GiB}}\]</div>
+<p>Now suppose the student implements a 4-fold ensemble or caches predictions for multiple TTA views:</p>
+<div class="arithmatex">\[4\text{ folds} \times 4.92\text{ GiB} = \mathbf{19.68\text{ GiB}}\]</div>
+<p>Along with PyTorch model weights in host RAM (<span class="arithmatex">\(~2\text{ GB}\)</span>), operating system buffers, and Python garbage collection overhead, the memory consumption spikes past 30 GB. The kernel terminates with:</p>
+<pre class="highlight"><code class="language-text">The kernel appeared to die unexpectedly. It has been restarted. (Error Code: 137 - OOM)</code></pre>
+<p>Even if the student attempts to cache these arrays to disk in <code>/kaggle/working</code>, writing <span class="arithmatex">\(19.7\text{ GB}\)</span> of <code>.npy</code> files immediately exhausts the 20 GB disk quota, crashing the session with <code>No space left on device</code>!</p>
+<p><img alt="Streaming Inference Memory Profile" src="assets/fig07_streaming_inference_memory_profile.png" />
+<em>Figure 5.1: (Left) Monolithic caching rapidly breaches Kaggle RAM/disk ceilings as test images accumulate. (Right) Streaming architecture processes batches in <span class="arithmatex">\(O(1)\)</span> constant working memory (&lt;100 MiB), streaming text rows directly to disk.</em></p>
+<hr />
+<h2 id="2-the-streaming-architecture-o1-bounded-memory">2. The Streaming Architecture: <span class="arithmatex">\(O(1)\)</span> Bounded Memory</h2>
+<p>The solution to memory exhaustion is the <strong>streaming inference architecture</strong>.</p>
+<p>Instead of retaining probability maps across all 3,000 test images, you process the test set in small, bounded minibatches (<span class="arithmatex">\(B = 16\)</span>). As each batch completes inference, its probability maps are immediately thresholded, area-filtered, encoded into Run-Length Encoded (RLE) strings, appended directly to the output CSV file, and purged from memory:</p>
+<pre class="highlight"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        The Bounded Streaming Pipeline (per Batch)                      │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. Load Batch Images        ──► PyTorch Tensor: [B, 1, 128, 800]                       │
+│ 2. Forward Pass (No Grad)   ──► Model Logits:   [B, 4, 128, 800] (GPU VRAM)            │
+│ 3. TTA &amp; Ensemble Fusion    ──► Float32 Probs:  [B, 4, 128, 800]                       │
+│ 4. Threshold &amp; Area Filter  ──► Binary Masks:   [B, 4, 128, 800] (uint8)               │
+│ 5. Encode Fortran RLE       ──► Text Strings:   "start length ..." or " "              │
+│ 6. Write Rows to Disk       ──► CSV File Stream: 4 × B rows appended                   │
+│ 7. Purge Batch Buffers      ──► Python GC / torch.cuda.empty_cache()                   │
+└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Under this architecture:</p>
+<ul>
+<li>Active working memory is <span class="arithmatex">\(O(1)\)</span> constant with respect to test set size: it depends only on batch size <span class="arithmatex">\(B\)</span>, requiring less than <span class="arithmatex">\(100\text{ MiB}\)</span> of RAM at any instant.</li>
+<li>Disk usage is strictly limited to the final <code>submission.csv</code> file (<span class="arithmatex">\(~3 - 5\text{ MB}\)</span>).</li>
+</ul>
+<hr />
+<h2 id="3-essential-pytorch-inference-primitives">3. Essential PyTorch Inference Primitives</h2>
+<p>To minimize GPU VRAM consumption and maximize inference throughput, configure PyTorch with these four essential primitives:</p>
+<h3 id="1-torchinference_mode-preferred-over-torchno_grad">1. <code>torch.inference_mode()</code> (Preferred over <code>torch.no_grad()</code>)</h3>
+<p><code>torch.inference_mode()</code> is a faster, lower-overhead context manager introduced in PyTorch 1.9. It disables view tracking and version counters in addition to disabling gradient graphs:</p>
+<pre class="highlight"><code class="language-python"># PREFERRED
+with torch.inference_mode():
+    outputs = model(images)</code></pre>
+<h3 id="2-explicit-modeleval">2. Explicit <code>model.eval()</code></h3>
+<p>Always set your model to evaluation mode before generating predictions:
+<pre class="highlight"><code class="language-python">model.eval()</code></pre>
+Evaluation mode switches <code>BatchNorm2d</code> layers to use their frozen running mean and variance rather than batch statistics, and disables <code>Dropout</code> layers. Omitting <code>model.eval()</code> causes predictions to fluctuate randomly depending on batch size!</p>
+<h3 id="3-mixed-precision-torchautocast">3. Mixed Precision (<code>torch.autocast</code>)</h3>
+<p>Run inference with automatic mixed precision (AMP) using <code>torch.bfloat16</code> or <code>torch.float16</code>:
+<pre class="highlight"><code class="language-python">with torch.inference_mode():
+    with torch.autocast(device_type="cuda", dtype=torch.float16):
+        logits = model(images)</code></pre>
+AMP halves the GPU memory occupied by activation tensors and doubles Tensor Core throughput on modern NVIDIA GPUs.</p>
+<h3 id="4-pinned-memory-non-blocking-transfers">4. Pinned Memory &amp; Non-Blocking Transfers</h3>
+<p>When loading batches from disk, configure your <code>DataLoader</code> with <code>pin_memory=True</code> and perform asynchronous host-to-device transfers:
+<pre class="highlight"><code class="language-python">images = images.to(device, non_blocking=True)</code></pre></p>
+<hr />
+<h2 id="4-batch-size-throughput-vs-vram-allocation">4. Batch Size Throughput vs. VRAM Allocation</h2>
+<p>Choosing an inference batch size requires balancing throughput (images processed per second) against peak GPU memory allocation:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Batch Size (<span class="arithmatex">\(B\)</span>)</th>
+<th style="text-align: left;">Images / Sec (GPU)</th>
+<th style="text-align: left;">GPU VRAM Allocated</th>
+<th style="text-align: left;">Total Test Time (3,000 imgs)</th>
+<th style="text-align: left;">OOM Risk Factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 1\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(28\text{ img/s}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.2\text{ GB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(107\text{ seconds}\)</span></td>
+<td style="text-align: left;">Zero (<span class="arithmatex">\(100\%\)</span> safe)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 8\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(95\text{ img/s}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2.8\text{ GB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(32\text{ seconds}\)</span></td>
+<td style="text-align: left;">Very Low</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 16\)</span> (Sweet Spot)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(140\text{ img/s}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.5\text{ GB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(21\text{ seconds}\)</span></td>
+<td style="text-align: left;">Optimal Headroom</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 32\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(165\text{ img/s}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8.2\text{ GB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(18\text{ seconds}\)</span></td>
+<td style="text-align: left;">Safe on 16 GB GPU</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 64\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(175\text{ img/s}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(14.8\text{ GB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(17\text{ seconds}\)</span></td>
+<td style="text-align: left;">High (Near 16 GB limit!)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!TIP]
+Notice the diminishing returns: moving from <span class="arithmatex">\(B = 16\)</span> to <span class="arithmatex">\(B = 64\)</span> saves only <span class="arithmatex">\(4\)</span> seconds across the entire test set, but triples VRAM consumption from <span class="arithmatex">\(4.5\text{ GB}\)</span> to <span class="arithmatex">\(14.8\text{ GB}\)</span>, pushing the GPU perilously close to an out-of-memory crash. Standardize on <strong><span class="arithmatex">\(B = 16\)</span></strong> for a robust balance of speed and safety.</p>
+</blockquote>
+<hr />
+<h2 id="5-implementation-the-memory-bounded-streaming-engine">5. Implementation: The Memory-Bounded Streaming Engine</h2>
+<p>Here is a clean implementation pattern for a streaming test inference loop:</p>
+<pre class="highlight"><code class="language-python">import csv
+import torch
+import numpy as np
+from torch.utils.data import DataLoader
+from tqdm.auto import tqdm
+
+def stream_test_inference(
+    model: torch.nn.Module,
+    test_loader: DataLoader,
+    output_csv_path: str,
+    thresholds: dict[str, float],
+    min_areas: dict[str, int],
+    device: torch.device
+) -&gt; None:
+    """Stream model predictions directly to a submission CSV in bounded memory."""
+    model.eval()
+    defect_classes = ["defect_a", "defect_b", "defect_c", "defect_d"]
+
+    with open(output_csv_path, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["ID", "image_id", "defect_type", "mask_rle"])
+
+        row_id = 1
+
+        for batch in tqdm(test_loader, desc="Streaming Test Inference"):
+            image_ids = batch["image_id"]
+            images = batch["image"].to(device, non_blocking=True)  # [B, 1, 128, 800]
+
+            with torch.inference_mode():
+                # Forward pass in half precision
+                with torch.autocast(device_type=device.type, dtype=torch.float16):
+                    logits = model(images)
+                probs = torch.sigmoid(logits).cpu().numpy()  # [B, 4, 128, 800]
+
+            # Process and write each image in the batch
+            for b_idx, img_id in enumerate(image_ids):
+                for c_idx, defect_name in enumerate(defect_classes):
+                    prob_ch = probs[b_idx, c_idx]
+                    tau = thresholds[defect_name]
+                    min_area = min_areas[defect_name]
+
+                    # Post-processing: Threshold + 8-Connected Component Filter
+                    binary_mask = (prob_ch &gt;= tau).astype(np.uint8)
+                    clean_mask = filter_small_components(binary_mask, min_area)
+
+                    # RLE encode with single-space sentinel
+                    rle_str = rle_encode(clean_mask)
+
+                    # Stream row directly to disk
+                    writer.writerow([row_id, img_id, defect_name, rle_str])
+                    row_id += 1
+
+            # Explicitly free batch references
+            del images, logits, probs
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
+
+    print(f"✓ Inference complete: wrote {row_id - 1} rows to {output_csv_path}")</code></pre>
+<hr />
+<h2 id="6-defensive-execution-resiliency">6. Defensive Execution &amp; Resiliency</h2>
+<p>To prevent unexpected session terminations from ruining a multi-hour run, implement defensive execution patterns:</p>
+<h3 id="1-pre-flight-execution-smoke-test">1. Pre-Flight Execution Smoke Test</h3>
+<p>Before running inference across all 3,000 test images, execute your complete pipeline on a dummy batch of 4 synthetic strips. Verify that:</p>
+<ul>
+<li>Checkpoints load cleanly without missing keys.</li>
+<li>Forward pass, TTA, and ensembling complete without shape errors.</li>
+<li>RLE strings are encoded without index overflows.</li>
+<li>A dummy CSV file is created and passes schema validation.</li>
+</ul>
+<h3 id="2-time-budgeting-and-monitoring">2. Time Budgeting and Monitoring</h3>
+<p>Track your execution velocity. If evaluating 100 images takes <span class="arithmatex">\(60\text{ seconds}\)</span>, evaluating 3,000 images will require:</p>
+<div class="arithmatex">\[\text{Estimated Time} = \frac{3000}{100} \times 60\text{ s} = 1,800\text{ s} = 30\text{ minutes}\]</div>
+<p>Log your elapsed time and ETA using <code>tqdm.auto</code>. If your estimated total runtime exceeds 7 hours, disable multi-view TTA or reduce ensemble complexity immediately.</p>
+<h3 id="3-atomic-file-writing">3. Atomic File Writing</h3>
+<p>Never write your final submission directly to <code>/kaggle/working/submission.csv</code>. If the notebook encounters a transient error or is interrupted mid-execution, an incomplete, corrupted CSV will be left behind.</p>
+<ul>
+<li>Write to a temporary file first: <code>/kaggle/working/submission_temp.csv</code>.</li>
+<li>Run an automated validation script on the temporary file.</li>
+<li>Only upon complete validation, rename it atomically:
+  <pre class="highlight"><code class="language-python">import os
+os.replace("/kaggle/working/submission_temp.csv", "/kaggle/working/submission.csv")</code></pre></li>
+</ul>
+<hr />
+<h2 id="7-decision-analysis-architecture-comparison">7. Decision Analysis: Architecture Comparison</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Architectural Pattern</th>
+<th style="text-align: left;">Host RAM Footprint</th>
+<th style="text-align: left;">Disk Footprint</th>
+<th style="text-align: left;">Peak VRAM</th>
+<th style="text-align: left;">Recovery Capability</th>
+<th style="text-align: left;">Recommended Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Monolithic Global Array</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(5 - 20\text{ GB}\)</span> (OOM risk)</td>
+<td style="text-align: left;">Minimal (<span class="arithmatex">\(0\text{ GB}\)</span>)</td>
+<td style="text-align: left;">High</td>
+<td style="text-align: left;">None (Crash loses all work)</td>
+<td style="text-align: left;"><strong>Never use</strong> for test inference</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Disk-Mapped Arrays (<code>np.memmap</code>)</strong></td>
+<td style="text-align: left;">Low (<span class="arithmatex">\(~500\text{ MB}\)</span>)</td>
+<td style="text-align: left;">High (<span class="arithmatex">\(10 - 20\text{ GB}\)</span> disk)</td>
+<td style="text-align: left;">Moderate</td>
+<td style="text-align: left;">High (Can resume from disk)</td>
+<td style="text-align: left;">Good for offline validation sweeps</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Streaming Direct-to-RLE (Recommended)</strong></td>
+<td style="text-align: left;">Constant (<span class="arithmatex">\(&lt;100\text{ MB}\)</span>)</td>
+<td style="text-align: left;">Zero (<span class="arithmatex">\(&lt;5\text{ MB}\)</span> CSV)</td>
+<td style="text-align: left;">Low (<span class="arithmatex">\(~4.5\text{ GB}\)</span>)</td>
+<td style="text-align: left;">Atomic replacement</td>
+<td style="text-align: left;"><strong>Optimal for Kaggle test inference</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-diagnostic-checklist-memory-runtime-health">8. Diagnostic Checklist: Memory &amp; Runtime Health</h2>
+<p>Verify these five indicators in your inference notebook:</p>
+<ol>
+<li>
+<p><strong>Host RAM Stability</strong>: Check memory usage before and after 500 images:
+   <pre class="highlight"><code class="language-python">import psutil
+print(f"RAM Used: {psutil.Process().memory_info().rss / 1024**2:.1f} MB")</code></pre>
+   If RAM increases continuously as batches advance, you have an uncollected object reference or memory leak.</p>
+</li>
+<li>
+<p><strong>GPU VRAM Reservation</strong>: Check peak VRAM:
+   <pre class="highlight"><code class="language-python">print(f"Peak VRAM: {torch.cuda.max_memory_allocated() / 1024**2:.1f} MB")</code></pre>
+   Ensure peak allocation does not exceed <span class="arithmatex">\(12\text{ GB}\)</span> on a 16 GB GPU.</p>
+</li>
+<li>
+<p><strong>Working Directory Cleanliness</strong>: Inspect files in <code>/kaggle/working</code>:
+   <pre class="highlight"><code class="language-bash">ls -lh /kaggle/working</code></pre>
+   Verify that no stale <code>.npy</code>, <code>.pt</code>, or temporary files are clogging disk space.</p>
+</li>
+</ol>
+<hr />
+<h2 id="9-ungraded-activity-calculate-the-memory-budget">9. Ungraded Activity: Calculate the Memory Budget</h2>
+<p>Suppose a student wants to deploy a 3-model ensemble with 4-view TTA across 3,000 test images (<span class="arithmatex">\(128 \times 800\)</span>, 4 defect channels).</p>
+<ol>
+<li>How many total neural network forward passes will be executed?</li>
+<li>If the student allocates a float32 probability array for every forward pass simultaneously, how many gigabytes of memory would be required?</li>
+<li>If the student adopts the streaming architecture with batch size <span class="arithmatex">\(B = 16\)</span>, what is the maximum amount of probability tensor memory in active RAM at any single moment?</li>
+</ol>
+<hr />
+<h2 id="10-authoritative-framework-references">10. Authoritative Framework References</h2>
+<ul>
+<li><strong>PyTorch Documentation</strong>: <a href="https://pytorch.org/docs/stable/generated/torch.inference_mode.html">Inference Mode (<code>torch.inference_mode</code>)</a></li>
+<li><strong>PyTorch Documentation</strong>: <a href="https://pytorch.org/docs/stable/amp.html">Automatic Mixed Precision (<code>torch.autocast</code>)</a></li>
+<li><strong>Python Standard Library</strong>: <a href="https://docs.python.org/3/library/csv.html"><code>csv</code> module documentation</a></li>
+<li><strong>Kaggle Documentation</strong>: <a href="https://www.kaggle.com/docs/competitions#notebooks-and-compute-resources">Code Competition Container Limits and Submission Guidelines</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_ensembling_models_and_checkpoints.html">← Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_06_submission_integrity_and_the_competition_contract.html">Guide 06 · Submission Integrity &amp; RLE Contract →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

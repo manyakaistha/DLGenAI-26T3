@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 07 · Post-Processing &amp; Thresholds · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 07 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-post-processing-pipeline">1. Motivation: The Post-Processing Pipeline</a></li>
+<li><a href="#2-probability-calibration-decision-thresholds-tau">2. Probability Calibration &amp; Decision Thresholds (\(\tau\))</a></li>
+<li><a href="#3-connected-component-analysis-and-minimum-area-filtering">3. Connected Component Analysis and Minimum Area Filtering</a></li>
+<li><a href="#4-per-class-calibration-one-size-does-not-fit-all">4. Per-Class Calibration: One Size Does Not Fit All</a></li>
+<li><a href="#5-metric-divergence-naive-dice-vs-competition-score">5. Metric Divergence: Naive Dice vs. Competition Score</a></li>
+<li><a href="#6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</a></li>
+<li><a href="#7-decisions-you-must-make">7. Decisions You Must Make</a></li>
+<li><a href="#8-try-it-filter-noise-speckles-on-a-toy-array">8. Try It: Filter Noise Speckles on a Toy Array</a></li>
+<li><a href="#9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="post-processing-the-decision-pipeline-logits-to-binary-masks">Post-Processing &amp; The Decision Pipeline: Logits to Binary Masks</h1>
+<p>Training a neural network produces a model that outputs continuous, real-valued tensor fields called <strong>logits</strong>:</p>
+<div class="arithmatex">\[\mathbf{Z} \in \mathbb{R}^{4 \times 128 \times 800}\]</div>
+<p>However, neither the competition evaluation metric nor a factory inspection automated sorting system can consume raw floating-point logits. They require hard, discrete binary decisions: <em>Is pixel <span class="arithmatex">\((y, x)\)</span> defect_a, or is it clean steel?</em></p>
+<p>The bridge between continuous model outputs and discrete binary predictions is the <strong>decision pipeline</strong>. Far from being an afterthought, post-processing can dramatically alter your model's leaderboard score. A single stray 3-pixel false-positive speckle on an otherwise clean image can drop that image's Dice score from <span class="arithmatex">\(1.0\)</span> to <span class="arithmatex">\(0.0\)</span>.</p>
+<p>In this guide, you will learn how to convert logits to probabilities, tune decision thresholds <span class="arithmatex">\(\tau\)</span>, analyze connected components with OpenCV, and apply <strong>minimum area filtering</strong> to suppress sensor noise.</p>
+<hr />
+<h2 id="1-motivation-the-post-processing-pipeline">1. Motivation: The Post-Processing Pipeline</h2>
+<p>The post-processing pipeline transforms raw logits into clean binary masks through four sequential stages:</p>
+<pre class="highlight"><code>┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│   1. Raw Logits │ ────► │ 2. Probabilities│ ────► │ 3. Thresholding │ ────► │ 4. Area Filter  │
+│  Z ∈ [-∞, +∞]   │       │  P = σ(Z) ∈[0,1]│       │  P ≥ τ → {0, 1} │       │ Blob Area ≥ Amin│
+└─────────────────┘       └─────────────────┘       └─────────────────┘       └─────────────────┘</code></pre>
+<p><img alt="Decision Pipeline Thresholds" src="assets/fig07_decision_pipeline_thresholds.png" />
+<em>Figure 7.1: The decision pipeline. (1) Model logits. (2) Probabilities mapped via Sigmoid. (3) Raw binary mask at <span class="arithmatex">\(\tau=0.5\)</span> containing noise speckles. (4) Clean defect mask after 8-connected component area filtering (<span class="arithmatex">\(A_{\min}=50\text{ px}\)</span>).</em></p>
+<hr />
+<h2 id="2-probability-calibration-decision-thresholds-tau">2. Probability Calibration &amp; Decision Thresholds (<span class="arithmatex">\(\tau\)</span>)</h2>
+<p>For a multi-label Sigmoid head, raw logits <span class="arithmatex">\(z \in \mathbb{R}\)</span> are squashed into independent probabilities <span class="arithmatex">\(\hat{P} \in [0, 1]\)</span> via the sigmoid function:</p>
+<div class="arithmatex">\[\hat{P}(c, y, x) = \sigma(z(c, y, x)) = \frac{1}{1 + e^{-z(c, y, x)}}\]</div>
+<p>To convert continuous probabilities <span class="arithmatex">\(\hat{P}\)</span> into a binary mask <span class="arithmatex">\(\hat{M} \in \{0, 1\}\)</span>, you apply a <strong>decision threshold</strong> <span class="arithmatex">\(\tau \in (0, 1)\)</span>:</p>
+<div class="arithmatex">\[\hat{M}(c, y, x) = \begin{cases} 1 &amp; \text{if } \hat{P}(c, y, x) \ge \tau \\ 0 &amp; \text{if } \hat{P}(c, y, x) &lt; \tau \end{cases}\]</div>
+<h3 id="why-tau-05-is-rarely-optimal">Why <span class="arithmatex">\(\tau = 0.5\)</span> is Rarely Optimal:</h3>
+<p>The default threshold <span class="arithmatex">\(\tau = 0.5\)</span> assumes two conditions:</p>
+<ol>
+<li>The neural network's probabilities are perfectly calibrated.</li>
+<li>The cost of a false positive equals the cost of a false negative.</li>
+</ol>
+<p>In surface anomaly segmentation, neither assumption holds!</p>
+<ul>
+<li>False positives on empty images are severely penalized because clean images represent a massive fraction of industrial production.</li>
+<li>False negatives on positive images destroy Foreground Dice on rare defects.</li>
+</ul>
+<pre class="highlight"><code>                      The Decision Threshold Spectrum
+◄─────────────────────────────────────────────────────────────────────────────►
+Low Threshold (τ = 0.2 - 0.3)                    High Threshold (τ = 0.7 - 0.8)
+• High Recall                                    • High Specificity
+• Detects faint, low-contrast flaws              • Suppresses noisy false alarms
+• High risk of false positives on clean steel    • Risks missing thin or subtle defects</code></pre>
+<hr />
+<h2 id="3-connected-component-analysis-and-minimum-area-filtering">3. Connected Component Analysis and Minimum Area Filtering</h2>
+<p>Even with an optimal probability threshold <span class="arithmatex">\(\tau\)</span>, segmentation networks frequently predict isolated, high-frequency false-alarm "speckles"—clusters of 1 to 10 pixels triggered by sensor noise, glare, or dust particles.</p>
+<h3 id="the-physics-of-minimum-defect-dimensions">The Physics of Minimum Defect Dimensions:</h3>
+<p>Physical defects on steel coils are physical entities produced by mechanical tooling:</p>
+<ul>
+<li>A roll mark or inclusion has a physical surface area.</li>
+<li>An isolated 3-pixel cluster rarely represents a true structural defect; it is almost always sensor noise or model uncertainty.</li>
+</ul>
+<p>If you retain these tiny speckles on a clean image:</p>
+<ul>
+<li>Ground Truth: <span class="arithmatex">\(Y = 0\)</span> (empty mask).</li>
+<li>Prediction: <span class="arithmatex">\(\hat{Y} = 3\text{ pixels}\)</span>.</li>
+<li>Dice Score: <span class="arithmatex">\(\frac{2 \times 0}{0 + 3} = \mathbf{0.0}\)</span>! A clean sheet receives zero score because of 3 stray pixels.</li>
+</ul>
+<h3 id="the-connected-components-solution">The Connected Components Solution:</h3>
+<p>Using OpenCV's <code>cv2.connectedComponentsWithStats</code>, we group 8-connected positive pixels into discrete blobs and measure the area of each blob:</p>
+<pre class="highlight"><code>Pixel Grid:
+[ 0  0  0  0  0 ]
+[ 0  1  1  0  0 ] ──► Component 1: Area = 3 px (&lt; Amin) ──► REMOVED (Zeroed)
+[ 0  0  1  0  0 ]
+[ 0  0  0  0  0 ]
+[ 1  1  1  1  1 ] ──► Component 2: Area = 10 px (≥ Amin) ─► RETAINED (Valid)
+[ 1  1  1  1  1 ]</code></pre>
+<pre class="highlight"><code class="language-python">import cv2
+import numpy as np
+
+def filter_small_components(binary_mask: np.ndarray, min_area: int) -&gt; np.ndarray:
+    """Zero out connected components whose total pixel area is less than min_area."""
+    if min_area &lt;= 0 or binary_mask.sum() == 0:
+        return binary_mask
+
+    # Ensure mask is uint8 {0, 1}
+    mask_uint8 = binary_mask.astype(np.uint8)
+
+    # 8-connected neighborhood analysis
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask_uint8, connectivity=8)
+
+    # Initialize clean output
+    clean_mask = np.zeros_like(mask_uint8)
+
+    # Label 0 is background; iterate through detected defect components 1..N
+    for label_id in range(1, num_labels):
+        area = stats[label_id, cv2.CC_STAT_AREA]
+        if area &gt;= min_area:
+            clean_mask[labels == label_id] = 1
+
+    return clean_mask</code></pre>
+<hr />
+<h2 id="4-per-class-calibration-one-size-does-not-fit-all">4. Per-Class Calibration: One Size Does Not Fit All</h2>
+<p>Different defect classes exhibit fundamentally different physical morphologies:</p>
+<ul>
+<li><code>defect_a</code>: May appear as long, thin longitudinal scratches.</li>
+<li><code>defect_c</code>: May appear as large, dense clusters of oxide scale or staining.</li>
+<li><code>defect_b</code>: An extremely rare defect category where missing a single true instance heavily penalizes your foreground score.</li>
+</ul>
+<p>Therefore, applying the exact same threshold <span class="arithmatex">\(\tau\)</span> and minimum area cutoff <span class="arithmatex">\(A_{\min}\)</span> across all four defect classes is suboptimal:</p>
+<div class="arithmatex">\[\boldsymbol{\tau} = [\tau_a, \tau_b, \tau_c, \tau_d], \quad \mathbf{A}_{\min} = [A_{\min, a}, A_{\min, b}, A_{\min, c}, A_{\min, d}]\]</div>
+<h3 id="the-recall-ceiling-trade-off">The Recall Ceiling Trade-off:</h3>
+<p>Whenever you set a minimum area threshold <span class="arithmatex">\(A_{\min}\)</span>, you establish a <strong>mathematical recall ceiling</strong>:</p>
+<ul>
+<li>If the true ground truth in <code>train.csv</code> contains a valid defect of size 45 pixels, setting <span class="arithmatex">\(A_{\min} = 50\)</span> guarantees that your model can <em>never</em> achieve <span class="arithmatex">\(100\%\)</span> recall on that instance!</li>
+<li><strong>Rule</strong>: Inspect the minimum ground truth instance sizes in your training annotations. Set <span class="arithmatex">\(A_{\min}\)</span> strictly below the smallest verified defect instance for each class.</li>
+</ul>
+<hr />
+<h2 id="5-metric-divergence-naive-dice-vs-competition-score">5. Metric Divergence: Naive Dice vs. Competition Score</h2>
+<p>When you sweep thresholds and area cutoffs on your validation set, be prepared for an important discovery:</p>
+<div class="arithmatex">\[\text{The threshold that maximizes Naive Mean Dice does NOT maximize the Competition Score!}\]</div>
+<h3 id="why-do-the-optima-diverge">Why Do the Optima Diverge?</h3>
+<ol>
+<li><strong>Naive Mean Dice</strong>: Averages the Dice coefficient across <em>all</em> image-class pairs. Because empty pairs represent the majority of samples, naive Dice strongly rewards <strong>aggressive abstention</strong> (high thresholds <span class="arithmatex">\(\tau \approx 0.7\)</span>, large <span class="arithmatex">\(A_{\min} \approx 200\)</span>). Predicting empty masks everywhere scores a perfect 1.0 on every clean sheet!</li>
+<li><strong>Competition Score</strong>: Places <span class="arithmatex">\(70\%\)</span> of its total weight on <strong>Foreground Dice</strong> computed <em>exclusively over positive pairs</em>. If your model abstains too aggressively, foreground recall collapses, destroying <span class="arithmatex">\(70\%\)</span> of your leaderboard score.</li>
+</ol>
+<blockquote>
+<p><strong>Takeaway:</strong> Always evaluate your threshold sweep using the competition's explicit foreground-weighted metric. Optimizing thresholds solely for naive mean Dice will systematically bias your model toward over-abstention.</p>
+</blockquote>
+<hr />
+<h2 id="6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Over-Filtering Rare Defects</strong></td>
+<td style="text-align: left;">Setting <span class="arithmatex">\(A_{\min}\)</span> too high on <code>defect_b</code>.</td>
+<td style="text-align: left;">Validation score for <code>defect_b</code> drops to exactly 0.0.</td>
+<td style="text-align: left;">Check per-class positive Dice; verify that true instances are not filtered.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4-Connectivity instead of 8</strong></td>
+<td style="text-align: left;">Setting <code>connectivity=4</code> in <code>connectedComponents</code>.</td>
+<td style="text-align: left;">Diagonal lines are broken into multiple tiny sub-blobs and filtered out.</td>
+<td style="text-align: left;">Always use <code>connectivity=8</code> for continuous defect segmentation.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Slow Python Loops</strong></td>
+<td style="text-align: left;">Iterating over every pixel coordinate <span class="arithmatex">\((x, y)\)</span> in pure Python.</td>
+<td style="text-align: left;">Post-processing takes minutes per batch.</td>
+<td style="text-align: left;">Use vectorized NumPy masks: <code>clean_mask[labels == label_id] = 1</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Tuning on Test Data</strong></td>
+<td style="text-align: left;">Adjusting thresholds based on public leaderboard feedback.</td>
+<td style="text-align: left;">Severe overfitting to public test subset; private score drops.</td>
+<td style="text-align: left;">Tune <span class="arithmatex">\(\tau\)</span> and <span class="arithmatex">\(A_{\min}\)</span> strictly on your held-out validation set.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-decisions-you-must-make">7. Decisions You Must Make</h2>
+<ol>
+<li><strong>Threshold Sweep Grid</strong>: Define a search grid for your validation sweep:<ul>
+<li>Thresholds: <span class="arithmatex">\(\tau \in \{0.30, 0.40, 0.50, 0.60, 0.70\}\)</span></li>
+<li>Minimum Areas: <span class="arithmatex">\(A_{\min} \in \{0, 25, 50, 100, 200\}\)</span> pixels</li>
+</ul>
+</li>
+<li><strong>Channel Independence</strong>: Decide whether you will sweep a single global <span class="arithmatex">\((\tau, A_{\min})\)</span> pair or calibrate four independent class-specific pairs.</li>
+<li><strong>Empty Mask Safeguard</strong>: Ensure that when all pixels are filtered out, your post-processor emits an all-zero array, ready for RLE empty-space serialization.</li>
+</ol>
+<hr />
+<h2 id="8-try-it-filter-noise-speckles-on-a-toy-array">8. Try It: Filter Noise Speckles on a Toy Array</h2>
+<p>Run this diagnostic snippet to verify that 8-connected component filtering removes noise speckles while preserving a genuine defect blob:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+import cv2
+
+# Create a toy 10x10 binary mask
+mask = np.zeros((10, 10), dtype=np.uint8)
+
+# 1. Add a genuine 6-pixel defect blob (2x3 rectangle)
+mask[2:4, 2:5] = 1
+
+# 2. Add two stray 1-pixel sensor noise speckles
+mask[0, 9] = 1
+mask[8, 1] = 1
+
+print(f"Original mask active pixels: {mask.sum()} (1 blob of 6 px, 2 speckles of 1 px)")
+
+# 3. Apply area filter with Amin = 4
+num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+filtered = np.zeros_like(mask)
+min_area = 4
+
+for lbl in range(1, num_labels):
+    area = stats[lbl, cv2.CC_STAT_AREA]
+    if area &gt;= min_area:
+        filtered[labels == lbl] = 1
+
+print(f"Filtered mask active pixels: {filtered.sum()}")
+assert filtered.sum() == 6, f"Expected 6 pixels, got {filtered.sum()}"
+assert filtered[0, 9] == 0 and filtered[8, 1] == 0, "Speckles were not removed!"
+assert filtered[2, 2] == 1, "Genuine defect was corrupted!"
+print("✓ Noise speckle filtering verified successfully!")</code></pre>
+<hr />
+<h2 id="9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>OpenCV Connected Components</strong>: <a href="https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#ga107a78bf7cd25dec05fb4dfc5c9e765f"><code>cv2.connectedComponentsWithStats</code> API</a></li>
+<li><strong>Scikit-Learn Precision-Recall Curve</strong>: <a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_precision_recall.html">Tuning Decision Thresholds</a></li>
+<li><strong>Davis &amp; Goadrich (2006)</strong>: <a href="https://doi.org/10.1145/1143844.1143874">The Relationship Between Precision-Recall and ROC Curves</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_baseline_unet_and_training_loop.html">← Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_08_rle_submission_and_verification.html">Guide 08 · RLE &amp; First Submission →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

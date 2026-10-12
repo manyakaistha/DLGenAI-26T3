@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 02 · LR Schedulers &amp; Warmup · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 02 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-destabilization-and-late-stage-oscillation">1. Observable Problem: Destabilization and Late-Stage Oscillation</a></li>
+<li><a href="#2-optimization-mechanics-the-role-of-the-learning-rate">2. Optimization Mechanics: The Role of the Learning Rate</a></li>
+<li><a href="#3-schedule-archetypes-mathematical-formulation">3. Schedule Archetypes: Mathematical Formulation</a></li>
+<li><a href="#4-the-critical-role-of-linear-warmup">4. The Critical Role of Linear Warmup</a></li>
+<li><a href="#5-stepping-cadence-per-batch-vs-per-epoch">5. Stepping Cadence: Per-Batch vs. Per-Epoch</a></li>
+<li><a href="#6-implementation-pattern-adamw-with-warmup-and-cosine-decay">6. Implementation Pattern: AdamW with Warmup and Cosine Decay</a></li>
+<li><a href="#7-diagnostic-symptoms-causes-and-checks">7. Diagnostic Symptoms: Causes and Checks</a></li>
+<li><a href="#8-ungraded-try-it-schedule-selection-challenge">8. Ungraded "Try It": Schedule Selection Challenge</a></li>
+<li><a href="#9-authoritative-references">9. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="learning-rate-schedulers-and-warmup-strategies">Learning-Rate Schedulers and Warmup Strategies</h1>
+<p>In deep learning optimization, the <strong>learning rate (<span class="arithmatex">\(\eta\)</span>)</strong> is universally recognized as the single most critical hyperparameter. It dictates the magnitude of parameter updates across the high-dimensional loss surface. </p>
+<p>In industrial anomaly segmentation—where networks pair deep pretrained feature extractors with randomly initialized decoders to detect millimeter-thin defects—a static, constant learning rate is rarely sufficient. A learning rate aggressive enough to escape poor initial local minima early in training will cause weights to oscillate chaotically around the sharp, narrow ravines required to trace hairline defect boundaries later in training.</p>
+<p>This guide explores the physical and geometric role of learning-rate dynamics, contrasts standard schedule archetypes, analyzes the stabilization mechanics of linear warmup, examines per-batch versus per-epoch stepping cadences, and provides a structured protocol for controlled schedule comparisons.</p>
+<hr />
+<h2 id="1-observable-problem-destabilization-and-late-stage-oscillation">1. Observable Problem: Destabilization and Late-Stage Oscillation</h2>
+<p>Consider two diagnostic traces from segmentation runs using a constant learning rate <span class="arithmatex">\(\eta = 10^{-3}\)</span>:</p>
+<pre class="highlight"><code class="language-text">Run A: Initial Destabilization (No Warmup)
+Epoch 1: Train Loss = 0.842 | Gradient Norm = 142.8 | Val Foreground Dice = 0.08
+Epoch 2: Train Loss = 1.620 | Gradient Norm = 380.2 | Val Foreground Dice = 0.00
+Epoch 3: Train Loss = 0.910 | Gradient Norm = 95.4  | Val Foreground Dice = 0.12
+Symptom: Large initial gradients from the random decoder shatter pretrained encoder weights,
+causing loss spikes and unstable early representations.
+
+Run B: Late-Stage Oscillation (Constant Learning Rate)
+Epoch 15: Train Loss = 0.185 | Val Foreground Dice = 0.582
+Epoch 20: Train Loss = 0.182 | Val Foreground Dice = 0.579
+Epoch 25: Train Loss = 0.184 | Val Foreground Dice = 0.581
+Epoch 30: Train Loss = 0.181 | Val Foreground Dice = 0.578
+Symptom: Training loss and validation Dice plateau prematurely. The constant step size
+overshoots the fine, sharp minima needed to resolve subtle scratch boundaries.</code></pre>
+<p>Both failure modes highlight the fundamental limitation of a fixed learning rate: <strong>the optimal step size at the start of training is drastically different from the optimal step size near convergence</strong>.</p>
+<hr />
+<h2 id="2-optimization-mechanics-the-role-of-the-learning-rate">2. Optimization Mechanics: The Role of the Learning Rate</h2>
+<p>In stochastic gradient descent with momentum and AdamW, parameter updates follow the general form:</p>
+<div class="arithmatex">\[\theta_{t+1} = \theta_t - \eta_t \cdot \hat{m}_t\]</div>
+<p>where <span class="arithmatex">\(\theta_t\)</span> represents the model weights at step <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(\eta_t\)</span> is the instantaneous learning rate, and <span class="arithmatex">\(\hat{m}_t\)</span> is the bias-corrected gradient vector (or momentum-scaled directional estimate).</p>
+<p>The optimization trajectory encounters three distinct phases during a training run:</p>
+<pre class="highlight"><code>Phase 1: Exploration &amp; Alignment (Epochs 1 to 5)
+• Gradients are large and noisy.
+• Randomly initialized decoder weights must align with pretrained encoder features.
+• Risk: Gradient explosions shattering pretrained representations.
+• Need: Low, gradually increasing learning rate (Linear Warmup).
+
+Phase 2: Active Traversal (Epochs 5 to 20)
+• Model descends the primary valleys of the loss surface.
+• Coarse defect patterns, class shapes, and major spatial features are learned.
+• Need: High, sustained learning rate to make steady progress and escape saddle points.
+
+Phase 3: Fine Boundary Annealing (Epochs 20 to 30)
+• Coarse features are established; optimization focuses on sub-pixel boundary refinement.
+• Minima for thin scratches (2–5 pixels wide) are steep and narrow.
+• Need: Smooth decay to a fraction of the initial learning rate (1% to 5%) to settle into narrow minima.</code></pre>
+<hr />
+<h2 id="3-schedule-archetypes-mathematical-formulation">3. Schedule Archetypes: Mathematical Formulation</h2>
+<p><img alt="Learning Rate Schedules Comparison" src="assets/fig03_lr_schedules_comparison.png" />
+<em>Figure 2.1: Comparison of learning-rate trajectories across a 30-epoch budget. Warmup followed by Cosine Annealing provides smooth, continuous decay down to the minimum learning-rate floor.</em></p>
+<h3 id="1-step-decay-steplr-multisteplr">1. Step Decay (<code>StepLR</code> / <code>MultiStepLR</code>)</h3>
+<p>Multiplies the learning rate by a fixed factor <span class="arithmatex">\(\gamma \in (0, 1)\)</span> at pre-determined epoch milestones:</p>
+<div class="arithmatex">\[\eta_t = \eta_0 \cdot \gamma^{\lfloor t / s \rfloor}\]</div>
+<p>where <span class="arithmatex">\(s\)</span> is the step size (e.g., decay every 10 epochs by <span class="arithmatex">\(\gamma = 0.2\)</span>).</p>
+<ul>
+<li><em>Advantage</em>: Simple and intuitive.</li>
+<li><em>Disadvantage</em>: Discontinuous drops introduce abrupt shocks to optimizer momentum buffers; requires manual tuning of step milestone epochs.</li>
+</ul>
+<h3 id="2-cosine-annealing-cosineannealinglr">2. Cosine Annealing (<code>CosineAnnealingLR</code>)</h3>
+<p>Introduced by Loshchilov and Hutter (2016), cosine annealing smoothly decreases the learning rate following a half-cosine wave:</p>
+<div class="arithmatex">\[\eta_t = \eta_{\min} + \frac{1}{2} (\eta_{\max} - \eta_{\min}) \left( 1 + \cos\left( \frac{\pi t}{T_{\max}} \right) \right)\]</div>
+<p>where:</p>
+<ul>
+<li><span class="arithmatex">\(\eta_{\max}\)</span>: Peak learning rate (e.g., <span class="arithmatex">\(10^{-3}\)</span>).</li>
+<li><span class="arithmatex">\(\eta_{\min}\)</span>: Minimum learning rate floor (e.g., <span class="arithmatex">\(10^{-5}\)</span> or <span class="arithmatex">\(0.01 \times \eta_{\max}\)</span>).</li>
+<li><span class="arithmatex">\(t\)</span>: Current optimization step or epoch.</li>
+<li>
+<p><span class="arithmatex">\(T_{\max}\)</span>: Total number of steps or epochs in the training budget.</p>
+</li>
+<li>
+<p><em>Advantage</em>: Smooth, non-discontinuous trajectory without hyperparameter milestones.</p>
+</li>
+<li><em>Physical Meaning</em>: The early derivative of cosine is near zero, allowing sustained exploration; the middle phase descends rapidly; the final tail flattens smoothly, granting ample time for delicate boundary annealing.</li>
+</ul>
+<h3 id="3-validation-driven-plateau-decay-reducelronplateau">3. Validation-Driven Plateau Decay (<code>ReduceLROnPlateau</code>)</h3>
+<p>Instead of following a predetermined clock, this scheduler dynamically monitors a validation metric (such as validation loss or validation Foreground Dice):</p>
+<div class="arithmatex">\[\eta_{k+1} = \begin{cases} 
+\eta_k \cdot \gamma &amp; \text{if validation metric has not improved by } \delta_{\min} \text{ for } p \text{ epochs} \\
+\eta_k &amp; \text{otherwise}
+\end{cases}\]</div>
+<p>where <span class="arithmatex">\(p\)</span> is patience (e.g., 3 epochs) and <span class="arithmatex">\(\gamma\)</span> is the reduction factor (e.g., 0.5).</p>
+<ul>
+<li><em>Advantage</em>: Highly responsive to actual model progress; pauses decay if the model is still learning.</li>
+<li><em>Disadvantage</em>: Sensitive to validation metric noise. If rare defect sampling causes validation Dice to fluctuate, the scheduler may prematurely drop the learning rate to zero.</li>
+</ul>
+<hr />
+<h2 id="4-the-critical-role-of-linear-warmup">4. The Critical Role of Linear Warmup</h2>
+<p>In modern segmentation architectures, the encoder backbone is typically pre-trained on ImageNet (millions of natural images), while the decoder, skip-connection projections, and segmentation head are initialized with random Gaussian noise.</p>
+<p>If training commences immediately at maximum learning rate (<span class="arithmatex">\(\eta_{\max} = 10^{-3}\)</span>):</p>
+<ol>
+<li>The random decoder outputs wildly inaccurate predictions, generating massive loss values.</li>
+<li>Backpropagating these massive initial losses produces violent gradient updates across all layers.</li>
+<li>These updates shatter the delicate, pre-trained spatial feature detectors in early encoder convolutions.</li>
+</ol>
+<h3 id="the-linear-warmup-formulation">The Linear Warmup Formulation:</h3>
+<p>Over the first <span class="arithmatex">\(E_{\text{warmup}}\)</span> epochs (typically 2 to 5 epochs):</p>
+<div class="arithmatex">\[\eta_t = \eta_{\max} \cdot \left( \frac{t + 1}{E_{\text{warmup}}} \right), \quad \text{for } 0 \le t &lt; E_{\text{warmup}}\]</div>
+<p>During warmup:</p>
+<ul>
+<li>Initial gradients are scaled down proportionally (<span class="arithmatex">\(1/3\)</span>, <span class="arithmatex">\(2/3\)</span>, then <span class="arithmatex">\(3/3\)</span>).</li>
+<li>The randomly initialized decoder adjusts its weights into a plausible range.</li>
+<li>Batch Normalization running statistics stabilize without corrupting backbone feature representations.</li>
+</ul>
+<hr />
+<h2 id="5-stepping-cadence-per-batch-vs-per-epoch">5. Stepping Cadence: Per-Batch vs. Per-Epoch</h2>
+<p>A common source of confusion is whether <code>scheduler.step()</code> should be invoked after <strong>every training mini-batch</strong> or once at the <strong>end of each epoch</strong>.</p>
+<pre class="highlight"><code>Cadence A: Per-Epoch Stepping
+• Scheduler is called once after all training batches in the epoch complete.
+• Total schedule length: T_max = num_epochs (e.g., T_max = 30).
+• Common for: StepLR, ReduceLROnPlateau, basic LambdaLR.
+
+Cadence B: Per-Batch Stepping
+• Scheduler is called after EVERY optimizer step (every batch or accumulation group).
+• Total schedule length: T_max = num_epochs * steps_per_epoch.
+  Example: 30 epochs * 285 batches = 8,550 total steps.
+• Common for: OneCycleLR, fine-grained CosineAnnealingLR.</code></pre>
+<blockquote>
+<p>[!CAUTION]
+<strong>The Cadence Mismatch Trap</strong>:
+If you configure <code>CosineAnnealingLR(optimizer, T_max=30)</code> intending it for 30 epochs, but accidentally call <code>scheduler.step()</code> inside your inner training loop after every batch, the scheduler will complete its entire 30-epoch decay in the <strong>first 30 batches of Epoch 1</strong>! The remaining 29 epochs will run at the flat minimum learning rate.</p>
+</blockquote>
+<hr />
+<h2 id="6-implementation-pattern-adamw-with-warmup-and-cosine-decay">6. Implementation Pattern: AdamW with Warmup and Cosine Decay</h2>
+<p>Here is the clean, reproducible PyTorch implementation using <code>torch.optim.lr_scheduler.LambdaLR</code>:</p>
+<pre class="highlight"><code class="language-python">import math
+import torch
+import torch.nn as nn
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import LambdaLR
+
+def build_warmup_cosine_scheduler(
+    optimizer: torch.optim.Optimizer,
+    epochs: int,
+    warmup_epochs: int = 3,
+    min_lr_ratio: float = 0.01,
+) -&gt; LambdaLR:
+    """Creates a per-epoch LambdaLR scheduler combining linear warmup with cosine decay.
+
+    Args:
+        optimizer: PyTorch optimizer (e.g. AdamW).
+        epochs: Total training budget in epochs.
+        warmup_epochs: Number of initial epochs dedicated to linear warmup.
+        min_lr_ratio: Minimum LR floor expressed as a fraction of initial LR (e.g. 0.01 = 1%).
+    """
+    def lr_lambda(epoch: int) -&gt; float:
+        # Phase 1: Linear Warmup
+        if epoch &lt; warmup_epochs:
+            return float(epoch + 1) / max(1, warmup_epochs)
+
+        # Phase 2: Cosine Annealing Decay
+        progress = float(epoch - warmup_epochs) / max(1, epochs - warmup_epochs - 1)
+        progress = min(1.0, max(0.0, progress))
+        cosine_decay = 0.5 * (1.0 + math.cos(math.pi * progress))
+
+        return min_lr_ratio + (1.0 - min_lr_ratio) * cosine_decay
+
+    return LambdaLR(optimizer, lr_lambda)</code></pre>
+<h3 id="complete-training-step-loop-sequence">Complete Training Step Loop Sequence:</h3>
+<pre class="highlight"><code class="language-python"># Setup
+optimizer = AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+scheduler = build_warmup_cosine_scheduler(optimizer, epochs=30, warmup_epochs=3)
+
+for epoch in range(30):
+    model.train()
+    for batch in train_loader:
+        optimizer.zero_grad(set_to_none=True)
+        images, masks = batch["image"].to(device), batch["mask"].to(device)
+
+        loss = criterion(model(images), masks)
+        loss.backward()
+
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        optimizer.step()  # Optimizer MUST step before scheduler
+
+    # Validation step
+    val_metrics = evaluate(model, val_loader)
+
+    # Step per-epoch scheduler at epoch boundary
+    scheduler.step()
+
+    current_lr = optimizer.param_groups[0]["lr"]
+    print(f"Epoch {epoch+1:02d} Complete | Val Foreground Dice: {val_metrics['fg_dice']:.4f} | Next LR: {current_lr:.2e}")</code></pre>
+<hr />
+<h2 id="7-diagnostic-symptoms-causes-and-checks">7. Diagnostic Symptoms: Causes and Checks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Observable Symptom in Logs</th>
+<th style="text-align: left;">Underlying Root Cause</th>
+<th style="text-align: left;">Verification Check</th>
+<th style="text-align: left;">Recommended Next Step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Loss diverges to <code>NaN</code> in Epoch 1, especially when starting with pretrained backbone.</td>
+<td style="text-align: left;">Gradient shattering: high initial LR applied to random decoder propagates unstable gradients into encoder.</td>
+<td style="text-align: left;">Check <code>train/gradient_norm</code> in first 50 steps; inspect decoder weight initialization.</td>
+<td style="text-align: left;">Add 3–5 epochs of linear warmup; verify initial learning rate <span class="arithmatex">\(\le 10^{-3}\)</span>; add gradient clipping.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Learning rate drops to minimum floor before Epoch 1 finishes.</td>
+<td style="text-align: left;">Cadence mismatch: per-epoch scheduler (<code>T_max = 30</code>) was stepped inside the per-batch inner loop.</td>
+<td style="text-align: left;">Print <code>optimizer.param_groups[0]['lr']</code> at every batch; inspect scheduler call location.</td>
+<td style="text-align: left;">Move <code>scheduler.step()</code> outside the batch loop to the epoch boundary.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Training loss continues descending smoothly, but validation Dice stops improving at epoch 12.</td>
+<td style="text-align: left;">Overfitting on training distribution; model memorizing subtle texture patterns without generalizable boundary rules.</td>
+<td style="text-align: left;">Compare training loss vs. validation loss curve; inspect validation error masks.</td>
+<td style="text-align: left;">Introduce learning rate decay (cosine); add early stopping; increase data augmentations.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>ReduceLROnPlateau</code> drops learning rate prematurely on epoch 4 during noisy validation.</td>
+<td style="text-align: left;">Patience window too short (<span class="arithmatex">\(p = 1\)</span>), causing scheduler to react to normal validation mini-batch stochasticity.</td>
+<td style="text-align: left;">Check validation Dice variance across consecutive epochs.</td>
+<td style="text-align: left;">Increase patience to <span class="arithmatex">\(p \ge 4\)</span>; enforce <code>min_delta</code> (e.g., <span class="arithmatex">\(0.005\)</span>) to ignore minor noise.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-ungraded-try-it-schedule-selection-challenge">8. Ungraded "Try It": Schedule Selection Challenge</h2>
+<p>Review the following three project scenarios and determine which schedule configuration is most technically sound:</p>
+<pre class="highlight"><code class="language-text">Scenario A:
+A student has a fixed budget of 30 epochs on Kaggle GPUs. They are using an EfficientNet-B2
+backbone paired with a U-Net++ decoder. They want a smooth, predictable decay that spends
+adequate time annealing boundary pixels in the final 10 epochs.
+
+Scenario B:
+A student has an open-ended training budget on a private workstation. They are uncertain
+how many epochs the model will need to converge, and they want the learning rate to drop
+only when validation loss demonstrably flattens for several consecutive evaluations.
+
+Scenario C:
+A student trains a model from scratch (randomly initialized encoder and decoder, no ImageNet
+weights). They want to ramp up the learning rate immediately to 5e-3 on batch 1.</code></pre>
+<p><strong>Diagnostic Questions</strong>:</p>
+<ol>
+<li>For Scenario A, why is a Linear Warmup (3 epochs) + Cosine Annealing schedule preferable to StepLR?</li>
+<li>For Scenario B, what monitored quantity and patience setting should be passed to <code>ReduceLROnPlateau</code> to avoid premature stopping?</li>
+<li>For Scenario C, what will happen to the randomly initialized weights if warmup is omitted?</li>
+</ol>
+<hr />
+<h2 id="9-authoritative-references">9. Authoritative References</h2>
+<ul>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.LambdaLR.html"><code>torch.optim.lr_scheduler.LambdaLR</code></a></li>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html"><code>torch.optim.lr_scheduler.CosineAnnealingLR</code></a></li>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.ReduceLROnPlateau.html"><code>torch.optim.lr_scheduler.ReduceLROnPlateau</code></a></li>
+<li>Loshchilov, I., &amp; Hutter, F. (2016). <em>SGDR: Stochastic Gradient Descent with Warm Restarts</em>. ICLR. (Foundational cosine annealing reference).</li>
+<li>Goyal, P., et al. (2017). <em>Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour</em>. arXiv:1706.02677. (Foundational linear warmup reference).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_01_multilevel_class_imbalance.html">← Guide 01 · Multi-Level Class Imbalance</a><a href="guide_03_early_stopping_and_checkpoint_governance.html">Guide 03 · Early Stopping &amp; Checkpoints →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

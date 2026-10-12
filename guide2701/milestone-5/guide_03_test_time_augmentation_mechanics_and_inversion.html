@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 03 · Test-Time Augmentation (TTA) · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html" aria-current="page"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 03 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-un-inverted-ghosting-bug">1. Concrete Failure Case: The Un-Inverted Ghosting Bug</a></li>
+<li><a href="#2-the-complete-transformation-inversion-cycle">2. The Complete Transformation &amp; Inversion Cycle</a></li>
+<li><a href="#3-worked-numerical-example-the-asymmetric-toy-grid">3. Worked Numerical Example: The Asymmetric Toy Grid</a></li>
+<li><a href="#4-physical-plausibility-on-industrial-steel-strips">4. Physical Plausibility on Industrial Steel Strips</a></li>
+<li><a href="#5-averaging-formulations-logits-vs-probabilities">5. Averaging Formulations: Logits vs. Probabilities</a></li>
+<li><a href="#6-implementation-and-computational-cost">6. Implementation and Computational Cost</a></li>
+<li><a href="#7-the-spatial-alignment-verification-diagnostic">7. The Spatial Alignment Verification Diagnostic</a></li>
+<li><a href="#8-decision-analysis-when-does-tta-help-vs-hurt">8. Decision Analysis: When Does TTA Help vs. Hurt?</a></li>
+<li><a href="#9-ungraded-activity-predict-the-alignment-consequence">9. Ungraded Activity: Predict the Alignment Consequence</a></li>
+<li><a href="#10-authoritative-framework-competition-references">10. Authoritative Framework &amp; Competition References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-03-test-time-augmentation-tta-inversion-geometry-verification">Guide 03: Test-Time Augmentation (TTA): Inversion Geometry &amp; Verification</h1>
+<p>In standard evaluation, a trained neural network inspects each test image once in its native orientation:</p>
+<div class="arithmatex">\[\hat{\mathbf{P}} = f_{\theta}(\mathbf{x})\]</div>
+<p>However, deep neural networks are not strictly equivariant to geometric transformations. An anomaly positioned near the left boundary of a steel strip might trigger slightly different feature activations than the exact same anomaly viewed from the opposite direction.</p>
+<p><strong>Test-Time Augmentation (TTA)</strong> is an inference-time technique that exploits this sensitivity. By generating multiple augmented views of a test image, running the forward pass through each view, <strong>inverting the geometric transformation on the resulting prediction maps</strong>, and averaging the aligned predictions, TTA can smooth out boundary noise, reduce variance, and boost model confidence.</p>
+<p>Yet TTA is frequently misunderstood and improperly implemented. An omitted or incorrect inverse transformation does not merely degrade performance—it causes catastrophic spatial inversion bugs where defects on the left side of a strip are stamped onto the right side, destroying localization entirely.</p>
+<p>In this guide, you will master the full transformation and spatial inversion cycle, understand why spatial flips are physically plausible on industrial line-scan strips, evaluate logit versus probability averaging, and implement strict alignment verification tests.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-un-inverted-ghosting-bug">1. Concrete Failure Case: The Un-Inverted Ghosting Bug</h2>
+<p>Consider an industrial line-scan strip (<span class="arithmatex">\(128 \times 800\)</span>) containing a localized crack (<code>defect_d</code>) near the left end of the sheet, spanning columns <span class="arithmatex">\([40..100]\)</span>:</p>
+<pre class="highlight"><code>Original Strip x:
+Row 50: [ ... (clean) ... [DEFECT D at cols 40..100] ... (clean) ... ]</code></pre>
+<p>A student implements Horizontal Flip (H-Flip) TTA to boost test performance:</p>
+<ol>
+<li>
+<p>They flip the image horizontally: <span class="arithmatex">\(\mathbf{x}_{\text{flipped}} = \operatorname{fliplr}(\mathbf{x})\)</span>.
+   On this flipped canvas, the crack now sits on the <strong>right</strong> side, spanning columns <span class="arithmatex">\([700..760]\)</span> (<span class="arithmatex">\(800 - 100 = 700\)</span>).</p>
+</li>
+<li>
+<p>The model correctly predicts the defect at its new coordinates on the flipped image:</p>
+<div class="arithmatex">\[\hat{\mathbf{P}}_{\text{flipped}} \in [0, 1]^{128 \times 800}, \quad \text{high probability at cols } [700..760]\]</div>
+</li>
+<li>
+<p><strong>The Fatal Bug</strong>: The student directly averages the predictions without inverting:</p>
+<div class="arithmatex">\[\hat{\mathbf{P}}_{\text{final}} = 0.5 \times \hat{\mathbf{P}}_{\text{orig}} + 0.5 \times \hat{\mathbf{P}}_{\text{flipped}}\]</div>
+</li>
+</ol>
+<h3 id="what-happens-to-the-prediction">What Happens to the Prediction?</h3>
+<ul>
+<li>At true coordinates <span class="arithmatex">\([40..100]\)</span>: The original pass predicts <span class="arithmatex">\(0.90\)</span>, but the un-inverted pass predicts <span class="arithmatex">\(0.02\)</span>. The average is <span class="arithmatex">\(\frac{0.90 + 0.02}{2} = \mathbf{0.46}\)</span>. At <span class="arithmatex">\(\tau = 0.50\)</span>, the real defect vanishes!</li>
+<li>At mirror coordinates <span class="arithmatex">\([700..760]\)</span>: The original pass predicts <span class="arithmatex">\(0.02\)</span>, but the un-inverted pass predicts <span class="arithmatex">\(0.90\)</span>. The average is <span class="arithmatex">\(\frac{0.02 + 0.90}{2} = \mathbf{0.46}\)</span>. A ghost defect is predicted on spotless steel!</li>
+</ul>
+<p>The student’s submission now contains two faint ghost detections, both below threshold, resulting in an Intersection-over-Union of <strong>0.0000</strong>!</p>
+<p><img alt="TTA Flip Inversion Cycle" src="assets/fig05_tta_flip_inversion_cycle.png" />
+<em>Figure 3.1: The Test-Time Augmentation transformation cycle. (Top) The correct cycle: transform, predict, invert, average. (Bottom) The un-inverted bug: omitting inversion creates mirror ghost defects and destroys spatial localization.</em></p>
+<hr />
+<h2 id="2-the-complete-transformation-inversion-cycle">2. The Complete Transformation &amp; Inversion Cycle</h2>
+<p>Test-Time Augmentation consists of four sequential, mathematically coupled stages:</p>
+<pre class="highlight"><code>                 ┌────────────────────────────────────────────────────────┐
+                 │                Original Image x                        │
+                 └──────────────────────────┬─────────────────────────────┘
+                                            │
+                     ┌──────────────────────┴──────────────────────┐
+                     ▼                                             ▼
+       Identity Pass: x_0 = x                       Transform: x_k = T_k(x)
+                     │                                             │
+                     ▼                                             ▼
+       Forward: P_0 = f_θ(x_0)                      Forward: P_k = f_θ(x_k)
+                     │                                             │
+                     │                              Inverse: P_k* = T_k^(-1)(P_k)
+                     │                                             │
+                     └──────────────────────┬──────────────────────┘
+                                            ▼
+                           Ensemble Average: P_TTA = 1/K ∑ P_k*</code></pre>
+<h3 id="the-invertibility-requirement">The Invertibility Requirement</h3>
+<p>Every test-time transformation <span class="arithmatex">\(T\)</span> must possess a well-defined, exact spatial inverse <span class="arithmatex">\(T^{-1}\)</span> such that:</p>
+<div class="arithmatex">\[T^{-1}(T(\mathbf{M})) = \mathbf{M} \quad \forall \mathbf{M} \in \mathbb{R}^{H \times W}\]</div>
+<p>For discrete reflection operations on a 2D tensor:</p>
+<ul>
+<li><strong>Horizontal Flip (<span class="arithmatex">\(H\)</span>-Flip)</strong>: Reflection across the vertical centerline.<ul>
+<li>Forward: <span class="arithmatex">\(T_H(A)[y, x] = A[y, W - 1 - x]\)</span></li>
+<li>Inverse: <span class="arithmatex">\(T_H^{-1} = T_H\)</span> (An involution: applying it twice restores the original tensor).</li>
+</ul>
+</li>
+<li><strong>Vertical Flip (<span class="arithmatex">\(V\)</span>-Flip)</strong>: Reflection across the horizontal centerline.<ul>
+<li>Forward: <span class="arithmatex">\(T_V(A)[y, x] = A[H - 1 - y, x]\)</span></li>
+<li>Inverse: <span class="arithmatex">\(T_V^{-1} = T_V\)</span> (Also an involution).</li>
+</ul>
+</li>
+<li><strong>Composite <span class="arithmatex">\(HV\)</span>-Flip</strong>: Both horizontal and vertical reflections (<span class="arithmatex">\(180^\circ\)</span> planar rotation).<ul>
+<li>Forward: <span class="arithmatex">\(T_{HV}(A)[y, x] = A[H - 1 - y, W - 1 - x]\)</span></li>
+<li>Inverse: <span class="arithmatex">\(T_{HV}^{-1} = T_{HV}\)</span>.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="3-worked-numerical-example-the-asymmetric-toy-grid">3. Worked Numerical Example: The Asymmetric Toy Grid</h2>
+<p>Let us trace a tiny <span class="arithmatex">\(3 \times 4\)</span> probability grid through the complete <span class="arithmatex">\(H\)</span>-flip and <span class="arithmatex">\(V\)</span>-flip cycles.</p>
+<p>Suppose an asymmetric defect blob is localized in the upper-left corner of the original canvas:</p>
+<pre class="highlight"><code>Original Image / Ground Truth Y:
+Row / Col     Col 0    Col 1    Col 2    Col 3
+Row 0        [  1        1        0        0  ]  &lt;-- Defect located at (0, 0), (0, 1), (1, 0)
+Row 1        [  1        0        0        0  ]
+Row 2        [  0        0        0        0  ]</code></pre>
+<h3 id="trace-a-horizontal-flip-h-flip">Trace A: Horizontal Flip (<span class="arithmatex">\(H\)</span>-Flip)</h3>
+<ol>
+<li>
+<p><strong>Forward Transform <span class="arithmatex">\(T_H(\mathbf{x})\)</span></strong>: Flip columns along the horizontal axis:
+   <pre class="highlight"><code>T_H(x):
+[ 0  0  1  1 ]  &lt;-- Defect has moved to Col 2 and Col 3
+[ 0  0  0  1 ]
+[ 0  0  0  0 ]</code></pre></p>
+</li>
+<li>
+<p><strong>Model Forward Pass on <span class="arithmatex">\(T_H(\mathbf{x})\)</span></strong>:
+   The model evaluates <span class="arithmatex">\(T_H(\mathbf{x})\)</span> and predicts high probability at the transformed coordinates:
+   <pre class="highlight"><code>P_flipped = f_θ(T_H(x)):
+[ 0.05  0.08  0.92  0.95 ]
+[ 0.04  0.05  0.10  0.91 ]
+[ 0.02  0.03  0.04  0.05 ]</code></pre></p>
+</li>
+<li>
+<p><strong>Spatial Inversion <span class="arithmatex">\(T_H^{-1}(\hat{\mathbf{P}}_{\text{flipped}})\)</span></strong>:
+   Flip columns horizontally back to the native coordinate system:
+   <pre class="highlight"><code>T_H^(-1)(P_flipped):
+[ 0.95  0.92  0.08  0.05 ]  &lt;-- Restored to Col 0 and Col 1!
+[ 0.91  0.10  0.05  0.04 ]
+[ 0.05  0.04  0.03  0.02 ]</code></pre></p>
+</li>
+<li>
+<p><strong>Aggregation with Original Pass <span class="arithmatex">\(\hat{\mathbf{P}}_{\text{orig}}\)</span></strong>:
+   Suppose the original pass predicted:
+   <pre class="highlight"><code>P_orig:
+[ 0.90  0.88  0.06  0.03 ]
+[ 0.89  0.12  0.04  0.02 ]
+[ 0.03  0.02  0.02  0.01 ]</code></pre>
+   Averaging <span class="arithmatex">\(\hat{\mathbf{P}}_{\text{orig}}\)</span> and <span class="arithmatex">\(T_H^{-1}(\hat{\mathbf{P}}_{\text{flipped}})\)</span>:
+   <pre class="highlight"><code>P_TTA = 0.5 * (P_orig + Inverted):
+[ 0.925  0.900  0.070  0.040 ]  --&gt; Defect pixels reinforced to &gt;0.90!
+[ 0.900  0.110  0.045  0.030 ]  --&gt; False alarm pixels suppressed to &lt;0.07!
+[ 0.040  0.030  0.025  0.015 ]</code></pre></p>
+</li>
+</ol>
+<p>At threshold <span class="arithmatex">\(\tau = 0.50\)</span>, the resulting binary mask perfectly recovers the ground truth with zero boundary artifacts!</p>
+<hr />
+<h2 id="4-physical-plausibility-on-industrial-steel-strips">4. Physical Plausibility on Industrial Steel Strips</h2>
+<p>Not every mathematical transformation is physically plausible in industrial manufacturing:</p>
+<pre class="highlight"><code>                                The Industrial Strip Geometry
+◄────────────────────────────────── Width = 800 px (Rolling Direction) ──────────────────────────────────►
+▲
+│ Height = 128 px (Cross-Strip Transverse Axis)
+▼</code></pre>
+<h3 id="why-flips-are-valid">Why Flips Are Valid:</h3>
+<ol>
+<li><strong>Horizontal Flip (<span class="arithmatex">\(H\)</span>-Flip)</strong>: Reverses the rolling direction (simulating inspecting the coil from the trailing end instead of the leading end). Steel surface textures (oxide scale, roller marks) are physically symmetrical with respect to forward vs. backward longitudinal motion.</li>
+<li><strong>Vertical Flip (<span class="arithmatex">\(V\)</span>-Flip)</strong>: Reverses the transverse axis across the strip width (simulating viewing the steel coil from the left drive side versus the right operator side). Flaws appear identically regardless of cross-strip perspective.</li>
+</ol>
+<h3 id="why-arbitrary-rotations-and-transpositions-are-invalid">Why Arbitrary Rotations and Transpositions Are INVALID:</h3>
+<ul>
+<li><strong><span class="arithmatex">\(90^\circ\)</span> Rotation / Transposition</strong>: Swaps height and width, producing a <span class="arithmatex">\(800 \times 128\)</span> tensor. This completely violates the fixed line-scan aspect ratio (<span class="arithmatex">\(6.25:1\)</span>).</li>
+<li>Furthermore, physical steel rolling imparts a directional grain along the longitudinal axis. Rotating the image by <span class="arithmatex">\(90^\circ\)</span> rotates the mechanical rolling grain perpendicularly, presenting an out-of-distribution visual pattern to the convolutional filters!</li>
+</ul>
+<blockquote>
+<p>[!CAUTION]
+Restrict your TTA policy strictly to <strong>reflections</strong>: <code>{Identity, Horizontal Flip}</code> (2 views) or <code>{Identity, H-Flip, V-Flip, HV-Flip}</code> (4 views). Never apply arbitrary affine rotations (<span class="arithmatex">\(15^\circ, 45^\circ\)</span>) or <span class="arithmatex">\(90^\circ\)</span> transpositions.</p>
+</blockquote>
+<hr />
+<h2 id="5-averaging-formulations-logits-vs-probabilities">5. Averaging Formulations: Logits vs. Probabilities</h2>
+<p>When aggregating <span class="arithmatex">\(K\)</span> augmented passes, should you average raw logits or activated probabilities?</p>
+<h3 id="approach-1-averaging-probabilities-soft-blending">Approach 1: Averaging Probabilities (Soft Blending)</h3>
+<div class="arithmatex">\[\hat{\mathbf{P}}_{\text{TTA}} = \frac{1}{K} \sum_{k=1}^{K} T_k^{-1}\left(\sigma\left(f_{\theta}(T_k(\mathbf{x}))\right)\right)\]</div>
+<ul>
+<li><strong>Properties</strong>: Operates strictly in the bounded probability domain <span class="arithmatex">\([0, 1]\)</span>.</li>
+<li>
+<p><strong>Convexity</strong>: Because the logistic sigmoid <span class="arithmatex">\(\sigma(z)\)</span> is non-linear, Jensen's inequality guarantees:</p>
+<div class="arithmatex">\[\sigma\left(\frac{1}{K}\sum z_k\right) \neq \frac{1}{K}\sum \sigma(z_k)\]</div>
+<p>Averaging probabilities dampens extreme, uncalibrated logit spikes. If three views predict <span class="arithmatex">\(z \approx -4\)</span> (clean metal) and one view predicts a spurious outlier spike <span class="arithmatex">\(z \approx +6\)</span>, probability averaging computes:</p>
+<div class="arithmatex">\[\frac{0.018 + 0.018 + 0.018 + 0.997}{4} = \mathbf{0.263} &lt; 0.50\]</div>
+<p>The spurious logit spike is safely suppressed!</p>
+</li>
+</ul>
+<h3 id="approach-2-averaging-logits">Approach 2: Averaging Logits</h3>
+<div class="arithmatex">\[\hat{\mathbf{Z}}_{\text{TTA}} = \frac{1}{K} \sum_{k=1}^{K} T_k^{-1}\left(f_{\theta}(T_k(\mathbf{x}))\right), \quad \hat{\mathbf{P}}_{\text{TTA}} = \sigma\left(\hat{\mathbf{Z}}_{\text{TTA}}\right)\]</div>
+<ul>
+<li><strong>Properties</strong>: Preserves linearity in feature space. However, a single unbounded logit outlier (<span class="arithmatex">\(z = +15\)</span>) will dominate the average, causing false alarms.</li>
+</ul>
+<blockquote>
+<p>[!TIP]
+In semantic segmentation, <strong>averaging activated probabilities</strong> is the standard, robust choice for TTA because it naturally bounds confidence and guards against outlier activations.</p>
+</blockquote>
+<hr />
+<h2 id="6-implementation-and-computational-cost">6. Implementation and Computational Cost</h2>
+<pre class="highlight"><code class="language-python">import torch
+import torch.nn as nn
+
+def predict_tta_4view(model: nn.Module, image: torch.Tensor) -&gt; torch.Tensor:
+    """Execute 4-view Test-Time Augmentation on a single GPU batch [B, 1, 128, 800].
+
+    Transforms: Identity, Horizontal Flip, Vertical Flip, HV Flip.
+    """
+    model.eval()
+    with torch.inference_mode():
+        # 1. Identity view
+        p0 = torch.sigmoid(model(image))
+
+        # 2. Horizontal Flip view
+        img_h = torch.flip(image, dims=[-1])
+        p1 = torch.flip(torch.sigmoid(model(img_h)), dims=[-1])
+
+        # 3. Vertical Flip view
+        img_v = torch.flip(image, dims=[-2])
+        p2 = torch.flip(torch.sigmoid(model(img_v)), dims=[-2])
+
+        # 4. Horizontal + Vertical Flip view
+        img_hv = torch.flip(image, dims=[-2, -1])
+        p3 = torch.flip(torch.sigmoid(model(img_hv)), dims=[-2, -1])
+
+        # Aggregate probability maps
+        p_tta = (p0 + p1 + p2 + p3) / 4.0
+
+    return p_tta</code></pre>
+<h3 id="the-cost-equation">The Cost Equation</h3>
+<p>TTA provides variance reduction, but at a direct computational price:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">TTA Policy</th>
+<th style="text-align: left;">Views (<span class="arithmatex">\(K\)</span>)</th>
+<th style="text-align: left;">Inference Time</th>
+<th style="text-align: left;">GPU VRAM Overhead</th>
+<th style="text-align: left;">Typical Validation Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>No TTA (Identity)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.0\times\)</span> (Baseline)</td>
+<td style="text-align: left;"><span class="arithmatex">\(1.0\times\)</span></td>
+<td style="text-align: left;">Baseline score.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2-View (<span class="arithmatex">\(H\)</span>-Flip)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2.0\times\)</span> (Double forward passes)</td>
+<td style="text-align: left;">None (if streamed)</td>
+<td style="text-align: left;"><span class="arithmatex">\(+0.005\)</span> to <span class="arithmatex">\(+0.015\)</span> Dice gain.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4-View (<span class="arithmatex">\(H + V + HV\)</span>)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(4\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(4.0\times\)</span> (Quadruple passes)</td>
+<td style="text-align: left;">None (if streamed)</td>
+<td style="text-align: left;"><span class="arithmatex">\(+0.008\)</span> to <span class="arithmatex">\(+0.020\)</span> Dice gain.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!WARNING]
+Kaggle notebooks enforce a strict 9-hour total execution limit. If your baseline model takes 35 minutes to evaluate 3,000 test images, 4-view TTA will increase runtime to <span class="arithmatex">\(2.3\)</span> hours. If you ensemble 4 models with 4-view TTA, inference time balloons to <span class="arithmatex">\(9.3\)</span> hours—triggering notebook timeout! Always benchmark inference latency on 100 images before committing to multi-view TTA.</p>
+</blockquote>
+<hr />
+<h2 id="7-the-spatial-alignment-verification-diagnostic">7. The Spatial Alignment Verification Diagnostic</h2>
+<p>Never verify TTA simply by checking whether total active pixel counts match:</p>
+<div class="arithmatex">\[\sum \hat{M}_{\text{orig}} \stackrel{?}{=} \sum \hat{M}_{\text{inverted}}\]</div>
+<p>A flipped mask has the exact same pixel sum even if it is completely inverted across the canvas!</p>
+<p>You must verify spatial alignment using an <strong>asymmetric coordinate test</strong>:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+def verify_tta_alignment():
+    """Verify that horizontal and vertical flip inversions preserve exact pixel coordinates."""
+    H, W = 128, 800
+    test_canvas = np.zeros((H, W), dtype=np.float32)
+
+    # Place an asymmetric localized marker at known coordinates
+    test_canvas[25:35, 120:180] = 1.0
+
+    # 1. Test Horizontal Flip Inversion
+    h_flipped = np.flip(test_canvas, axis=-1)
+    h_restored = np.flip(h_flipped, axis=-1)
+    assert np.array_equal(test_canvas, h_restored), "Horizontal flip inversion failed!"
+
+    # 2. Test Vertical Flip Inversion
+    v_flipped = np.flip(test_canvas, axis=-2)
+    v_restored = np.flip(v_flipped, axis=-2)
+    assert np.array_equal(test_canvas, v_restored), "Vertical flip inversion failed!"
+
+    # 3. Test Alignment IoU with Known Marker
+    # Simulates an un-inverted bug to prove diagnostic sensitivity
+    buggy_blend = 0.5 * test_canvas + 0.5 * h_flipped
+    intersection = np.logical_and(test_canvas &gt; 0.5, buggy_blend &gt; 0.5).sum()
+    print(f"Verified: Un-inverted bug overlap with true marker = {intersection} pixels (should be 0)")
+    assert intersection == 0, "Diagnostic failed to catch inversion misalignment!"
+    print("✓ TTA spatial inversion contracts verified 100% mathematically sound.")
+
+verify_tta_alignment()</code></pre>
+<hr />
+<h2 id="8-decision-analysis-when-does-tta-help-vs-hurt">8. Decision Analysis: When Does TTA Help vs. Hurt?</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Factor</th>
+<th style="text-align: left;">TTA Helps</th>
+<th style="text-align: left;">TTA Hurts or Wastes Budget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Model Invariance</strong></td>
+<td style="text-align: left;">Model was trained with synchronized horizontal flips; feature spaces align smoothly.</td>
+<td style="text-align: left;">Model was never trained with flips; transformed views produce out-of-distribution hallucinations.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Boundary Fuzziness</strong></td>
+<td style="text-align: left;">High uncertainty on defect borders; averaging sharpens high-confidence cores.</td>
+<td style="text-align: left;">Defect is an ultra-thin 1-pixel scratch; slight geometric misalignments wash out weak probabilities below threshold.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Computational Budget</strong></td>
+<td style="text-align: left;">Ample time remaining within Kaggle limits (&lt; 2 hours).</td>
+<td style="text-align: left;">Tight latency budget; ensemble of multiple models already saturates notebook limits.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-ungraded-activity-predict-the-alignment-consequence">9. Ungraded Activity: Predict the Alignment Consequence</h2>
+<p>Suppose a defect blob in the native coordinate system spans:</p>
+<div class="arithmatex">\[\text{Rows } [30..40], \quad \text{Columns } [100..200] \quad (\text{Canvas size } 128 \times 800)\]</div>
+<ol>
+<li>What are the bounding box row and column ranges of this defect after applying a horizontal flip (<span class="arithmatex">\(H\)</span>-flip)?</li>
+<li>What are the bounding box row and column ranges after applying a composite <span class="arithmatex">\(HV\)</span>-flip?</li>
+<li>If an engineer erroneously implements <span class="arithmatex">\(T_{HV}^{-1}\)</span> using only <code>np.flip(pred, axis=-1)</code> (omitting the vertical axis inversion), what will be the resulting bounding box coordinates of the "restored" prediction?</li>
+<li>What will be the Intersection-over-Union between the ground truth defect and this partially inverted prediction?</li>
+</ol>
+<hr />
+<h2 id="10-authoritative-framework-competition-references">10. Authoritative Framework &amp; Competition References</h2>
+<ul>
+<li><strong>PyTorch Documentation</strong>: <a href="https://pytorch.org/docs/stable/generated/torch.flip.html"><code>torch.flip</code></a></li>
+<li><strong>Kaggle Discussions</strong>: <em>Test-Time Augmentation Strategies in Industrial Semantic Segmentation</em></li>
+<li><strong>Kolesnikov et al. (2019)</strong>: <em>Big Transfer (BiT): General Visual Representation Learning</em> (Section 4: Test-time policy and variance reduction).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_02_connected_components_and_minimum_area_filtering.html">← Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_04_ensembling_models_and_checkpoints.html">Guide 04 · Ensembling Models &amp; Checkpoints →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

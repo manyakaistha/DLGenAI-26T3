@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 07 · Controlled Experimentation · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html" aria-current="page"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 07 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-multi-change-confusion">1. Observable Problem: The Multi-Change Confusion</a></li>
+<li><a href="#2-the-four-principles-of-controlled-experimentation">2. The Four Principles of Controlled Experimentation</a></li>
+<li><a href="#3-the-experiment-audit-matrix">3. The Experiment Audit Matrix</a></li>
+<li><a href="#4-the-anatomy-of-an-ablation-study">4. The Anatomy of an Ablation Study</a></li>
+<li><a href="#5-common-experimentation-anti-patterns">5. Common Experimentation Anti-Patterns</a></li>
+<li><a href="#6-ungraded-try-it-design-an-experiment-plan">6. Ungraded "Try It": Design an Experiment Plan</a></li>
+<li><a href="#7-authoritative-references">7. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="controlled-experimentation-and-scientific-iteration">Controlled Experimentation and Scientific Iteration</h1>
+<p>When training deep segmentation models, the temptation to try multiple promising ideas at once is overwhelming. A team might simultaneously swap their encoder backbone, add cosine learning-rate decay, introduce rare-class oversampling, switch from BCE to Focal Loss, and apply aggressive new augmentations—all in a single training run.</p>
+<p>If the validation score drops, which change was responsible? More dangerously, <strong>if the validation score improves by +0.03, did all five changes help—or did one brilliant change help by +0.07 while two harmful changes degraded performance by -0.04?</strong></p>
+<p>Without controlled experimentation, deep learning degenerates into superstitious trial-and-error. You waste hundreds of GPU hours chasing phantom improvements and deploying bloated pipelines with harmful components.</p>
+<p>This final guide establishes the <strong>scientific method for machine learning engineering</strong>: the One-Factor-At-A-Time (OFAT) protocol, invariant baselines, ablation methodology, and an experiment audit matrix to ensure every line of code in your pipeline is justified by rigorous empirical evidence.</p>
+<hr />
+<h2 id="1-observable-problem-the-multi-change-confusion">1. Observable Problem: The Multi-Change Confusion</h2>
+<p>Consider this real-world interaction between two project logs:</p>
+<pre class="highlight"><code class="language-text">Run 01: Baseline
+Architecture: ResNet-34 U-Net | Loss: BCE + Soft Dice | Schedule: Constant 1e-3 | Sampling: Natural
+Val Foreground Dice: 0.502 | Clean Specificity: 98.4%
+
+Run 02: "The Kitchen Sink"
+Student changes:
+1. Switched encoder to EfficientNet-B2
+2. Added Cosine Annealing with Warmup
+3. Enabled 5x Rare-Class Oversampling
+4. Replaced BCE with Focal Loss
+5. Added Random Gamma &amp; Contrast Augmentation
+Val Foreground Dice: 0.518 (+0.016 improvement!)</code></pre>
+<p>The student declares Run 02 an unambiguous success and permanently adopts all five changes.</p>
+<p>Two weeks later, the team conducts a systematic ablation study and discovers:</p>
+<ul>
+<li>The <strong>Cosine Annealing</strong> schedule had actually improved the score by <strong>+0.045</strong>.</li>
+<li>The <strong>Focal Loss</strong> and <strong>5x Oversampling</strong> had degraded performance by <strong>-0.029</strong> by flooding clean images with false alarms!</li>
+<li>By bundling all changes together, the student had masked a severe degradation and locked two harmful components into their pipeline.</li>
+</ul>
+<hr />
+<h2 id="2-the-four-principles-of-controlled-experimentation">2. The Four Principles of Controlled Experimentation</h2>
+<p><img alt="Controlled Experimentation Protocol" src="assets/fig10_controlled_experimentation_matrix.png" />
+<em>Figure 7.1: The scientific iteration cycle in deep learning. Every experiment isolates a single factor, tests an explicit falsifiable hypothesis against a frozen baseline anchor, and reaches a definitive audit decision.</em></p>
+<p>To achieve scientific attribution, adhere strictly to these four rules:</p>
+<h3 id="principle-1-the-one-factor-at-a-time-ofat-rule">Principle 1: The One-Factor-At-A-Time (OFAT) Rule</h3>
+<p>In any individual experiment run, <strong>change exactly one independent variable</strong> relative to your established baseline anchor:</p>
+<ul>
+<li>Change the learning-rate schedule, OR</li>
+<li>Change the loss formulation, OR</li>
+<li>Change the sampling rule, OR</li>
+<li>Change the encoder architecture.
+<strong>Never change two simultaneously.</strong> If an experiment changes both the optimizer and the dataset sampling, you cannot attribute the resulting score to either factor.</li>
+</ul>
+<h3 id="principle-2-freeze-invariant-foundations">Principle 2: Freeze Invariant Foundations</h3>
+<p>Every experiment in a series must share an identical foundation:</p>
+<ol>
+<li><strong>Identical Validation Split</strong>: Always evaluate against the exact same combination-stratified fold (e.g. Fold 0). Never compare a Fold 0 score to a Fold 1 score or a random split.</li>
+<li><strong>Identical Preprocessing &amp; Dimensions</strong>: Grayscale loading, standard normalization, and native <span class="arithmatex">\(128 \times 800\)</span> resolution must remain fixed.</li>
+<li><strong>Identical Evaluation Protocol</strong>: The metric computation code, threshold evaluation grid, and minimum area filters must be identical.</li>
+<li><strong>Identical Random Seed</strong>: Keep data splitting, worker initialization, and augmentations seeded deterministically.</li>
+</ol>
+<h3 id="principle-3-formulate-a-falsifiable-hypothesis">Principle 3: Formulate a Falsifiable Hypothesis</h3>
+<p>Before launching an experiment, write down an explicit hypothesis stating <strong>why</strong> the change should help and <strong>what specific measurement</strong> will confirm or refute it:</p>
+<ul>
+<li><em>Poor Hypothesis</em>: "I want to try cosine decay to see if it improves things."</li>
+<li><em>Rigorous Scientific Hypothesis</em>: "Because our baseline oscillates in narrow minima during the final 10 epochs, switching from constant LR to Cosine Annealing with a 3-epoch warmup will reduce late-stage loss variance and increase validation Foreground Dice on thin defects by at least <span class="arithmatex">\(+0.02\)</span>."</li>
+</ul>
+<h3 id="principle-4-distinguish-signal-from-stochastic-noise">Principle 4: Distinguish Signal from Stochastic Noise</h3>
+<p>Every deep learning run contains random variance from mini-batch shuffling and weight initialization.</p>
+<ul>
+<li>If an experiment alters a hyperparameter and the validation Dice shifts from <span class="arithmatex">\(0.562\)</span> to <span class="arithmatex">\(0.564\)</span> (<span class="arithmatex">\(+0.002\)</span>), this difference is within typical run-to-run noise! Do not declare victory.</li>
+<li>A genuine architectural or algorithmic improvement typically produces a noticeable shift (<span class="arithmatex">\(+0.015\)</span> to <span class="arithmatex">\(+0.04\)</span>) or a marked change in error distributions.</li>
+<li>When in doubt, repeat the run across two random seeds to verify that the gain is reproducible.</li>
+</ul>
+<hr />
+<h2 id="3-the-experiment-audit-matrix">3. The Experiment Audit Matrix</h2>
+<p>Maintain a structured experiment tracking matrix (in Weights &amp; Biases or a markdown table) that records every run:</p>
+<h3 id="fictional-run-comparison-matrix">Fictional Run Comparison Matrix:</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Run ID</th>
+<th style="text-align: left;">Experiment Name</th>
+<th style="text-align: left;">Changed Factor vs. Anchor</th>
+<th style="text-align: left;">Train Budget</th>
+<th style="text-align: left;">Val Loss</th>
+<th style="text-align: left;">Val FG Dice</th>
+<th style="text-align: left;">Clean Spec.</th>
+<th style="text-align: left;">Memory / Speed</th>
+<th style="text-align: left;">Verdict &amp; Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>exp-00</code></td>
+<td style="text-align: left;"><strong>Anchor Baseline</strong></td>
+<td style="text-align: left;">Baseline: U-Net (ResNet-34), Constant LR <span class="arithmatex">\(10^{-3}\)</span>, Natural Sampling, BCE+Dice</td>
+<td style="text-align: left;">30 ep</td>
+<td style="text-align: left;">0.228</td>
+<td style="text-align: left;">0.502</td>
+<td style="text-align: left;">98.4%</td>
+<td style="text-align: left;">4.8 GB / 22 img/s</td>
+<td style="text-align: left;"><strong>Anchor Established</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>exp-01</code></td>
+<td style="text-align: left;">Sched: Cosine</td>
+<td style="text-align: left;">Changed: Cosine Annealing with 3-ep Warmup</td>
+<td style="text-align: left;">30 ep</td>
+<td style="text-align: left;">0.198</td>
+<td style="text-align: left;"><strong>0.548</strong> (+0.046)</td>
+<td style="text-align: left;">98.6%</td>
+<td style="text-align: left;">4.8 GB / 22 img/s</td>
+<td style="text-align: left;"><strong>PROMOTE</strong>: Clear gain in boundary Dice; promotes to new anchor.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>exp-02</code></td>
+<td style="text-align: left;">Loss: Focal Loss</td>
+<td style="text-align: left;">Changed: Replaced BCE with Focal Loss (<span class="arithmatex">\(\gamma=2\)</span>)</td>
+<td style="text-align: left;">30 ep</td>
+<td style="text-align: left;">0.215</td>
+<td style="text-align: left;">0.521 (-0.027)</td>
+<td style="text-align: left;">88.2%</td>
+<td style="text-align: left;">4.8 GB / 21 img/s</td>
+<td style="text-align: left;"><strong>REVERT</strong>: Severe drop in clean specificity; refuted hypothesis.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>exp-03</code></td>
+<td style="text-align: left;">Samp: Sqrt Rare</td>
+<td style="text-align: left;">Changed: Bounded Sqrt Sampler (<span class="arithmatex">\(w_{\max}=4.0\)</span>)</td>
+<td style="text-align: left;">30 ep</td>
+<td style="text-align: left;">0.204</td>
+<td style="text-align: left;"><strong>0.566</strong> (+0.018)</td>
+<td style="text-align: left;">97.1%</td>
+<td style="text-align: left;">4.8 GB / 22 img/s</td>
+<td style="text-align: left;"><strong>PROMOTE</strong>: Rare Defect B recall rose from 0% to 38%; clean specificity held <span class="arithmatex">\(&gt;97\%\)</span>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>exp-04</code></td>
+<td style="text-align: left;">Arch: EfficientNet-B2</td>
+<td style="text-align: left;">Changed: Replaced ResNet-34 encoder with B2</td>
+<td style="text-align: left;">30 ep</td>
+<td style="text-align: left;">0.182</td>
+<td style="text-align: left;"><strong>0.589</strong> (+0.023)</td>
+<td style="text-align: left;">97.4%</td>
+<td style="text-align: left;">5.4 GB / 18 img/s</td>
+<td style="text-align: left;"><strong>PROMOTE</strong>: Better multi-scale feature extraction on longitudinal scratches.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>exp-05</code></td>
+<td style="text-align: left;">Post: Min Area 100</td>
+<td style="text-align: left;">Changed: Applied <span class="arithmatex">\(A_{\min} = 100\text{ px}\)</span> to all classes</td>
+<td style="text-align: left;">Eval</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">0.551 (-0.038)</td>
+<td style="text-align: left;">99.2%</td>
+<td style="text-align: left;">Post-process</td>
+<td style="text-align: left;"><strong>REVERT</strong>: Filtered out genuine small <code>defect_b</code> instances; must keep <span class="arithmatex">\(A_{\min}=0\)</span> for rare class.</td>
+</tr>
+</tbody>
+</table>
+<p>Notice how every single improvement was isolated, attributed, and validated independently.</p>
+<hr />
+<h2 id="4-the-anatomy-of-an-ablation-study">4. The Anatomy of an Ablation Study</h2>
+<p>An <strong>ablation study</strong> is the inverse of iterative optimization: you take your best high-performing pipeline and systematically <strong>remove or disable one component at a time</strong> to verify that each component is strictly necessary.</p>
+<pre class="highlight"><code>Full Optimized Pipeline:
+[EfficientNet-B2] + [Warmup+Cosine] + [Bounded Rare Sampling] + [Calibrated Area Filter]
+Score: 0.589
+
+Ablation 1: Remove Bounded Rare Sampling (revert to Natural Uniform)
+Score drops to 0.552 (-0.037) -&gt; Proves that rare sampling is vital for Defect B recall.
+
+Ablation 2: Remove Cosine Schedule (revert to Constant LR)
+Score drops to 0.544 (-0.045) -&gt; Proves that schedule decay is vital for boundary annealing.
+
+Ablation 3: Remove Area Filtering (revert to A_min = 0 for all classes)
+Score drops to 0.574 (-0.015) -&gt; Proves that speckle suppression provides a real precision boost.</code></pre>
+<p>If removing a component causes <strong>zero drop in score</strong>, that component is dead weight! Delete it from your codebase immediately to keep your system lean, fast, and maintainable.</p>
+<hr />
+<h2 id="5-common-experimentation-anti-patterns">5. Common Experimentation Anti-Patterns</h2>
+<ol>
+<li><strong>The "Kaggle Leaderboard Overfitting" Anti-Pattern</strong>:<ul>
+<li>Submitting every single training run to the public leaderboard and using the public score to guide hyperparameter decisions.</li>
+<li><em>Why it fails</em>: The public leaderboard represents a small subset of the test set. Over-tuning to it causes public overfitting, leading to massive leaderboard shakeup on the private test set. Trust your local combination-stratified validation fold!</li>
+</ul>
+</li>
+<li><strong>The "Comparing Uncalibrated Models" Anti-Pattern</strong>:<ul>
+<li>Comparing Model X at threshold <span class="arithmatex">\(\tau = 0.50\)</span> against Model Y at threshold <span class="arithmatex">\(\tau = 0.50\)</span>, when Model X's optimal threshold is <span class="arithmatex">\(0.35\)</span> and Model Y's optimal threshold is <span class="arithmatex">\(0.65\)</span>.</li>
+<li><em>Why it fails</em>: Always calibrate decision thresholds and area filters on held-out validation data before declaring one architecture superior to another.</li>
+</ul>
+</li>
+<li><strong>The "Changing Seeds to Find a Lucky Run" Anti-Pattern</strong>:<ul>
+<li>Re-running the identical model with seeds 41, 42, 43, 44, and 45 until one seed achieves a slightly higher score, then claiming an improvement.</li>
+<li><em>Why it fails</em>: This is statistical noise, not architectural progress.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="6-ungraded-try-it-design-an-experiment-plan">6. Ungraded "Try It": Design an Experiment Plan</h2>
+<p>Imagine you have just established a baseline model with the following characteristics:</p>
+<ul>
+<li>Validation Foreground Dice: <span class="arithmatex">\(0.48\)</span></li>
+<li>Clean Material Specificity: <span class="arithmatex">\(98.8\%\)</span></li>
+<li>Rare Defect B Recall: <span class="arithmatex">\(0.0\%\)</span> (Completely missed)</li>
+<li>Small Defect (<span class="arithmatex">\(&lt;100\text{ px}\)</span>) Recall: <span class="arithmatex">\(12\%\)</span></li>
+</ul>
+<p>You have a research budget of <strong>4 experiments</strong>.</p>
+<p><strong>Task</strong>: Formulate a sequential 4-step experimental plan:</p>
+<ol>
+<li>What single factor will you test in Experiment 1? State your hypothesis.</li>
+<li>If Experiment 1 succeeds, what factor will you test in Experiment 2?</li>
+<li>What negative symptom will you monitor in your experiment logs to ensure that clean-material performance is not sacrificed?</li>
+</ol>
+<hr />
+<h2 id="7-authoritative-references">7. Authoritative References</h2>
+<ul>
+<li>Sculley, D., et al. (2015). <em>Hidden Technical Debt in Machine Learning Systems</em>. Advances in Neural Information Processing Systems (NeurIPS). (Foundational reference on pipeline complexity, dead code, and ablation discipline).</li>
+<li>Bouthillier, X., et al. (2021). <em>Accounting for variance in machine learning benchmarks</em>. Proceedings of Machine Learning and Systems (MLSys). (Empirical variance and seed significance).</li>
+<li>Weights &amp; Biases <a href="https://docs.wandb.ai/guides/track">Experiment Tracking Best Practices</a>.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html">← Guide 06 · Validation Error Analysis</a><a href="walkthrough-notebook.html">Walkthrough Notebook &amp; Code Examples →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

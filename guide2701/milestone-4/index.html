@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milestone 4 Overview · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="true">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Milestone 4 Overview</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#training-improvements-model-optimization-11-november-2026">Training Improvements &amp; Model Optimization (11 November 2026)</a></li>
+<li><a href="#1-prerequisites-from-earlier-milestones">1. Prerequisites from Earlier Milestones</a></li>
+<li><a href="#2-curriculum-map-milestone-4-topics-study-guides">2. Curriculum Map: Milestone 4 Topics &amp; Study Guides</a></li>
+<li><a href="#3-guide-overviews-recommended-reading-order">3. Guide Overviews &amp; Recommended Reading Order</a></li>
+<li><a href="#4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</a></li>
+<li><a href="#5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-4-student-study-guides">Milestone 4 Student Study Guides</h1>
+<h2 id="training-improvements-model-optimization-11-november-2026">Training Improvements &amp; Model Optimization (11 November 2026)</h2>
+<p>Welcome to Milestone 4 of the Industrial Surface Anomaly Segmentation project!</p>
+<p>In <strong>Milestone 1</strong>, you inspected the physical line-scan sensor domain, Fortran-order RLE encodings, and the metric penalty on empty masks. In <strong>Milestone 2</strong>, you constructed your end-to-end segmentation pipeline: PyTorch datasets, industrial augmentations, combination-stratified splits, baseline U-Net models, post-processing filters, and generated your first valid Kaggle submission.</p>
+<p>In <strong>Milestone 4</strong>, you advance from building a functional baseline to <strong>mastering optimization, training dynamics, numerical efficiency, and scientific error diagnostics</strong>. You will learn how to stabilize training on rare defects, manage GPU memory with mixed precision, schedule learning rates, govern early stopping, and decompose validation errors to make principled engineering improvements.</p>
+<hr />
+<h2 id="1-prerequisites-from-earlier-milestones">1. Prerequisites from Earlier Milestones</h2>
+<p>Before diving into Milestone 4, ensure you are comfortable with these core foundations established in Milestones 1 and 2:</p>
+<ol>
+<li><strong>Aspect Ratio and Strip Geometry</strong>: Industrial line-scan images are <span class="arithmatex">\(800 \times 128\)</span> pixels (<span class="arithmatex">\(6.25:1\)</span> ratio). Native dimensions must be preserved to avoid distorting longitudinal defects.</li>
+<li><strong>Multi-Label Mask Representation</strong>: You understand that targets are 4-channel binary tensors <code>[4, 128, 800]</code> representing classes <code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, and <code>defect_d</code>.</li>
+<li><strong>Combination Stratification</strong>: You understand why naive random splitting causes rare defects (like <code>defect_b</code>) to suffer extreme fold variance, and why image-level combination stratification is mandatory to prevent data leakage.</li>
+<li><strong>Baseline U-Net Mechanics</strong>: You understand the encoder contracting path, decoder expanding path, lateral skip connections, and compound BCE + Soft Dice loss functions.</li>
+<li><strong>Post-Processing Pipeline</strong>: You know how continuous logits are converted into binary masks via decision thresholds <span class="arithmatex">\(\tau\)</span>, and how connected-component analysis applies minimum area filtering (<span class="arithmatex">\(A_{\min}\)</span>).</li>
+</ol>
+<hr />
+<h2 id="2-curriculum-map-milestone-4-topics-study-guides">2. Curriculum Map: Milestone 4 Topics &amp; Study Guides</h2>
+<p>The five core Milestone 4 curriculum requirements are organized into seven focused, progressive study guides:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Milestone 4 Curriculum Topic</th>
+<th style="text-align: left;">Primary Study Guide(s)</th>
+<th style="text-align: left;">Theoretical Principles</th>
+<th style="text-align: left;">Practical Implementation &amp; Diagnostic Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Class Imbalance</strong></td>
+<td style="text-align: left;"><a href="guide_01_multilevel_class_imbalance.html">Guide 01: Multi-Level Class Imbalance</a></td>
+<td style="text-align: left;">Image-level vs. class-level vs. pixel-level imbalance; data oversampling vs. loss weighting; prior shift; evaluation integrity.</td>
+<td style="text-align: left;">Implement bounded square-root <code>WeightedRandomSampler</code> and class-balanced Dice; monitor rare-class recall vs. clean-image false alarms.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Learning-Rate Schedulers</strong></td>
+<td style="text-align: left;"><a href="guide_02_learning_rate_schedulers_and_warmup.html">Guide 02: LR Schedulers &amp; Warmup</a></td>
+<td style="text-align: left;">Optimization landscape; linear warmup stabilization; Step, Cosine Annealing, and Plateau decay; per-batch vs. per-epoch stepping.</td>
+<td style="text-align: left;">Implement <code>LambdaLR</code> with warmup and cosine decay; diagnose early gradient shattering and late-stage oscillation.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Early Stopping &amp; Checkpoints</strong></td>
+<td style="text-align: left;"><a href="guide_03_early_stopping_and_checkpoint_governance.html">Guide 03: Early Stopping &amp; Governance</a></td>
+<td style="text-align: left;">Monitored quantity selection; minimum delta <span class="arithmatex">\(\delta_{\min}\)</span>; patience window; atomic checkpointing; holdout overfitting risk.</td>
+<td style="text-align: left;">Build an <code>EarlyStopping</code> tracker with automatic rollback to <code>best.pt</code>; evaluate 5-fold OOF cross-validation to prevent validation drift.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Mixed Precision &amp; GPU Memory</strong></td>
+<td style="text-align: left;"><a href="guide_04_mixed_precision_amp_and_gpu_memory.html">Guide 04: Mixed Precision &amp; GPU Memory</a></td>
+<td style="text-align: left;">IEEE-754 precision (FP32, FP16, BF16); Tensor Cores; VRAM breakdown (weights, AdamW state, activations); dynamic gradient scaling; microbatches.</td>
+<td style="text-align: left;">Implement PyTorch 2.x <code>torch.amp.autocast</code> and <code>torch.amp.GradScaler</code>; configure gradient accumulation to simulate large effective batches.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Validation Dice &amp; Overfitting</strong></td>
+<td style="text-align: left;"><a href="guide_05_validation_dice_and_overfitting_diagnostics.html">Guide 05: Metric Governance &amp; Overfitting</a></td>
+<td style="text-align: left;">The Naive Dice Trap; empty-pair convention (<span class="arithmatex">\(1.0\)</span>); 70/20/10 official competition metric; threshold sensitivity <span class="arithmatex">\(\tau\)</span>; learning curve archetypes.</td>
+<td style="text-align: left;">Decompose validation logs into Foreground Dice, empty-pair specificity, and false-positive pixel score; diagnose learning curve failure modes.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Validation Error Analysis</strong></td>
+<td style="text-align: left;"><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html">Guide 06: Validation Error Analysis</a></td>
+<td style="text-align: left;">The 4-view visual audit; 6 spatial error archetypes; presence recall vs. overlap recall; defect area binning (1..100 px, 101..500 px, 501+ px).</td>
+<td style="text-align: left;">Build a structured error audit gallery; separate presence detection from boundary precision; formulate testable diagnostic hypotheses.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7. Scientific Iteration Protocol</strong></td>
+<td style="text-align: left;"><a href="guide_07_controlled_experimentation_and_iteration.html">Guide 07: Controlled Experimentation</a></td>
+<td style="text-align: left;">One-Factor-At-A-Time (OFAT) rule; invariant baseline anchors; experiment audit matrix; ablation studies; distinguishing signal from noise.</td>
+<td style="text-align: left;">Maintain an experiment comparison matrix; conduct systematic component ablations; eliminate harmful multi-change confounding.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-guide-overviews-recommended-reading-order">3. Guide Overviews &amp; Recommended Reading Order</h2>
+<p>Follow this recommended reading and implementation sequence:</p>
+<ul>
+<li>
+<p><strong><a href="guide_01_multilevel_class_imbalance.html">Guide 01: Multi-Level Class Imbalance: Image, Class, and Pixel Mechanics</a></strong>:
+  Deconstructs imbalance into image-level (clean material), class-level (rare <code>defect_b</code>), and pixel-level (0.2% defect canvas occupancy). Explains why aggressive oversampling shifts the model's prior and floods clean images with false alarms. Walks through a 100-strip numerical example of bounded square-root sampling and proves why validation data must remain strictly unweighted.</p>
+</li>
+<li>
+<p><strong><a href="guide_02_learning_rate_schedulers_and_warmup.html">Guide 02: Learning-Rate Schedulers and Warmup Strategies</a></strong>:
+  Explores how learning-rate dynamics dictate optimization traversal. Demonstrates why randomly initialized decoders require linear warmup to prevent gradient shattering of pretrained backbones. Compares Step Decay, Cosine Annealing, and ReduceLROnPlateau, and resolves the per-batch versus per-epoch stepping cadence trap.</p>
+</li>
+<li>
+<p><strong><a href="guide_03_early_stopping_and_checkpoint_governance.html">Guide 03: Early Stopping, Checkpoint Governance, and Validation Drift</a></strong>:
+  Investigates why validation loss minimums often diverge from peak Foreground Dice. Details the mechanics of <code>patience</code>, <code>min_delta</code>, and atomic checkpoint serialization. Warns against the hazard of holdout overfitting (validation drift) caused by repeated tuning against the same validation fold.</p>
+</li>
+<li>
+<p><strong><a href="guide_04_mixed_precision_amp_and_gpu_memory.html">Guide 04: Mixed Precision (AMP) and GPU Memory Optimization</a></strong>:
+  Provides a forensic breakdown of GPU VRAM (weights, gradients, AdamW moments, and activation tensors). Explains how PyTorch 2.x <code>torch.amp</code> leverages Tensor Cores in FP16/BF16, details dynamic gradient scaling (<code>GradScaler</code>) to prevent gradient underflow, and demonstrates gradient accumulation to decouple hardware microbatch sizes from effective optimization batches.</p>
+</li>
+<li>
+<p><strong><a href="guide_05_validation_dice_and_overfitting_diagnostics.html">Guide 05: Metric Governance: Validation Dice, Empty Pairs, and Overfitting</a></strong>:
+  Exposes the "Naive Dice Trap"—proving how a lazy model that predicts all zeros achieves an 85% naive Dice score. Dissects the 2×2 contingency matrix of image-class pairs and explains the official 70/20/10 competition score. Categorizes six learning curve archetypes to diagnose overfitting, underfitting, and probability drift.</p>
+</li>
+<li>
+<p><strong><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html">Guide 06: Validation Error Analysis and Spatial Defect Diagnostics</a></strong>:
+  Establishes a 4-view visual audit workflow and defines the six spatial error archetypes (missed thin defects, false alarms on clean material, class confusion, speckle noise, boundary dilation, and fragmented cracks). Introduces defect size binning and stratified sampling to prevent the cherry-picking trap.</p>
+</li>
+<li>
+<p><strong><a href="guide_07_controlled_experimentation_and_iteration.html">Guide 07: Controlled Experimentation and Scientific Iteration</a></strong>:
+  Synthesizes optimization into the scientific method. Enforces the One-Factor-At-A-Time (OFAT) rule, details invariant baseline anchors, structures an experiment audit matrix, and explains how ablation studies identify dead code in your pipeline.</p>
+</li>
+</ul>
+<hr />
+<h2 id="4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</h2>
+<p>To support hands-on learning without disclosing confidential competition benchmarks, this curriculum includes complete, self-contained educational resources built entirely on <strong>synthetic data</strong>:</p>
+<h3 id="1-interactive-walkthrough-notebook">1. Interactive Walkthrough Notebook</h3>
+<ul>
+<li><strong>Jupyter Notebook</strong>: <a href="downloads/synthetic_optimization_walkthrough.ipynb"><code>notebooks/synthetic_optimization_walkthrough.ipynb</code></a></li>
+<li><strong>Paired Python Script</strong>: <a href="downloads/synthetic_optimization_walkthrough.py"><code>notebooks/synthetic_optimization_walkthrough.py</code></a></li>
+<li><strong>Setup Guide</strong>: <a href="walkthrough-notebook.html"><code>notebooks/README.md</code></a></li>
+</ul>
+<p>This walkthrough runs on CPU in under 3 seconds and interactively demonstrates bounded sampling, warmup/cosine scheduling, early stopping, PyTorch 2.x AMP accumulation, multi-metric decomposition, and spatial error binning.</p>
+<h3 id="2-standalone-diagnostic-scripts">2. Standalone Diagnostic Scripts</h3>
+<ul>
+<li>
+<p><strong>Imbalance &amp; Bounded Sampler</strong>: <a href="examples/toy_imbalance_sampler.py"><code>examples/toy_imbalance_sampler.py</code></a>
+  Simulates a 200-strip imbalanced dataset, compares natural uniform draws against bounded weighted draws, and audits class exposure over 10 epochs.</p>
+</li>
+<li>
+<p><strong>Learning Rate Scheduler Simulator</strong>: <a href="examples/toy_scheduler_visualizer.py"><code>examples/toy_scheduler_visualizer.py</code></a>
+  Simulates and tabulates learning-rate trajectories across Warmup + Cosine, StepLR, and ReduceLROnPlateau.</p>
+</li>
+<li>
+<p><strong>Early Stopping &amp; Checkpoint Rollback</strong>: <a href="examples/toy_early_stopping.py"><code>examples/toy_early_stopping.py</code></a>
+  Executes an early stopping tracker across 20 validation epochs, demonstrating patience counting, noise filtering (<code>min_delta</code>), and automatic weight restoration.</p>
+</li>
+<li>
+<p><strong>PyTorch 2.x AMP Lifecycle</strong>: <a href="examples/toy_amp_lifecycle.py"><code>examples/toy_amp_lifecycle.py</code></a>
+  Demonstrates <code>torch.amp.autocast</code>, <code>torch.amp.GradScaler</code>, microbatch accumulation, unscaling, and gradient norm clipping on toy tensors.</p>
+</li>
+<li>
+<p><strong>Validation Error Analyzer</strong>: <a href="examples/toy_error_analyzer.py"><code>examples/toy_error_analyzer.py</code></a>
+  Decomposes validation predictions into presence recall, overlap recall, clean-image specificity, conditional Dice, and defect size bins.</p>
+</li>
+</ul>
+<hr />
+<h2 id="5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</h2>
+<p>These study guides are designed as a <strong>scientific guide, not a hyperparameter cheat sheet</strong>:</p>
+<ul>
+<li>They explain the underlying mathematics, numerical mechanics, failure modes, and debugging protocols.</li>
+<li>They do <strong>not</strong> provide pre-computed hyperparameter values, optimal batch sizes, private class weights, or pre-trained checkpoints.</li>
+<li>They do <strong>not</strong> reveal internal exploratory data analysis findings or competition benchmarks from the private training set.</li>
+<li>There are <strong>no assessment questions or graded tasks</strong> in this folder; all exercises are clearly marked ungraded activities.</li>
+<li>You must formulate your own hypotheses, conduct your own controlled experiments, and audit your models against <code>data/public/</code>.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="guide_01_multilevel_class_imbalance.html">Guide 01 · Multi-Level Class Imbalance →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

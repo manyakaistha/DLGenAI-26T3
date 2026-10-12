@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 08 · RLE &amp; First Submission · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html" aria-current="page"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html" aria-current="page"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 08 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-prediction-to-submission-pipeline">1. Motivation: The Prediction-to-Submission Pipeline</a></li>
+<li><a href="#2-rle-indexing-and-traversal-order">2. RLE Indexing and Traversal Order</a></li>
+<li><a href="#3-the-empty-mask-sentinel-the-single-space-rule">3. The Empty Mask Sentinel: The Single-Space Rule</a></li>
+<li><a href="#4-the-submission-file-schema">4. The Submission File Schema</a></li>
+<li><a href="#5-the-encode-decode-roundtrip-invariant">5. The Encode-Decode Roundtrip Invariant</a></li>
+<li><a href="#6-pre-submission-validation-checklist">6. Pre-Submission Validation Checklist</a></li>
+<li><a href="#7-common-mistakes-and-diagnostics">7. Common Mistakes and Diagnostics</a></li>
+<li><a href="#8-decisions-you-must-make">8. Decisions You Must Make</a></li>
+<li><a href="#9-try-it-run-a-complete-roundtrip-on-a-toy-mask">9. Try It: Run a Complete Roundtrip on a Toy Mask</a></li>
+<li><a href="#10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="run-length-encoding-and-first-kaggle-submission">Run-Length Encoding and First Kaggle Submission</h1>
+<p>You have constructed a PyTorch <code>Dataset</code>, isolated a combination-stratified validation partition, configured experiment tracking with W&amp;B, trained a baseline U-Net, and calibrated your post-processing thresholds. Now comes the final milestone objective: <strong>converting model predictions into a valid, rejected-proof Kaggle submission file</strong>.</p>
+<p>Submitting a machine learning prediction file to an automated competition platform is a strict software engineering contract. A single missing row, an extra comma, a transposed axis, or an empty cell parsed as <code>NaN</code> will cause Kaggle's evaluation engine to reject your submission with a generic error message.</p>
+<p>This guide details the complete conceptual chain from 2D binary masks to RLE strings, demystifies the <strong>1-indexed Fortran column-major traversal order</strong>, explains the <strong>single-space sentinel rule</strong>, and provides a comprehensive <strong>submission validation checklist</strong>.</p>
+<hr />
+<h2 id="1-motivation-the-prediction-to-submission-pipeline">1. Motivation: The Prediction-to-Submission Pipeline</h2>
+<p>Before writing any serialization code, visualize the complete data transformation lifecycle:</p>
+<pre class="highlight"><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       The Prediction-to-Submission Chain                    │
+├───────────────────┬───────────────────┬───────────────────┬─────────────────┤
+│  1. Model Output  │ 2. Post-Process   │  3. RLE Encoding  │ 4. CSV Assembly │
+│ Logits Z ∈ R^4    │ Probabilities P   │ Fortran order 'F' │ Match template  │
+│ [4, 128, 800]     │ Binary Masks M    │ Pairs: (start,len)│ 12,000 rows     │
+│                   │ {0.0, 1.0}        │ Empty = ' '       │ ID, image, class│
+└───────────────────┴───────────────────┴───────────────────┴─────────────────┘</code></pre>
+<p>Every test image in <code>data/public/test/</code> must pass through this exact chain, resulting in four rows in your final CSV file (one for each defect category).</p>
+<hr />
+<h2 id="2-rle-indexing-and-traversal-order">2. RLE Indexing and Traversal Order</h2>
+<p>Run-Length Encoding (RLE) is a lossless compression format for binary arrays. Instead of storing 102,400 individual pixel booleans, RLE stores pairs of integers:</p>
+<div class="arithmatex">\[\text{start}_1 \quad \text{length}_1 \quad \text{start}_2 \quad \text{length}_2 \quad \dots\]</div>
+<h3 id="the-two-non-negotiable-rules">The Two Non-Negotiable Rules:</h3>
+<h4 id="rule-1-1-based-indexing">Rule 1: 1-Based Indexing</h4>
+<p>In Python, arrays are 0-indexed (the first element is index 0). In standard Kaggle RLE, <strong>the first pixel is index 1</strong>.</p>
+<div class="arithmatex">\[\text{Index}_{\text{RLE}} = \text{Index}_{\text{Python}} + 1\]</div>
+<h4 id="rule-2-column-major-fortran-orderf-traversal">Rule 2: Column-Major (Fortran <code>order='F'</code>) Traversal</h4>
+<p>Standard image processing traverses rows from left to right (row-major, C order). Kaggle surface segmentation traverses <strong>columns from top to bottom, then moves to the next column</strong> (column-major, Fortran order).</p>
+<p><img alt="RLE Fortran Traversal Grid" src="assets/fig08_rle_fortran_traversal_grid.png" />
+<em>Figure 8.1: Numbered toy grid (<span class="arithmatex">\(4 \times 6\)</span>) demonstrating 1-indexed column-major traversal (order='F'). Pixels are read top-to-bottom down column 0, then column 1, and so forth.</em></p>
+<h3 id="walking-through-the-toy-4-times-6-grid">Walking Through the Toy <span class="arithmatex">\(4 \times 6\)</span> Grid:</h3>
+<p>Consider a canvas of height <span class="arithmatex">\(H=4\)</span> rows and width <span class="arithmatex">\(W=6\)</span> columns (total pixels = 24).
+A defect occupies:</p>
+<ul>
+<li>Column 2: row 1 and row 2 (active pixels)</li>
+<li>Column 3: row 2 and row 3 (active pixels)</li>
+</ul>
+<p>Let us calculate the 1-indexed Fortran positions:</p>
+<div class="arithmatex">\[\text{Index}(r, c) = c \times H + r + 1\]</div>
+<ul>
+<li>At <span class="arithmatex">\((r=1, c=2)\)</span>: <span class="arithmatex">\(\text{Index} = 2 \times 4 + 1 + 1 = \mathbf{10}\)</span></li>
+<li>
+<p>At <span class="arithmatex">\((r=2, c=2)\)</span>: <span class="arithmatex">\(\text{Index} = 2 \times 4 + 2 + 1 = \mathbf{11}\)</span>
+  <span class="arithmatex">\(\to\)</span> First run starts at index <strong>10</strong> with length <strong>2</strong>.</p>
+</li>
+<li>
+<p>At <span class="arithmatex">\((r=2, c=3)\)</span>: <span class="arithmatex">\(\text{Index} = 3 \times 4 + 2 + 1 = \mathbf{15}\)</span></p>
+</li>
+<li>At <span class="arithmatex">\((r=3, c=3)\)</span>: <span class="arithmatex">\(\text{Index} = 3 \times 4 + 3 + 1 = \mathbf{16}\)</span>
+  <span class="arithmatex">\(\to\)</span> Second run starts at index <strong>15</strong> with length <strong>2</strong>.</li>
+</ul>
+<p>The final encoded RLE string is:</p>
+<div class="arithmatex">\[\mathbf{"10 \ 2 \ 15 \ 2"}\]</div>
+<hr />
+<h2 id="3-the-empty-mask-sentinel-the-single-space-rule">3. The Empty Mask Sentinel: The Single-Space Rule</h2>
+<p>In this competition, almost half of industrial images contain no defects at all, and individual defect categories (like <code>defect_b</code>) are absent in <span class="arithmatex">\(&gt;97\%\)</span> of images. What should your code write into the <code>mask_rle</code> column when your model predicts that an image is completely clean?</p>
+<pre class="highlight"><code>                        THE EMPTY MASK CSV CONTRACT
+┌─────────────────────────────────────────┬─────────────────────────────────────────┐
+│           SUBMITTED CSV RULE            │             WHY IT MATTERS              │
+├─────────────────────────────────────────┼─────────────────────────────────────────┤
+│ EXACTLY ONE ASCII SPACE: " "            │ Kaggle's automated submission parser    │
+│ (A string of length 1 containing ' ')   │ treats completely blank CSV fields as   │
+│                                         │ null/NaN values and rejects the file!   │
+└─────────────────────────────────────────┴─────────────────────────────────────────┘</code></pre>
+<p>Inspect <code>data/public/sample_submission.csv</code>. You will observe:
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle
+1,TEST_0001,defect_a, 
+2,TEST_0001,defect_b, 
+3,TEST_0001,defect_c, 
+4,TEST_0001,defect_d, </code></pre>
+Notice that between the final comma and the newline, there is <strong>exactly one space character</strong> (<code>" "</code>).</p>
+<ul>
+<li>If you write an empty string <code>""</code>, pandas exports <code>,</code> with no content. Kaggle parses this as <code>NaN</code> and rejects your submission!</li>
+<li>In your encoder, explicitly enforce:
+  <pre class="highlight"><code class="language-python">if mask.sum() == 0:
+    return " "</code></pre></li>
+</ul>
+<hr />
+<h2 id="4-the-submission-file-schema">4. The Submission File Schema</h2>
+<p>The template file <code>data/public/sample_submission.csv</code> is the <strong>authoritative schema</strong>. Your output file must match it row-for-row:</p>
+<h3 id="1-file-structure">1. File Structure:</h3>
+<ul>
+<li>Total Images: 3,000 test images in <code>data/public/test/</code>.</li>
+<li>Rows per Image: 4 rows (<code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, <code>defect_d</code>).</li>
+<li>Total Rows: Exactly <strong>12,001 lines</strong> (1 header row + 12,000 prediction rows).</li>
+</ul>
+<h3 id="2-exact-column-headers">2. Exact Column Headers:</h3>
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Column Name</th>
+<th style="text-align: left;">Data Type</th>
+<th style="text-align: left;">Permitted Values / Format</th>
+<th style="text-align: left;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>ID</code></td>
+<td style="text-align: left;">Integer</td>
+<td style="text-align: left;"><span class="arithmatex">\(1, 2, 3, \dots, 12000\)</span> (sequential 1-based index)</td>
+<td style="text-align: left;"><code>42</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>image_id</code></td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">Matches test filename without <code>.jpg</code></td>
+<td style="text-align: left;"><code>TEST_0042</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>defect_type</code></td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">One of: <code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, <code>defect_d</code></td>
+<td style="text-align: left;"><code>defect_c</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>mask_rle</code></td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">Valid RLE string or single ASCII space <code>" "</code></td>
+<td style="text-align: left;"><code>"25641 4 25769 4"</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-the-encode-decode-roundtrip-invariant">5. The Encode-Decode Roundtrip Invariant</h2>
+<p>Before trusting any RLE encoder in your submission pipeline, verify the <strong>roundtrip invariant</strong>:</p>
+<div class="arithmatex">\[\text{decode}(\text{encode}(M)) \equiv M \quad \forall M \in \{0, 1\}^{H \times W}\]</div>
+<p>If you encode a binary mask and immediately decode the resulting string back into a 2D array, the resulting array must be <strong>bit-for-bit identical</strong> to the original mask.</p>
+<pre class="highlight"><code class="language-python">def verify_roundtrip(mask_2d: np.ndarray) -&gt; bool:
+    rle_str = rle_encode(mask_2d)
+    recovered = rle_decode(rle_str, shape=mask_2d.shape)
+    return np.array_equal(mask_2d, recovered)</code></pre>
+<p>Run this test on:</p>
+<ol>
+<li>An all-zero mask (empty).</li>
+<li>An all-ones mask (full).</li>
+<li>A single 1-pixel defect at <span class="arithmatex">\((0, 0)\)</span>.</li>
+<li>A single 1-pixel defect at <span class="arithmatex">\((127, 799)\)</span> (the opposite canvas corner).</li>
+<li>Complex multi-blob synthetic masks.</li>
+</ol>
+<hr />
+<h2 id="6-pre-submission-validation-checklist">6. Pre-Submission Validation Checklist</h2>
+<p>Before submitting your generated CSV file to Kaggle, run this automated verification checklist in Python. Every check must pass:</p>
+<pre class="highlight"><code class="language-python">import pandas as pd
+import numpy as np
+
+def validate_submission_file(csv_path: str, template_path: str = "data/public/sample_submission.csv"):
+    print(f"Validating submission: {csv_path}...")
+
+    # 1. Row count check
+    df = pd.read_csv(csv_path, keep_default_na=False)  # keep_default_na=False preserves " "
+    assert len(df) == 12000, f"Row count error: expected 12,000, got {len(df)}"
+    print("✓ Row count: exactly 12,000 prediction rows.")
+
+    # 2. Column names check
+    expected_cols = ["ID", "image_id", "defect_type", "mask_rle"]
+    assert list(df.columns) == expected_cols, f"Column mismatch: expected {expected_cols}, got {list(df.columns)}"
+    print("✓ Columns: headers match authoritative schema exactly.")
+
+    # 3. No Null / NaN check
+    for col in ["ID", "image_id", "defect_type"]:
+        assert df[col].isnull().sum() == 0, f"Null values detected in {col}!"
+    print("✓ Identifiers: zero null or missing values.")
+
+    # 4. Empty mask representation check
+    empty_masks = df[df["mask_rle"].str.strip() == ""]
+    print(f"• Predicted empty masks: {len(empty_masks)} / 12,000 ({len(empty_masks)/12000*100:.1f}%)")
+
+    # 5. RLE token syntax and in-bounds checks
+    non_empty = df[df["mask_rle"].str.strip() != ""]
+    print(f"• Predicted active masks: {len(non_empty)} / 12,000")
+
+    total_canvas_pixels = 128 * 800
+    for idx, row in non_empty.iterrows():
+        tokens = [int(x) for x in row["mask_rle"].split()]
+        assert len(tokens) % 2 == 0, f"Row {row['ID']} has odd number of RLE tokens!"
+        starts = tokens[0::2]
+        lengths = tokens[1::2]
+        for s, l in zip(starts, lengths):
+            assert s &gt;= 1, f"Row {row['ID']} start index &lt; 1!"
+            assert l &gt;= 1, f"Row {row['ID']} length &lt; 1!"
+            assert s + l - 1 &lt;= total_canvas_pixels, f"Row {row['ID']} run exceeds canvas boundary!"
+
+    print("✓ RLE Syntax: all non-empty strings have even token counts and valid bounds.")
+
+    # 6. Template ordering check
+    template = pd.read_csv(template_path)
+    assert np.array_equal(df["image_id"].values, template["image_id"].values), "Image ID sequence mismatch!"
+    assert np.array_equal(df["defect_type"].values, template["defect_type"].values), "Defect type sequence mismatch!"
+    print("✓ Template ordering: row order matches sample_submission.csv identically.")
+
+    print("\n★ ALL SUBMISSION VALIDATION CHECKS PASSED! Ready for Kaggle upload.")</code></pre>
+<hr />
+<h2 id="7-common-mistakes-and-diagnostics">7. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Kaggle Null Rejection</strong></td>
+<td style="text-align: left;">Writing <code>""</code> instead of <code>" "</code> for empty masks.</td>
+<td style="text-align: left;">Kaggle error: <em>"Submission contains NaN or Null values"</em>.</td>
+<td style="text-align: left;">Load with <code>keep_default_na=False</code>; check for nulls.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Row Count Error</strong></td>
+<td style="text-align: left;">Filtering out empty rows from your output CSV.</td>
+<td style="text-align: left;">Submission file has fewer than 12,000 rows.</td>
+<td style="text-align: left;">Verify <code>len(df) == 12000</code>. Clean images must have rows!</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>C-Order Shearing</strong></td>
+<td style="text-align: left;">Flattening mask in row-major order (<code>mask.flatten()</code>).</td>
+<td style="text-align: left;">Private score near 0; masks transposed diagonally.</td>
+<td style="text-align: left;">Always pass <code>order='F'</code> to <code>flatten()</code> and <code>reshape()</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>0-Indexed RLE</strong></td>
+<td style="text-align: left;">Forgetting to add <span class="arithmatex">\(+1\)</span> to starts during encoding.</td>
+<td style="text-align: left;">Masks shifted upward by 1 pixel in evaluation.</td>
+<td style="text-align: left;">Check single pixel at <span class="arithmatex">\((0, 0)\)</span> encodes to <code>"1 1"</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Wrong ID Column</strong></td>
+<td style="text-align: left;">Emitting 0-indexed IDs (<span class="arithmatex">\(0..11999\)</span>) instead of <span class="arithmatex">\(1..12000\)</span>.</td>
+<td style="text-align: left;">Kaggle rejection or row alignment failure.</td>
+<td style="text-align: left;">Compare <code>df["ID"].values</code> to <code>sample_submission.csv</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-decisions-you-must-make">8. Decisions You Must Make</h2>
+<ol>
+<li><strong>Inference Batching</strong>: When generating test predictions, use a <code>DataLoader</code> with <code>shuffle=False</code> and <code>batch_size=8</code> or <code>16</code> to accelerate throughput.</li>
+<li><strong>Threshold Application</strong>: Apply your calibrated validation thresholds <span class="arithmatex">\((\tau, A_{\min})\)</span> per class during the inference pass.</li>
+<li><strong>Atomic File Saving</strong>: Write predictions to a temporary file (e.g., <code>submission_temp.csv</code>), execute your validation checklist, and only rename to <code>submission.csv</code> once all assertions pass.</li>
+</ol>
+<hr />
+<h2 id="9-try-it-run-a-complete-roundtrip-on-a-toy-mask">9. Try It: Run a Complete Roundtrip on a Toy Mask</h2>
+<p>Run this self-contained script to verify Fortran RLE encoding, single-space handling, and decoding on a toy canvas:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+def rle_encode_toy(mask):
+    if mask.sum() == 0:
+        return " "
+    pixels = mask.flatten(order="F")
+    padded = np.concatenate([[0], pixels, [0]])
+    diffs = np.diff(padded)
+    starts = np.where(diffs == 1)[0] + 1
+    ends = np.where(diffs == -1)[0] + 1
+    lengths = ends - starts
+    runs = []
+    for s, l in zip(starts, lengths):
+        runs.extend([str(s), str(l)])
+    return " ".join(runs)
+
+def rle_decode_toy(rle_str, shape):
+    if not rle_str or rle_str.strip() == "":
+        return np.zeros(shape, dtype=np.uint8)
+    tokens = [int(x) for x in rle_str.split()]
+    starts = np.array(tokens[0::2]) - 1
+    lengths = np.array(tokens[1::2])
+    flat = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for s, l in zip(starts, lengths):
+        flat[s : s + l] = 1
+    return flat.reshape(shape, order="F")
+
+# 1. Test empty mask
+empty_mask = np.zeros((4, 6), dtype=np.uint8)
+assert rle_encode_toy(empty_mask) == " ", "Empty mask must return single space!"
+
+# 2. Test active mask
+active_mask = np.zeros((4, 6), dtype=np.uint8)
+active_mask[1:3, 2] = 1  # 2 pixels in col 2 (indices 10, 11)
+encoded = rle_encode_toy(active_mask)
+print(f"Active mask RLE: '{encoded}'")
+assert encoded == "10 2", f"Expected '10 2', got '{encoded}'"
+
+# 3. Test roundtrip
+recovered = rle_decode_toy(encoded, shape=(4, 6))
+assert np.array_equal(active_mask, recovered), "Roundtrip reconstruction failed!"
+print("✓ RLE encoding, empty-space sentinel, and roundtrip verified successfully!")</code></pre>
+<p>For the complete standalone RLE testing script with full boundary assertions, inspect:
+👉 <a href="examples/toy_rle_roundtrip.py"><code>docs/milestone_2_student_guide/examples/toy_rle_roundtrip.py</code></a></p>
+<hr />
+<h2 id="10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>Kaggle RLE Format Overview</strong>: <a href="https://www.kaggle.com/c/severstal-steel-defect-detection/overview/evaluation">Kaggle Run-Length Encoding Specifications</a></li>
+<li><strong>Pandas CSV Serialization</strong>: <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html"><code>pandas.DataFrame.to_csv</code> Documentation</a></li>
+<li><strong>NumPy <code>flatten</code> &amp; Fortran Ordering</strong>: <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.flatten.html">NumPy <code>ndarray.flatten</code> Documentation</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_postprocessing_logits_to_masks.html">← Guide 07 · Post-Processing &amp; Thresholds</a><a href="walkthrough-notebook.html">Walkthrough Notebook &amp; Code Examples →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

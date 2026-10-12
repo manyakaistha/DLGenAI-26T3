@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 04 · Mixed Precision (AMP) &amp; Memory · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 04 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-oom-crash-and-the-throughput-bottleneck">1. Observable Problem: The OOM Crash and the Throughput Bottleneck</a></li>
+<li><a href="#2-anatomy-of-gpu-memory-where-do-the-gigabytes-go">2. Anatomy of GPU Memory: Where Do the Gigabytes Go?</a></li>
+<li><a href="#3-automatic-mixed-precision-amp-mechanics-and-formats">3. Automatic Mixed Precision (AMP): Mechanics and Formats</a></li>
+<li><a href="#4-dynamic-gradient-scaling-gradscaler">4. Dynamic Gradient Scaling (GradScaler)</a></li>
+<li><a href="#5-microbatch-sizing-and-gradient-accumulation">5. Microbatch Sizing and Gradient Accumulation</a></li>
+<li><a href="#6-implementation-pattern-pytorch-2x-modern-amp-syntax">6. Implementation Pattern: PyTorch 2.x Modern AMP Syntax</a></li>
+<li><a href="#7-diagnostic-symptoms-causes-and-checks">7. Diagnostic Symptoms: Causes and Checks</a></li>
+<li><a href="#8-ungraded-try-it-memory-footprint-estimation">8. Ungraded "Try It": Memory Footprint Estimation</a></li>
+<li><a href="#9-authoritative-references">9. Authoritative References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="mixed-precision-amp-and-gpu-memory-optimization">Mixed Precision (AMP) and GPU Memory Optimization</h1>
+<p>Deep segmentation networks operating on high-resolution industrial strips (<span class="arithmatex">\(128 \times 800\)</span> pixels) place intense demands on GPU hardware. As your architectures advance from lightweight baselines to deep encoder-decoder variants with attention gates, GPU video memory (VRAM) rapidly becomes the primary engineering bottleneck.</p>
+<p>An unoptimized pipeline will trigger abrupt <code>CUDA out of memory</code> (OOM) crashes, force you to train with artificially tiny batches, or waste hours waiting on memory-bandwidth-bound matrix multiplications. </p>
+<p>This guide breaks down the physical anatomy of GPU memory, explains the numerical mechanics of <strong>Automatic Mixed Precision (AMP)</strong> in PyTorch 2.x, details dynamic gradient scaling, and demonstrates how to decouple physical memory constraints from optimization dynamics using <strong>gradient accumulation</strong>.</p>
+<hr />
+<h2 id="1-observable-problem-the-oom-crash-and-the-throughput-bottleneck">1. Observable Problem: The OOM Crash and the Throughput Bottleneck</h2>
+<p>Consider two common runtime errors encountered when expanding segmentation training:</p>
+<pre class="highlight"><code class="language-text">Crash 1: The Out-Of-Memory Abortion
+RuntimeError: CUDA out of memory. Tried to allocate 400.00 MiB (GPU 0; 15.78 GiB total capacity; 
+14.92 GiB already allocated; 312.50 MiB free; 15.10 GiB reserved in total by PyTorch)
+Symptom: The training loop crashes abruptly mid-epoch when trying to allocate intermediate activation
+tensors for a high-resolution skip connection.
+
+Bottleneck 2: The Underutilized GPU
+Batch Size: 2 | GPU Allocation: 3.2 GiB / 16 GiB | GPU Compute Utilization: 22%
+Epoch Time: 18 minutes (Throughput: 10.5 samples/second)
+Symptom: Memory is kept small to avoid OOM, but the GPU's Tensor Cores sit idle, waiting on memory-bandwidth
+transfers of standard 32-bit floating-point tensors.</code></pre>
+<p>To resolve both challenges, we must understand exactly where GPU bytes are spent during forward and backward passes.</p>
+<hr />
+<h2 id="2-anatomy-of-gpu-memory-where-do-the-gigabytes-go">2. Anatomy of GPU Memory: Where Do the Gigabytes Go?</h2>
+<p><img alt="GPU Memory Breakdown and Numerical Precision" src="assets/fig05_amp_memory_breakdown.png" />
+<em>Figure 4.1: Breakdown of GPU VRAM consumption for a 15M-parameter segmentation model in pure FP32 versus PyTorch AMP, accompanied by IEEE-754 bit representations for FP32, FP16, and BF16.</em></p>
+<p>GPU memory during training is partitioned into five distinct categories:</p>
+<h3 id="1-model-parameters-weights">1. Model Parameters (Weights)</h3>
+<p>For a network with <span class="arithmatex">\(M\)</span> parameters stored in standard single-precision float32 (4 bytes per parameter):</p>
+<div class="arithmatex">\[\text{Memory}_{\text{weights}} = M \times 4\text{ bytes}\]</div>
+<ul>
+<li>A 10-million parameter U-Net requires <span class="arithmatex">\(10^7 \times 4 = 40\text{ MB}\)</span>.</li>
+<li>An 80-million parameter modern backbone requires <span class="arithmatex">\(80 \times 10^6 \times 4 = 320\text{ MB}\)</span>.</li>
+<li><em>Takeaway</em>: Contrary to popular belief, raw model parameters occupy a relatively modest portion of modern GPU memory.</li>
+</ul>
+<h3 id="2-parameter-gradients">2. Parameter Gradients</h3>
+<p>During the backward pass, PyTorch computes a partial derivative <span class="arithmatex">\(\frac{\partial \mathcal{L}}{\partial \theta}\)</span> for every trainable parameter <span class="arithmatex">\(\theta\)</span>:</p>
+<div class="arithmatex">\[\text{Memory}_{\text{gradients}} = M \times 4\text{ bytes}\]</div>
+<ul>
+<li>Matches parameter memory exactly: a 10M parameter model requires another <span class="arithmatex">\(40\text{ MB}\)</span>.</li>
+</ul>
+<h3 id="3-optimizer-state-the-silent-memory-consumer">3. Optimizer State (The Silent Memory Consumer)</h3>
+<p>Adaptive optimizers like <strong>AdamW</strong> maintain two internal running averages for every single parameter:</p>
+<ol>
+<li>First moment vector <span class="arithmatex">\(m_t\)</span> (momentum): <span class="arithmatex">\(M \times 4\text{ bytes}\)</span>.</li>
+<li>Second moment vector <span class="arithmatex">\(v_t\)</span> (uncentered variance): <span class="arithmatex">\(M \times 4\text{ bytes}\)</span>.</li>
+</ol>
+<div class="arithmatex">\[\text{Memory}_{\text{AdamW}} = 2 \times M \times 4 = 8 \times M\text{ bytes}\]</div>
+<ul>
+<li>For a 10M parameter model, AdamW consumes <strong><span class="arithmatex">\(80\text{ MB}\)</span></strong> of VRAM—twice the size of the model itself!</li>
+<li>For a 50M parameter model, AdamW consumes <strong><span class="arithmatex">\(400\text{ MB}\)</span></strong> purely for its momentum tracking buffers.</li>
+</ul>
+<h3 id="4-activations-the-dominant-memory-consumer-in-segmentation">4. Activations (The Dominant Memory Consumer in Segmentation)</h3>
+<p>During the forward pass, PyTorch must store the intermediate feature maps output by every convolutional and normalization layer so they can be referenced during backpropagation.
+The activation footprint scales with:</p>
+<div class="arithmatex">\[\text{Memory}_{\text{activations}} \propto \text{Batch Size } (B) \times \text{Height } (H) \times \text{Width } (W) \times \text{Channels } (C) \times \text{Depth}\]</div>
+<ul>
+<li>
+<p>On an industrial line-scan strip (<span class="arithmatex">\(128 \times 800 = 102,400\text{ pixels}\)</span>), an early encoder feature map with 64 channels stores:</p>
+<div class="arithmatex">\[8 \text{ images} \times 64 \text{ channels} \times 128 \times 800 \times 4\text{ bytes} \approx 209.7\text{ MB}\]</div>
+<p>for just <strong>one</strong> convolution layer!</p>
+</li>
+<li>
+<p>Summed across 40+ layers in a full U-Net, activations easily consume <strong>4 to 10 GiB</strong> of VRAM.</p>
+</li>
+</ul>
+<h3 id="5-workspace-and-cuda-context">5. Workspace and CUDA Context</h3>
+<p>CUDA driver kernels, PyTorch internal memory allocator caches, and cuDNN workspace buffers typically reserve an overhead of <strong><span class="arithmatex">\(500\text{ MB}\)</span> to <span class="arithmatex">\(1.2\text{ GiB}\)</span></strong>.</p>
+<hr />
+<h2 id="3-automatic-mixed-precision-amp-mechanics-and-formats">3. Automatic Mixed Precision (AMP): Mechanics and Formats</h2>
+<p>Standard deep learning computations represent real numbers using <strong>IEEE 754 Single Precision (FP32)</strong>:</p>
+<ul>
+<li>1 sign bit, 8 exponent bits, 23 mantissa (fraction) bits (4 bytes).</li>
+<li>Dynamic range: <span class="arithmatex">\(\approx 10^{-38}\)</span> to <span class="arithmatex">\(10^{38}\)</span>.</li>
+</ul>
+<p>Modern GPU architectures (NVIDIA Volta, Turing, Ampere, Ada, Hopper) include dedicated hardware units called <strong>Tensor Cores</strong>. Tensor Cores perform matrix multiplications at <span class="arithmatex">\(2\times\)</span> to <span class="arithmatex">\(4\times\)</span> higher throughput when tensors are represented in 16-bit formats:</p>
+<h3 id="floating-point-16-bit-formats">Floating-Point 16-bit Formats:</h3>
+<ol>
+<li><strong>FP16 (Half Precision)</strong>:<ul>
+<li>1 sign bit, 5 exponent bits, 10 mantissa bits (2 bytes).</li>
+<li>Dynamic range: <span class="arithmatex">\(\approx 6 \times 10^{-5}\)</span> to <span class="arithmatex">\(65,504\)</span>.</li>
+<li><em>Limitation</em>: Because it has only 5 exponent bits, numbers smaller than <span class="arithmatex">\(6 \times 10^{-5}\)</span> underflow to zero.</li>
+</ul>
+</li>
+<li><strong>BF16 (Bfloat16 / Brain Floating Point)</strong>:<ul>
+<li>1 sign bit, 8 exponent bits, 7 mantissa bits (2 bytes).</li>
+<li>Dynamic range: identical to FP32 (<span class="arithmatex">\(\approx 10^{-38}\)</span> to <span class="arithmatex">\(10^{38}\)</span>), but lower precision.</li>
+<li>Supported natively on Ampere+ (A100, RTX 3000/4000) and modern CPUs.</li>
+</ul>
+</li>
+</ol>
+<h3 id="what-amp-does-automatically">What AMP Does Automatically:</h3>
+<p>PyTorch's Automatic Mixed Precision (<code>torch.amp</code>) automatically converts operations:</p>
+<ul>
+<li><strong>Fast 16-bit operations</strong>: <span class="arithmatex">\(3 \times 3\)</span> convolutions, <span class="arithmatex">\(1 \times 1\)</span> projections, matrix multiplications, and linear layers are executed in FP16/BF16 on Tensor Cores.</li>
+<li><strong>Protected 32-bit operations</strong>: Numerically sensitive operations that require wide dynamic range—such as Batch Normalization statistics, Softmax denominators, and Loss reductions—are automatically retained in FP32.</li>
+</ul>
+<hr />
+<h2 id="4-dynamic-gradient-scaling-gradscaler">4. Dynamic Gradient Scaling (<code>GradScaler</code>)</h2>
+<p>In FP16, the minimum representable positive number before underflow is <span class="arithmatex">\(\approx 6 \times 10^{-5}\)</span>.
+During backpropagation through a deep segmentation network, gradients in early convolutional layers are often very small (e.g., <span class="arithmatex">\(10^{-6}\)</span> or <span class="arithmatex">\(10^{-7}\)</span>). If backpropagated in raw FP16, these gradients <strong>underflow to absolute zero</strong>, completely halting weight updates in early encoder layers!</p>
+<p>To prevent underflow, PyTorch utilizes a <strong>Dynamic Gradient Scaler (<code>torch.amp.GradScaler</code>)</strong>:</p>
+<pre class="highlight"><code>Forward Pass:
+1. Inputs converted to FP16 inside torch.amp.autocast.
+2. Loss computed in FP32 for numerical stability.
+
+Backward Pass:
+3. Loss is multiplied by a large scale factor S (e.g., S = 65,536.0):
+   Scaled Loss = Loss * S
+4. Backpropagation runs on Scaled Loss. All gradients are scaled up by S:
+   Scaled Gradients = Gradients * S  (Safe from underflow!)
+
+Optimizer Step:
+5. Scaler UNSCALES gradients before the optimizer steps:
+   True Gradients = Scaled Gradients / S
+6. If any gradient contains Inf or NaN (overflow occurred):
+   -&gt; Optimizer step is SKIPPED entirely.
+   -&gt; Scale factor S is halved (e.g. 65,536 -&gt; 32,768).
+7. If no overflow occurs for N consecutive steps:
+   -&gt; Scale factor S is doubled.</code></pre>
+<hr />
+<h2 id="5-microbatch-sizing-and-gradient-accumulation">5. Microbatch Sizing and Gradient Accumulation</h2>
+<p>What if your model still exceeds VRAM even with AMP enabled?
+Do not immediately resize your images to <span class="arithmatex">\(256 \times 256\)</span> (which destroys the <span class="arithmatex">\(6.25:1\)</span> industrial aspect ratio) or shrink your model capacity. Instead, decouple your <strong>hardware microbatch size</strong> from your <strong>effective optimization batch size</strong> using <strong>gradient accumulation</strong>.</p>
+<p><img alt="Gradient Accumulation Lifecycle" src="assets/fig06_gradient_accumulation_steps.png" />
+<em>Figure 4.2: Step-by-step lifecycle of gradient accumulation. Gradients from 4 microbatches of size 4 accumulate into parameter buffers, achieving an effective batch size of 16 before a single optimizer step is executed.</em></p>
+<h3 id="definitions">Definitions:</h3>
+<ul>
+<li><strong>Microbatch Size (<span class="arithmatex">\(B_{\text{micro}}\)</span>)</strong>: The number of images fed into the GPU in a single <code>forward()</code> pass (constrained by physical VRAM).</li>
+<li><strong>Accumulation Steps (<span class="arithmatex">\(K_{\text{accum}}\)</span>)</strong>: The number of microbatches evaluated before calling <code>optimizer.step()</code>.</li>
+<li>
+<p><strong>Effective Batch Size (<span class="arithmatex">\(B_{\text{eff}}\)</span>)</strong>:</p>
+<div class="arithmatex">\[B_{\text{eff}} = B_{\text{micro}} \times K_{\text{accum}}\]</div>
+</li>
+</ul>
+<h3 id="the-loss-scaling-requirement">The Loss Scaling Requirement:</h3>
+<p>Because PyTorch's <code>loss.backward()</code> <em>accumulates</em> (sums) gradients into <code>.grad</code> buffers, you must divide the loss by <span class="arithmatex">\(K_{\text{accum}}\)</span>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{scaled}} = \frac{\mathcal{L}}{K_{\text{accum}}}\]</div>
+<p>If you forget this division, your accumulated gradients will be <span class="arithmatex">\(K_{\text{accum}}\)</span> times too large, acting like an unintended <span class="arithmatex">\(K\times\)</span> spike in your learning rate!</p>
+<hr />
+<h2 id="6-implementation-pattern-pytorch-2x-modern-amp-syntax">6. Implementation Pattern: PyTorch 2.x Modern AMP Syntax</h2>
+<p>In this repository, we run <strong>PyTorch 2.8.0</strong>. Modern PyTorch 2.x standardizes mixed precision under the <code>torch.amp</code> namespace rather than the legacy <code>torch.cuda.amp</code> module.</p>
+<pre class="highlight"><code class="language-python">import torch
+import torch.nn as nn
+from torch.optim import AdamW
+
+# 1. Device and Scaler Initialization
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+amp_enabled = (device.type == "cuda")
+
+# PyTorch 2.x GradScaler constructor takes device_type as first argument
+scaler = torch.amp.GradScaler(device.type, enabled=amp_enabled)
+optimizer = AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
+
+# Batch parameters
+microbatch_size = 4
+accumulation_steps = 4  # Effective batch = 16
+
+optimizer.zero_grad(set_to_none=True)
+
+for step, batch in enumerate(train_loader):
+    images = batch["image"].to(device, non_blocking=True)
+    masks = batch["mask"].to(device, non_blocking=True)
+
+    # 2. Forward pass inside autocast context
+    with torch.amp.autocast(device_type=device.type, enabled=amp_enabled):
+        logits = model(images)
+        loss = criterion(logits, masks)
+        # Scale loss by accumulation steps
+        scaled_loss = loss / accumulation_steps
+
+    # 3. Scaled backward pass
+    scaler.scale(scaled_loss).backward()
+
+    # 4. Optimizer update every `accumulation_steps`
+    if (step + 1) % accumulation_steps == 0 or (step + 1) == len(train_loader):
+        # A. Unscale gradients before clipping norms
+        scaler.unscale_(optimizer)
+
+        # B. Clip gradients
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
+        # C. Step optimizer through scaler
+        scaler.step(optimizer)
+
+        # D. Update scaler factor
+        scaler.update()
+
+        # E. Zero gradients using set_to_none=True to release memory
+        optimizer.zero_grad(set_to_none=True)</code></pre>
+<blockquote>
+<p>[!CAUTION]
+<strong>The Unscaling Ordering Rule</strong>:
+You <strong>MUST</strong> call <code>scaler.unscale_(optimizer)</code> <strong>BEFORE</strong> calling <code>torch.nn.utils.clip_grad_norm_()</code>. If you clip gradients before unscaling, PyTorch will evaluate gradient norms on the scaled values (<span class="arithmatex">\(G \times S\)</span>), misinterpreting healthy gradients as massive explosions and artificially shrinking your updates to zero!</p>
+</blockquote>
+<hr />
+<h2 id="7-diagnostic-symptoms-causes-and-checks">7. Diagnostic Symptoms: Causes and Checks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Observable Symptom in Logs</th>
+<th style="text-align: left;">Underlying Mechanism</th>
+<th style="text-align: left;">Diagnostic Check</th>
+<th style="text-align: left;">Corrective Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>RuntimeError: CUDA out of memory</code> during validation or test inference.</td>
+<td style="text-align: left;">Memory retained by computation graph; or validation run with gradient tracking enabled.</td>
+<td style="text-align: left;">Check if validation loop is wrapped in <code>@torch.inference_mode()</code> or <code>with torch.no_grad():</code>.</td>
+<td style="text-align: left;">Use <code>@torch.inference_mode()</code>; delete large probability tensors when finished; call <code>torch.cuda.empty_cache()</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss suddenly becomes <code>NaN</code> or <code>Inf</code> on step 15, and never recovers.</td>
+<td style="text-align: left;">Numerical underflow/overflow in loss calculation or logit exponentiation.</td>
+<td style="text-align: left;">Print min/max logits; check loss function head consistency.</td>
+<td style="text-align: left;">Verify loss calculates BCE on raw logits (not sigmoided probabilities); verify <code>GradScaler</code> is active.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Optimizer step appears to be skipped repeatedly; model parameters do not change.</td>
+<td style="text-align: left;">GradScaler repeatedly encountering Inf/NaN, triggering automatic step abortion.</td>
+<td style="text-align: left;">Inspect <code>scaler.get_scale()</code>; if scale factor drops below 1.0, severe numerical overflow is occurring.</td>
+<td style="text-align: left;">Clamp loss weights; reduce learning rate; check for zero-division in custom loss denominators.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Training runs <span class="arithmatex">\(3\times\)</span> slower with AMP enabled than expected.</td>
+<td style="text-align: left;">Excessive host-to-device synchronization calls inside the training loop.</td>
+<td style="text-align: left;">Search code for <code>.item()</code>, <code>.cpu()</code>, or <code>print(loss)</code> inside the per-batch inner loop.</td>
+<td style="text-align: left;">Remove intermediate <code>.item()</code> calls from GPU; accumulate metrics as tensors and synchronize once per epoch.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-ungraded-try-it-memory-footprint-estimation">8. Ungraded "Try It": Memory Footprint Estimation</h2>
+<p>A student proposes training a U-Net with a <strong>ResNet-34 encoder</strong> (21.3 million parameters) on a GPU with <strong>16 GiB VRAM</strong>.</p>
+<p><strong>System Parameters</strong>:</p>
+<ul>
+<li>Model parameters (<span class="arithmatex">\(M\)</span>): <span class="arithmatex">\(21.3 \times 10^6\)</span></li>
+<li>Optimizer: AdamW</li>
+<li>Image resolution: <span class="arithmatex">\(128 \times 800\)</span> pixels (single-channel grayscale input, 4 output mask channels)</li>
+<li>Hardware Microbatch Size: <span class="arithmatex">\(B = 8\)</span></li>
+</ul>
+<p><strong>Questions to Calculate</strong>:</p>
+<ol>
+<li>How much memory do the model parameters and gradients occupy in FP32?</li>
+<li>How much memory does the AdamW optimizer state occupy in FP32?</li>
+<li>If each strip requires approximately <span class="arithmatex">\(120\text{ MB}\)</span> of intermediate activations across all U-Net layers during forward propagation at <span class="arithmatex">\(B=1\)</span>, what is the activation memory footprint at <span class="arithmatex">\(B=8\)</span> in pure FP32?</li>
+<li>How does enabling PyTorch AMP reduce the activation memory footprint, and how many microbatches of size 4 would be needed to simulate an effective batch size of 16?</li>
+</ol>
+<hr />
+<h2 id="9-authoritative-references">9. Authoritative References</h2>
+<ul>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/amp.html"><code>torch.amp</code></a> (PyTorch 2.x unified mixed-precision documentation).</li>
+<li>Micikevicius, P., et al. (2018). <em>Mixed Precision Training</em>. International Conference on Learning Representations (ICLR). (Foundational paper on loss scaling and half precision).</li>
+<li>NVIDIA <a href="https://www.nvidia.com/en-us/data-center/tensor-cores/">Tensor Cores Architecture Overview</a>.</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_03_early_stopping_and_checkpoint_governance.html">← Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html">Guide 05 · Metric Governance &amp; Overfitting →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

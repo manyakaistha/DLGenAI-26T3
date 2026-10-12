@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 02 · Batching &amp; DataLoaders · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html" aria-current="page"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 02 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-mechanics-of-batching">1. Motivation: The Mechanics of Batching</a></li>
+<li><a href="#2-image-level-isolation-the-long-format-split-hazard">2. Image-Level Isolation: The Long-Format Split Hazard</a></li>
+<li><a href="#3-the-dataloader-architecture">3. The DataLoader Architecture</a></li>
+<li><a href="#4-batch-memory-footprint-calculations">4. Batch Memory Footprint Calculations</a></li>
+<li><a href="#5-custom-collation-why-default-collate-works">5. Custom Collation: Why Default Collate Works</a></li>
+<li><a href="#6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</a></li>
+<li><a href="#7-decisions-you-must-make">7. Decisions You Must Make</a></li>
+<li><a href="#8-try-it-verify-batch-collation-and-isolation-on-toy-data">8. Try It: Verify Batch Collation and Isolation on Toy Data</a></li>
+<li><a href="#9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="batching-dataloaders-and-image-level-isolation">Batching, DataLoaders, and Image-Level Isolation</h1>
+<p>Once your PyTorch <code>Dataset</code> can reliably decode individual images and defect masks into <code>[C, H, W]</code> tensors, the next engineering challenge is feeding them efficiently into your neural network. Modern deep learning accelerators (GPUs and TPUs) rely on <strong>batched tensor operations</strong> to achieve massive parallel throughput.</p>
+<p>In this guide, you will learn how the PyTorch <code>DataLoader</code> collates individual samples into 4D batch tensors, how multi-process worker mechanics function, and why <strong>image-level isolation</strong> is the single most critical guardrail against subtle validation data leakage.</p>
+<hr />
+<h2 id="1-motivation-the-mechanics-of-batching">1. Motivation: The Mechanics of Batching</h2>
+<p>Training a neural network with individual images (<span class="arithmatex">\(B=1\)</span>) is computationally inefficient. GPUs contain thousands of compute cores designed for SIMD (Single Instruction, Multiple Data) operations. Minibatch gradient descent averages gradients across <span class="arithmatex">\(B\)</span> independent samples, reducing gradient variance and allowing large matrix multiplications:</p>
+<div class="arithmatex">\[\mathbf{X}_{\text{batch}} \in \mathbb{R}^{B \times C \times H \times W}, \quad \mathbf{Y}_{\text{batch}} \in \mathbb{R}^{B \times K \times H \times W}\]</div>
+<p>For our industrial strip dataset, this translates to:</p>
+<ul>
+<li>Input Image Batch: <span class="arithmatex">\([B, 1, 128, 800]\)</span> in <code>torch.float32</code></li>
+<li>Target Mask Batch: <span class="arithmatex">\([B, 4, 128, 800]\)</span> in <code>torch.float32</code></li>
+</ul>
+<p>Managing this batch assembly requires careful orchestration of CPU multiprocessing, system memory pinning, and GPU data transfers.</p>
+<hr />
+<h2 id="2-image-level-isolation-the-long-format-split-hazard">2. Image-Level Isolation: The Long-Format Split Hazard</h2>
+<p>In standard computer vision datasets, each row in an annotation CSV typically corresponds to a distinct image. In our industrial surface anomaly dataset, <strong>each image spans four consecutive rows</strong> in <code>train.csv</code> (one per defect class).</p>
+<pre class="highlight"><code>train.csv Row Layout:
+Row 0: STRIP_0001, defect_a, NaN
+Row 1: STRIP_0001, defect_b, NaN
+Row 2: STRIP_0001, defect_c, "100 20 ..."  &lt;-- Same physical image!
+Row 3: STRIP_0001, defect_d, NaN
+Row 4: STRIP_0002, defect_a, NaN
+...</code></pre>
+<h3 id="the-catastrophic-failure-row-level-random-splitting">The Catastrophic Failure: Row-Level Random Splitting</h3>
+<p>If you apply a naive splitting function (such as <code>sklearn.model_selection.train_test_split</code>) directly to the rows of <code>train.csv</code>, rows belonging to <code>STRIP_0001</code> will be randomly distributed across both partitions:</p>
+<ul>
+<li>Train Split: receives Row 0 (<code>defect_a</code>), Row 1 (<code>defect_b</code>), Row 3 (<code>defect_d</code>)</li>
+<li>Validation Split: receives Row 2 (<code>defect_c</code>)</li>
+</ul>
+<p>What happens during training?</p>
+<ol>
+<li>The training loop loads <code>STRIP_0001.jpg</code> from disk and updates weights based on rows 0, 1, and 3.</li>
+<li>The validation loop loads <code>STRIP_0001.jpg</code> and evaluates row 2.</li>
+<li>Because the network has already observed the exact physical surface texture, rolling grain, and lighting of <code>STRIP_0001.jpg</code> during training, your validation metrics will appear artificially high.<blockquote>
+<p><strong>Golden Rule of Dataset Splitting:</strong> The train/validation split must take place at the <strong>Image ID level</strong>, strictly <em>before</em> instantiating any <code>Dataset</code> or <code>DataLoader</code> objects.</p>
+</blockquote>
+</li>
+</ol>
+<div class="arithmatex">\[\text{Train}_{\text{IDs}} \cap \text{Val}_{\text{IDs}} = \emptyset\]</div>
+<pre class="highlight"><code class="language-python"># The Disjoint Isolation Assertion
+train_ids = set(train_dataset.image_ids)
+val_ids = set(val_dataset.image_ids)
+assert len(train_ids.intersection(val_ids)) == 0, "FATAL DATA LEAK: Overlapping image IDs detected!"</code></pre>
+<hr />
+<h2 id="3-the-dataloader-architecture">3. The DataLoader Architecture</h2>
+<p>The PyTorch <code>DataLoader</code> manages asynchronous multi-process loading and tensor collation.</p>
+<p><img alt="Batch Collation and Workers" src="assets/fig02_batch_collation_and_workers.png" />
+<em>Figure 2.1: Multi-process DataLoader execution flow: worker processes load and transform samples in parallel, passing them to the main process for collation, memory pinning, and non-blocking GPU transfer.</em></p>
+<h3 id="key-dataloader-parameters">Key DataLoader Parameters:</h3>
+<h4 id="1-batch_size">1. <code>batch_size</code></h4>
+<p>Determines the number of samples grouped into one forward/backward pass.</p>
+<ul>
+<li>Larger batch sizes (<span class="arithmatex">\(B=16, 32\)</span>) stabilize batch normalization statistics and increase GPU utilization.</li>
+<li>Smaller batch sizes (<span class="arithmatex">\(B=4, 8\)</span>) consume less VRAM and introduce stochastic regularization, but increase gradient variance.</li>
+</ul>
+<h4 id="2-shuffle">2. <code>shuffle</code></h4>
+<ul>
+<li><strong>Training</strong>: Set <code>shuffle=True</code>. Randomizing the sequence of samples prevents cyclical optimization paths and breaks correlations between adjacent batches.</li>
+<li><strong>Validation</strong>: Set <code>shuffle=False</code>. Validation evaluates fixed model performance on a static dataset; shuffling adds unnecessary CPU overhead.</li>
+</ul>
+<h4 id="3-num_workers">3. <code>num_workers</code></h4>
+<p>Controls the number of background worker subprocesses spawned to load images and decode RLE masks.</p>
+<ul>
+<li><code>num_workers=0</code>: Data loading occurs synchronously in the main Python process. The GPU sits completely idle while the CPU reads images from disk and runs augmentations.</li>
+<li><code>num_workers=2</code> or <code>4</code>: Background processes pre-load upcoming batches while the GPU computes the current forward/backward pass.</li>
+</ul>
+<h4 id="4-pin_memorytrue">4. <code>pin_memory=True</code></h4>
+<p>Allocates batch tensors in host <strong>page-locked (pinned) system memory</strong>.</p>
+<ul>
+<li>Pinned memory bypasses OS virtual memory paging, enabling hardware Direct Memory Access (DMA) controllers to stream data directly into GPU VRAM.</li>
+<li>Paired with <code>batch["image"].to(device, non_blocking=True)</code>, data transfers execute concurrently with GPU kernel execution.</li>
+</ul>
+<h4 id="5-worker_init_fn-reproducibility-across-subprocesses">5. <code>worker_init_fn</code>: Reproducibility Across Subprocesses</h4>
+<p>When using multi-worker data loading, Python's <code>random</code> and NumPy's <code>np.random</code> generators in worker processes inherit identical seeds from the parent process by default. Without an explicit <code>worker_init_fn</code>, every worker process will apply the exact same sequence of random augmentations!</p>
+<pre class="highlight"><code class="language-python">def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)</code></pre>
+<hr />
+<h2 id="4-batch-memory-footprint-calculations">4. Batch Memory Footprint Calculations</h2>
+<p>Before selecting a batch size, calculate your tensor memory requirements. For a batch of size <span class="arithmatex">\(B\)</span> with single-channel images and 4-channel masks:</p>
+<div class="arithmatex">\[\text{Image Memory} = B \times 1 \times 128 \times 800 \times 4 \text{ bytes} = B \times 409,600 \text{ bytes} \approx B \times 0.40 \text{ MB}\]</div>
+<div class="arithmatex">\[\text{Mask Memory} = B \times 4 \times 128 \times 800 \times 4 \text{ bytes} = B \times 1,638,400 \text{ bytes} \approx B \times 1.60 \text{ MB}\]</div>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Batch Size (<span class="arithmatex">\(B\)</span>)</th>
+<th style="text-align: left;">Image Batch Tensor</th>
+<th style="text-align: left;">Mask Batch Tensor</th>
+<th style="text-align: left;">Combined Batch Host Memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 4\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.60 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(6.40 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8.00 \text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 8\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(3.20 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(12.80 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(16.00 \text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 16\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(6.40 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(25.60 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(32.00 \text{ MB}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong><span class="arithmatex">\(B = 32\)</span></strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(12.80 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(51.20 \text{ MB}\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(64.00 \text{ MB}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Notice that the raw batch tensors are lightweight. The primary VRAM consumer during training is <strong>intermediate activation feature maps</strong> retained for backpropagation, not the input batch itself.</p>
+<hr />
+<h2 id="5-custom-collation-why-default-collate-works">5. Custom Collation: Why Default Collate Works</h2>
+<p>By default, PyTorch uses <code>torch.utils.data.dataloader.default_collate</code>. If your <code>Dataset.__getitem__</code> returns a dictionary:
+<pre class="highlight"><code class="language-python">{
+    "image_id": "STRIP_0042",
+    "image": torch.Tensor(1, 128, 800),
+    "mask": torch.Tensor(4, 128, 800)
+}</code></pre>
+The <code>default_collate</code> function inspects the types:</p>
+<ul>
+<li><code>torch.Tensor</code> objects are stacked along a new 0th dimension: <span class="arithmatex">\([B, 1, 128, 800]\)</span> and <span class="arithmatex">\([B, 4, 128, 800]\)</span>.</li>
+<li>Strings (<code>image_id</code>) are assembled into a Python list of strings: <code>["STRIP_0042", "STRIP_0043", ...]</code>.</li>
+</ul>
+<p>You only need a custom <code>collate_fn</code> if you introduce variable-length metadata or bounding boxes. For fixed-size industrial strip tensors, <code>default_collate</code> is optimal.</p>
+<hr />
+<h2 id="6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Failure Mode</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Row-Level Leakage</strong></td>
+<td style="text-align: left;">Splitting <code>train.csv</code> rows directly without grouping by <code>image_id</code>.</td>
+<td style="text-align: left;">Validation score starts at <span class="arithmatex">\(&gt;0.85\)</span> on epoch 1, but test score is near 0.</td>
+<td style="text-align: left;">Assert <code>len(set(train_ids) &amp; set(val_ids)) == 0</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Worker Process Deadlock</strong></td>
+<td style="text-align: left;">OpenCV multi-threading conflicting with PyTorch multiprocessing fork.</td>
+<td style="text-align: left;">DataLoader freezes indefinitely on batch 1 with 100% CPU usage.</td>
+<td style="text-align: left;">Call <code>cv2.setNumThreads(0)</code> at the beginning of your script.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Identical Augmentation Streams</strong></td>
+<td style="text-align: left;">Omitting <code>worker_init_fn</code> with multi-worker loading.</td>
+<td style="text-align: left;">Workers apply identical augmentations to different images.</td>
+<td style="text-align: left;">Inspect random numbers generated inside workers across epochs.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>VRAM Out-of-Memory (OOM)</strong></td>
+<td style="text-align: left;">Batch size too large for GPU VRAM during backward pass.</td>
+<td style="text-align: left;"><code>RuntimeError: CUDA out of memory</code> during <code>loss.backward()</code>.</td>
+<td style="text-align: left;">Halve your <code>batch_size</code> or use gradient accumulation.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Unshuffled Training Batches</strong></td>
+<td style="text-align: left;">Setting <code>shuffle=False</code> on the training <code>DataLoader</code>.</td>
+<td style="text-align: left;">Training loss oscillates erratically or plateaus early.</td>
+<td style="text-align: left;">Verify <code>shuffle=True</code> on training loader, <code>shuffle=False</code> on validation loader.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-decisions-you-must-make">7. Decisions You Must Make</h2>
+<ol>
+<li><strong>Worker Count Tuning</strong>: Benchmark data loading speed on your training machine:<ul>
+<li>Run 100 batches with <code>num_workers=0, 2, 4</code>.</li>
+<li>Measure batches loaded per second: <span class="arithmatex">\(\text{throughput} = \frac{N_{\text{batches}}}{\text{elapsed\_time}}\)</span>.</li>
+<li>Select the lowest worker count that saturates your GPU without consuming excessive system RAM.</li>
+</ul>
+</li>
+<li><strong>Batch Size vs. Gradient Accumulation</strong>: If your target GPU has limited VRAM (e.g., 8 GB or 16 GB), you may be constrained to <span class="arithmatex">\(B=4\)</span> or <span class="arithmatex">\(B=8\)</span>. If you require the gradient stability of <span class="arithmatex">\(B=16\)</span>, implement <strong>gradient accumulation</strong>:
+   <pre class="highlight"><code class="language-python"># Simulate effective batch size = micro_batch * accumulation_steps
+loss = loss / accumulation_steps
+loss.backward()
+if (step + 1) % accumulation_steps == 0:
+    optimizer.step()
+    optimizer.zero_grad()</code></pre></li>
+</ol>
+<hr />
+<h2 id="8-try-it-verify-batch-collation-and-isolation-on-toy-data">8. Try It: Verify Batch Collation and Isolation on Toy Data</h2>
+<p>Run this self-contained diagnostic snippet to verify that your DataLoader collates tensors properly and that your train/val partitions are strictly isolated:</p>
+<pre class="highlight"><code class="language-python">import pandas as pd
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+class ToyDataset(Dataset):
+    def __init__(self, ids):
+        self.ids = ids
+    def __len__(self):
+        return len(self.ids)
+    def __getitem__(self, idx):
+        return {
+            "image_id": self.ids[idx],
+            "image": torch.full((1, 128, 800), idx, dtype=torch.float32),
+            "mask": torch.zeros((4, 128, 800), dtype=torch.float32),
+        }
+
+# Fictional image IDs
+all_ids = [f"STRIP_{i:04d}" for i in range(10)]
+
+# Image-level 80/20 split
+train_ids = all_ids[:8]
+val_ids = all_ids[8:]
+
+# 1. Isolation check
+assert len(set(train_ids).intersection(set(val_ids))) == 0, "Leakage detected!"
+print(f"Split verified: {len(train_ids)} train images, {len(val_ids)} val images. Disjoint: TRUE.")
+
+# 2. Batch collation check
+train_loader = DataLoader(ToyDataset(train_ids), batch_size=4, shuffle=True)
+batch = next(iter(train_loader))
+
+print(f"Batch images shape: {tuple(batch['image'].shape)} [B, C, H, W]")
+print(f"Batch masks shape:  {tuple(batch['mask'].shape)} [B, C, H, W]")
+print(f"Batch IDs:          {batch['image_id']}")
+assert batch["image"].shape == (4, 1, 128, 800), "Image batch shape error!"
+assert batch["mask"].shape == (4, 4, 128, 800), "Mask batch shape error!"
+print("✓ DataLoader batch collation verified successfully!")</code></pre>
+<hr />
+<h2 id="9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>PyTorch <code>torch.utils.data.DataLoader</code></strong>: <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">DataLoader API Reference</a></li>
+<li><strong>PyTorch Reproducibility &amp; Multiprocessing</strong>: <a href="https://pytorch.org/docs/stable/notes/randomness.html#dataloader">Reproducibility Notes</a></li>
+<li><strong>CUDA Pinned Memory and Asynchronous Transfers</strong>: <a href="https://pytorch.org/docs/stable/notes/cuda.html#memory-management">Memory Management</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_01_dataset_contract_and_strip_tensors.html">← Guide 01 · The Dataset Contract</a><a href="guide_03_industrial_augmentations_and_alignment.html">Guide 03 · Industrial Augmentations →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 04 · Ensembling Models &amp; Checkpoints · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 04 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-incompatible-ensemble">1. Concrete Failure Case: The Incompatible Ensemble</a></li>
+<li><a href="#2-the-three-tiers-of-ensembling">2. The Three Tiers of Ensembling</a></li>
+<li><a href="#3-probability-blending-soft-vs-mask-voting-hard">3. Probability Blending (Soft) vs. Mask Voting (Hard)</a></li>
+<li><a href="#4-the-5-prerequisites-for-valid-ensembling">4. The 5 Prerequisites for Valid Ensembling</a></li>
+<li><a href="#5-error-correlation-and-the-diversity-dividend">5. Error Correlation and the Diversity Dividend</a></li>
+<li><a href="#6-how-to-select-ensemble-weights-without-data-leakage">6. How to Select Ensemble Weights Without Data Leakage</a></li>
+<li><a href="#7-decision-matrix-trade-off-analysis">7. Decision Matrix: Trade-Off Analysis</a></li>
+<li><a href="#8-diagnostic-checklist-verifying-your-ensemble">8. Diagnostic Checklist: Verifying Your Ensemble</a></li>
+<li><a href="#9-ungraded-activity-predict-the-ensemble-behavior">9. Ungraded Activity: Predict the Ensemble Behavior</a></li>
+<li><a href="#10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-04-ensembling-models-checkpoints-probability-blending-decision-fusion">Guide 04: Ensembling Models &amp; Checkpoints: Probability Blending &amp; Decision Fusion</h1>
+<p>In competitive machine learning, no single model architecture or training run captures the entire complexity of the underlying data distribution. One architecture (such as U-Net with a ResNet backbone) may excel at capturing fine, high-frequency spatial boundaries on thin scratches, while another (such as a Feature Pyramid Network with an EfficientNet backbone) may demonstrate superior semantic context on diffuse, irregular oxide inclusions.</p>
+<p><strong>Ensembling</strong> is the principled combination of multiple model hypotheses into a unified consensus prediction. When individual models commit errors that are partially uncorrelated, combining their outputs cancels out individual idiosyncrasies and produces a prediction that is more accurate and robust than any constituent model.</p>
+<p>However, ensembling is not a magic wand. Combining models with mismatched preprocessing, unaligned class indices, or highly correlated errors adds significant inference latency and GPU memory overhead with zero performance gain.</p>
+<p>In this guide, you will evaluate the three tiers of ensembling, contrast soft probability blending against hard binary mask voting, establish the strict technical prerequisites for combining predictions, analyze error diversity, and design a leakage-free validation protocol for ensemble weight selection.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-incompatible-ensemble">1. Concrete Failure Case: The Incompatible Ensemble</h2>
+<p>Consider a student who trains two models:</p>
+<ul>
+<li><strong>Model A</strong>: U-Net with ResNet34 backbone, trained on grayscale images normalized with per-image z-score standard normalization (<span class="arithmatex">\(\mu = 0, \sigma = 1\)</span>).</li>
+<li><strong>Model B</strong>: FPN with EfficientNet-B2 backbone, trained on images normalized with ImageNet 3-channel mean and standard deviation.</li>
+</ul>
+<p>During inference, the student writes an ensemble loop:
+<pre class="highlight"><code class="language-python"># FATAL FLAW: Mismatched preprocessing!
+for batch_images in test_loader:
+    # batch_images is normalized with per-image z-score
+    prob_a = model_a(batch_images).sigmoid()
+    prob_b = model_b(batch_images).sigmoid()  # Model B expects ImageNet stats!
+
+    ensemble_prob = 0.5 * prob_a + 0.5 * prob_b</code></pre></p>
+<h3 id="what-went-wrong">What Went Wrong?</h3>
+<p>Because Model B receives inputs normalized with statistics completely different from its training distribution, its feature activations saturate. It emits uncalibrated, noisy probabilities hovering between <span class="arithmatex">\(0.4\)</span> and <span class="arithmatex">\(0.6\)</span> everywhere.</p>
+<p>When averaged with Model A’s sharp predictions:</p>
+<ul>
+<li>Model A predicts a high-confidence defect (<span class="arithmatex">\(p = 0.92\)</span>).</li>
+<li>Model B predicts uncalibrated noise (<span class="arithmatex">\(p = 0.20\)</span>).</li>
+<li>The average is <span class="arithmatex">\(\frac{0.92 + 0.20}{2} = \mathbf{0.56}\)</span>. A high-confidence detection is diluted to near-threshold ambiguity!</li>
+<li>On clean sheets, Model B’s noise (<span class="arithmatex">\(p \approx 0.45\)</span>) inflates background probabilities, triggering false alarms.</li>
+</ul>
+<p>Instead of outperforming the best individual checkpoint, the broken ensemble performs <strong>worse than Model A alone</strong>, while doubling execution time!</p>
+<hr />
+<h2 id="2-the-three-tiers-of-ensembling">2. The Three Tiers of Ensembling</h2>
+<p>Before combining disparate neural networks, understand the three fundamental tiers of model aggregation:</p>
+<pre class="highlight"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 The Ensembling Spectrum                                │
+├────────────────────────────┬────────────────────────────┬──────────────────────────────┤
+│  Tier 1: Weight Averaging  │ Tier 2: Checkpoint Blend   │ Tier 3: Multi-Model Ensemble │
+│  (EMA / SWA)               │ (Snapshots within 1 run)   │ (Diverse Backbones &amp; Folds)  │
+├────────────────────────────┼────────────────────────────┼──────────────────────────────┤
+│ • Averages parameter       │ • Blends predictions of    │ • Blends predictions across  │
+│   weights θ = α θ_1 + ...  │   best.pt and last.pt      │   distinct architectures     │
+│ • Single forward pass!     │ • 2 forward passes         │ • N forward passes           │
+│ • Zero inference latency   │ • Moderate diversity       │ • High diversity             │
+└────────────────────────────┴────────────────────────────┴──────────────────────────────┘</code></pre>
+<h3 id="tier-1-parameter-weight-averaging-ema-swa">Tier 1: Parameter Weight Averaging (EMA / SWA)</h3>
+<ul>
+<li>
+<p><strong>Mechanism</strong>: A running exponential moving average (EMA) or Stochastic Weight Averaging (SWA) of model parameters is maintained during training:</p>
+<div class="arithmatex">\[\boldsymbol{\theta}_{\text{EMA}} \leftarrow \beta \boldsymbol{\theta}_{\text{EMA}} + (1 - \beta) \boldsymbol{\theta}_{\text{current}}, \quad \beta \approx 0.999\]</div>
+</li>
+<li>
+<p><strong>Inference Cost</strong>: Exactly <span class="arithmatex">\(1.0\times\)</span> (identical to a single model).</p>
+</li>
+<li><strong>Benefit</strong>: Smooths loss landscape geometry, preventing convergence into sharp, brittle local minima.</li>
+</ul>
+<h3 id="tier-2-multi-checkpoint-blending-within-one-training-run">Tier 2: Multi-Checkpoint Blending (Within One Training Run)</h3>
+<ul>
+<li><strong>Mechanism</strong>: Averaging predictions from the epoch with the best validation score (<code>best.pt</code>) and the final epoch (<code>last.pt</code>), or across multiple cyclical learning rate snapshots.</li>
+<li><strong>Inference Cost</strong>: <span class="arithmatex">\(K\times\)</span> forward passes.</li>
+<li><strong>Limitation</strong>: Weights share identical initialization and training trajectories; error diversity is relatively low.</li>
+</ul>
+<h3 id="tier-3-multi-architecture-multi-fold-ensembles-across-runs">Tier 3: Multi-Architecture / Multi-Fold Ensembles (Across Runs)</h3>
+<ul>
+<li><strong>Mechanism</strong>: Combining independently trained models with different encoder backbones (e.g. EfficientNet + ResNet + ConvNeXt) or cross-validation folds (e.g. Fold 0 + Fold 1).</li>
+<li><strong>Inference Cost</strong>: <span class="arithmatex">\(M\times\)</span> forward passes and <span class="arithmatex">\(M\times\)</span> model weight storage.</li>
+<li><strong>Benefit</strong>: Maximum error decorrelation. Backbones with different receptive fields and attention mechanisms make distinct errors, maximizing ensemble gain.</li>
+</ul>
+<hr />
+<h2 id="3-probability-blending-soft-vs-mask-voting-hard">3. Probability Blending (Soft) vs. Mask Voting (Hard)</h2>
+<p>Once multiple models are evaluated on a test strip, how should their outputs be combined?</p>
+<p><img alt="Ensemble Blending vs Voting" src="assets/fig06_ensemble_blending_vs_voting.png" />
+<em>Figure 4.1: Soft probability blending vs hard binary mask voting. (1) Individual model probabilities. (2) Soft probability blend preserves continuous uncertainty. (3) Hard voting discretizes prematurely at <span class="arithmatex">\(\tau=0.5\)</span>. (4) The resulting decision boundaries: notice how soft blending smooths borderline ambiguity.</em></p>
+<h3 id="method-a-soft-probability-blending-recommended">Method A: Soft Probability Blending (Recommended)</h3>
+<p>Compute a convex combination of continuous predicted probability maps before applying any decision threshold:</p>
+<div class="arithmatex">\[\hat{\mathbf{P}}_{\text{ensemble}} = \sum_{m=1}^{M} w_m \hat{\mathbf{P}}_m, \quad \sum_{m=1}^{M} w_m = 1.0, \quad w_m \ge 0\]</div>
+<p>Then apply the decision threshold and minimum area filter to the blended probability map:</p>
+<div class="arithmatex">\[\hat{\mathbf{M}}_{\text{ensemble}} = \operatorname{FilterArea}\left(\mathbb{I}\left(\hat{\mathbf{P}}_{\text{ensemble}} \ge \boldsymbol{\tau}\right), \mathbf{A}_{\min}\right)\]</div>
+<h3 id="method-b-hard-binary-mask-voting">Method B: Hard Binary Mask Voting</h3>
+<p>Binarize each model's prediction independently using threshold <span class="arithmatex">\(\tau\)</span>, then vote across binary masks:</p>
+<div class="arithmatex">\[\hat{\mathbf{M}}_m = \mathbb{I}(\hat{\mathbf{P}}_m \ge \tau), \quad \hat{\mathbf{M}}_{\text{vote}} = \mathbb{I}\left(\sum_{m=1}^{M} \hat{\mathbf{M}}_m \ge K_{\text{vote}}\right)\]</div>
+<p>Where <span class="arithmatex">\(K_{\text{vote}}\)</span> is a voting rule (e.g. Unanimous <span class="arithmatex">\(K=M\)</span>, Majority <span class="arithmatex">\(K = \lceil M/2 \rceil\)</span>, or Any <span class="arithmatex">\(K=1\)</span>).</p>
+<h3 id="the-worked-numerical-example-borderline-disagreement">The Worked Numerical Example: Borderline Disagreement</h3>
+<p>Examine five pixels along a defect boundary evaluated by two models:</p>
+<pre class="highlight"><code>Pixel Description          P(Model 1)    P(Model 2)    Soft Blend (0.5+0.5)    Hard Mask 1 (τ=0.5)    Hard Mask 2 (τ=0.5)    Hard AND    Hard OR
+Pixel 1 (Clear BG)         0.05          0.08          0.06                    0                      0                      0           0
+Pixel 2 (Low Border)       0.35          0.42          0.38                    0                      0                      0           0
+Pixel 3 (Disagreement)     0.46          0.62          0.54                    0                      1                      0           1
+Pixel 4 (High Border)      0.68          0.74          0.71                    1                      1                      1           1
+Pixel 5 (Clear Defect)     0.94          0.96          0.95                    1                      1                      1           1</code></pre>
+<h4 id="why-soft-blending-outperforms-hard-voting">Why Soft Blending Outperforms Hard Voting:</h4>
+<ul>
+<li>Look at <strong>Pixel 3</strong>: Model 1 is slightly unconvinced (<span class="arithmatex">\(0.46 &lt; 0.50\)</span>), but Model 2 is confident (<span class="arithmatex">\(0.62 \ge 0.50\)</span>).<ul>
+<li>In <strong>Hard AND voting</strong>: The detection is discarded (<span class="arithmatex">\(0 \land 1 = 0\)</span>), causing false negatives on boundary pixels.</li>
+<li>In <strong>Hard OR voting</strong>: Any spurious noise speckle from either model is accepted (<span class="arithmatex">\(0 \lor 1 = 1\)</span>), causing false alarms on clean sheets.</li>
+<li>In <strong>Soft Blending</strong>: The average is <span class="arithmatex">\(0.54\)</span>. Because Model 2’s confidence (<span class="arithmatex">\(+0.12\)</span> above threshold) outweighs Model 1’s hesitation (<span class="arithmatex">\(-0.04\)</span> below threshold), the blended probability correctly crosses <span class="arithmatex">\(\tau = 0.50\)</span>.</li>
+</ul>
+</li>
+<li><strong>Crucial Advantage</strong>: Soft blending keeps the probability continuous, allowing you to optimize post-processing thresholds <span class="arithmatex">\(\boldsymbol{\tau}\)</span> and minimum area filters <span class="arithmatex">\(\mathbf{A}_{\min}\)</span> <strong>on the aggregated ensemble output</strong>.</li>
+</ul>
+<hr />
+<h2 id="4-the-5-prerequisites-for-valid-ensembling">4. The 5 Prerequisites for Valid Ensembling</h2>
+<p>Before writing an ensemble script, verify that your models satisfy every contract on this checklist:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Prerequisite</th>
+<th style="text-align: left;">Specification</th>
+<th style="text-align: left;">Failure Consequence if Violated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Identical Coordinate Space</strong></td>
+<td style="text-align: left;">All models output predictions on native <span class="arithmatex">\(128 \times 800\)</span> canvas coordinates.</td>
+<td style="text-align: left;">Predictions are spatially shifted or distorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Identical Class Index Order</strong></td>
+<td style="text-align: left;">Channel 0 is <code>defect_a</code>, Channel 1 is <code>defect_b</code>, Channel 2 is <code>defect_c</code>, Channel 3 is <code>defect_d</code>.</td>
+<td style="text-align: left;">Catastrophic cross-contamination: scratch probabilities blended with oxide scale.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Compatible Output Semantics</strong></td>
+<td style="text-align: left;">Both models emit probability maps in <span class="arithmatex">\([0.0, 1.0]\)</span> (not raw un-activated logits).</td>
+<td style="text-align: left;">Model with larger logit magnitude completely hijacks the ensemble.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Consistent Input Preprocessing</strong></td>
+<td style="text-align: left;">Each model receives images preprocessed with its own exact training pipeline (e.g. CLAHE, z-score, or ImageNet normalization).</td>
+<td style="text-align: left;">Severe distribution shift, feature saturation, noisy predictions.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Calibrated Score Scales</strong></td>
+<td style="text-align: left;">Both models have comparable confidence calibration.</td>
+<td style="text-align: left;">One overconfident model overrides a better-calibrated model.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-error-correlation-and-the-diversity-dividend">5. Error Correlation and the Diversity Dividend</h2>
+<p>Ensembling succeeds because of <strong>error diversity</strong>.</p>
+<p>Let the prediction error of model <span class="arithmatex">\(m\)</span> at a given pixel be <span class="arithmatex">\(\epsilon_m = \hat{P}_m - P^*\)</span>, with variance <span class="arithmatex">\(\sigma^2 = \mathbb{E}[\epsilon_m^2]\)</span> and pairwise correlation coefficient <span class="arithmatex">\(\rho = \operatorname{Corr}(\epsilon_i, \epsilon_j)\)</span>.</p>
+<p>The expected error variance of a simple average ensemble of <span class="arithmatex">\(M\)</span> models is:</p>
+<div class="arithmatex">\[\sigma_{\text{ensemble}}^2 = \rho \sigma^2 + \frac{1 - \rho}{M} \sigma^2\]</div>
+<h3 id="the-two-limiting-cases">The Two Limiting Cases:</h3>
+<ol>
+<li>
+<p><strong>Perfect Correlation (<span class="arithmatex">\(\rho = 1.0\)</span>)</strong>:</p>
+<div class="arithmatex">\[\sigma_{\text{ensemble}}^2 = 1.0 \times \sigma^2 + 0 = \sigma^2\]</div>
+<p>If two models always make identical mistakes (e.g. two checkpoints from the same epoch with different random seeds), <strong>there is zero variance reduction</strong>. You double inference time for zero score gain.</p>
+</li>
+<li>
+<p><strong>Completely Uncorrelated Errors (<span class="arithmatex">\(\rho = 0.0\)</span>)</strong>:</p>
+<div class="arithmatex">\[\sigma_{\text{ensemble}}^2 = \frac{\sigma^2}{M}\]</div>
+<p>Error variance decreases linearly with the number of models <span class="arithmatex">\(M\)</span>.</p>
+</li>
+</ol>
+<blockquote>
+<p>[!NOTE]
+To maximize diversity, combine models with different inductive biases:
+- Architecture Diversity: U-Net (local spatial detail) + FPN or DeepLabV3+ (multi-scale receptive field).
+- Backbone Diversity: Convolutional (ResNet, EfficientNet) + Attention / Modern Conv (ConvNeXt).
+- Input Representation: Grayscale native + CLAHE contrast-enhanced.</p>
+</blockquote>
+<hr />
+<h2 id="6-how-to-select-ensemble-weights-without-data-leakage">6. How to Select Ensemble Weights Without Data Leakage</h2>
+<p>Ensemble weights <span class="arithmatex">\(\mathbf{w} = [w_1, w_2, \dots, w_M]\)</span> must be selected through a sound local validation protocol:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+def evaluate_weighted_ensemble(
+    val_probs_m1: np.ndarray,
+    val_probs_m2: np.ndarray,
+    val_gts: np.ndarray,
+    weight_m1_candidates: list[float]
+) -&gt; tuple[float, float]:
+    """Find optimal blending weights across held-out validation predictions."""
+    best_weight = 0.50
+    best_score = -1.0
+
+    for w1 in weight_m1_candidates:
+        w2 = 1.0 - w1
+        blended_probs = w1 * val_probs_m1 + w2 * val_probs_m2
+
+        # Evaluate competition metric on blended predictions at baseline tau=0.5
+        # (Replace with your competition evaluation metric function)
+        score = evaluate_competition_metric(blended_probs, val_gts, tau=0.50)
+
+        if score &gt; best_score:
+            best_score = score
+            best_weight = w1
+
+    return best_weight, best_score</code></pre>
+<h3 id="the-golden-rules-of-ensemble-validation">The Golden Rules of Ensemble Validation:</h3>
+<ol>
+<li><strong>Never Evaluate a Model on Its Own Training Fold</strong>: If Model 1 was trained on Fold 0, you cannot evaluate its ensemble weight on Fold 0 validation data. It will display artificially high confidence, biassing the weight selection.</li>
+<li><strong>Use Out-of-Fold (OOF) Blends</strong>: Evaluate ensemble weights across complete Out-of-Fold predictions where every sample was held out during the training of the respective models.</li>
+<li><strong>Prefer Simple Equal Weighting (<span class="arithmatex">\(1/M\)</span>) as Baseline</strong>: A simple unweighted average (<span class="arithmatex">\(\mathbf{w} = [1/M, \dots, 1/M]\)</span>) is surprisingly difficult to beat and strongly guards against overfitting validation variance. Only use non-equal weights if validation evidence demonstrates a substantial, consistent difference in model quality.</li>
+<li><strong>Never Tune Weights on the Public Leaderboard</strong>: Submitting five weight variants to Kaggle to pick the best score fits the private test set's random sampling noise, resulting in leaderboard shakeup.</li>
+</ol>
+<hr />
+<h2 id="7-decision-matrix-trade-off-analysis">7. Decision Matrix: Trade-Off Analysis</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Ensemble Strategy</th>
+<th style="text-align: left;">Expected Metric Gain</th>
+<th style="text-align: left;">Latency Multiplier</th>
+<th style="text-align: left;">Storage Overhead</th>
+<th style="text-align: left;">Implementation Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Single Best Checkpoint</strong></td>
+<td style="text-align: left;">Baseline (<span class="arithmatex">\(0.0\)</span>)</td>
+<td style="text-align: left;"><span class="arithmatex">\(1.0\times\)</span> (Fastest)</td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span> checkpoint (<span class="arithmatex">\(~100\text{ MB}\)</span>)</td>
+<td style="text-align: left;">Low (Standard pipeline)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2-Model Blend (Diverse Backbones)</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(+0.015\)</span> to <span class="arithmatex">\(+0.030\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2.0\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2\times\)</span> checkpoints (<span class="arithmatex">\(~200\text{ MB}\)</span>)</td>
+<td style="text-align: left;">Moderate (Multi-model forward)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5-Fold Cross-Validation Ensemble</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(+0.020\)</span> to <span class="arithmatex">\(+0.035\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(5.0\times\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(5\times\)</span> checkpoints (<span class="arithmatex">\(~500\text{ MB}\)</span>)</td>
+<td style="text-align: left;">High (Fold artifact management)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Complex 10-Model Stacking</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(+0.025\)</span> to <span class="arithmatex">\(+0.040\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(10.0\times\)</span> (High OOM risk!)</td>
+<td style="text-align: left;"><span class="arithmatex">\(&gt;1\text{ GB}\)</span></td>
+<td style="text-align: left;">Extreme (Exceeds Kaggle budgets)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-diagnostic-checklist-verifying-your-ensemble">8. Diagnostic Checklist: Verifying Your Ensemble</h2>
+<ol>
+<li><strong>Standalone Benchmark Sanity</strong>: Did each individual model achieve a solid validation score on its own? Never add a weak, failing model to an ensemble in the hope that it will "add diversity"—it will only corrupt confident predictions.</li>
+<li>
+<p><strong>Prediction Correlation Matrix</strong>: Compute the Pearson correlation coefficient between the probability maps of Model 1 and Model 2 on validation strips:</p>
+<div class="arithmatex">\[r = \operatorname{Corr}(\hat{\mathbf{P}}_1, \hat{\mathbf{P}}_2)\]</div>
+<p>If <span class="arithmatex">\(r &gt; 0.98\)</span>, the models are nearly identical; consider keeping only the faster one. If <span class="arithmatex">\(0.80 &lt; r &lt; 0.92\)</span>, healthy diversity exists.</p>
+</li>
+<li>
+<p><strong>Inference Latency Benchmark</strong>: Time the ensemble forward pass on 50 images in a Kaggle notebook environment. Extrapolate to 3,000 images:</p>
+<div class="arithmatex">\[\text{Total Time} = 3000 \times \frac{\text{Time}_{50}}{50} &lt; 7.0\text{ hours}\]</div>
+<p>Ensure you maintain at least a 2-hour buffer below Kaggle’s 9-hour limit.</p>
+</li>
+</ol>
+<hr />
+<h2 id="9-ungraded-activity-predict-the-ensemble-behavior">9. Ungraded Activity: Predict the Ensemble Behavior</h2>
+<p>Review the following fictional scenario:</p>
+<ul>
+<li>Model A (U-Net) detects an inclusion cluster with predicted probability <span class="arithmatex">\(p_A = 0.70\)</span>.</li>
+<li>Model B (FPN) misses the inclusion cluster completely with predicted probability <span class="arithmatex">\(p_B = 0.10\)</span>.</li>
+</ul>
+<p><strong>Questions:</strong></p>
+<ol>
+<li>Under an equal-weighted soft blend (<span class="arithmatex">\(w_A = 0.5, w_B = 0.5\)</span>), what is the blended probability <span class="arithmatex">\(p_{\text{blend}}\)</span>?</li>
+<li>At a decision threshold <span class="arithmatex">\(\tau = 0.50\)</span>, does the ensemble detect or miss the defect?</li>
+<li>What happens if the student configures unequal weights <span class="arithmatex">\(w_A = 0.7, w_B = 0.3\)</span>?</li>
+<li>In what situation would Model B's low probability (<span class="arithmatex">\(0.10\)</span>) represent a beneficial correction of a false alarm, and in what situation would it represent a harmful dilution of a genuine defect?</li>
+</ol>
+<hr />
+<h2 id="10-authoritative-documentation-references">10. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>Dietterich (2000)</strong>: <em>Ensemble Methods in Machine Learning</em>, Multiple Classifier Systems (statistical, computational, and representational reasons for ensembling).</li>
+<li><strong>Kaggle Grandmaster Playbook</strong>: <em>Model Ensembling &amp; Blending Strategies in Competitive Computer Vision</em>.</li>
+<li><strong>Scikit-Learn Documentation</strong>: <a href="https://scikit-learn.org/stable/modules/ensemble.html">Ensemble Methods: Voting Classifier &amp; Blending</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html">← Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_05_scalable_inference_architecture_and_memory.html">Guide 05 · Scalable Inference &amp; Memory →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

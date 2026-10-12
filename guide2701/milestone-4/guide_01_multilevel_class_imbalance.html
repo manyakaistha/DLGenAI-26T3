@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 01 · Multi-Level Class Imbalance · Milestone 4 Student Guide</title>
+<meta name="description" content="Milestone 4 student study guides: training improvements, mixed precision, metric governance, and model optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 4</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Training improvements, mixed precision (AMP), metric governance, and optimization.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 4 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 4 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 4 Overview</a><a href="guide_01_multilevel_class_imbalance.html" aria-current="page"><span class="num">GUIDE 01</span>Guide 01 · Multi-Level Class Imbalance</a><a href="guide_02_learning_rate_schedulers_and_warmup.html"><span class="num">GUIDE 02</span>Guide 02 · LR Schedulers &amp; Warmup</a><a href="guide_03_early_stopping_and_checkpoint_governance.html"><span class="num">GUIDE 03</span>Guide 03 · Early Stopping &amp; Checkpoints</a><a href="guide_04_mixed_precision_amp_and_gpu_memory.html"><span class="num">GUIDE 04</span>Guide 04 · Mixed Precision (AMP) &amp; Memory</a><a href="guide_05_validation_dice_and_overfitting_diagnostics.html"><span class="num">GUIDE 05</span>Guide 05 · Metric Governance &amp; Overfitting</a><a href="guide_06_validation_error_analysis_and_spatial_diagnostics.html"><span class="num">GUIDE 06</span>Guide 06 · Validation Error Analysis</a><a href="guide_07_controlled_experimentation_and_iteration.html"><span class="num">GUIDE 07</span>Guide 07 · Controlled Experimentation</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 4 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 4 · Training Improvements & Model Optimization</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 4 Curriculum</span><p class="hero-title">Optimize.<br>Scale. Diagnose.</p><p class="hero-caption">Evidence-driven deep learning engineering.</p></div></div>
+<span class="section-label">Concept guide 01 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-observable-problem-the-rare-class-silence-and-false-alarm-flood">1. Observable Problem: The Rare-Class Silence and False-Alarm Flood</a></li>
+<li><a href="#2-the-three-levels-of-imbalance">2. The Three Levels of Imbalance</a></li>
+<li><a href="#3-intervention-strategies-data-level-vs-loss-level">3. Intervention Strategies: Data-Level vs. Loss-Level</a></li>
+<li><a href="#4-worked-numerical-demonstration-a-fictional-100-strip-pool">4. Worked Numerical Demonstration: A Fictional 100-Strip Pool</a></li>
+<li><a href="#5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</a></li>
+<li><a href="#6-implementation-pattern-bounded-sampling-in-pytorch">6. Implementation Pattern: Bounded Sampling in PyTorch</a></li>
+<li><a href="#7-common-pitfalls-checklist">7. Common Pitfalls Checklist</a></li>
+<li><a href="#8-ungraded-try-it-auditing-a-fictional-sampling-log">8. Ungraded "Try It": Auditing a Fictional Sampling Log</a></li>
+<li><a href="#9-framework-references">9. Framework References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="multi-level-class-imbalance-image-class-and-pixel-mechanics">Multi-Level Class Imbalance: Image, Class, and Pixel Mechanics</h1>
+<p>In standard deep learning classification tasks, class imbalance is typically treated as a single, one-dimensional problem: some categories have fewer training examples than others. In industrial surface defect segmentation, however, class imbalance manifests across <strong>three distinct physical and statistical levels simultaneously</strong>.</p>
+<p>An intervention designed to solve imbalance at one level can easily destabilize training or cause catastrophic error spikes at another level. This guide dissects the three tiers of imbalance, examines data-level and loss-level interventions, walks through a concrete numerical demonstration, and establishes strict validation safeguards to ensure your model detects rare anomalies without flooding clean material with false alarms.</p>
+<hr />
+<h2 id="1-observable-problem-the-rare-class-silence-and-false-alarm-flood">1. Observable Problem: The Rare-Class Silence and False-Alarm Flood</h2>
+<p>Consider two failure modes commonly observed in industrial segmentation runs:</p>
+<pre class="highlight"><code>Failure Mode 1: The "Silent Predictor"
+Training Loss: 0.12 (descends smoothly)
+Pixel Accuracy: 98.4%
+Validation Dice (defect_c): 0.65
+Validation Dice (defect_b): 0.00 (Zero predicted pixels across all validation images!)
+
+Failure Mode 2: The "False-Alarm Flood"
+Student applies 50x oversampling to rare defect_b images.
+Validation Dice (defect_b positives): 0.48 (Rare defects are finally detected!)
+Clean-Image Specificity: Drops from 99.1% to 64.3% (Clean images receive hundreds of false alarms!)
+Leaderboard Score: Plummets dramatically due to false positive penalties.</code></pre>
+<p>Why does this happen? In Failure Mode 1, the model learned that predicting all zeros for rare defects incurs negligible loss penalty, achieving near-perfect pixel accuracy. In Failure Mode 2, the student attempted to fix the problem by flooding training with rare-defect strips; the model adapted to this artificial prior, concluded that defects are ubiquitous, and began hallucinating defects on normal, defect-free material.</p>
+<p>To solve this, we must deconstruct imbalance into its three constitutive levels.</p>
+<hr />
+<h2 id="2-the-three-levels-of-imbalance">2. The Three Levels of Imbalance</h2>
+<p><img alt="The Three Levels of Class Imbalance" src="assets/fig01_imbalance_three_levels.png" />
+<em>Figure 1.1: Industrial surface segmentation exhibits three concurrent tiers of imbalance: image-level (clean vs. defective material), class-level (common vs. rare defect geometries), and pixel-level (defect area vs. canvas area).</em></p>
+<h3 id="level-1-image-level-imbalance-clean-vs-defective-strips">Level 1: Image-Level Imbalance (Clean vs. Defective Strips)</h3>
+<p>In a healthy industrial manufacturing line, high-grade steel strips are overwhelmingly <strong>defect-free</strong>. In our dataset domain, approximately half of all captured image strips contain no defects whatsoever.</p>
+<ul>
+<li><strong>The Physical Meaning</strong>: Clean images represent the true operational baseline of the optical line-scan cameras. They contain normal surface textures, grain boundaries, roller marks, and lighting variations.</li>
+<li><strong>The Modeling Danger</strong>: If you filter out clean images during training to "concentrate on defects," your model never learns what normal background looks like. When evaluated on real production strips, it will flag every benign surface texture as a defect.</li>
+</ul>
+<h3 id="level-2-class-level-imbalance-frequent-vs-rare-defect-classes">Level 2: Class-Level Imbalance (Frequent vs. Rare Defect Classes)</h3>
+<p>Defect types do not occur with equal frequency. In an industrial rolling mill:</p>
+<ul>
+<li>Some defects (like surface inclusions or scaling, e.g., <code>defect_c</code>) are continuous metallurgical phenomena and appear frequently.</li>
+<li>Other defects (like micro-cracks or longitudinal seam defects, e.g., <code>defect_b</code>) occur only during catastrophic tool wear or rare cooling anomalies.</li>
+<li><strong>The Modeling Danger</strong>: In a typical mini-batch of 8 images, a rare class like <code>defect_b</code> may not appear once across 50 consecutive gradient updates. The optimizer's moving momentum buffers (like those in AdamW) decay toward zero for rare-class parameters, starving them of gradient signal.</li>
+</ul>
+<h3 id="level-3-pixel-level-imbalance-defect-canvas-occupancy">Level 3: Pixel-Level Imbalance (Defect Canvas Occupancy)</h3>
+<p>Even when an image contains an active defect, the anomaly occupies only a tiny fraction of the strip.
+On an industrial line-scan canvas of <span class="arithmatex">\(128 \times 800 = 102,400\text{ pixels}\)</span>:</p>
+<ul>
+<li>A hairline scratch might be 2 pixels wide and 100 pixels long (<span class="arithmatex">\(200\text{ pixels}\)</span>).</li>
+<li>That scratch occupies only <span class="arithmatex">\(200 / 102,400 \approx 0.19\%\)</span> of the image!</li>
+<li>The background class commands <span class="arithmatex">\(99.81\%\)</span> of all supervised pixels.</li>
+<li><strong>The Modeling Danger</strong>: In standard Binary Cross-Entropy (BCE), gradient contributions from the <span class="arithmatex">\(102,200\)</span> background pixels easily drown out the gradients from the <span class="arithmatex">\(200\)</span> defect pixels.</li>
+</ul>
+<hr />
+<h2 id="3-intervention-strategies-data-level-vs-loss-level">3. Intervention Strategies: Data-Level vs. Loss-Level</h2>
+<p>To balance optimization gradients, practitioners employ interventions either at the <strong>data pipeline level</strong> (modifying what the model sees) or at the <strong>loss function level</strong> (modifying how the model is penalized).</p>
+<p><img alt="Sampling vs Loss Weighting" src="assets/fig02_sampling_vs_weighting.png" />
+<em>Figure 1.2: Comparison of data-level oversampling versus loss-level weighting. Oversampling shifts the empirical prior distribution, increasing false alarms on clean validation strips. Loss weighting preserves the natural data distribution while scaling gradient updates.</em></p>
+<h3 id="strategy-a-data-level-sampling">Strategy A: Data-Level Sampling</h3>
+<p>Data-level interventions adjust the probability <span class="arithmatex">\(P(\text{draw } i)\)</span> of selecting image <span class="arithmatex">\(i\)</span> during mini-batch construction:</p>
+<ol>
+<li><strong>Natural Uniform Sampling</strong>: Every image in the training partition has equal probability <span class="arithmatex">\(P(i) = 1/N\)</span>. Mini-batches reflect the real empirical distribution.</li>
+<li><strong>Weighted Random Sampling (<code>WeightedRandomSampler</code>)</strong>: Assigns an explicit sampling weight <span class="arithmatex">\(w_i \ge 1.0\)</span> to image <span class="arithmatex">\(i\)</span>. If image <span class="arithmatex">\(i\)</span> contains rare <code>defect_b</code>, setting <span class="arithmatex">\(w_i &gt; 1.0\)</span> increases its frequency of inclusion in batches.</li>
+</ol>
+<h4 id="mathematical-formulation-of-bounded-inverse-frequency-weighting">Mathematical Formulation of Bounded Inverse-Frequency Weighting:</h4>
+<p>For training set <span class="arithmatex">\(S\)</span> with <span class="arithmatex">\(N\)</span> images, let <span class="arithmatex">\(r_c\)</span> denote the empirical positive image prevalence of class <span class="arithmatex">\(c \in \{1, 2, 3, 4\}\)</span>:</p>
+<div class="arithmatex">\[r_c = \frac{1}{N} \sum_{i=1}^N \mathbb{I}(c \in \text{image } i)\]</div>
+<p>To prevent catastrophic oversampling, compute <strong>bounded square-root inverse weights</strong>:</p>
+<div class="arithmatex">\[w_{\text{class}}(c) = \min\left(w_{\max}, \frac{1}{\sqrt{\max(r_c, \epsilon)}}\right)\]</div>
+<p>where <span class="arithmatex">\(w_{\max} = 4.0\)</span> is a safety ceiling and <span class="arithmatex">\(\epsilon = 1/N\)</span>.</p>
+<p>For an image <span class="arithmatex">\(i\)</span> containing active defect set <span class="arithmatex">\(\mathcal{C}_i \subseteq \{1, 2, 3, 4\}\)</span>:</p>
+<div class="arithmatex">\[w_i = \begin{cases} 
+1.0 &amp; \text{if } \mathcal{C}_i = \emptyset \text{ (clean image)} \\
+\max_{c \in \mathcal{C}_i} w_{\text{class}}(c) &amp; \text{if } \mathcal{C}_i \neq \emptyset 
+\end{cases}\]</div>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Why take the maximum rather than the product?</strong>
+If an image contains both frequent <code>defect_c</code> and rare <code>defect_b</code>, multiplying their weights would over-weight multi-defect images disproportionately. Taking the maximum ensures that an image is sampled according to its rarest constituent defect without artificial multiplication.</p>
+</blockquote>
+<h3 id="strategy-b-loss-level-weighting">Strategy B: Loss-Level Weighting</h3>
+<p>Instead of altering how often images are sampled, loss-level weighting scales the gradient contribution of rare pixels directly in the objective function.</p>
+<h4 id="1-positive-weighting-in-binary-cross-entropy-pos_weight">1. Positive Weighting in Binary Cross-Entropy (<code>pos_weight</code>)</h4>
+<p>For continuous logit <span class="arithmatex">\(z \in \mathbb{R}\)</span> and binary label <span class="arithmatex">\(y \in \{0, 1\}\)</span>:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{BCE}}(z, y) = - \left[ \gamma \cdot y \log(\sigma(z)) + (1 - y) \log(1 - \sigma(z)) \right]\]</div>
+<p>where <span class="arithmatex">\(\gamma &gt; 1.0\)</span> is the positive class weight (<code>pos_weight</code>).</p>
+<p>If a defect occupies <span class="arithmatex">\(1\%\)</span> of the canvas and background occupies <span class="arithmatex">\(99\%\)</span>, setting <span class="arithmatex">\(\gamma = 10.0\)</span> scales the gradient contribution of true defect pixels by <span class="arithmatex">\(10\times\)</span>, preventing background pixels from dominating the backward pass.</p>
+<h4 id="2-class-balanced-soft-dice-loss">2. Class-Balanced Soft Dice Loss</h4>
+<p>In standard positive-pair Dice loss, all positive defect channels are summed uniformly:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1 - \frac{2 \sum_{k \in \mathcal{P}} \sum_{i} P_{k, i} Y_{k, i} + \epsilon}{\sum_{k \in \mathcal{P}} \sum_{i} (P_{k, i} + Y_{k, i}) + \epsilon}\]</div>
+<p>where <span class="arithmatex">\(\mathcal{P}\)</span> is the set of positive image-class pairs.</p>
+<p>In <strong>class-balanced Dice reduction</strong>, the loss calculates soft Dice independently per active defect class, and then averages across present classes:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{CB-Dice}} = \frac{1}{|\mathcal{C}_{\text{batch}}|} \sum_{c \in \mathcal{C}_{\text{batch}}} \left( 1 - \text{Dice}_c \right)\]</div>
+<p>Under this formulation, a batch containing 7 images of <code>defect_c</code> and 1 image of rare <code>defect_b</code> gives equal loss weight to both classes (<span class="arithmatex">\(\frac{1}{2}\mathcal{L}_c + \frac{1}{2}\mathcal{L}_b\)</span>), preventing the abundant class from drowning out the rare class.</p>
+<hr />
+<h2 id="4-worked-numerical-demonstration-a-fictional-100-strip-pool">4. Worked Numerical Demonstration: A Fictional 100-Strip Pool</h2>
+<p>To understand how oversampling shifts the training distribution, trace a fictional pool of <span class="arithmatex">\(N = 100\)</span> steel strips:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Subgroup</th>
+<th style="text-align: left;">Number of Strips</th>
+<th style="text-align: left;">Natural Prevalence (<span class="arithmatex">\(r_c\)</span>)</th>
+<th style="text-align: left;">Raw Inverse <span class="arithmatex">\(1/r_c\)</span></th>
+<th style="text-align: left;">Bounded Sqrt Weight (<span class="arithmatex">\(w_{\max} = 4.0\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Clean Material</strong></td>
+<td style="text-align: left;">50 strips</td>
+<td style="text-align: left;"><span class="arithmatex">\(50 / 100 = 0.50\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2.0\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1.0\)</span> (Baseline)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Defect A (Scratch)</strong></td>
+<td style="text-align: left;">12 strips</td>
+<td style="text-align: left;"><span class="arithmatex">\(12 / 100 = 0.12\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(8.3\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 / \sqrt{0.12} \approx 2.89\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Defect B (Micro-crack)</strong></td>
+<td style="text-align: left;">3 strips</td>
+<td style="text-align: left;"><span class="arithmatex">\(3 / 100 = 0.03\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(33.3\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(\min(4.0, 1 / \sqrt{0.03} \approx 5.77) = 4.0\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Defect C (Inclusion)</strong></td>
+<td style="text-align: left;">35 strips</td>
+<td style="text-align: left;"><span class="arithmatex">\(35 / 100 = 0.35\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(2.86\)</span></td>
+<td style="text-align: left;"><span class="arithmatex">\(1 / \sqrt{0.35} \approx 1.69\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Let us calculate the total sum of sampling weights across all 100 strips:</p>
+<div class="arithmatex">\[W_{\text{total}} = (50 \times 1.0) + (12 \times 2.89) + (3 \times 4.0) + (35 \times 1.69) = 50 + 34.68 + 12.0 + 59.15 = 155.83\]</div>
+<p>Now compare the probability of drawing each subgroup in any mini-batch:</p>
+<ul>
+<li>
+<p><strong>Clean Material Encounter Rate</strong>:</p>
+<div class="arithmatex">\[\text{Natural} = \frac{50}{100} = 50.0\% \quad \longrightarrow \quad \text{Weighted} = \frac{50 \times 1.0}{155.83} = 32.1\%\]</div>
+</li>
+<li>
+<p><strong>Rare Defect B Encounter Rate</strong>:</p>
+<div class="arithmatex">\[\text{Natural} = \frac{3}{100} = 3.0\% \quad \longrightarrow \quad \text{Weighted} = \frac{3 \times 4.0}{155.83} = 7.7\% \quad (+157\% \text{ relative exposure})\]</div>
+</li>
+</ul>
+<p>Notice what occurred:</p>
+<ol>
+<li>Rare <code>defect_b</code> strips are now encountered <strong><span class="arithmatex">\(2.57\times\)</span> more frequently</strong> per training epoch.</li>
+<li>Clean images still constitute <strong><span class="arithmatex">\(32.1\%\)</span></strong> of all draws—substantial enough to maintain strong background representation.</li>
+<li>If the student had used raw inverse frequency (<span class="arithmatex">\(w_B = 33.3\)</span>), the 3 rare images would constitute over <span class="arithmatex">\(30\%\)</span> of all training batches, causing severe memorization of those 3 specific strip textures!</li>
+</ol>
+<hr />
+<h2 id="5-diagnostic-symptoms-causes-and-checks">5. Diagnostic Symptoms: Causes and Checks</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Observable Symptom in Logs</th>
+<th style="text-align: left;">Underlying Root Mechanism</th>
+<th style="text-align: left;">Concrete Measurement to Take</th>
+<th style="text-align: left;">Corrective Next Step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Validation Dice on <code>defect_b</code> is exactly <span class="arithmatex">\(0.00\)</span>, while train loss converges.</td>
+<td style="text-align: left;">Gradient starvation: rare class is absent from most batches; optimizer steps decay weights toward background bias.</td>
+<td style="text-align: left;">Measure per-class positive count per epoch; check <code>positive_dice_b</code> vs. <code>dice_mean</code>.</td>
+<td style="text-align: left;">Introduce class-balanced Dice reduction or bounded weighted sampling (<span class="arithmatex">\(w_{\max} \le 4.0\)</span>).</td>
+</tr>
+<tr>
+<td style="text-align: left;">False alarm rate on clean images surges; clean specificity drops below <span class="arithmatex">\(80\%\)</span>.</td>
+<td style="text-align: left;">Prior shift: model was trained on an artificially defect-dense distribution, learning an over-sensitive decision threshold.</td>
+<td style="text-align: left;">Compute <code>fp_rate_on_empty</code> across classes; evaluate clean-image perfect rate.</td>
+<td style="text-align: left;">Reduce sampling weight ceiling (<span class="arithmatex">\(w_{\max}\)</span>); re-calibrate decision thresholds <span class="arithmatex">\(\tau\)</span> on natural validation data.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Model achieves high training Dice on rare class, but validation Dice remains near zero.</td>
+<td style="text-align: left;">Overfitting through duplicate repetition: the model memorized the few oversampled training strips.</td>
+<td style="text-align: left;">Check training vs. validation loss gap on rare-class subset; check gradient norms.</td>
+<td style="text-align: left;">Apply stronger spatial augmentations (flips, contrast jitter); cap sampling weight; increase weight decay.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Training loss diverges to <code>NaN</code> or spikes erratically.</td>
+<td style="text-align: left;">Excessive positive loss weight (<code>pos_weight &gt; 50</code>) produces massive gradient explosions on rare pixel errors.</td>
+<td style="text-align: left;">Inspect <code>train/gradient_norm</code> and individual loss terms (<code>bce_b</code>, <code>dice_b</code>).</td>
+<td style="text-align: left;">Clamp <code>pos_weight</code> to a reasonable ceiling (e.g. <span class="arithmatex">\(\le 20.0\)</span>); enable gradient clipping (<code>clip_grad_norm_</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-implementation-pattern-bounded-sampling-in-pytorch">6. Implementation Pattern: Bounded Sampling in PyTorch</h2>
+<p>Here is how to construct a bounded, leakage-free <code>WeightedRandomSampler</code> in PyTorch:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+import torch
+from torch.utils.data import DataLoader, WeightedRandomSampler
+
+def build_bounded_sampler(
+    train_records: list[dict],
+    max_weight: float = 4.0,
+    seed: int = 42
+) -&gt; WeightedRandomSampler:
+    """Constructs a deterministic WeightedRandomSampler with bounded square-root weights."""
+    n_records = len(train_records)
+    # Binary presence array: shape [N, 4]
+    presence = np.array([r["active_defects"] for r in train_records], dtype=bool)
+
+    # Class prevalence rates clamped to at least 1/N
+    rates = np.maximum(presence.mean(axis=0), 1.0 / n_records)
+
+    # Sqrt inverse class weights capped at max_weight
+    class_weights = np.clip(1.0 / np.sqrt(rates), 1.0, max_weight)
+
+    # Assign weight to each image
+    sample_weights = np.ones(n_records, dtype=np.float64)
+    for i, r in enumerate(train_records):
+        active_classes = [c for c, is_active in enumerate(r["active_defects"]) if is_active]
+        if active_classes:
+            # Use the max class weight to avoid double-counting multi-defect images
+            sample_weights[i] = np.max([class_weights[c] for c in active_classes])
+
+    generator = torch.Generator().manual_seed(seed)
+    return WeightedRandomSampler(
+        weights=torch.tensor(sample_weights, dtype=torch.double),
+        num_samples=n_records,
+        replacement=True,
+        generator=generator
+    )</code></pre>
+<blockquote>
+<p>[!WARNING]
+<strong>Strict Validation Invariant</strong>:
+The <code>WeightedRandomSampler</code> must <strong>ONLY</strong> be applied to the <code>train_loader</code>. The <code>val_loader</code> must <strong>ALWAYS</strong> use standard sequential or unweighted loading (<code>shuffle=False</code>, <code>sampler=None</code>). Altering the validation distribution invalidates your evaluation metrics!</p>
+</blockquote>
+<hr />
+<h2 id="7-common-pitfalls-checklist">7. Common Pitfalls Checklist</h2>
+<ol>
+<li><strong>The Validation Oversampling Trap</strong>:<ul>
+<li><em>Mistake</em>: Applying the weighted sampler to the entire dataset before splitting, or evaluating validation metrics on an oversampled validation loader.</li>
+<li><em>Consequence</em>: Validation score appears high because rare defects are overrepresented, but fails completely on Kaggle's natural test distribution.</li>
+</ul>
+</li>
+<li><strong>Double-Counting Multi-Label Images</strong>:<ul>
+<li><em>Mistake</em>: Multiplying class weights (<span class="arithmatex">\(w_i = w_A \times w_B \times w_C\)</span>) for images with multiple defects.</li>
+<li><em>Consequence</em>: Rare multi-defect images receive astronomical weights (e.g., <span class="arithmatex">\(w_i = 120.0\)</span>), causing the optimizer to overfit exclusively to those few strips.</li>
+</ul>
+</li>
+<li><strong>Ignoring Clean Image Specificity</strong>:<ul>
+<li><em>Mistake</em>: Celebrating an increase in <code>positive_dice_b</code> from 0.00 to 0.45 without checking whether <code>clean_image_perfect_rate</code> dropped from 95% to 50%.</li>
+<li><em>Consequence</em>: The official competition score drops because false-positive penalties outweigh the rare-class gain.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2 id="8-ungraded-try-it-auditing-a-fictional-sampling-log">8. Ungraded "Try It": Auditing a Fictional Sampling Log</h2>
+<p>Inspect this output snippet from a fictional training run:</p>
+<pre class="highlight"><code class="language-text">Epoch 10 Audit:
+[Natural Baseline]
+Train Loss: 0.184 | Val Loss: 0.192
+Val Dice Mean: 0.712 | Val Foreground Dice: 0.485
+Val Dice (A): 0.52 | Val Dice (B): 0.00 | Val Dice (C): 0.68 | Val Dice (D): 0.51
+Clean Strip Specificity: 98.6%
+
+[Experiment 1: Extreme Oversampling (Weight B = 25.0)]
+Train Loss: 0.245 | Val Loss: 0.380
+Val Dice Mean: 0.620 | Val Foreground Dice: 0.440
+Val Dice (A): 0.48 | Val Dice (B): 0.41 | Val Dice (C): 0.59 | Val Dice (D): 0.44
+Clean Strip Specificity: 71.2%</code></pre>
+<p><strong>Diagnostic Questions for You to Consider</strong>:</p>
+<ol>
+<li>In Experiment 1, why did <code>Val Dice Mean</code> drop from <code>0.712</code> to <code>0.620</code> even though <code>Val Dice (B)</code> rose from <code>0.00</code> to <code>0.41</code>?</li>
+<li>What happened to <code>Clean Strip Specificity</code>, and what does that imply about the model's false alarm rate on clean steel strips?</li>
+<li>What bounded sampling weight or loss weighting strategy would you propose as Experiment 2 to capture Defect B while keeping clean specificity above <span class="arithmatex">\(95\%\)</span>?</li>
+</ol>
+<hr />
+<h2 id="9-framework-references">9. Framework References</h2>
+<ul>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/data.html#torch.utils.data.WeightedRandomSampler"><code>torch.utils.data.WeightedRandomSampler</code></a></li>
+<li>PyTorch <a href="https://pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html"><code>torch.nn.BCEWithLogitsLoss</code></a> (parameter <code>pos_weight</code>)</li>
+<li>Lin, T. Y., et al. (2017). <em>Focal Loss for Dense Object Detection</em>. IEEE ICCV. (Foundational reference on modulating loss for extreme foreground-background class imbalance).</li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 4 Overview</a><a href="guide_02_learning_rate_schedulers_and_warmup.html">Guide 02 · LR Schedulers &amp; Warmup →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the mechanisms. Experiment with discipline. Audit your models on validation evidence.</footer></div></main></div></body></html>

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 06 · Submission Integrity &amp; RLE Contract · Milestone 5 Student Guide</title>
+<meta name="description" content="Milestone 5 student study guides: post-processing, ensembling, TTA, and Kaggle inference architecture.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 5</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Post-processing, ensembling, TTA, and reliable Kaggle inference architecture.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 5 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 5 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 5 Overview</a><a href="guide_01_thresholding_and_probability_calibration.html"><span class="num">GUIDE 01</span>Guide 01 · Thresholds &amp; Probability Calibration</a><a href="guide_02_connected_components_and_minimum_area_filtering.html"><span class="num">GUIDE 02</span>Guide 02 · Connected Components &amp; Min-Area</a><a href="guide_03_test_time_augmentation_mechanics_and_inversion.html"><span class="num">GUIDE 03</span>Guide 03 · Test-Time Augmentation (TTA)</a><a href="guide_04_ensembling_models_and_checkpoints.html"><span class="num">GUIDE 04</span>Guide 04 · Ensembling Models &amp; Checkpoints</a><a href="guide_05_scalable_inference_architecture_and_memory.html"><span class="num">GUIDE 05</span>Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_06_submission_integrity_and_the_competition_contract.html" aria-current="page"><span class="num">GUIDE 06</span>Guide 06 · Submission Integrity &amp; RLE Contract</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html"><span class="num">GUIDE 07</span>Guide 07 · Inference Ablation Ladders</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 5 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 5 · Post-Processing & Ensembling (18 November 2026)</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 5 Curriculum</span><p class="hero-title">From predictions<br>to podium.</p><p class="hero-caption">Calibrate. Blend. Deliver.</p></div></div>
+<span class="section-label">Concept guide 06 / 07</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-concrete-failure-case-the-null-string-rejection">1. Concrete Failure Case: The Null String Rejection</a></li>
+<li><a href="#2-the-7-rules-of-the-competition-contract">2. The 7 Rules of the Competition Contract</a></li>
+<li><a href="#3-worked-numerical-example-the-fortran-traversal-grid">3. Worked Numerical Example: The Fortran Traversal Grid</a></li>
+<li><a href="#4-the-canonical-encoder-and-clamped-decoder">4. The Canonical Encoder and Clamped Decoder</a></li>
+<li><a href="#5-automated-pre-flight-submission-audit-script">5. Automated Pre-Flight Submission Audit Script</a></li>
+<li><a href="#6-decision-analysis-submission-engineering-checklist">6. Decision Analysis: Submission Engineering Checklist</a></li>
+<li><a href="#7-ungraded-activity-spot-the-submission-bug">7. Ungraded Activity: Spot the Submission Bug</a></li>
+<li><a href="#8-authoritative-competition-specifications">8. Authoritative Competition Specifications</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="guide-06-submission-integrity-the-competition-contract-schema-rle-sentinels">Guide 06: Submission Integrity &amp; The Competition Contract: Schema, RLE &amp; Sentinels</h1>
+<p>After weeks of deep learning architecture design, loss function tuning, threshold optimization, and ensembling, everything culminates in a single file:
+<code>/kaggle/working/submission.csv</code></p>
+<p>Kaggle’s automated scoring system is completely unyielding. It does not inspect your PyTorch training code, verify your training loss curves, or give partial credit for elegant neural architectures. It executes an automated, programmatic ingest pipeline that parses your submitted CSV file against strict schema rules.</p>
+<p>If your submission file contains 12,000 rows instead of 12,001, if column headers are swapped, if empty predictions are saved as empty strings <code>""</code> (which parse as null values), or if a run-length string overflows beyond pixel 102,400, the evaluation engine immediately crashes with:</p>
+<pre class="highlight"><code class="language-text">Submission Scoring Error
+Your submission could not be scored because the submission file format was invalid.</code></pre>
+<p>In this guide, you will dissect the precise submission contract of the <strong>Industrial Surface Defect Detection</strong> competition, master the 1-indexed column-major Fortran RLE standard, understand the single-space empty-mask sentinel (<code>" "</code>), and implement a programmatic pre-flight verification validator to guarantee 100% Kaggle compliance.</p>
+<hr />
+<h2 id="1-concrete-failure-case-the-null-string-rejection">1. Concrete Failure Case: The Null String Rejection</h2>
+<p>Consider a team of students who build a high-performing ensemble achieving a 0.68 validation score.</p>
+<p>At the end of their inference notebook, they serialize their predictions using standard Pandas:
+<pre class="highlight"><code class="language-python"># FATAL FLAW: Naive Pandas serialization of empty masks!
+submission_df["mask_rle"] = submission_df["mask_rle"].fillna("")
+submission_df.to_csv("submission.csv", index=False)</code></pre></p>
+<p>In the resulting CSV file:
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle
+1,TEST_0001,defect_a,
+2,TEST_0001,defect_b,
+3,TEST_0001,defect_c,2450 12 2580 8
+4,TEST_0001,defect_d,</code></pre></p>
+<p>Notice rows 1, 2, and 4: because there was no predicted defect, the field after the comma is empty (<code>...defect_a,</code>).</p>
+<h3 id="what-happens-on-kaggle">What Happens on Kaggle?</h3>
+<p>When Kaggle’s automated evaluator reads this CSV, empty CSV fields (<code>,,</code>) parse as <code>NaN</code> / <code>null</code> values. The evaluator rejects the submission:</p>
+<blockquote>
+<p><strong>Evaluation Rejection</strong>: <em>Empty/NaN value detected in column 'mask_rle' on row 1. Submission rejected.</em></p>
+</blockquote>
+<p>Because clean, defect-free material represents a large proportion of industrial production, thousands of rows in <code>submission.csv</code> represent empty masks. If you do not format these empty rows with the exact required sentinel, your submission fails instantly.</p>
+<hr />
+<h2 id="2-the-7-rules-of-the-competition-contract">2. The 7 Rules of the Competition Contract</h2>
+<p>The competition template is established in <code>data/public/sample_submission.csv</code>. Your submission must strictly adhere to seven rules:</p>
+<h3 id="rule-1-exactly-12001-lines">Rule 1: Exactly 12,001 Lines</h3>
+<ul>
+<li>1 header row + 12,000 prediction rows.</li>
+<li>
+<p>The test set contains exactly <strong>3,000 images</strong>. Each image must have exactly <strong>4 rows</strong> (one per defect class).</p>
+<div class="arithmatex">\[3000\text{ test images} \times 4\text{ defect classes} = 12000\text{ prediction rows}\]</div>
+</li>
+<li>
+<p>No missing rows, no duplicate rows, and no extra lines.</p>
+</li>
+</ul>
+<h3 id="rule-2-strict-column-header-schema">Rule 2: Strict Column Header Schema</h3>
+<p>The header row must match the template character-for-character:
+<pre class="highlight"><code class="language-text">ID,image_id,defect_type,mask_rle</code></pre></p>
+<h3 id="rule-3-row-identifier-sequential-ordering">Rule 3: Row Identifier Sequential Ordering</h3>
+<p>The <code>ID</code> column must be a 1-indexed contiguous integer sequence from <code>1</code> to <code>12000</code>:</p>
+<ul>
+<li>Row 1: <code>ID = 1</code></li>
+<li>Row 12,000: <code>ID = 12000</code></li>
+</ul>
+<h3 id="rule-4-defect-class-ordering">Rule 4: Defect Class Ordering</h3>
+<p>For every test image, the four defect types must be listed in the canonical order:</p>
+<ol>
+<li><code>defect_a</code></li>
+<li><code>defect_b</code></li>
+<li><code>defect_c</code></li>
+<li><code>defect_d</code></li>
+</ol>
+<h3 id="rule-5-the-mandatory-single-space-sentinel">Rule 5: The Mandatory Single-Space Sentinel (<code>" "</code>)</h3>
+<p>If an image-class pair contains no predicted defect (an all-zero binary mask), the <code>mask_rle</code> column <strong>must contain exactly one ASCII space</strong>: <code>" "</code> (ASCII code 32).</p>
+<ul>
+<li>Blank string <code>""</code>: ❌ Rejected as null.</li>
+<li><code>NaN</code> / <code>None</code>: ❌ Rejected as null.</li>
+<li>Zero <code>"0"</code>: ❌ Rejected as corrupt RLE.</li>
+<li>Single space <code>" "</code>: ✅ Parsed by Kaggle as a non-null valid empty mask!</li>
+</ul>
+<h3 id="rule-6-1-indexed-column-major-fortran-rle">Rule 6: 1-Indexed Column-Major Fortran RLE</h3>
+<p>Run-Length Encoding must follow the Kaggle / Severstal standard:</p>
+<ul>
+<li>Pixel coordinates are <strong>1-indexed</strong> (first pixel in upper-left corner is index 1, not 0).</li>
+<li>Traversal is <strong>column-major</strong> (<code>order='F'</code>): pixels are traversed top-to-bottom along column 0, then top-to-bottom along column 1, and so on.</li>
+<li>Format: Space-delimited pairs of <code>start length start length ...</code>.</li>
+</ul>
+<h3 id="rule-7-strict-boundary-clamping-at-102400-pixels">Rule 7: Strict Boundary Clamping at 102,400 Pixels</h3>
+<p>Industrial strip dimensions are fixed at Height = 128, Width = 800.</p>
+<div class="arithmatex">\[\text{Total Pixels} = 128 \times 800 = 102,400\text{ pixels}\]</div>
+<ul>
+<li>The maximum permissible end index is <span class="arithmatex">\(102,400\)</span>.</li>
+<li>
+<p>Any run ending beyond index 102,400 causes an index overflow error in the evaluator. Always clamp decoded/encoded runs:</p>
+<div class="arithmatex">\[\text{end} = \min(\text{start} + \text{length}, 102400)\]</div>
+</li>
+</ul>
+<hr />
+<h2 id="3-worked-numerical-example-the-fortran-traversal-grid">3. Worked Numerical Example: The Fortran Traversal Grid</h2>
+<p><img alt="Fortran RLE Traversal" src="assets/fig08_fortran_rle_traversal.png" />
+<em>Figure 6.1: (Left) Column-major Fortran traversal on a 2D grid: indices increment vertically top-to-bottom before advancing to the next column. (Right) Encoding two defect runs into start-length pairs.</em></p>
+<p>Let us trace a tiny <span class="arithmatex">\(4 \times 5\)</span> canvas (<span class="arithmatex">\(H = 4, W = 5\)</span>, total 20 pixels) to see how 1-indexed Fortran traversal works:</p>
+<pre class="highlight"><code>Row / Col     Col 0    Col 1    Col 2    Col 3    Col 4
+Row 0         px #1    px #5    px #9    px #13   px #17
+Row 1         px #2    px #6    px #10   px #14   px #18
+Row 2         px #3    px #7    px #11   px #15   px #19
+Row 3         px #4    px #8    px #12   px #16   px #20</code></pre>
+<p>Notice the column-major traversal:</p>
+<ul>
+<li>Column 0 contains pixels 1, 2, 3, 4.</li>
+<li>Column 1 contains pixels 5, 6, 7, 8.</li>
+<li>Column 2 contains pixels 9, 10, 11, 12.</li>
+</ul>
+<h3 id="encoding-a-toy-defect-mask">Encoding a Toy Defect Mask</h3>
+<p>Suppose our model predicts defects at the following coordinates:</p>
+<ul>
+<li>Defect Run 1: Column 0, Rows 1 and 2 (pixels #2 and #3).</li>
+<li>Defect Run 2: Column 2, Rows 1, 2, and 3 (pixels #10, #11, and #12).</li>
+</ul>
+<pre class="highlight"><code>Binary Mask Grid:
+[ 0  0  0  0  0 ]
+[ 1  0  1  0  0 ]  &lt;-- Active at (1, 0) and (1, 2)
+[ 1  0  1  0  0 ]  &lt;-- Active at (2, 0) and (2, 2)
+[ 0  0  1  0  0 ]  &lt;-- Active at (3, 2)</code></pre>
+<ol>
+<li>
+<p><strong>Flatten in Fortran Order</strong>:</p>
+<div class="arithmatex">\[\text{Pixels } 1..20 = [0, \mathbf{1}, \mathbf{1}, 0, 0, 0, 0, 0, 0, \mathbf{1}, \mathbf{1}, \mathbf{1}, 0, 0, 0, 0, 0, 0, 0, 0]\]</div>
+</li>
+<li>
+<p><strong>Identify Continuous Runs</strong>:</p>
+<ul>
+<li>Run 1 starts at pixel <strong>2</strong>, spans <strong>2</strong> consecutive pixels. <span class="arithmatex">\(\to\)</span> <code>2 2</code></li>
+<li>Run 2 starts at pixel <strong>10</strong>, spans <strong>3</strong> consecutive pixels. <span class="arithmatex">\(\to\)</span> <code>10 3</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Formatted RLE String</strong>:</p>
+<div class="arithmatex">\[\text{"2 2 10 3"}\]</div>
+</li>
+</ol>
+<hr />
+<h2 id="4-the-canonical-encoder-and-clamped-decoder">4. The Canonical Encoder and Clamped Decoder</h2>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+def rle_encode(mask: np.ndarray) -&gt; str:
+    """Encode binary mask (H, W) into 1-indexed column-major Fortran RLE string.
+
+    Returns ' ' (single ASCII space) if mask is empty.
+    """
+    if mask.sum() == 0:
+        return " "
+
+    # Flatten in column-major Fortran order
+    dots = mask.flatten(order="F")
+    runs = np.where(dots[1:] != dots[:-1])[0] + 2
+    prefix = np.array([1], dtype=np.int64) if dots[0] else np.array([], dtype=np.int64)
+    suffix = np.array([len(dots) + 1], dtype=np.int64) if dots[-1] else np.array([], dtype=np.int64)
+    runs = np.concatenate([prefix, runs.astype(np.int64), suffix]).astype(np.int64)
+    starts = runs[::2]
+    lengths = runs[1::2] - starts
+
+    return " ".join(f"{int(s)} {int(l)}" for s, l in zip(starts, lengths))
+
+
+def rle_decode(rle_str: str, shape: tuple[int, int] = (128, 800)) -&gt; np.ndarray:
+    """Decode 1-indexed Fortran RLE string into a binary mask of given shape.
+
+    Clamps end indices to prevent canvas overflow.
+    """
+    if not rle_str or str(rle_str).strip() == "":
+        return np.zeros(shape, dtype=np.uint8)
+
+    s = rle_str.split()
+    starts = np.asarray(s[0::2], dtype=int) - 1
+    lengths = np.asarray(s[1::2], dtype=int)
+
+    # Critical: Clamp end index to total canvas pixels
+    max_pixels = shape[0] * shape[1]
+    ends = np.minimum(starts + lengths, max_pixels)
+
+    canvas = np.zeros(max_pixels, dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        canvas[lo:hi] = 1
+
+    return canvas.reshape(shape, order="F")</code></pre>
+<hr />
+<h2 id="5-automated-pre-flight-submission-audit-script">5. Automated Pre-Flight Submission Audit Script</h2>
+<p>Never submit a CSV file without running an automated verification check. Embed this audit directly at the end of your inference notebook:</p>
+<pre class="highlight"><code class="language-python">import csv
+import os
+from pathlib import Path
+
+def validate_submission_file(csv_path: str, expected_num_images: int = 3000) -&gt; bool:
+    """Run a comprehensive 7-point audit on the generated submission CSV file."""
+    print(f"Auditing submission file: {csv_path}...")
+    assert os.path.exists(csv_path), f"File not found: {csv_path}"
+
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+
+        # Check 1: Header Schema
+        header = next(reader)
+        expected_header = ["ID", "image_id", "defect_type", "mask_rle"]
+        assert header == expected_header, f"Header mismatch! Expected {expected_header}, got {header}"
+
+        rows = list(reader)
+
+    # Check 2: Exact Row Count
+    expected_rows = expected_num_images * 4
+    assert len(rows) == expected_rows, f"Row count error! Expected {expected_rows}, found {len(rows)}"
+
+    valid_defects = ["defect_a", "defect_b", "defect_c", "defect_d"]
+    empty_sentinel_count = 0
+    active_prediction_count = 0
+
+    seen_ids = set()
+
+    for idx, (row_id, img_id, defect, rle) in enumerate(rows, start=1):
+        # Check 3: Sequential ID
+        assert int(row_id) == idx, f"Row {idx}: ID non-sequential (got {row_id})"
+
+        # Check 4: Valid Defect Class
+        expected_defect = valid_defects[(idx - 1) % 4]
+        assert defect == expected_defect, f"Row {idx}: Defect order mismatch (expected {expected_defect}, got {defect})"
+
+        # Check 5: No Blank Strings or Nulls
+        assert rle != "", f"Row {idx}: Blank string detected! Must be ' ' for empty masks."
+
+        if rle == " ":
+            empty_sentinel_count += 1
+        else:
+            active_prediction_count += 1
+            tokens = rle.split()
+            # Check 6: Even number of RLE tokens
+            assert len(tokens) % 2 == 0, f"Row {idx}: Odd RLE token count ({len(tokens)})"
+
+            # Check 7: RLE Boundary Clamping &amp; Decodability
+            starts = [int(tokens[i]) for i in range(0, len(tokens), 2)]
+            lengths = [int(tokens[i+1]) for i in range(0, len(tokens), 2)]
+            for s, l in zip(starts, lengths):
+                assert s &gt;= 1, f"Row {idx}: Non-positive start index ({s})"
+                assert s &lt;= 102400, f"Row {idx}: Start index {s} exceeds 102,400"
+                assert s + l &lt;= 102401, f"Row {idx}: Run ends at {s+l}, exceeding boundary!"
+
+    file_size_mb = os.path.getsize(csv_path) / (1024 * 1024)
+    print("=" * 65)
+    print("✓ SUBMISSION AUDIT PASSED 100% CLEANLY")
+    print(f"  • Total rows verified     : {len(rows)} (12,001 lines with header)")
+    print(f"  • Empty masks (' ')       : {empty_sentinel_count} ({empty_sentinel_count / len(rows) * 100:.1f}%)")
+    print(f"  • Active defect masks     : {active_prediction_count} ({active_prediction_count / len(rows) * 100:.1f}%)")
+    print(f"  • File size on disk       : {file_size_mb:.2f} MB")
+    print("=" * 65)
+    return True</code></pre>
+<hr />
+<h2 id="6-decision-analysis-submission-engineering-checklist">6. Decision Analysis: Submission Engineering Checklist</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Checklist Item</th>
+<th style="text-align: left;">What to Check</th>
+<th style="text-align: left;">Failure Mode if Missed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Row Count</strong></td>
+<td style="text-align: left;"><code>wc -l submission.csv</code> must yield <code>12001</code>.</td>
+<td style="text-align: left;">Missing rows trigger scoring failure.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Column Names</strong></td>
+<td style="text-align: left;"><code>ID,image_id,defect_type,mask_rle</code>.</td>
+<td style="text-align: left;">Mismatched headers cause CSV parser rejection.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Empty Sentinel</strong></td>
+<td style="text-align: left;">Exactly <code>" "</code> (single space string).</td>
+<td style="text-align: left;">Null entries trigger immediate submission scoring error.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Fortran Ordering</strong></td>
+<td style="text-align: left;"><code>order='F'</code> in NumPy flatten/reshape.</td>
+<td style="text-align: left;">Transposed predictions have ~0.00 IoU with ground truth.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Index Clamping</strong></td>
+<td style="text-align: left;">Maximum index <span class="arithmatex">\(\le 102,400\)</span>.</td>
+<td style="text-align: left;">Canvas overflow errors crash the Kaggle backend.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-ungraded-activity-spot-the-submission-bug">7. Ungraded Activity: Spot the Submission Bug</h2>
+<p>Examine the following 4 candidate CSV excerpts from student submissions. Identify which one is <strong>valid</strong>, and diagnose the fatal bug in each of the other three:</p>
+<h3 id="excerpt-1">Excerpt 1:</h3>
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle
+1,TEST_0001,defect_a,
+2,TEST_0001,defect_b,
+3,TEST_0001,defect_c,100 15
+4,TEST_0001,defect_d,</code></pre>
+<h3 id="excerpt-2">Excerpt 2:</h3>
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle
+1,TEST_0001,defect_a,0
+2,TEST_0001,defect_b,0
+3,TEST_0001,defect_c,100 15
+4,TEST_0001,defect_d,0</code></pre>
+<h3 id="excerpt-3">Excerpt 3:</h3>
+<pre class="highlight"><code class="language-csv">ID,image_id,defect_type,mask_rle
+1,TEST_0001,defect_a, 
+2,TEST_0001,defect_b, 
+3,TEST_0001,defect_c,100 15
+4,TEST_0001,defect_d, </code></pre>
+<h3 id="excerpt-4">Excerpt 4:</h3>
+<pre class="highlight"><code class="language-csv">image_id,defect_type,mask_rle
+TEST_0001,defect_a, 
+TEST_0001,defect_b, 
+TEST_0001,defect_c,100 15
+TEST_0001,defect_d, </code></pre>
+<p><em>(Hint: Inspect column names, empty string representation, and numerical 0).</em></p>
+<hr />
+<h2 id="8-authoritative-competition-specifications">8. Authoritative Competition Specifications</h2>
+<ul>
+<li><strong>Kaggle Competition Rules</strong>: <a href="https://www.kaggle.com/competitions/industrial-surface-defect-detection">Industrial Surface Defect Detection Submission Guidelines</a></li>
+<li><strong>Severstal Steel Defect Detection</strong>: <a href="https://www.kaggle.com/c/severstal-steel-defect-detection/overview/evaluation">Kaggle Official RLE Standard</a></li>
+<li><strong>NumPy Documentation</strong>: <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.flatten.html"><code>numpy.ndarray.flatten(order='F')</code></a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_scalable_inference_architecture_and_memory.html">← Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html">Guide 07 · Inference Ablation Ladders →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>
