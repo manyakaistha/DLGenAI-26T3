@@ -162,7 +162,7 @@ const labs = {
     const { q, all, out } = startLab(
       el,
       "Mask → numbered pixels → runs",
-      `<p>Tap a cell to change foreground. Cell labels are <b>1-based indices</b>; coordinates use zero-based (x,y). One toy cell represents one mask pixel.</p><div class="controls"><label>Traversal<select aria-label="Traversal order"><option value="F">F: down columns</option><option value="C">C: across rows</option></select></label><button data-preset="worked">Worked mask</button><button data-preset="empty">Empty</button><button data-preset="patch">Patch</button><button data-preset="checker">Checkerboard</button><button data-preset="boundary">Boundary crossing</button></div><div class="grid"></div><div class="buffer" aria-label="Flattened mask"></div>${range("step", "Trace flattened index", 1, 24, 1)}<div class="readout"></div>`,
+      `<p>Tap a cell to change foreground. Cell labels are <b>1-based indices</b>; coordinates use zero-based (x,y). One toy cell represents one mask pixel.</p><div class="controls"><label>Traversal<select aria-label="Traversal order"><option value="F">F: down columns</option><option value="C">C: across rows</option></select></label><button data-preset="worked">Worked mask</button><button data-preset="empty">Empty</button><button data-preset="patch">Patch</button><button data-preset="checker">Checkerboard</button><button data-preset="boundary">Boundary crossing</button></div><div class="grid"></div><div class="buffer" aria-label="Flattened mask"></div>${range("step", "Trace flattened index", 1, 24, 1)}`,
     );
     const H = 4,
       W = 6;
@@ -205,13 +205,25 @@ const labs = {
         encoded = pairs.flat().join(" ");
       let decoded = Array(24).fill(0);
       pairs.forEach(([s, n]) => decoded.fill(1, s - 1, s - 1 + n));
-      let coords =
-        q("select").value === "F"
-          ? `x=floor((${step}−1)/4)=${Math.floor((step - 1) / 4)}, y=(${step}−1)%4=${(step - 1) % 4}`
-          : `x=(${step}−1)%6=${(step - 1) % 6}, y=floor((${step}−1)/6)=${Math.floor((step - 1) / 6)}`;
-      q(".readout").textContent =
-        `Index ${step}: ${coords}. Value=${bits[step - 1]}.`;
-      out.textContent = `RLE: ${encoded || "(empty string)"}. ${pairs.length} run pairs; ${bits.reduce((a, b) => a + b, 0)} foreground pixels. Round trip=${bits.every((v, i) => v === decoded[i]) ? "PASS" : "FAIL"}. ${pairs.map(([s, n]) => `${s} ${n} → slice [${s - 1}:${s - 1 + n}]`).join("; ")}`;
+      const order = q("select").value;
+      const x = order === "F" ? Math.floor((step - 1) / H) : (step - 1) % W;
+      const y = order === "F" ? (step - 1) % H : Math.floor((step - 1) / W);
+      const value = bits[step - 1];
+      const roundTrip = bits.every((v, i) => v === decoded[i]);
+      const slices = pairs.length
+        ? pairs.map(([start, length]) => `${start} ${length} → [${start - 1}:${start - 1 + length}]`).join(" · ")
+        : "No foreground runs";
+      out.classList.add("rle-summary");
+      out.innerHTML = `<div class="rle-summary-scroll"><table><caption>Current mask results</caption><tbody>
+        <tr><th scope="row">Traversal order</th><td>${order === "F" ? "F: down columns" : "C: across rows"}</td></tr>
+        <tr><th scope="row">Selected flattened index</th><td>${step} (1-based)</td></tr>
+        <tr><th scope="row">Pixel coordinate</th><td>(${x}, ${y}) (zero-based x, y)</td></tr>
+        <tr><th scope="row">Pixel value</th><td>${value} (${value ? "foreground" : "background"})</td></tr>
+        <tr><th scope="row">Encoded RLE</th><td>${encoded || "(empty string)"}</td></tr>
+        <tr><th scope="row">Run pairs and decoded slices</th><td>${slices}</td></tr>
+        <tr><th scope="row">Foreground pixels</th><td>${bits.reduce((a, b) => a + b, 0)} of ${bits.length}</td></tr>
+        <tr><th scope="row">Decode round trip</th><td>${roundTrip ? "PASS" : "FAIL"}</td></tr>
+      </tbody></table></div>`;
     }
     all("[data-preset]").forEach(
       (b) =>
