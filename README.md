@@ -24,3 +24,13 @@ uv run --no-project python -m http.server 8765 --directory _site
 The build checks all local links and anchors. GitHub Actions publishes the site to GitHub Pages when `main` changes. Enable GitHub Actions as the Pages publishing source in repository settings. Math rendering uses MathJax from jsDelivr.
 
 This repository contains only student learning materials and their website build files. Download competition data separately into `data/public/` in your own working environment.
+
+## Live session: Pixels, Masks & Experiments
+
+A separate interactive teaching companion to Guides 1–5, with a tiny W&B training notebook, annotated real-image examples, numbered RLE traces, sampling experiments and contrast/texture labs.
+
+- [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session/)
+- [Notebook](docs/live_session_materials/wandb_tutorial.ipynb)
+- [Instructor timing and deeper practice](docs/live_session_materials/instructor.md)
+
+Prepared walkthrough: 60–70 minutes. Independent coding and full derivations: 90–120 minutes. Notebook needs no competition data or GPU; default tracking is offline.

@@ -1,0 +1,157 @@
+.lab {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--wash);
+  border-radius: 10px;
+  margin: 28px 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.lab h3 {
+  margin-top: 0;
+}
+.lab label {
+  display: block;
+  font-size: 14px;
+  margin: 10px 0;
+}
+.lab input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.lab button,
+.lab select {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.lab button:focus-visible,
+.lab input:focus-visible,
+.lab select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+.lab .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 14px 0;
+}
+.lab output,
+.lab .readout {
+  display: block;
+  padding: 12px;
+  background: var(--paper);
+  border-left: 3px solid var(--accent);
+  font:
+    13px/1.7 "DM Mono",
+    monospace;
+  overflow-wrap: anywhere;
+  margin: 14px 0;
+}
+.lab canvas {
+  width: 100%;
+  display: block;
+  max-width: 100%;
+  border: 1px solid var(--line);
+}
+.lab .grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 5px;
+}
+.lab .grid button {
+  min-height: 48px;
+  padding: 5px;
+  font:
+    13px/1.5 "DM Mono",
+    monospace;
+}
+.lab .grid button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--on-accent, #fff);
+}
+.lab .grid button.current {
+  outline: 3px solid var(--flower, #df572e);
+  outline-offset: -3px;
+}
+.lab .buffer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 15px 0;
+}
+.lab .buffer span {
+  border: 1px solid var(--line);
+  padding: 3px 7px;
+  font: 12px monospace;
+}
+.lab .buffer .on {
+  background: var(--accent);
+  color: var(--on-accent, #fff);
+}
+.lab .bar {
+  height: 24px;
+  background: var(--accent);
+  min-width: 1px;
+}
+.lab .probrow {
+  display: grid;
+  grid-template-columns: 55px 1fr 65px;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.flow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 25px 0;
+}
+.flow span {
+  padding: 16px;
+  background: var(--wash);
+  border: 1px solid var(--line);
+  flex: 1;
+  min-width: 130px;
+  font-size: 13px;
+}
+.lab .twocol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+noscript {
+  display: block;
+  padding: 15px;
+  background: var(--wash);
+}
+@media (max-width: 550px) {
+  .lab {
+    padding: 14px;
+  }
+  .lab .twocol {
+    grid-template-columns: 1fr;
+  }
+  .lab .grid button {
+    font-size: 11px;
+  }
+  .flow {
+    display: block;
+  }
+  .flow span {
+    display: block;
+    margin: 8px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

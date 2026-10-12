@@ -186,6 +186,7 @@ def build(output: Path):
             active = ' aria-current="page"' if i == j else ""
             label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else "STARTER CODE · Q11–Q12" if j == len(sources) - 1 else f"GUIDE {j-1:02d}"
             nav += f'<a href="{url}"{active}><span class="num">{label}</span>{html.escape(title)}</a>'
+        nav += '<a href="session/index.html"><span class="num">LIVE LAB · 65 MINUTES</span>Pixels, Masks &amp; Experiments</a>'
         nav += "</nav>"
         pager = ""
         if i > 0:
@@ -232,6 +233,8 @@ def build(output: Path):
         parsed.feed(body)
         search.append({"title": titles[i], "url": urls[i], "text": " ".join(parsed.text)})
     (output / "search.json").write_text(json.dumps(search, ensure_ascii=False))
+    from build_live_session import build as build_session
+    build_session(output / "session")
     parsed_pages = {}
     for file in output.glob("*.html"):
         parsed = Inspect()

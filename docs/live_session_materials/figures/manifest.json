@@ -1,0 +1,35 @@
+{
+  "source": "data/public/train.csv",
+  "images": 11393,
+  "rows": 45572,
+  "class_positive_images": {
+    "defect_a": 1081,
+    "defect_b": 313,
+    "defect_c": 4100,
+    "defect_d": 1707
+  },
+  "cardinality": {
+    "0": 5516,
+    "1": 4679,
+    "2": 1072,
+    "3": 126,
+    "4": 0
+  },
+  "class_pixels": {
+    "defect_a": 809388,
+    "defect_b": 215701,
+    "defect_c": 22787304,
+    "defect_d": 12205494
+  },
+  "selected_examples": {
+    "defect_a": "4S22I7SA34",
+    "defect_b": "JBAI4VEGD5",
+    "defect_c": "30WEUKWBQT",
+    "defect_d": "6MBBS0WBUK"
+  },
+  "single_image_cohen_d": {
+    "image_id": "30WEUKWBQT",
+    "d": 0.7784756754469573,
+    "aggregation": "single-image pixel pooled SD"
+  }
+}
