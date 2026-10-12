@@ -3,7 +3,7 @@
 # dependencies = ["Markdown==3.8.2", "pymdown-extensions==10.16.1"]
 # ///
 """Build separate teaching notes and notebook; no milestone source is modified."""
-import argparse, hashlib, html, json, re, shutil
+import argparse, ast, hashlib, html, json, re, shutil
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
 import markdown
@@ -15,17 +15,26 @@ TITLES=['Session overview','W&B notebook lab','1 Â· Count the right things','2 Â
 URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html']
 
 def notebook():
+    path=SOURCE/'wandb_tutorial.py'
+    source=path.read_text()
+    lines=source.splitlines(keepends=True)
+    tree=ast.parse(source)
+    first=tree.body[0]
+    last=tree.body[-1]
+    if not (isinstance(first,ast.Expr) and isinstance(first.value,ast.Constant) and isinstance(first.value.value,str)):
+        raise ValueError('W&B tutorial must begin with its introductory docstring')
+    if not (isinstance(last,ast.Expr) and isinstance(last.value,ast.Constant) and isinstance(last.value.value,str)):
+        raise ValueError('W&B tutorial must end with its run-inspection notes')
+    intro=first.value.value
+    intro=intro[intro.index('# W&B:'):].strip()
+    closing=last.value.value.strip()
+    code=''.join(lines[first.end_lineno:last.lineno-1]).strip()+'\n'
+    code='\n'.join(line for line in code.splitlines() if line not in ('# Commented out IPython magic to ensure Python compatibility.', '# %pip install scikit-learn==1.7.2 joblib==1.5.2 matplotlib==3.10.9 wandb==0.23.1')).strip()+'\n'
     cells=[]
-    for chunk in re.split(r'^# %%', (SOURCE/'wandb_tutorial.py').read_text(),flags=re.M)[1:]:
-        first,*lines=chunk.splitlines()
-        kind='markdown' if '[markdown]' in first else 'code'
-        if kind=='markdown': lines=[re.sub(r'^# ?', '', s) for s in lines]
-        src='\n'.join(lines).strip()+'\n'
+    for kind,src in [('markdown',intro),('code','%pip install scikit-learn==1.7.2 joblib==1.5.2 matplotlib==3.10.9 wandb==0.23.1'),('code',code),('markdown',closing)]:
         cell=dict(cell_type=kind,metadata={},source=src.splitlines(keepends=True))
         if kind=='code': cell.update(execution_count=None,outputs=[])
         cells.append(cell)
-    # A separate installation cell lets Colab/Jupyter users actually run setup.
-    cells.insert(1,dict(cell_type='code',metadata={},execution_count=None,outputs=[],source=['%pip install scikit-learn==1.7.2 joblib==1.5.2 matplotlib==3.10.9 wandb==0.23.1\n']))
     doc=dict(cells=cells,metadata=dict(kernelspec=dict(display_name='Python 3',language='python',name='python3'),language_info=dict(name='python',version='3.11')),nbformat=4,nbformat_minor=5)
     for i,c in enumerate(cells): c['id']=f'session-{i:02d}'
     (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
