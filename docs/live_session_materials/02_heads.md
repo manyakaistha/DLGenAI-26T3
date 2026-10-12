@@ -82,7 +82,14 @@ Watch the totals beneath the chart: softmax always sums to 1, while the sum of t
 | Four sigmoids | B × 4 × H × W | Four binary masks, same shape | BCEWithLogitsLoss | Independent class thresholds |
 | Five-way softmax | B × 5 × H × W | B × H × W integer labels 0–4 | CrossEntropyLoss | Background-inclusive argmax |
 
-Feed raw logits to these losses; their implementations apply the appropriate stable activation internally. For disjoint targets, construct integer labels only after checking overlap. Otherwise converting with argmax silently erases a label. A four-sigmoid design can still be used on disjoint data, but competing predictions require explicit decision rules.
+The head, target format and loss have to agree:
+
+- **Four sigmoid channels + `BCEWithLogitsLoss`:** use this when each class is an independent yes/no label and pixels may carry more than one class. The model returns logits shaped `[B, 4, H, W]`; the target is a floating point stack of four binary masks with the same shape. The loss compares each class decision independently.
+- **Five softmax channels + `CrossEntropyLoss`:** use this when each pixel has exactly one category: background, A, B, C or D. The model returns logits shaped `[B, 5, H, W]`; the target is an integer map shaped `[B, H, W]` whose values are class IDs 0–4. The loss trains the categories to compete for that one label.
+
+In both cases, give the loss the **raw logits**. `BCEWithLogitsLoss` and `CrossEntropyLoss` apply numerically stable sigmoid and softmax calculations internally. Applying those activations first would be the wrong input and can make training less stable. For softmax targets, first confirm masks do not overlap: converting overlapping masks to one integer ID (often with `argmax`) silently drops one of the labels.
+
+A sigmoid head can represent disjoint labels too, but its independent outputs can select several classes at one pixel. You then need a clear decision rule, such as validated per-class thresholds or a documented tie-breaking policy. A softmax head already enforces one winner, including the option of background.
 
 ## What the constraint does and does not buy
 
@@ -99,6 +106,17 @@ Choose the output representation from what the **pixel annotations** permit, the
 Take A logit=2 and B logit=1. Their independent sigmoid probabilities are approximately 0.881 and 0.731. Both pass a 0.5 threshold. With five logits `[0,2,1,-1,-2]`, the softmax vector is approximately `[0.086,0.637,0.234,0.032,0.012]`; its entries sum to 1, and A wins argmax. Raising B’s logit increases its softmax probability and decreases the other probabilities through the shared denominator.
 
 ![Output tensor shapes and corresponding targets](figures/head_tensors.png)
+
+### Compare the two designs
+
+After your overlap audit, train two small models with the **same data split, backbone, preprocessing, random seed and training budget**. Change the output head, target encoding and matching loss together:
+
+1. Train four output channels with sigmoid-style binary masks and `BCEWithLogitsLoss`.
+2. Train five output channels with background-inclusive integer labels and `CrossEntropyLoss`.
+3. Use the same held-out images for both. Compare per-class Dice and IoU, foreground recall, and inference cost. Report per-class results as well as an average so rare classes do not disappear inside a high pixel-accuracy score.
+4. For sigmoid, choose each class threshold using validation data only. For softmax, use background-inclusive argmax. State these decision rules when reporting results.
+
+If your audit confirms disjoint masks, this is a direct comparison of two valid ways to model the same labels. If it finds overlap, the standard softmax target cannot preserve those pixels. Keep the overlap for the sigmoid experiment and explain the limitation; only compare softmax after stating how you handled overlapping pixels, since that choice changes the target task. Do not erase labels silently to make the comparison run.
 
 **Implementation check:** BCE targets are floating binary masks with the same shape as logits. Cross-entropy targets are integer class IDs and omit the channel dimension. Apply `sigmoid` or `softmax` when inspecting predictions, while feeding raw logits into the corresponding stable loss. A one-channel softmax is always 1; it cannot represent a foreground/background choice.
 
