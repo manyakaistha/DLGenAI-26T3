@@ -2,6 +2,14 @@
 
 Explore how surface images become segmentation masks, how data representation affects model design, and how to record a training experiment with Weights & Biases.
 
+[Watch live session recording (12 October 2026)](https://drive.google.com/file/d/1Cx4M0aVOmpj85j4lGFOKg-iId2v5um2X/view?usp=sharing) · [Open the W&B lab](wandb.md) · [Download the notebook](wandb_tutorial.ipynb)
+
+## Live session recording
+
+The live session for DLGenAI 26T3 was conducted on 12 October 2026 covering data representation, output heads, run-length encoding, and experiment tracking with Weights & Biases.
+
+- **Live recording:** [Watch the 12 October 2026 session recording on Google Drive](https://drive.google.com/file/d/1Cx4M0aVOmpj85j4lGFOKg-iId2v5um2X/view?usp=sharing)
+
 ## What you will learn
 
 ### Track an experiment with W&B
