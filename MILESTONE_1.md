@@ -38,7 +38,7 @@ Check whether any individual pixel carries annotations for two or more defect cl
 
 ## Question 4: RLE Standards & The Boundary Edge Case (Production Data Cleaning)
 
-The competition uses Kaggle/Severstal-style 1-based Fortran-order (column-major) Run-Length Encoding on a canvas of shape $(128, 800) = 102{,}400$ pixels. A naive decoder assumes every run index strictly satisfies:
+The competition uses a 1-based Fortran-order (column-major) Run-Length Encoding on a canvas of shape $(128, 800) = 102{,}400$ pixels. A naive decoder assumes every run index strictly satisfies:
 
 $$1 \le \text{start} + \text{length} - 1 \le 102{,}400.$$
 

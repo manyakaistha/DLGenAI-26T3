@@ -40,7 +40,7 @@ A 2D mask is really just a 2D *view* of a flat 1D array in memory. When you conv
    * Traversal moves vertically down columns (top-to-bottom, then right to the next column): $(0,0) \to (1,0) \to (2,0) \to \dots \to (0,1) \to \dots$
    * Index formula for pixel $(y, x)$:
      $$k_{\text{col}} = x \cdot H + y$$
-   * Standard in Fortran, MATLAB, and Kaggle/Severstal competitions.
+   * Standard in Fortran and MATLAB.
 
 > **Crucial Rule:** In this competition, RLE strings are **1-indexed and Column-Major (Fortran order)**!
 > Pixel index $1$ is $(y=0, x=0)$. Pixel index $2$ is $(y=1, x=0)$ — the pixel *directly below* the first. Pixel index $H+1$ ($129$) is $(y=0, x=1)$ — the start of the second column.
@@ -135,8 +135,6 @@ for s, e in zip(starts, ends):
 * **NumPy Documentation:**
   * [`numpy.reshape`](https://numpy.org/doc/stable/reference/generated/numpy.reshape.html) (Pay attention to the `order` parameter).
   * [`numpy.asfortranarray`](https://numpy.org/doc/stable/reference/generated/numpy.asfortranarray.html).
-* **Kaggle Evaluation Documentation:**
-  [Severstal Defect Detection Evaluation (RLE Specification)](https://www.kaggle.com/c/severstal-steel-defect-detection/overview/evaluation).
 * **OpenCV Memory Layout:**
   [OpenCV `cv::Mat` Class Reference](https://docs.opencv.org/4.x/d3/d63/classcv_1_1Mat.html) (Explains row-major storage and memory steps).
 

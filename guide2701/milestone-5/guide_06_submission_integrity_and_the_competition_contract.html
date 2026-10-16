@@ -108,7 +108,7 @@ submission_df.to_csv("submission.csv", index=False)</code></pre></p>
 <li>Single space <code>" "</code>: ✅ Parsed by Kaggle as a non-null valid empty mask!</li>
 </ul>
 <h3 id="rule-6-1-indexed-column-major-fortran-rle">Rule 6: 1-Indexed Column-Major Fortran RLE</h3>
-<p>Run-Length Encoding must follow the Kaggle / Severstal standard:</p>
+<p>Run-Length Encoding must follow the competition standard:</p>
 <ul>
 <li>Pixel coordinates are <strong>1-indexed</strong> (first pixel in upper-left corner is index 1, not 0).</li>
 <li>Traversal is <strong>column-major</strong> (<code>order='F'</code>): pixels are traversed top-to-bottom along column 0, then top-to-bottom along column 1, and so on.</li>
@@ -351,7 +351,6 @@ TEST_0001,defect_d, </code></pre>
 <h2 id="8-authoritative-competition-specifications">8. Authoritative Competition Specifications</h2>
 <ul>
 <li><strong>Kaggle Competition Rules</strong>: <a href="https://www.kaggle.com/competitions/industrial-surface-defect-detection">Industrial Surface Defect Detection Submission Guidelines</a></li>
-<li><strong>Severstal Steel Defect Detection</strong>: <a href="https://www.kaggle.com/c/severstal-steel-defect-detection/overview/evaluation">Kaggle Official RLE Standard</a></li>
 <li><strong>NumPy Documentation</strong>: <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.flatten.html"><code>numpy.ndarray.flatten(order='F')</code></a></li>
 </ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_scalable_inference_architecture_and_memory.html">← Guide 05 · Scalable Inference &amp; Memory</a><a href="guide_07_inference_experimentation_discipline_and_ablation_ladders.html">Guide 07 · Inference Ablation Ladders →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">

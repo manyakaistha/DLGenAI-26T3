@@ -110,7 +110,7 @@
 <pre class="highlight"><code class="language-python">image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)  # Returns ndarray of shape (128, 800), uint8</code></pre>
 Loading in default BGR mode (<code>cv2.imread(image_path)</code>) creates three identical redundant color channels, tripling memory bandwidth and VRAM usage without providing additional physical information.</p>
 <h3 id="step-3-fortran-order-rle-decoding">Step 3: Fortran-Order RLE Decoding</h3>
-<p>The RLE strings follow the standard Kaggle/Severstal specification:</p>
+<p>The RLE strings follow the standard specification:</p>
 <ul>
 <li><strong>1-indexed</strong>: Pixel counting begins at index 1 (not 0).</li>
 <li><strong>Column-Major (Fortran order, <code>order='F'</code>)</strong>: Pixels are traversed top-to-bottom down column 0, then top-to-bottom down column 1, and so forth.</li>
