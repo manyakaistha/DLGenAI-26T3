@@ -174,3 +174,12 @@
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else if(visible)repaint();});
   size();
 })();
+
+// Load the shared study helper relative to this theme, including nested session pages.
+(() => {
+  const current=document.currentScript;
+  if(!current)return;
+  const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('ask-ai.css',current.src).href;
+  const script=document.createElement('script');script.src=new URL('ask-ai.js',current.src).href;
+  document.head.append(css,script);
+})();
