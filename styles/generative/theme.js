@@ -180,6 +180,7 @@
   const current=document.currentScript;
   if(!current)return;
   const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('ask-ai.css',current.src).href;
-  const script=document.createElement('script');script.src=new URL('ask-ai.js',current.src).href;
-  document.head.append(css,script);
+  const decoration=document.createElement('script');decoration.src=new URL('ask-ai-botanical.js',current.src).href;
+  decoration.onload=()=>{const script=document.createElement('script');script.src=new URL('ask-ai.js',current.src).href;document.head.append(script);};
+  document.head.append(css,decoration);
 })();

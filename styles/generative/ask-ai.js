@@ -13,7 +13,9 @@
   const pageTitle = titleOf(headings[0]) || document.title.split(' · ')[0];
   let selection = null;
   const floating = document.createElement('button');
-  floating.type='button';floating.className='ask-ai-float';floating.textContent='Ask AI';floating.setAttribute('aria-haspopup','dialog');
+  floating.type='button';floating.className='ask-ai-float';floating.setAttribute('aria-haspopup','dialog');
+  const botanicals=window.AskAIBotanicals;
+  botanicals.decorateStamp(floating);
   floating.setAttribute('aria-label','Ask AI to explain this page or selected text');
   document.body.append(floating);
   const dialog=document.createElement('dialog');dialog.className='ask-ai-dialog';
@@ -108,13 +110,15 @@ ${limited || 'No excerpt supplied. Explain the named topic and its prerequisites
     updateLink();opener=document.activeElement===document.body?floating:document.activeElement;dialog.showModal();
   }
   headings.forEach(h=>{
-    const b=document.createElement('button');b.type='button';b.className='ask-ai-heading';b.textContent='Ask AI';b.setAttribute('aria-label','Ask AI about '+titleOf(h));b.setAttribute('aria-haspopup','dialog');b.onclick=()=>open(h);h.append(b);
+    const b=document.createElement('button');b.type='button';b.className='ask-ai-heading';botanicals.decorateFlower(b,260310+headings.indexOf(h)*97);b.setAttribute('aria-label','Ask AI about '+titleOf(h));b.setAttribute('aria-haspopup','dialog');b.onclick=()=>open(h);h.append(b);
   });
-  document.addEventListener('selectionchange',()=>{if(dialog.open)return;const next=selectedContext();selection=next;floating.textContent=next?'Ask AI about selection':'Ask AI';});
-  // Keep an existing selection when the student clicks the floating control.
-  floating.addEventListener('pointerdown',e=>{selection=selectedContext()||selection;e.preventDefault();});
-  floating.onclick=()=>open(null,!!selection);
-  dialog.querySelector('.ask-ai-clear').onclick=()=>{selection=null;window.getSelection()?.removeAllRanges();floating.textContent='Ask AI';dialog.close();open();};
+  document.addEventListener('selectionchange',()=>{if(dialog.open)return;const next=selectedContext();selection=next;botanicals.setStamp(floating,!!next);});
+  // Capture before native focus changes selection; preserve normal touch clicks.
+  let pendingSelection=null;
+  floating.addEventListener('pointerdown',()=>{pendingSelection=selectedContext()||selection;});
+  floating.addEventListener('pointercancel',()=>{pendingSelection=null;});
+  floating.onclick=()=>{selection=pendingSelection||selection;pendingSelection=null;open(null,!!selection);};
+  dialog.querySelector('.ask-ai-clear').onclick=()=>{selection=null;window.getSelection()?.removeAllRanges();botanicals.setStamp(floating,false);dialog.close();open();};
   area.addEventListener('input',updateLink);
   dialog.querySelector('.ask-ai-copy').onclick=copyPrompt;
   launch.addEventListener('click',()=>{if(launch.dataset.copyRequired==='true')copyPrompt();});

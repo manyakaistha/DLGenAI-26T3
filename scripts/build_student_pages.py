@@ -243,7 +243,7 @@ def build(output: Path):
         shutil.copytree(review_source, output / "guide2701", dirs_exist_ok=True)
         # Keep shared behavior current in the unlisted rendered snapshot too.
         for theme in (output / "guide2701").rglob("styles/generative/theme.js"):
-            for name in ("theme.js", "ask-ai.js", "ask-ai.css"):
+            for name in ("theme.js", "ask-ai.js", "ask-ai.css", "ask-ai-botanical.js"):
                 shutil.copy2(ROOT / "styles/generative" / name, theme.parent / name)
     parsed_pages = {}
     for file in output.glob("*.html"):
