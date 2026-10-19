@@ -8,7 +8,8 @@
   const assessmentPage = /milestone-\d+\.html$/i.test(location.pathname) || headings.filter(h => /^Question\s+\d+/i.test(h.textContent)).length > 2;
   const taskTitle = /^(?:question\s*\d+|q\d+\b|activity\b|exercise\b|practice\b|worked\b|answer\b|solution\b|your assignment\b|task\b|exit check\b|predict, change)/i;
   const cleanTitle = h => (h?.cloneNode(true) || document.createElement('span'));
-  function titleOf(h) { const c=cleanTitle(h);c.querySelectorAll('.ask-ai-heading').forEach(e=>e.remove());return c.textContent.trim().replace(/^Question\s*\d+\s*:\s*/i,''); }
+  function rawTitle(h) { const c=cleanTitle(h);c.querySelectorAll('.ask-ai-heading').forEach(e=>e.remove());return c.textContent.trim(); }
+  function titleOf(h) { return rawTitle(h).replace(/^Question\s*\d+\s*:\s*/i,''); }
   const pageTitle = titleOf(headings[0]) || document.title.split(' · ')[0];
   let selection = null;
   const floating = document.createElement('button');
@@ -38,10 +39,10 @@
   }
   function excerpt(h) {
     // Assessment pages share concept titles only, never question bodies or worked answers.
-    if(assessmentPage || (h && taskTitle.test(titleOf(h)))) return '';
+    if(assessmentPage || (h && taskTitle.test(rawTitle(h)))) return '';
     const holder=document.createElement('div');let skipping=false;
     for(const node of sectionNodes(h)){
-      if(/^H[1-6]$/.test(node.tagName))skipping=taskTitle.test(titleOf(node));
+      if(/^H[1-6]$/.test(node.tagName))skipping=taskTitle.test(rawTitle(node));
       if(skipping)continue;
       const copy=node.cloneNode(true);
       copy.querySelectorAll('details,button,input,select,textarea,script,style,.ask-ai-heading,.teaching-lab,[data-lab],mjx-assistive-mml').forEach(e=>e.remove());
@@ -58,9 +59,9 @@
     const sel=window.getSelection();if(!sel || sel.isCollapsed || !sel.rangeCount)return null;
     const range=sel.getRangeAt(0);if(!article.contains(range.startContainer)||!article.contains(range.endContainer))return null;
     const h=nearestHeading(range.startContainer);
-    const protectedContent=assessmentPage || taskTitle.test(titleOf(h)) || !!range.startContainer.parentElement?.closest('details');
+    const protectedContent=assessmentPage || taskTitle.test(rawTitle(h)) || !!range.startContainer.parentElement?.closest('details');
     // If any protected question/answer block intersects the selection, send only the concept title.
-    const crossesProtected=[...article.querySelectorAll('details,h1,h2,h3,h4')].some(e=>range.intersectsNode(e)&&(e.tagName==='DETAILS'||taskTitle.test(titleOf(e))));
+    const crossesProtected=[...article.querySelectorAll('details,h1,h2,h3,h4')].some(e=>range.intersectsNode(e)&&(e.tagName==='DETAILS'||taskTitle.test(rawTitle(e))));
     return {heading:h,text:protectedContent||crossesProtected?'':sel.toString().trim(),protected:protectedContent||crossesProtected};
   }
   function promptFor({heading,text,protected:guard=false,mode='page'}) {
@@ -99,12 +100,12 @@ ${limited || 'No excerpt supplied. Explain the named topic and its prerequisites
   }
   function open(h=null,useSelection=false){
     const chosen=useSelection?selection:null;
-    const protectedTopic=assessmentPage||(h&&taskTitle.test(titleOf(h)));
+    const protectedTopic=assessmentPage||(h&&taskTitle.test(rawTitle(h)));
     const context=chosen?{...chosen,mode:'selection'}:{heading:h,text:excerpt(h),protected:protectedTopic,mode:h?'section':'page'};
     area.value=promptFor(context);status.textContent='';
     dialog.querySelector('.ask-ai-context').textContent=chosen?(chosen.protected?'Selected assessment material: sharing its concept title only.':'Explaining your selected text.'):(h?'Explaining: '+titleOf(h):'Explaining this page.');
     dialog.querySelector('.ask-ai-clear').hidden=!chosen;
-    updateLink();opener=document.activeElement;dialog.showModal();
+    updateLink();opener=document.activeElement===document.body?floating:document.activeElement;dialog.showModal();
   }
   headings.forEach(h=>{
     const b=document.createElement('button');b.type='button';b.className='ask-ai-heading';b.textContent='Ask AI';b.setAttribute('aria-label','Ask AI about '+titleOf(h));b.setAttribute('aria-haspopup','dialog');b.onclick=()=>open(h);h.append(b);
