@@ -9,6 +9,10 @@ Follow one picture from a file on disk to an augmented training batch. These not
 3. **[DataLoader: build a batch](dataloader.md)** — group samples, shuffle their order, and understand the final batch.
 4. **[Augmentations: make useful variations](augmentations.md)** — change appearance safely while keeping masks aligned. Explore four interactive labs and solve the prediction activities.
 
+## Session slides
+
+[Download the slides PDF (22 slides)](https://github.com/manyakaistha/DLGenAI-26T3/raw/refs/heads/main/docs/dataset_live_session/slides.pdf)
+
 ## Run the companion notebook
 
 [Download notebook](dataset_tutorial.ipynb) · [Download Python script](dataset_tutorial.py)
