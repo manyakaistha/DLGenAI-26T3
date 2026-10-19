@@ -187,6 +187,7 @@ def build(output: Path):
             label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else "STARTER CODE · Q11–Q12" if j == len(sources) - 1 else f"GUIDE {j-1:02d}"
             nav += f'<a href="{url}"{active}><span class="num">{label}</span>{html.escape(title)}</a>'
         nav += '<a href="session/index.html"><span class="num">Live session 12/10/26</span>Pixels, Masks &amp; Experiments</a>'
+        nav += '<a href="session-2/index.html"><span class="num">Live session 19/10/26</span>Dataset, DataLoader &amp; Augmentations</a>'
         nav += "</nav>"
         pager = ""
         if i > 0:
@@ -235,6 +236,8 @@ def build(output: Path):
     (output / "search.json").write_text(json.dumps(search, ensure_ascii=False))
     from build_live_session import build as build_session
     build_session(output / "session")
+    from build_dataset_session import build as build_dataset_session
+    build_dataset_session(output / "session-2")
     review_source = ROOT / "guide2701"
     if review_source.is_dir():
         shutil.copytree(review_source, output / "guide2701", dirs_exist_ok=True)

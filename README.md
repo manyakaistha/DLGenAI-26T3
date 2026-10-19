@@ -33,3 +33,13 @@ A separate interactive teaching companion to Guides 1–3, with a compact W&B de
 - [Notebook](docs/live_session_materials/wandb_tutorial.ipynb)
 
 The notebook uses a small synthetic dataset and needs no competition data or GPU.
+
+
+## Live session: Dataset, DataLoader & Augmentations
+
+A beginner-friendly continuation with an 80/20 split lesson, explained PyTorch code, a batch builder and four interactive augmentation labs.
+
+- [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-2/)
+- [Notebook](docs/dataset_live_session/dataset_tutorial.ipynb)
+
+The notebook creates original synthetic cloud-like data locally and runs on CPU.
