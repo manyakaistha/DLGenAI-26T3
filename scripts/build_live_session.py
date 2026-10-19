@@ -7,7 +7,7 @@ import argparse, ast, hashlib, html, json, re, shutil
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
 import markdown
-from build_student_pages import CSS, JS, CREDIT_ART, Inspect, normalize_markdown
+from build_student_pages import CSS, JS, CREDIT_ART, Inspect, normalize_markdown, version_theme_assets
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'docs/live_session_materials'
 MODULES=['README','wandb','01_data','02_heads','03_rle']
@@ -95,6 +95,7 @@ def build(out):
             path=p.path or url
             assert (out/path).is_file(),f'Broken link: {url}: {link}'
             if p.fragment and path in pages: assert unquote(p.fragment) in pages[path].ids,(url,link)
+    version_theme_assets(out)
     print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((SOURCE/"wandb_tutorial.ipynb").read_text())["cells"])} cells → {out}')
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,default=ROOT/'runs/live_session_preview');build(ap.parse_args().output.resolve())

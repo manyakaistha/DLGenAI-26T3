@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import re
@@ -132,6 +133,25 @@ def normalize_markdown(source: str) -> str:
     return "\n".join(lines)
 
 
+
+def version_theme_assets(output: Path):
+    """Version shared assets as one bundle to prevent mixed cached UI releases."""
+    assets = sorted((ROOT / "styles/generative").glob("*"))
+    digest = hashlib.sha256()
+    for asset in assets:
+        if asset.is_file() and asset.suffix in (".js", ".css"):
+            digest.update(asset.name.encode())
+            digest.update(asset.read_bytes())
+    version = digest.hexdigest()[:16]
+    pattern = r'(styles/generative/[A-Za-z0-9_.-]+\.(?:js|css))(?:\?[^"\s<>]*)?'
+    for page in output.rglob("*.html"):
+        source = page.read_text()
+        rendered = re.sub(pattern, lambda match: match.group(1) + "?v=" + version, source)
+        if rendered != source:
+            page.write_text(rendered)
+    return version
+
+
 def build(output: Path):
     output.mkdir(parents=True, exist_ok=True)
     modules = sorted(GUIDES.glob("guide_*.md"))
@@ -245,6 +265,7 @@ def build(output: Path):
         for theme in (output / "guide2701").rglob("styles/generative/theme.js"):
             for name in ("theme.js", "ask-ai.js", "ask-ai.css", "ask-ai-botanical.js"):
                 shutil.copy2(ROOT / "styles/generative" / name, theme.parent / name)
+    version_theme_assets(output)
     parsed_pages = {}
     for file in output.glob("*.html"):
         parsed = Inspect()

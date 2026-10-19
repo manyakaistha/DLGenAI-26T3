@@ -179,8 +179,9 @@
 (() => {
   const current=document.currentScript;
   if(!current)return;
-  const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('ask-ai.css',current.src).href;
-  const decoration=document.createElement('script');decoration.src=new URL('ask-ai-botanical.js',current.src).href;
-  decoration.onload=()=>{const script=document.createElement('script');script.src=new URL('ask-ai.js',current.src).href;document.head.append(script);};
+  const assetURL=(name)=>{const url=new URL(name,current.src);url.search=new URL(current.src).search;return url.href;};
+  const css=document.createElement('link');css.rel='stylesheet';css.href=assetURL('ask-ai.css');
+  const decoration=document.createElement('script');decoration.src=assetURL('ask-ai-botanical.js');
+  decoration.onload=()=>{const script=document.createElement('script');script.src=assetURL('ask-ai.js');document.head.append(script);};
   document.head.append(css,decoration);
 })();
