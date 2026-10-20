@@ -110,7 +110,7 @@ ${limited || 'No excerpt supplied. Explain the named topic and its prerequisites
     updateLink();opener=document.activeElement===document.body?floating:document.activeElement;dialog.showModal();
   }
   headings.forEach(h=>{
-    const b=document.createElement('button');b.type='button';b.className='ask-ai-heading';botanicals.decorateFlower(b,260310+headings.indexOf(h)*97);b.setAttribute('aria-label','Ask AI about '+titleOf(h));b.setAttribute('aria-haspopup','dialog');b.onclick=()=>open(h);h.append(b);
+    const b=document.createElement('button');b.type='button';b.className='ask-ai-heading';botanicals.decorateFlower(b,260310+headings.indexOf(h)*97);b.setAttribute('aria-label','Ask AI to explain this section: '+titleOf(h));b.setAttribute('aria-haspopup','dialog');b.onclick=()=>open(h);h.append(b);
   });
   document.addEventListener('selectionchange',()=>{if(dialog.open)return;const next=selectedContext();selection=next;botanicals.setStamp(floating,!!next);});
   // Capture before native focus changes selection; preserve normal touch clicks.

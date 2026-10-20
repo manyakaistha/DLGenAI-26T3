@@ -58,9 +58,6 @@
     const icon=svg('svg',{viewBox:'0 0 64 64','class':'ai-bloom-icon','aria-hidden':'true',focusable:'false'});
     const flower=ornament(seed),position=svg('g',{transform:'translate(32 31)'});
     position.append(flower.g);icon.append(position);
-    const center=svg('text',{x:32,y:34.5,'class':'ai-bloom-monogram','text-anchor':'middle'});center.textContent='AI';
-    // A quiet paper disk keeps the monogram legible through the spiral.
-    icon.append(svg('circle',{cx:32,cy:31,r:7.5,'class':'ai-bloom-center'}),center);
     const label=document.createElement('span');label.className='ai-bloom-label';label.textContent='Ask AI';
     button.replaceChildren(icon,label);
     const state={button,flower,value:0,target:0,from:0,visible:true,hover:false,focus:false};states.add(state);apply(state,0);observer.observe(button);
