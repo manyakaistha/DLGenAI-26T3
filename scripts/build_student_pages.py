@@ -229,7 +229,7 @@ def build(output: Path):
 <link rel="stylesheet" href="styles/generative/theme.css">
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="{str(i == 0).lower()}">
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="{str(i == 0).lower()}" data-ai-help="{'off' if source == QUESTION or source == STARTERS / 'README.md' else 'study'}">
 <div class="reading-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a><div class="layout">
 <aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>

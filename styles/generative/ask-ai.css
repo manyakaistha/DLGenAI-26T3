@@ -22,3 +22,12 @@ html[data-ask-ai-motion="off"] .ai-stamp-orbit,html[data-ask-ai-hidden="true"] .
 @media print{.ask-ai-float,.ask-ai-heading,.ask-ai-dialog{display:none!important}}
 
 .ask-ai-heading:focus-visible{border-radius:4px}
+
+/* Quiet settings action leaves the botanical stamp as the primary control. */
+.ask-ai-float{bottom:calc(40px + env(safe-area-inset-bottom))}
+.ask-ai-preferences{position:fixed;z-index:20;right:35px;bottom:calc(8px + env(safe-area-inset-bottom));min-height:30px;padding:4px 10px;border:0;background:var(--paper);color:var(--muted);font:11px 'DM Mono',monospace;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.ask-ai-notice{position:fixed;z-index:21;right:155px;bottom:calc(30px + env(safe-area-inset-bottom));max-width:min(340px,calc(100vw - 150px));margin:0;padding:10px 14px;background:var(--paper);color:var(--ink);box-shadow:0 2px 12px #0002;font:13px/1.5 'DM Sans',sans-serif;border:1px solid var(--line);border-radius:4px;pointer-events:none}.ask-ai-notice:empty{display:none}
+.ask-ai-dialog select{box-sizing:border-box;width:100%;min-height:44px;padding:10px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:4px;font:16px 'DM Sans',sans-serif}.ask-ai-dialog .ask-ai-remember{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:400}.ask-ai-remember input{margin-top:6px;accent-color:var(--accent);width:18px;height:18px;flex-shrink:0}
+.ask-ai-dialog .ask-ai-launch{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}.ask-ai-launch:disabled{opacity:.5;cursor:default}.ask-ai-preferences:focus-visible{outline:3px solid var(--flower);outline-offset:2px}
+@media(max-width:560px){.ask-ai-preferences{right:14px}.ask-ai-float{bottom:calc(40px + env(safe-area-inset-bottom))}.ask-ai-notice{right:116px;max-width:calc(100vw - 132px);bottom:calc(40px + env(safe-area-inset-bottom))}}
+@media print{.ask-ai-preferences,.ask-ai-notice{display:none!important}}
