@@ -1,18 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="paper">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive classroom presentation: encoder–decoder mechanics, pretraining, fine-tuning and evaluation. 26 October 2026.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23253c87'/%3E%3Ctext x='4' y='22' font-size='17' font-family='Arial' fill='white'%3EDL%3C/text%3E%3C/svg%3E">
-  <title>From Features to Evidence · Live Presentation</title>
+  <title>Transfer Learning for Segmentation · 26 October</title>
+  <script>try{const t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
   <style>/* PRESENTATION_CSS */</style>
 </head>
 <body>
 <noscript>This interactive presentation needs JavaScript. The full <a href="https://manyakaistha.github.io/DLGenAI-26T3/session-3/">study notes</a> work without it.</noscript>
 <div id="viewport">
   <main id="stage" aria-label="Interactive live session presentation">
-    <header class="deck-header"><span class="wordmark">DLGenAI <i>/</i> LIVE LAB</span><span id="chapter"></span><button id="contents" aria-haspopup="dialog">Slide index <kbd>I</kbd></button></header>
+    <header class="deck-header"><span class="wordmark">DLGenAI <i>/</i> SESSION 03</span><span id="chapter"></span><div class="header-actions"><details class="palette-menu"><summary>Palette</summary><div class="palette-popover" role="group" aria-label="Choose your palette"><button type="button" class="theme-option" data-palette="paper" aria-pressed="true"><span style="--swatch:#f3eee4;--dot:#e7462b"></span>Paper</button><button type="button" class="theme-option" data-palette="midnight" aria-pressed="false"><span style="--swatch:#101b38;--dot:#ff7568"></span>Midnight</button><button type="button" class="theme-option" data-palette="moss" aria-pressed="false"><span style="--swatch:#133a2a;--dot:#ffb7c5"></span>Moss</button><button type="button" class="theme-option" data-palette="butter" aria-pressed="false"><span style="--swatch:#ffe9a8;--dot:#d72d43"></span>Butter</button><button type="button" class="theme-option" data-palette="blush" aria-pressed="false"><span style="--swatch:#fad4d8;--dot:#bd2348"></span>Blush</button><button type="button" class="theme-option" data-palette="mono" aria-pressed="false"><span style="--swatch:#141414;--dot:#f2f2f2"></span>Mono</button></div></details><button id="contents" aria-haspopup="dialog">Slide index <kbd>I</kbd></button></div></header>
+    <div class="botanical botanical-a" aria-hidden="true"><svg viewBox="0 0 90 110" focusable="false"><path class="stem" d="M43 108C43 74 47 47 61 12"/><path class="leaf" d="M47 75C30 66 21 54 19 43c14 1 25 10 28 25Z"/><path class="leaf" d="M50 58c13-12 25-16 37-14-5 13-16 20-34 21Z"/><path class="petal" d="M61 23c-9-11-8-21 1-22 9-1 13 6 8 16 9-7 17-5 17 3 0 8-9 11-18 8 5 9 1 16-6 14-7-2-8-10-2-19Z"/><circle class="center" cx="64" cy="17" r="5"/></svg></div>
+    <div class="botanical botanical-b" aria-hidden="true"><svg viewBox="0 0 90 110" focusable="false"><path class="stem" d="M44 108C47 77 42 50 28 14"/><path class="leaf" d="M42 76c17-7 27-18 31-30-15 1-26 9-31 24Z"/><path class="leaf" d="M39 59C26 48 14 44 3 47c5 12 16 18 33 18Z"/><path class="petal" d="M28 24c-9-11-8-21 1-22 9-1 13 6 8 16 9-7 17-5 17 3 0 8-9 11-18 8 5 9 1 16-6 14-7-2-8-10-2-19Z"/><circle class="center" cx="31" cy="18" r="5"/></svg></div>
     <div id="slides"></div>
     <footer class="deck-footer">
       <div class="tools"><button id="motion" aria-pressed="false">Motion on</button><button id="fullscreen">Fullscreen</button><a id="notes" href="https://manyakaistha.github.io/DLGenAI-26T3/session-3/" target="_blank" rel="noopener">Study notes ↗</a></div>
@@ -21,7 +24,7 @@
     <div id="progress" aria-hidden="true"></div>
   </main>
 </div>
-<dialog id="index-dialog" aria-labelledby="index-title"><div class="dialog-heading"><h2 id="index-title">Choose a teaching moment.</h2><button id="close-index" aria-label="Close slide index">×</button></div><p>← → / Space to navigate · Home / End · F for fullscreen · Esc closes this menu.</p><label class="route-setting"><input id="include-mri" type="checkbox"> Include the three optional MRI stops in the slide sequence</label><div id="index-list"></div><a href="index.html" download="26-october-interactive-presentation.html">Download this presentation for offline use ↓</a></dialog>
+<dialog id="index-dialog" aria-labelledby="index-title"><div class="dialog-heading"><h2 id="index-title">Slide index</h2><button id="close-index" aria-label="Close slide index">×</button></div><p>← → / Space to navigate · Home / End · F for fullscreen · Esc closes this menu.</p><label class="route-setting"><input id="include-mri" type="checkbox"> Include the three optional MRI stops in the slide sequence</label><div id="index-list"></div><a href="index.html" download="26-october-interactive-presentation.html">Download this presentation for offline use ↓</a></dialog>
 <div id="announcer" class="sr-only" aria-live="polite"></div>
 <script>/* PRESENTATION_JS */</script>
 </body>

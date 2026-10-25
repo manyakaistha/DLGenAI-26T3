@@ -8,6 +8,9 @@ study Markdown, seven existing reading labs, and notebooks are unchanged.
 - Website route: `/session-3/presentation/index.html`; linked from Live Session Resources.
 - Edit `index.html` (shell), `presentation.css` (layout), or `presentation.js`
   (slide content and activities). No framework, runtime packages, CDN, or font download.
+- The header palette picker follows the main site themes (`paper`, `midnight`,
+  `moss`, `butter`, `blush`, `mono`) and remembers the selected theme locally.
+  The deck keeps its botanical marks decorative and theme-aware.
 - The builder embeds styles, JavaScript and the attributed existing MRI contact
   sheet into one HTML file. Download it from Slide index for offline presentation.
   Links to the full study guides and external dataset still require internet.
