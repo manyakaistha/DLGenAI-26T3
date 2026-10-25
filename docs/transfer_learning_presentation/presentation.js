@@ -14,7 +14,7 @@
   const callout = text => `<div class="callout">${text}</div>`;
   const quiz = (question, options, correct, explanation) => `<div data-lab="quiz" data-correct="${correct}" data-explanation="${escape(explanation)}"><div class="question">${question}</div><div class="quiz-options" style="margin-top:18px">${options.map((text,i)=>btn(text,`answer-${i}`,'answer-button')).join('')}</div><div class="answer" role="status">Choose an answer, then explain your reasoning.</div>${reset()}</div>`;
   const slides = [
-    {id:'start',chapter:'26 October 2026 · Milestone 3',title:'Transfer learning for segmentation',note:'',hero:true,body:`<div class="body two"><div class="hero-left"><div class="eyebrow">26 October · Transfer learning</div><h1>A pretrained encoder.<br><em>Your segmentation task.</em></h1><p>A model already knows how to notice patterns. Today we’ll see what that head start gives us—and how to check it honestly.</p><div class="row" style="margin-top:26px">${jump('Start the session →','task')}<span class="small muted">Encoder → fine-tuning → evaluation</span></div><p class="small muted" style="margin-top:22px">Tap through the examples. Keep the notes nearby when you want the code.</p></div>${panel(`<div class="tag">Inside a segmentation model</div><div class="cover-diagram"><div class="cover-skip"><span>skip: preserve location</span></div><div class="feature-column"><div class="feature-map" style="width:104px;height:104px">IMAGE</div><span class="small">Input</span></div><span class="arrow">→</span><div class="feature-column"><div class="feature-map" style="width:73px;height:73px">FEATURES</div><span class="small">Encoder</span></div><span class="arrow">→</span><div class="feature-column"><div class="feature-map" style="width:104px;height:104px">MASK</div><span class="small">Decoder</span></div></div><div class="rule"></div><p class="small muted">The encoder finds patterns. The decoder turns them into a mask.</p>`)}</div>`},
+    {id:'start',chapter:'26 October 2026 · Milestone 3',title:'Transfer learning for segmentation',note:'',hero:true,body:`<div class="body two"><div class="hero-left"><div class="eyebrow">Live session 03 · 26 October 2026</div><h1>A head start<br>for <em>your U-Net.</em></h1><p>Borrow a pretrained encoder. Build a decoder for your task. Then test what that head start actually gives you.</p><div class="row" style="margin-top:24px">${jump('Let’s begin <span aria-hidden="true">↗</span>','task')}</div><p class="small muted" style="margin-top:20px">Explore the examples together. <br>Keep the study notes for the code.</p></div><figure class="cover-workbench"><figcaption><span class="tag">From an image to a pixel decision</span><span class="cover-caption">A schematic U-Net</span></figcaption><div class="cover-model"><div class="cover-bridge"><span>skip connections · spatial detail</span></div><div class="cover-unit"><div class="cover-sample">${Array.from({length:64},(_,i)=>`<i class="${[18,19,26,27,34,35,42,43].includes(i)?'sample-mark':''}"></i>`).join('')}</div><strong>Image</strong><span>What do we see?</span></div><span class="model-arrow" aria-hidden="true">→</span><div class="cover-unit"><div class="encoder-stack"><i></i><i></i><i></i><span>features</span></div><strong>Encoder → decoder</strong><span>Find patterns. Restore detail.</span></div><span class="model-arrow" aria-hidden="true">→</span><div class="cover-unit"><div class="cover-sample mask">${Array.from({length:64},(_,i)=>`<i class="${[18,19,26,27,34,35,42,43].includes(i)?'sample-mark':''}"></i>`).join('')}</div><strong>Mask</strong><span>Where is it?</span></div></div><div class="cover-key"><span><i></i> Pretrained encoder</span><span><i></i> New decoder + pixel head</span></div><p class="tiny muted">Synthetic pattern · binary example</p></figure></div><nav class="session-route" aria-label="Session roadmap">${[['01','The model','Shapes & skip connections','task'],['02','The head start','Architecture & weights','pretraining'],['03','The fine-tuning','Gradients & model state','freeze'],['04','The evidence','Losses & fair comparisons','logits']].map(([n,t,d,id])=>`<button data-jump="${id}"><span>${n}</span><strong>${t}</strong><small>${d}</small><i aria-hidden="true">↗</i></button>`).join('')}</nav>`},
     {id:'task',chapter:'01 / Encoder & decoder',title:'Classification or segmentation?',lede:'We’re borrowing a starting point, not changing the question we ask of each pixel.',note:'encoder.html',body:`<div class="body two">${panel(`<div data-lab="task"><div class="controls">${btn('Classification','classify')}${btn('Segmentation','segment','primary')}</div><div class="viz"></div></div>`)}${panel(`<h3>Where is the defect?</h3><div class="concept-list"><p>The encoder extracts features: edges, textures and more complex patterns.</p><p>The decoder combines those features at higher spatial resolutions.</p><p>One binary class needs one logit per pixel. Our four defect types need four channels.</p></div><p class="note-line">We use binary examples today. Our defect model still needs four independent outputs.</p>`)}</div>`},
     {id:'shapes',chapter:'01 / Encoder & decoder',title:'Inside the encoder',lede:'Click a stage. Watch the picture shrink as the feature channels grow.',note:'encoder.html',body:`<div class="body wide-left">${panel(`<div data-lab="shapes"><div class="controls"><label>Input <select name="size"><option value="256,256">256 × 256</option><option value="128,128">128 × 128</option><option value="128,800">128 × 800 · industrial aspect ratio</option></select></label>${reset()}</div><div class="viz"></div></div>`)}${panel(`<h3>What changes at each stage?</h3><p>Height and width decrease as the encoder downsamples.</p><div class="rule"></div><p>Channel count grows: the network can represent more kinds of features.</p><p class="note-line">Feature channels describe patterns. Output channels describe our target classes.</p>`)}</div>`},
     {id:'convolution',chapter:'01 / Encoder & decoder',title:'How a convolution finds a pattern',lede:'Let’s watch one tiny filter move across an image.',note:'encoder.html',body:`<div class="body wide-left">${panel(`<div data-lab="conv"><div class="controls">${btn('Next position','step','primary')}${btn('Play one scan','play')}${reset()}</div><div class="viz"></div></div>`)}${panel(`<h3>One filter, many image patches</h3><p>The same 3 × 3 weights visit each image patch.</p><div class="rule"></div><p>Where a patch matches the filter, the response is larger.</p><p class="note-line">This filter is hand-set to detect a vertical change. A real CNN learns its filter weights.</p>`)}</div>`},
@@ -49,6 +49,9 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
 
   $('#slides').innerHTML=slides.map((s,i)=>`<section id="${s.id}" class="slide ${s.hero?'hero':''}" aria-labelledby="title-${i}" ${i?'hidden inert':''}>${s.hero?'':`<div class="eyebrow">${escape(s.chapter)}</div><h2 id="title-${i}" tabindex="-1">${escape(s.title)}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:''}`} ${s.body}</section>`).join('');
   $('#start h1').id='title-0'; $('#start h1').tabIndex=-1;
+  const chapters=[['01','Model','task'],['02','Weights','pretraining'],['03','Fine-tune','freeze'],['04','Evidence','logits']];
+  $('#chapter').classList.add('sr-only');
+  $('#chapter').insertAdjacentHTML('afterend',`<nav class="chapter-nav" aria-label="Jump to a chapter">${chapters.map(([n,label,id])=>`<button data-jump="${id}"><span>${n}</span> ${label}</button>`).join('')}</nav>`);
   const themes=['paper','midnight','moss','butter','blush','mono'];
   const themeRoot=document.documentElement;
   function applyTheme(name){
@@ -77,11 +80,17 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     const n=typeof target==='string'?slides.findIndex(s=>s.id===target):target;
     if(n<0||n>=slides.length)return;
     settle();current=n;
-    $$('.slide').forEach((el,i)=>{el.hidden=i!==n;el.inert=i!==n;});
+    $$('.slide').forEach((el,i)=>{el.classList.remove('is-entering');el.hidden=i!==n;el.inert=i!==n;});
+    if(focus&&!motionOff) { void $$('.slide')[n].offsetWidth; $$('.slide')[n].classList.add('is-entering'); }
+    const chapter=slides[n].chapter.match(/^0[1-4]/)?.[0];
+    $$('.chapter-nav button').forEach((button,i)=>{if(chapters[i][0]===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
     $('#chapter').textContent=slides[n].chapter;
     const path=route(),position=path.indexOf(n);
     $('#counter').textContent=position<0?`Optional · ${slides.filter(s=>s.optional).findIndex(s=>s.id===slides[n].id)+1}/3`:`${String(position+1).padStart(2,'0')} / ${path.length}`;
     $('#previous').disabled=n===0;$('#next').disabled=n===slides.length-1;
+    const next=path.find(i=>i>n),prev=path.filter(i=>i<n).at(-1);
+    $('#next').title=next===undefined?'End of session':`Next: ${slides[next].title}`;
+    $('#previous').title=prev===undefined?'Start of session':`Previous: ${slides[prev].title}`;
     $('#notes').href=notesBase+slides[n].note;
     $('#progress').style.width=`${(position<0?(n+1)/slides.length:(position+1)/path.length)*100}%`;
     try{history.replaceState(null,'',`#${slides[n].id}`);}catch{/* Embedded/offline viewers may restrict URL changes. */}
@@ -92,11 +101,19 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   function move(direction){let n=current+direction;while(n>=0&&n<slides.length&&!includeMRI&&slides[n].optional)n+=direction;go(n);}
   $('#previous').onclick=()=>move(-1);$('#next').onclick=()=>move(1);
   const dialog=$('#index-dialog');
-  $('#contents').onclick=()=>{settle();dialog.showModal();};$('#close-index').onclick=()=>dialog.close();
+  $('#contents').onclick=()=>{settle();$('#slide-search').value='';filterIndex();dialog.showModal();$('#slide-search').focus();};$('#close-index').onclick=()=>dialog.close();
   $('#include-mri').onchange=e=>{includeMRI=e.target.checked;go(current,false);};
-  $('#index-list').innerHTML=slides.map((s,i)=>`<button type="button" data-jump="${s.id}" class="${s.optional?'optional':''}"><span>${String(i+1).padStart(2,'0')}</span>${s.optional?'Optional · ':''}${escape(s.title)}</button>`).join('');
+  const indexGroups=[['Opening',[slides[0]]],...chapters.map(([n,label])=>[`${n} / ${label}`,slides.filter(s=>s.chapter.startsWith(n))]),['Optional / MRI',slides.filter(s=>s.optional)]];
+  $('#index-list').innerHTML=indexGroups.map(([label,items])=>`<section class="index-group"><h3>${label}</h3><div>${items.map(s=>`<button type="button" data-jump="${s.id}" data-search="${escape((s.title+' '+s.chapter+' '+(s.lede||'')+' '+s.body.replace(/<[^>]*>/g,' ')).toLowerCase())}" class="${s.optional?'optional':''}"><span>${String(slides.indexOf(s)+1).padStart(2,'0')}</span><strong>${escape(s.title)}</strong><i aria-hidden="true">↗</i></button>`).join('')}</div></section>`).join('');
+  function filterIndex(){
+    const terms=$('#slide-search').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    $$('#index-list button').forEach(b=>b.hidden=!terms.every(term=>b.dataset.search.includes(term)));
+    $$('.index-group').forEach(group=>group.hidden=!$$('button',group).some(b=>!b.hidden));
+    $('#index-empty').hidden=$$('#index-list button').some(b=>!b.hidden);
+  }
+  $('#slide-search').addEventListener('input',filterIndex);
   document.addEventListener('click',e=>{const target=e.target.closest('[data-jump]');if(target){if(dialog.open)dialog.close();go(target.dataset.jump);}});
-  function motionUI(){ $('#motion').textContent=motionOff?'Motion off':'Motion on';$('#motion').setAttribute('aria-pressed',String(motionOff)); }
+  function motionUI(){ themeRoot.dataset.motion=motionOff?'off':'on'; $('#motion').textContent=motionOff?'Motion off':'Motion on';$('#motion').setAttribute('aria-pressed',String(motionOff)); }
   $('#motion').onclick=()=>{motionOff=!motionOff;settle();motionUI();};
   media.addEventListener('change',e=>{motionOff=e.matches;settle();motionUI();});motionUI();
   document.addEventListener('visibilitychange',()=>{if(document.hidden)settle();});
@@ -106,6 +123,8 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   document.addEventListener('fullscreenchange',()=>{$('#fullscreen').textContent=document.fullscreenElement?'Exit fullscreen':'Fullscreen';fit();});
   document.addEventListener('keydown',e=>{
     if(e.altKey||e.ctrlKey||e.metaKey||e.isComposing||dialog.open)return;
+    const palette=$('.palette-menu');
+    if(palette.open){if(e.key==='Escape'){palette.open=false;$('summary',palette).focus();}return;}
     const editing=e.target.closest('input,select,textarea,[contenteditable]');
     if(editing)return;
     if(e.key===' '&&e.target.closest('button,a'))return;
@@ -132,11 +151,16 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   if(innerWidth<=700)setTimeout(()=>scrollTo(0,0),80);
 
   const grid=(values,cols,classes=()=>'',label='')=>`<div class="pixel-grid" role="img" aria-label="${escape(label||values.join(', '))}" style="grid-template-columns:repeat(${cols},1fr)">${values.map((v,i)=>`<span class="pixel ${classes(v,i)}" aria-hidden="true">${escape(v)}</span>`).join('')}</div>`;
-  const setPressed=(root,active)=>$$('[data-action]',root).forEach(b=>{if(b.dataset.action!=='reset')b.setAttribute('aria-pressed',String(b.dataset.action===active));});
+  const setPressed=(root,active)=>$$('[data-action]',root).forEach(b=>{if(b.dataset.action!=='reset'){const selected=b.dataset.action===active;b.setAttribute('aria-pressed',String(selected));b.classList.toggle('primary',selected);}});
   const labs={};
   function mount(name,setup){$$(`[data-lab="${name}"]`).forEach(root=>{
     const api=setup(root),viz=$('.viz',root);
-    function update(){api.render(viz);}
+    $$('input[type=range]',root).forEach((input,i)=>{
+      input.id=`range-${name}-${i}`;
+      input.insertAdjacentHTML('afterend',`<output class="range-value" for="${input.id}" aria-live="off"></output>`);
+    });
+    function update(){api.render(viz);$$('input[type=range]',root).forEach(input=>{const value=Number(input.value).toFixed(input.name==='z'?1:2);input.nextElementSibling.value=value;input.setAttribute('aria-valuetext',value);});}
+
     root.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;settle();api.action?.(b.dataset.action,update);if(!api.ownsRender){const focused=document.activeElement===b;update();if(focused&&!b.isConnected){const replacement=$$('[data-action]',root).find(x=>x.dataset.action===b.dataset.action);replacement?.focus({preventScroll:true});}}});
     root.addEventListener('input',e=>{if(e.target.matches('input,select')){settle();api.input?.(e.target);update();}});
     root.addEventListener('change',e=>{if(e.target.matches('select')){settle();api.input?.(e.target);update();}});
@@ -177,7 +201,7 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   }};});
   mount('curves',root=>{let mode='train',revealed=false;return{action:a=>{if(a==='reveal')revealed=!revealed;else{mode=a;revealed=false;}},render:v=>{setPressed(root,mode);const random=mode==='train'?[.92,.76,.64,.55,.49,.43]:[.25,.36,.47,.55,.60,.63],pretrained=mode==='train'?[.74,.55,.43,.36,.31,.27]:[.35,.46,.55,.60,.62,.63];const path=values=>values.map((x,i)=>`${i?'L':'M'}${55+i*95},${220-x*175}`).join(' ');v.innerHTML=`<svg class="curve-svg" viewBox="0 0 575 275" role="img" aria-label="Illustrative ${mode==='train'?'training loss falls faster for the pretrained arm':'validation Dice ends at the same value for both arms'}. Not measured results."><line x1="55" y1="20" x2="55" y2="220" stroke="#a9aeb6"/><line x1="55" y1="220" x2="540" y2="220" stroke="#a9aeb6"/>${[0,.5,1].map(x=>`<text x="18" y="${225-x*175}">${x}</text>`).join('')}<path d="${path(random)}" fill="none" stroke="var(--coral)" stroke-width="3" stroke-dasharray="8 6"/><path d="${path(pretrained)}" fill="none" stroke="var(--blue)" stroke-width="4"/>${[1,2,3,4,5,6].map((x,i)=>`<text x="${50+i*95}" y="242">${x}</text>`).join('')}<text x="245" y="258">Equal-budget epochs</text></svg><div class="row small"><span style="color:var(--blue)">━ Pretrained start</span><span style="color:var(--coral)">┄ Random start</span><span class="chip">Illustrative, not measured</span></div>`;$("[data-action=reveal]",root).setAttribute('aria-pressed',String(revealed));$('.answer',root).textContent=revealed?(mode==='train'?'The pretrained arm fits training data faster in this example. That alone says nothing about held-out quality.':'Both end at the same validation Dice here, despite different early learning. A faster start does not guarantee a better final score.'):'Predict what this curve lets us conclude. Then reveal.';}};});
   $$('[data-lab=quiz]').forEach(root=>{
-    root.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const answer=$('.answer',root);if(b.dataset.action==='reset'){answer.className='answer';answer.textContent='Choose an answer, then explain your reasoning.';$$('button',root).forEach(x=>x.removeAttribute('aria-pressed'));return;}const correct=+b.dataset.action.split('-')[1]===+root.dataset.correct;answer.className=`answer ${correct?'':'wrong'}`;answer.textContent=correct?root.dataset.explanation:'Look again at what changes between the two options. Try another answer.';$$('[data-action^=answer]',root).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+    root.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const answer=$('.answer',root);if(b.dataset.action==='reset'){answer.className='answer';answer.textContent='Choose an answer, then explain your reasoning.';$$('button',root).forEach(x=>{x.removeAttribute('aria-pressed');delete x.dataset.result;});return;}const correct=+b.dataset.action.split('-')[1]===+root.dataset.correct;answer.className=`answer ${correct?'':'wrong'}`;answer.textContent=correct?'Correct. '+root.dataset.explanation:'Look again at what changes between the two options. Try another answer.';$$('[data-action^=answer]',root).forEach(x=>{x.setAttribute('aria-pressed',String(x===b));if(x===b)x.dataset.result=correct?'correct':'incorrect';else delete x.dataset.result;});});
   });
   // A small model surface supports numerical verification in the browser.
   window.Presentation=Object.freeze({go,slides:slides.map(({id,title,optional})=>({id,title,optional:!!optional})),get current(){return slides[current].id;},get animating(){return !!pending;},math:Object.freeze({convolutionAt,softMetrics,hardMetrics,bceLogit})});

@@ -50,3 +50,22 @@ when the slide changes, the tab hides, the menu opens, another activity starts,
 or reduced motion is requested. There is no random regeneration or automatic
 slide advancement. Motion off supports a static teaching mode and follows OS
 preference changes.
+
+## Presentation design and navigation
+
+The Session 3 redesign follows the installed `ppt-design` skill's audience-first
+layout and rendered-review guidance, adapted to the existing interactive HTML
+artifact. It preserves the course palette, lesson order and all 24 teaching stops.
+The cover combines a synthetic image-to-mask schematic with a four-part roadmap.
+Desktop chapter shortcuts jump to Model, Weights, Fine-tune and Evidence; the
+cover roadmap provides the same entry points on phones. Explanatory notes sit
+beside focused workbenches; comparison, code and MRI pages retain their own roles.
+
+The slide index groups topics by chapter and searches titles, descriptions and
+lesson text. Empty searches show a clear message; opening the index resets the
+filter. Slider outputs show their current values and reset with their activities.
+Selected activity tabs have one consistent highlight. Quizzes show explicit check
+or cross markers and feedback. Native keyboard behavior is preserved in inputs,
+selects and the palette. A brief opacity entrance respects Motion off and OS
+reduced-motion preferences. All visual assets remain embedded or code-native;
+there are no additional runtime dependencies.
