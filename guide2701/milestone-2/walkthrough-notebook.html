@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Legacy synthetic pipeline walkthrough · Milestone 2</title>
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script>
+</head><body data-overview="false" data-ai-help="off">
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span>
+<a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>Previously shared resources</p><div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div>
+<details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details></aside>
+<main id="main"><div class="content"><span class="section-label">Legacy link · Current navigation</span>
+<article>
+        <h1>Legacy synthetic pipeline walkthrough</h1><p><strong>Legacy reference material.</strong> These synthetic demos use
+    single-channel grayscale images, a dictionary sample with <code>image</code> and
+    <code>mask</code> keys, and standardized pixel values. They are separate from the
+    current Q7 contract: RGB images scaled to [0, 1] and an <code>(image, masks)</code>
+    tuple. They demonstrate pipeline mechanics, not a learnable segmentation benchmark.</p><ul>
+    <li><a href="downloads/synthetic_pipeline_walkthrough.ipynb" download>Original synthetic walkthrough · Jupyter notebook</a></li>
+    <li><a href="downloads/synthetic_pipeline_walkthrough.py" download>Original synthetic walkthrough · Python script</a></li>
+    <li><a href="examples/toy_dataset_loader.py" download>Legacy toy Dataset and DataLoader script</a></li>
+    <li><a href="examples/toy_rle_roundtrip.py" download>Legacy toy RLE round-trip script</a></li>
+    <li><a href="examples/toy_unet_step.py" download>Legacy toy U-Net step script</a></li>
+    </ul>
+        <p>For the current assessment, follow <a href="guide_07_pytorch_dataset_and_architectural_paradigms.html">Guide 7: Dataset contract</a>
+        and <a href="guide_08_training_dynamics_and_convergence.html">Guide 8: Training dynamics</a>.</p></article><nav class="pagination" aria-label="Return to current guides">
+<a href="index.html">← Current Milestone 2 guides</a></nav></div></main></div></body></html>

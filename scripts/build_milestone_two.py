@@ -89,6 +89,74 @@ def render_pagination(current_index: int) -> str:
     return pager
 
 
+# Public links distributed before the question-wise curriculum was introduced.
+# These topics do not all have one-to-one replacements, so use explicit notices
+# rather than silently redirecting students to a different lesson.
+LEGACY_GUIDES = {
+    "guide_01_dataset_contract_and_strip_tensors.html": ("Dataset contract and strip tensors", URLS[8]),
+    "guide_02_batching_dataloaders_and_isolation.html": ("Batching, DataLoaders and isolation", URLS[8]),
+    "guide_03_industrial_augmentations_and_alignment.html": ("Industrial augmentations and alignment", URLS[0]),
+    "guide_04_multilabel_stratification_and_leakage.html": ("Multi-label stratification and leakage", URLS[0]),
+    "guide_05_wandb_experiment_tracking.html": ("W&B experiment tracking", URLS[9]),
+    "guide_06_baseline_unet_and_training_loop.html": ("Baseline U-Net and training loop", URLS[9]),
+    "guide_07_postprocessing_logits_to_masks.html": ("Post-processing logits into masks", URLS[0]),
+    "guide_08_rle_submission_and_verification.html": ("RLE submission and verification", URLS[2]),
+}
+
+
+def build_legacy_pages(output: Path) -> None:
+    """Keep previously published lesson and download URLs useful."""
+    legacy_notice = """<p><strong>Legacy reference material.</strong> These synthetic demos use
+    single-channel grayscale images, a dictionary sample with <code>image</code> and
+    <code>mask</code> keys, and standardized pixel values. They are separate from the
+    current Q7 contract: RGB images scaled to [0, 1] and an <code>(image, masks)</code>
+    tuple. They demonstrate pipeline mechanics, not a learnable segmentation benchmark.</p>"""
+    resources = """<ul>
+    <li><a href="downloads/synthetic_pipeline_walkthrough.ipynb" download>Original synthetic walkthrough · Jupyter notebook</a></li>
+    <li><a href="downloads/synthetic_pipeline_walkthrough.py" download>Original synthetic walkthrough · Python script</a></li>
+    <li><a href="examples/toy_dataset_loader.py" download>Legacy toy Dataset and DataLoader script</a></li>
+    <li><a href="examples/toy_rle_roundtrip.py" download>Legacy toy RLE round-trip script</a></li>
+    <li><a href="examples/toy_unet_step.py" download>Legacy toy U-Net step script</a></li>
+    </ul>"""
+    pages = {}
+    for url, (topic, target) in LEGACY_GUIDES.items():
+        title = f"Previously shared guide: {topic}"
+        target_title = LABELS[URLS.index(target)][1]
+        body = f"""<h1>{html.escape(topic)}</h1>
+        <p>This previously shared URL belongs to the earlier pipeline-oriented guide series.
+        Milestone 2 is now organized by assessment question; the earlier topics do not
+        all have exact replacements in the revised curriculum.</p>
+        <p>Start with <a href="{target}">{html.escape(target_title)}</a> to find the
+        relevant current material, or browse the <a href="index.html">current curriculum map</a>.</p>
+        <p>The <a href="walkthrough-notebook.html">legacy synthetic walkthrough and scripts</a>
+        remain available as reference downloads.</p>"""
+        pages[url] = (title, body)
+    pages["walkthrough-notebook.html"] = ("Legacy synthetic pipeline walkthrough", f"""
+        <h1>Legacy synthetic pipeline walkthrough</h1>{legacy_notice}{resources}
+        <p>For the current assessment, follow <a href="{URLS[8]}">Guide 7: Dataset contract</a>
+        and <a href="{URLS[9]}">Guide 8: Training dynamics</a>.</p>""")
+    nav = render_sidebar_nav(-1)
+    for url, (title, body) in pages.items():
+        page = f"""<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{html.escape(title)} · Milestone 2</title>
+<script>try {{ const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; }} catch {{}}</script>
+<link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script>
+</head><body data-overview="false" data-ai-help="off">
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span>
+<a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>Previously shared resources</p><div class="desktop-nav">{nav}</div>
+<details class="mobile-menu"><summary>Browse Milestone 2</summary>{nav}</details></aside>
+<main id="main"><div class="content"><span class="section-label">Legacy link · Current navigation</span>
+<article>{body}</article><nav class="pagination" aria-label="Return to current guides">
+<a href="index.html">← Current Milestone 2 guides</a></nav></div></main></div></body></html>"""
+        (output / url).write_text(page, encoding="utf-8")
+
+
 def build_milestone_two(output: Path):
     """Build all Milestone 2 question-wise pages from Markdown sources into output directory."""
     output.mkdir(parents=True, exist_ok=True)
@@ -109,22 +177,13 @@ def build_milestone_two(output: Path):
     titles = [item[1] for item in LABELS]
     mapping = {p.resolve(): url for p, url in zip(sources, URLS)}
 
-    # Clean up stale files
-    stale_files = ["walkthrough-notebook.html"]
-    for stale_file in stale_files:
-        stale_path = output / stale_file
-        if stale_path.is_file():
-            stale_path.unlink()
-    for stale_dir in ["downloads", "examples"]:
-        stale_path = output / stale_dir
-        if stale_path.is_dir():
-            shutil.rmtree(stale_path)
-
-    # Copy assets
-    if (SOURCE / "assets").is_dir():
-        if (output / "assets").is_dir():
-            shutil.rmtree(output / "assets")
-        shutil.copytree(SOURCE / "assets", output / "assets", dirs_exist_ok=True)
+    # Recreate resource directories so both clean and repeated builds agree.
+    for directory in ("assets", "downloads", "examples"):
+        destination = output / directory
+        if destination.is_dir():
+            shutil.rmtree(destination)
+        if (SOURCE / directory).is_dir():
+            shutil.copytree(SOURCE / directory, destination)
     if (output / "styles").is_dir():
         shutil.rmtree(output / "styles")
     shutil.copytree(ROOT / "styles/generative", output / "styles/generative", dirs_exist_ok=True)
@@ -167,12 +226,14 @@ def build_milestone_two(output: Path):
             resolved = (source.parent / unquote(parts.path)).resolve()
             if resolved in mapping:
                 target = mapping[resolved]
-            elif parts.path.startswith("assets/") or parts.path.startswith("downloads/"):
-                target = parts.path
-            elif (output / parts.path).exists():
-                target = parts.path
+            elif resolved.is_relative_to(SOURCE.resolve()) and resolved.relative_to(SOURCE.resolve()).parts[0] in {"assets", "downloads", "examples"}:
+                # Assessment Markdown lives at the repository root, whereas guide
+                # Markdown lives in SOURCE. Resolve before rebasing either form.
+                target = resolved.relative_to(SOURCE.resolve()).as_posix()
             else:
                 target = parts.path
+            if parts.query:
+                target += "?" + parts.query
             if parts.fragment:
                 target += "#" + parts.fragment
             return f'{attr}="{html.escape(target, quote=True)}"'
@@ -244,6 +305,8 @@ def build_milestone_two(output: Path):
             "url": URLS[i],
             "text": " ".join(parsed.text),
         })
+
+    build_legacy_pages(output)
 
     (output / "search.json").write_text(json.dumps(search, ensure_ascii=False), encoding="utf-8")
     print(f"Built {len(URLS)} question-wise Milestone 2 pages → {output}")

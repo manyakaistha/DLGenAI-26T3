@@ -32,7 +32,7 @@
 <ul>
 <li><a href="#1-architectural-paradigms-for-multi-defect-segmentation">1. Architectural Paradigms for Multi-Defect Segmentation</a></li>
 <li><a href="#2-the-pytorch-dataset-contract-for-paradigm-1">2. The PyTorch Dataset Contract for Paradigm 1</a></li>
-<li><a href="#3-why-must-the-target-mask-be-cast-to-torchfloat32">3. Why Must the Target Mask Be Cast to torch.float32?</a></li>
+<li><a href="#3-why-use-floating-point-target-masks-for-bce">3. Why Use Floating-Point Target Masks for BCE?</a></li>
 <li><a href="#4-guiding-hints-for-question-7">4. Guiding Hints for Question 7</a></li>
 <li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
 </ul>
@@ -54,19 +54,19 @@
 <p>Inspired by prompt-conditioned architectures such as <strong>OpenAI's Whisper</strong> (which uses prefix prompt tokens like <code>&lt;|en|&gt;</code> to dynamically steer task execution), segmentation is reframed as an interactive query: <em>"Here is a steel strip image; segment only defect class <span class="arithmatex">\(k\)</span>."</em></p>
 <div class="arithmatex">\[f_\theta : (\mathbf{X} \in \mathbb{R}^{3 \times H \times W}, c \in \{\text{defect_a}, \dots\}) \longrightarrow \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\]</div>
 <ul>
-<li><strong>Advantage (Dedicated Capacity):</strong> The decoder concentrates its entire parameter capacity on isolating one defect mechanism at a time, and training batches can be balanced across prompt queries.</li>
-<li><strong>Trade-off (Inference Latency):</strong> Evaluating a single test image across all four defect classes requires <strong>four separate forward passes</strong> (one per defect prompt).</li>
+<li><strong>Advantage (Class-Directed Prediction):</strong> The condition tells the model which defect to segment, and training batches can be balanced across class queries. A conditioned model normally shares learned parameters across queries; conditioning alone does not allocate a dedicated set of weights to each class.</li>
+<li><strong>Trade-off (Inference Cost):</strong> Producing all four classes requires four class-conditioned outputs. A simple implementation may run the entire model once per class, but other implementations can cache shared image features or batch class queries. The cost depends on where conditioning occurs; it is not necessarily four complete image-encoder passes.</li>
 </ul>
 <hr />
 <h2 id="2-the-pytorch-dataset-contract-for-paradigm-1">2. The PyTorch Dataset Contract for Paradigm 1</h2>
 <p>To train under <strong>Paradigm 1</strong>, your custom PyTorch <code>Dataset</code> subclass must implement:</p>
 <ul>
-<li><code>__len__</code>: Returns the total count of unique training images (<span class="arithmatex">\(N = 11{,}393\)</span>).</li>
+<li><code>__len__</code>: Returns the number of unique image IDs in <strong>this Dataset partition</strong>. The full training corpus contains <span class="arithmatex">\(11{,}393\)</span> images, but separate training and validation Datasets report their own subset sizes, not the full-corpus count.</li>
 <li><code>__getitem__(idx)</code>: Loads the <span class="arithmatex">\(idx\)</span>-th image from disk, normalizes pixel values to <span class="arithmatex">\([0.0, 1.0]\)</span> in shape <code>(3, 128, 800)</code>, decodes the four defect RLE masks into shape <code>(4, 128, 800)</code> with <code>torch.float32</code> dtype, and returns the tuple <code>(image, masks)</code>.</li>
 </ul>
 <p>When wrapped inside a PyTorch <code>DataLoader</code> with <code>batch_size = 4</code>, individual samples are collated along a new batch dimension, yielding 4-dimensional tensors of the form <span class="arithmatex">\([B, C, H, W]\)</span>.</p>
 <hr />
-<h2 id="3-why-must-the-target-mask-be-cast-to-torchfloat32">3. Why Must the Target Mask Be Cast to <code>torch.float32</code>?</h2>
+<h2 id="3-why-use-floating-point-target-masks-for-bce">3. Why Use Floating-Point Target Masks for BCE?</h2>
 <p>A common question in PyTorch segmentation is:</p>
 <blockquote>
 <p><em>"Since defect masks contain only binary values (0 for background and 1 for defect), why can't we store target masks as <code>torch.uint8</code> or <code>torch.bool</code>?"</em></p>
@@ -82,16 +82,18 @@
 <div class="arithmatex">\[\frac{\partial \mathcal{L}}{\partial z} = \sigma(z) - y\]</div>
 </li>
 <li>
-<p><strong>Hardware Kernel Execution:</strong> The predicted probability <span class="arithmatex">\(\sigma(z) = \frac{1}{1 + e^{-z}}\)</span> is a continuous <strong>floating-point value</strong> between <span class="arithmatex">\(0.0\)</span> and <span class="arithmatex">\(1.0\)</span>. The PyTorch C++/CUDA kernel computes the subtraction <span class="arithmatex">\(\sigma(z) - y\)</span> directly in floating-point registers. Therefore, the target tensor <span class="arithmatex">\(y\)</span> <strong>must share the exact same floating-point type (<code>torch.float32</code>)</strong> as the predicted logits <span class="arithmatex">\(z\)</span>.</p>
+<p><strong>Target Representation and PyTorch Operations:</strong> <code>BCEWithLogitsLoss</code> expects floating-point targets with the same shape as the logits and values in <span class="arithmatex">\([0, 1]\)</span>. Binary labels are therefore represented as <span class="arithmatex">\(0.0\)</span> and <span class="arithmatex">\(1.0\)</span>. Passing integer or boolean mask tensors is unsuitable for this loss's floating-point operations and can raise dtype/casting errors. Convert the masks before evaluating the loss.</p>
 </li>
 </ol>
+<p>For this assignment, use <code>torch.float32</code> masks as specified in Q7. A simple full-precision training loop uses float32 images, logits and masks. <strong>Float32 is a practical contract here, not the only floating-point type PyTorch supports:</strong> float64 loss calculations and supported mixed-precision combinations are also valid. The target and logit dtypes do not universally have to match exactly.</p>
+<p>The gradient formula above explains how predictions are adjusted toward the labels; it does not prove a requirement for identical dtypes. Targets normally do not require gradients. Feed raw logits into <code>BCEWithLogitsLoss</code> rather than applying sigmoid first; its fused formulation handles the sigmoid and binary cross-entropy stably.</p>
 <hr />
 <h2 id="4-guiding-hints-for-question-7">4. Guiding Hints for Question 7</h2>
 <p>To answer Question 7:</p>
 <ul>
 <li><strong>Hint 1 (Identify 4D Batch Shapes):</strong> Given a batch size of 4, 3 color channels, 4 defect classes, height 128, and width 800, write out the exact shapes <span class="arithmatex">\([B, C, H, W]\)</span> for both <code>images</code> and <code>masks</code>.</li>
 <li><strong>Hint 2 (Verify Channel Order):</strong> In Paradigm 1, mask channels strictly map to: Channel 0 <span class="arithmatex">\(\to\)</span> <code>defect_a</code>, Channel 1 <span class="arithmatex">\(\to\)</span> <code>defect_b</code>, Channel 2 <span class="arithmatex">\(\to\)</span> <code>defect_c</code>, Channel 3 <span class="arithmatex">\(\to\)</span> <code>defect_d</code>.</li>
-<li><strong>Hint 3 (Formulate the Loss Explanation):</strong> Explain why integer or boolean targets fail by highlighting the continuous gradient arithmetic <span class="arithmatex">\(\sigma(z) - y\)</span> inside the binary cross-entropy kernel.</li>
+<li><strong>Hint 3 (Formulate the Loss Explanation):</strong> Explain why BCE uses floating-point target values, state the float32 mask contract for this assignment, and distinguish that choice from a universal requirement that every target and logit dtype match exactly.</li>
 <li><strong>Hint 4 (Explore Paradigm 2 Differences):</strong> For the optional question, consider how the dataset item would change if each sample yielded a single-channel mask and a condition prompt token rather than a 4-channel tensor.</li>
 </ul>
 <hr />
@@ -100,7 +102,8 @@
 <li>Open <a href="milestone-2.html#question-7-pytorch-dataset-for-paradigm-1">Milestone 2 Assessment: Question 7</a>.</li>
 <li>Implement your PyTorch <code>SurfaceAnomalyDataset</code> and DataLoader under Paradigm 1.</li>
 <li>Extract the first batch and report <code>images_shape, masks_shape, dtype, brief_loss_explanation</code>.</li>
-</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html">← Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_08_training_dynamics_and_convergence.html">Q8 · Training Dynamics &amp; Convergence →</a></nav>
+</ol>
+<p>Reference: PyTorch’s <a href="https://docs.pytorch.org/docs/2.8/data.html">Dataset and DataLoader documentation</a> and <a href="https://docs.pytorch.org/docs/2.8/generated/torch.nn.BCEWithLogitsLoss.html"><code>BCEWithLogitsLoss</code> documentation</a> describe these interface and loss contracts.</p></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html">← Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_08_training_dynamics_and_convergence.html">Q8 · Training Dynamics &amp; Convergence →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>

@@ -19,7 +19,7 @@ Every study guide corresponds directly to an assessment question in [`MILESTONE_
 | **Question 4** | [Guide 4: Multi-Label Defect Co-Occurrence Matrix](guide_04_defect_cooccurrence_matrix.md) | Compound manufacturing errors, multi-label indicator vectors, $4 \times 4$ co-occurrence matrix formulation $C = \mathbf{Y}^T \mathbf{Y}$, joint failure patterns. | Formulating symmetric indicator matrices, diagonal vs. off-diagonal pairs. |
 | **Question 5** | [Guide 5: Co-Occurrence vs. Correlation (The Base-Rate Effect)](guide_05_cooccurrence_vs_correlation_base_rate.md) | The Base-Rate Fallacy in defect associations, expected independent co-occurrence, Pearson correlation coefficient ($\phi$ coefficient) for binary vectors. | Normalizing co-occurrence for marginal base rates, interpreting correlation values. |
 | **Question 6** | [Guide 6: Pixel-Level Spatial Overlap & Mutual Exclusivity](guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.md) | Image-level co-occurrence vs. pixel-level spatial intersection, pairwise mask overlap $|M_i \cap M_j|$, pairwise Dice, 4-Sigmoid vs. 5-Softmax head validity. | Multi-label mask decoding, pairwise pixel intersection checks, architectural validity. |
-| **Question 7** | [Guide 7: PyTorch Dataset Architecture & Loss Typing](guide_07_pytorch_dataset_and_architectural_paradigms.md) | Multi-Channel Joint Prediction (Paradigm 1) vs. Prompt-Conditioned Segmentation (Paradigm 2), PyTorch `Dataset` contract, 4D tensor collation $[B, C, H, W]$, why `BCEWithLogitsLoss` requires `torch.float32`. | Dataset methods contract, tensor dimensions, floating-point gradient arithmetic in BCE. |
+| **Question 7** | [Guide 7: PyTorch Dataset Architecture & Loss Typing](guide_07_pytorch_dataset_and_architectural_paradigms.md) | Multi-Channel Joint Prediction (Paradigm 1) vs. Prompt-Conditioned Segmentation (Paradigm 2), PyTorch `Dataset` contract, 4D tensor collation $[B, C, H, W]$, floating-point targets for `BCEWithLogitsLoss` and the assignment’s `torch.float32` mask contract. | Dataset methods contract, tensor dimensions, floating-point target representation in BCE. |
 | **Question 8** | [Guide 8: Baseline Model Training Dynamics & Convergence](guide_08_training_dynamics_and_convergence.md) | 5-epoch baseline U-Net training lifecycle, monitoring train vs. val loss trajectories, diagnosing underfitting vs. overfitting, optimal checkpoint selection. | Tracking epoch loss pairs, diagnosing generalization regimes, checkpoint selection. |
 
 ---
@@ -31,7 +31,7 @@ In Milestone 2, you also explore two fundamentally different paradigms for formu
 1. **Paradigm 1: Multi-Channel Joint Prediction (Concurrent Multi-Task):**
    A shared encoder-decoder backbone processes the steel strip and concurrently predicts all four defect channels in a single forward pass ($f_\theta: \mathbf{X} \in \mathbb{R}^{3 \times H \times W} \to \mathbf{\hat{Y}} \in \mathbb{R}^{4 \times H \times W}$). Highly throughput-efficient, but subject to gradient competition between dominant and rare classes.
 2. **Paradigm 2: Conditioned / Prompted Segmentation (Query-Based):**
-   Inspired by Whisper's prefix prompt conditioning tokens, segmentation is reframed as an interactive query ($f_\theta: (\mathbf{X}, c) \to \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}$). Dedicated parameter capacity per defect query, but requires $4\times$ inference passes per image.
+   Inspired by Whisper's prefix prompt conditioning tokens, segmentation is reframed as an interactive query ($f_\theta: (\mathbf{X}, c) \to \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}$). Class-directed outputs normally share learned parameters. Predicting all four classes needs four conditioned outputs, but queries may be batched or shared image features cached; inference cost depends on the implementation.
 
 ---
 
@@ -42,3 +42,8 @@ In Milestone 2, you also explore two fundamentally different paradigms for formu
 3. **Write and run your own Python scripts** against `data/public/` to solve the real task described in the "Your Assignment Task" section of each guide.
 4. Enter your final answers into the assessment sheet:
    👉 [`MILESTONE_2.md`](../../MILESTONE_2.md)
+
+
+## Previously Shared Resources
+
+Earlier pipeline-oriented URLs remain available through compatibility pages. The [legacy synthetic walkthrough and downloads](walkthrough-notebook.html) use a grayscale/dictionary contract; they are reference material rather than the RGB/tuple Dataset contract required by current Q7.

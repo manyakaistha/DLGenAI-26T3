@@ -34,6 +34,7 @@
 <li><a href="#curriculum-map-questions-guided-learning-modules">Curriculum Map: Questions &amp; Guided Learning Modules</a></li>
 <li><a href="#architectural-formulations-overview">Architectural Formulations Overview</a></li>
 <li><a href="#how-to-work-through-milestone-2">How to Work Through Milestone 2:</a></li>
+<li><a href="#previously-shared-resources">Previously Shared Resources</a></li>
 </ul>
 </div>
 </details>
@@ -93,8 +94,8 @@
 <tr>
 <td style="text-align: left;"><strong>Question 7</strong></td>
 <td style="text-align: left;"><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html">Guide 7: PyTorch Dataset Architecture &amp; Loss Typing</a></td>
-<td style="text-align: left;">Multi-Channel Joint Prediction (Paradigm 1) vs. Prompt-Conditioned Segmentation (Paradigm 2), PyTorch <code>Dataset</code> contract, 4D tensor collation <span class="arithmatex">\([B, C, H, W]\)</span>, why <code>BCEWithLogitsLoss</code> requires <code>torch.float32</code>.</td>
-<td style="text-align: left;">Dataset methods contract, tensor dimensions, floating-point gradient arithmetic in BCE.</td>
+<td style="text-align: left;">Multi-Channel Joint Prediction (Paradigm 1) vs. Prompt-Conditioned Segmentation (Paradigm 2), PyTorch <code>Dataset</code> contract, 4D tensor collation <span class="arithmatex">\([B, C, H, W]\)</span>, floating-point targets for <code>BCEWithLogitsLoss</code> and the assignment’s <code>torch.float32</code> mask contract.</td>
+<td style="text-align: left;">Dataset methods contract, tensor dimensions, floating-point target representation in BCE.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Question 8</strong></td>
@@ -114,7 +115,7 @@
 </li>
 <li>
 <p><strong>Paradigm 2: Conditioned / Prompted Segmentation (Query-Based):</strong>
-   Inspired by Whisper's prefix prompt conditioning tokens, segmentation is reframed as an interactive query (<span class="arithmatex">\(f_\theta: (\mathbf{X}, c) \to \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\)</span>). Dedicated parameter capacity per defect query, but requires <span class="arithmatex">\(4\times\)</span> inference passes per image.</p>
+   Inspired by Whisper's prefix prompt conditioning tokens, segmentation is reframed as an interactive query (<span class="arithmatex">\(f_\theta: (\mathbf{X}, c) \to \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\)</span>). Class-directed outputs normally share learned parameters. Predicting all four classes needs four conditioned outputs, but queries may be batched or shared image features cached; inference cost depends on the implementation.</p>
 </li>
 </ol>
 <hr />
@@ -125,7 +126,9 @@
 <li><strong>Write and run your own Python scripts</strong> against <code>data/public/</code> to solve the real task described in the "Your Assignment Task" section of each guide.</li>
 <li>Enter your final answers into the assessment sheet:
    👉 <a href="milestone-2.html"><code>MILESTONE_2.md</code></a></li>
-</ol></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="milestone-2.html">Milestone 2 questions →</a></nav>
+</ol>
+<h2 id="previously-shared-resources">Previously Shared Resources</h2>
+<p>Earlier pipeline-oriented URLs remain available through compatibility pages. The <a href="walkthrough-notebook.html">legacy synthetic walkthrough and downloads</a> use a grayscale/dictionary contract; they are reference material rather than the RGB/tuple Dataset contract required by current Q7.</p></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="milestone-2.html">Milestone 2 questions →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
