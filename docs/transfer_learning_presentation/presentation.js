@@ -185,8 +185,8 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
 })();
 
 // The presentation uses the same seeded garden language as the reading site:
-// procedural stems, leaves and spiral blooms keep the frame alive without
-// becoming another piece of slide content. Geometry is generated once, then
+// miniature stems, leaves and spiral blooms form a quiet footer signature.
+// Geometry is generated once, then
 // rendered deterministically at the current time.
 (() => {
   'use strict';
@@ -197,9 +197,8 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   if (!ctx) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const root = document.documentElement;
-  const stage = document.querySelector('#stage');
   let width = 0, height = 0, dpr = 1, visible = true, frame = 0;
-  let lastNow = performance.now(), elapsed = 0, birth = performance.now();
+  let lastNow = performance.now(), elapsed = 0;
   let palette = {};
 
   function mulberry32(seed) {
@@ -212,24 +211,18 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     };
   }
   const rand = mulberry32(261026);
-  const plants = [
-    [.94, .17, -.025], [1.01, .30, .045], [.95, .46, -.03],
-    [.88, .64, .02], [.08, .78, -.03], [.02, .59, .04], [.05, .92, .025]
-  ].map(([x, y, bend], i) => ({
-    x, y, bend,
-    curve: [[x + bend, 1.025], [x + bend, .70], [x - .014, .43], [x, y]],
-    radius: 12 + rand() * 9,
-    phase: rand() * Math.PI * 2,
-    petals: 5 + Math.floor(rand() * 3),
-    leaves: 3 + Math.floor(rand() * 2),
-    depth: i < 4 ? .94 : .68
-  }));
-  const pollen = Array.from({length:34}, () => ({
-    x: rand() < .55 ? .72 + rand() * .3 : rand() * .3,
-    y: .08 + rand() * .86,
-    size: .8 + rand() * 2.5,
-    alpha: .12 + rand() * .2
-  }));
+  // A miniature specimen group, confined to the footer's empty centre.
+  // Use the reading site's flower contour/spiral, at a much quieter scale.
+  const plants = [[.27,.38,-.08],[.52,.24,.04],[.76,.48,.08]]
+    .map(([x,y,bend]) => ({
+      x, y, bend,
+      curve: [[x+bend,.96],[x+bend,.72],[x-.025,.54],[x,y]],
+      radius: 5 + rand() * 1.7,
+      phase: rand() * Math.PI * 2,
+      petals: 5 + Math.floor(rand() * 3),
+      leaves: 2,
+      depth: .78
+    }));
   for (const p of plants) {
     p.contour = Array.from({length:73}, (_, i) => {
       const a = i / 72 * Math.PI * 2;
@@ -258,8 +251,8 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     palette = Object.fromEntries(['line','stem','flower','flower-line'].map(name => [name, styles.getPropertyValue(`--${name}`).trim()]));
   }
   function resize() {
-    width = Math.max(1, canvas.clientWidth || stage?.clientWidth || 1280);
-    height = Math.max(1, canvas.clientHeight || stage?.clientHeight || 720);
+    width = Math.max(1, canvas.clientWidth || 112);
+    height = Math.max(1, canvas.clientHeight || 42);
     dpr = Math.min(devicePixelRatio || 1, 2.5);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -287,7 +280,6 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     ctx.rotate(Math.sin(time * .00045 + p.phase) * .07);
     ctx.scale(scale, scale);
     ctx.globalAlpha = alpha;
-    const r = p.radius;
     // A scalloped outer contour matches the reading site's inked blossoms.
     ctx.beginPath();
     for (let i = 0; i < p.contour.length; i++) {
@@ -298,7 +290,7 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     ctx.fillStyle = palette.flower;
     ctx.strokeStyle = palette['flower-line'];
     ctx.lineWidth = 1.1;
-    ctx.fill(); ctx.stroke();
+    ctx.fill();
     // Fine spiral linework keeps the blooms from reading as flat stickers.
     ctx.beginPath();
     for (let i = 0; i < p.spiral.length; i++) {
@@ -306,10 +298,6 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.strokeStyle = palette['flower-line']; ctx.lineWidth = .85; ctx.stroke();
-    ctx.beginPath(); ctx.arc(0, 0, r * .16, 0, Math.PI * 2);
-    ctx.fillStyle = palette['flower-line']; ctx.fill();
-    ctx.beginPath(); ctx.arc(0, 0, r * .16, 0, Math.PI * 2);
-    ctx.strokeStyle = palette.stem; ctx.lineWidth = .7; ctx.stroke();
     ctx.restore();
   }
   function draw(now) {
@@ -319,32 +307,18 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
     const motionOn = !reduced.matches && motionButton?.getAttribute('aria-pressed') !== 'true';
     if (motionOn && visible && !document.hidden) elapsed += dt;
     const time = motionOn ? elapsed : 0;
-    const grow = motionOn ? easeOut((now - birth) / 1100) : 1;
+    const grow = motionOn ? easeOut(elapsed / 1100) : 1;
     ctx.clearRect(0, 0, width, height);
 
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = palette.line; ctx.lineWidth = .55; ctx.globalAlpha = .38;
-    for (let i = 0; i < 5; i++) {
-      const y = height * (.17 + i * .16);
-      ctx.beginPath(); ctx.moveTo(width * .04, y); ctx.lineTo(width * .96, y); ctx.stroke();
-    }
-    for (const dot of pollen) {
-      ctx.globalAlpha = dot.alpha;
-      ctx.fillStyle = palette.stem;
-      ctx.fillRect(dot.x * width, dot.y * height, dot.size, dot.size);
-    }
-
-    const boil = Math.floor(time / 110);
     for (const p of plants) {
-      const sway = motionOn ? Math.sin(time * .0006 + p.phase) * Math.min(3.2, width * .004) : 0;
-      const jitter = Math.sin(boil * 1.71 + p.phase * 5.3) * .8;
+      const sway = motionOn ? Math.sin(time * .0006 + p.phase) * Math.min(.55, width * .004) : 0;
+
       const x = p.x * width + sway;
       const y = p.y * height;
-      // The normalized curve is seeded once above; only its gentle sway and
-      // discrete line-boil offset change between frames.
+      // The normalized curve is seeded once; only a subpixel sway changes.
       const path = p.curve.map(([px, py], i) => [
-        px * width + (i === 2 ? jitter : 0) + (i > 1 ? sway : sway * .35),
-        py * height + (i === 0 ? 18 : 0)
+        px * width + (i > 1 ? sway : sway * .35),
+        py * height
       ]);
       const stemGrowth = clamp(grow * 1.14);
       ctx.globalAlpha = p.depth;
@@ -353,16 +327,16 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
         const point = cubic(path, i / 36 * stemGrowth);
         if (i === 0) ctx.moveTo(point[0], point[1]); else ctx.lineTo(point[0], point[1]);
       }
-      ctx.strokeStyle = palette.stem; ctx.lineWidth = 1.35; ctx.lineCap = 'round'; ctx.stroke();
+      ctx.strokeStyle = palette.stem; ctx.lineWidth = .8; ctx.lineCap = 'round'; ctx.stroke();
       for (let j = 0; j < p.leaves; j++) {
-        const t = .18 + j * .16;
+        const t = .28 + j * .27;
         if (t > stemGrowth) continue;
         const point = cubic(path, t);
         const side = j % 2 ? -.58 : -2.46;
-        drawLeaf(point[0], point[1], side + jitter * .01, 13 + j * 2.3, clamp((stemGrowth - t) * 5), p.depth * .72);
+        drawLeaf(point[0], point[1], side, 5 + j * .8, clamp((stemGrowth - t) * 5), p.depth * .72);
       }
       const bloomProgress = clamp((grow - .52) / .48);
-      if (bloomProgress > 0) drawBloom(p, x, y, spring(bloomProgress) * (width < 700 ? .74 : 1), time, p.depth);
+      if (bloomProgress > 0) drawBloom(p, x, y, spring(bloomProgress), time, p.depth);
     }
     if (motionOn && visible && !document.hidden) frame = requestAnimationFrame(draw);
   }

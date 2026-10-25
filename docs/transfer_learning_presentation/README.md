@@ -10,10 +10,11 @@ study Markdown, seven existing reading labs, and notebooks are unchanged.
   (slide content and activities). No framework, runtime packages, CDN, or font download.
 - The header palette picker follows the main site themes (`paper`, `midnight`,
   `moss`, `butter`, `blush`, `mono`) and remembers the selected theme locally.
-  The deck keeps a seeded, theme-aware botanical canvas decorative and clear of
-  slide content. Its stems, leaves and spiral blooms share the main study
-  site's garden language, with Retina scaling, deterministic geometry,
-  line-boil jitter, reduced-motion/static fallback, and offscreen pausing.
+  Three miniature blooms occupy a dedicated 112 × 42 px footer canvas (34 px
+  high on phones), clear of slide content and navigation. Their scalloped
+  silhouettes, spiral linework and leaves match the main site. Seeded geometry,
+  Retina scaling, subpixel sway, reduced-motion/static fallback and hidden/
+  offscreen pausing keep the decoration quiet. No background rules or pollen.
 - The builder embeds styles, JavaScript and the attributed existing MRI contact
   sheet into one HTML file. Download it from Slide index for offline presentation.
   Links to the full study guides and external dataset still require internet.

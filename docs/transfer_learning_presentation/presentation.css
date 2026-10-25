@@ -107,3 +107,29 @@ dialog{border:1px solid var(--line);border-radius:16px;padding:30px;background:v
   .deck-footer{position:static;left:auto;right:auto;bottom:auto;height:auto;min-height:70px;margin:0 12px;padding:13px 0;background:var(--paper);border-top:1px solid var(--line)}.tools{gap:2px}.tools button,.tools a{font-size:10px;padding:7px}.tools #fullscreen{display:none}.tools a{max-width:62px}.paging{gap:4px}.paging button{font-size:19px;padding:7px 11px}.paging span{font-size:10px;min-width:55px}
   h1{font-size:43px}h2{font-size:33px}h3{font-size:20px}.lede{font-size:17px}p{font-size:18px}.small{font-size:15px}.concept-list p{font-size:17px}.panel.blue{padding:18px!important}.shape-steps{height:175px}.conv-layout{gap:16px 12px}.conv-layout .pixel{width:25px;height:25px}.threshold-layout{gap:14px 8px}.threshold-layout .grid-label{max-width:140px}.threshold-layout .pixel{width:23px;height:23px}.threshold-layout>div:last-child{gap:10px;flex-wrap:wrap}.threshold-layout>div:last-child p{font-size:12px}.soft-layout{gap:16px}.soft-layout .pixel{width:25px;height:25px}.code{font-size:14px}.check-table{font-size:14px}.check-table td,.check-table th{padding:8px 4px}.check-table select{font-size:12px;max-width:120px}.mri-image{height:190px}.curve-svg{height:auto;aspect-ratio:575/275}.summary-line p{font-size:17px}
 }
+
+/* Quiet botanical signature: decoration has its own space, never behind a slide. */
+@media screen {
+  .botanical-canvas{inset:auto;left:50%;bottom:0;transform:translateX(-50%);width:112px;height:42px;opacity:.8}
+  .deck-footer{isolation:isolate}
+  .deck-footer .tools,.deck-footer .paging{position:relative;z-index:1}
+  .body>.panel:has([data-lab]){box-shadow:none}
+  .panel,.hero .body>.panel{border-radius:8px!important}
+  .feature-map{box-shadow:3px 3px 0 color-mix(in srgb,var(--stem) 6%,transparent)}
+  .eyebrow,.tag,.deck-header #chapter{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:400}
+  .eyebrow{color:var(--muted)}
+  .hero-left p{max-width:530px;line-height:1.5}
+  .hero-left p.small{max-width:460px}
+  .panel.blue{background:var(--panel)!important;color:var(--ink);border-color:var(--line)}
+  .panel.blue .muted,.panel.blue .note-line{color:var(--muted)}
+  .panel.blue a{color:var(--blue)}
+  .summary-line span{font-size:23px;color:var(--muted)}
+  #progress{height:2px;opacity:.65}
+}
+@media(max-width:700px){
+  .deck-footer{flex-wrap:wrap;row-gap:8px;padding-top:8px}
+  .botanical-canvas{position:relative;left:auto;bottom:auto;transform:none;flex:0 0 112px;margin-inline:calc((100% - 112px)/2);height:34px;width:112px;opacity:.8}
+  .deck-footer .tools{flex:1}
+  .slide{padding-bottom:44px}
+}
+@media print{.botanical-canvas{display:none}}
