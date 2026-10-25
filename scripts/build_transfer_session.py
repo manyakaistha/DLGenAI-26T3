@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 from build_live_session import build as render_session
 from build_transfer_learning_notebook import build as build_notebook
+from build_transfer_presentation import build as build_presentation
 from build_student_hub import validate_site
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +44,7 @@ def build(out):
                                  topline='26 October · Milestone 3 live session',
                                  kicker='Inspect. Reuse. Compare.', hero='From features<br>to evidence.',
                                  caption='Understand the mechanism. Test the idea.', download_label='Classroom notebook ↓'))
+    build_presentation(out / 'presentation')
     validate_site(out)
 
 

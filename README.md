@@ -56,3 +56,10 @@ Detailed study notes explain encoder–decoder mechanics, pretrained initializat
 - [Optional complete MRI experiment](docs/transfer_learning_live_session/notebook.md)
 
 Original technical depth, code examples and interactive controls are preserved. Dataset preparation and full training remain optional; dataset attribution and license are documented in the application notes.
+
+
+## Interactive live presentation · 26 October
+
+[Open the 16:9 presentation](https://manyakaistha.github.io/DLGenAI-26T3/session-3/presentation/) alongside the unchanged detailed study guides. It contains 21 core slides, three optional MRI stops, step-through diagrams and numerical activities. Use arrows, the slide index and fullscreen; download the standalone HTML from the index to present offline.
+
+Sources and controls: [presentation README](docs/transfer_learning_presentation/README.md). Build independently with `uv run --no-project python scripts/build_transfer_presentation.py`, or use the website build above.

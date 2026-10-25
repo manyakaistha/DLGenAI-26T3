@@ -32,8 +32,10 @@ def exits(parent, home):
 
 def cards(items, current, action):
     return '<div class="resource-list">' + ''.join(
-        f'<a class="resource-card" href="{relative(url, current)}"><span class="resource-meta">{html.escape(meta)}</span>'
+        '<div>' + f'<a class="resource-card" href="{relative(url, current)}"><span class="resource-meta">{html.escape(meta)}</span>'
         f'<h2>{html.escape(title)}</h2><p>{html.escape(description)}</p><span class="resource-action">{action} →</span></a>'
+        + (f'<p><a href="{relative("session-3/presentation/index.html", current)}">Present the 26 October session · interactive slides →</a></p>'
+           if url == 'session-3/index.html' else '') + '</div>'
         for url, meta, title, description in items) + '</div>'
 
 
