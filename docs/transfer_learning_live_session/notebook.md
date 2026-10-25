@@ -1,4 +1,12 @@
-# 7. Run the companion notebook
+# Optional MRI application: the complete experiment
+
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page preserves the complete real-data experiment and setup instructions. Run it when you want to apply the concepts; dataset download and a full training run are optional for following the main notes.</p>
+<a href="README.md">Return to the session overview →</a>
+</div>
+
+For a smaller, data-free walkthrough of encoder features and one decoder join: [classroom notebook](classroom_walkthrough.ipynb) · [Python version](classroom_walkthrough.py). The complete MRI notebook is introduced below.
 
 The notebook is a complete teaching pipeline for the supplied MRI TIFF dataset. It creates a paired index, splits patients, inspects feature shapes, verifies a first-convolution identity, trains two matched models and saves comparable validation evidence. It does not import this repository’s industrial training code.
 
@@ -72,3 +80,6 @@ A classroom checkpoint is a local artifact, not bundled website content. Downloa
 - **Changing a cell has no effect:** recreate the dataset/model/optimizer objects that captured the old configuration, or restart and run all cells in order.
 
 Return to the [session overview](README.md).
+
+
+[Finish this optional application and continue →](README.md)

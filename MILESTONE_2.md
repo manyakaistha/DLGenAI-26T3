@@ -19,7 +19,7 @@ $$\text{"start length start length ..."}$$
 
 which directly reference the 1D flattened column-major memory array.
 
-![2D Pixel Grid (8 x 8)](assets/fig_q1_rle_grid_8x8.png)
+![2D Pixel Grid (8 x 8)](docs/milestone_2_student_guide/assets/fig_q1_rle_grid_8x8.png)
 
 **Question:** Inspect the provided 2D pixel grid of size $8 \times 8$ in the figure above. What is the exact Run-Length Encoded (RLE) string for this mask?
 

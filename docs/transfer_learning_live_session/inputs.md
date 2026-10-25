@@ -1,4 +1,10 @@
-# 4. Prepare MRI channels for an ImageNet encoder
+# Optional MRI application: channels and normalization
+
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page applies pretrained input requirements to MRI sequences. It includes the original normalization, grayscale adaptation and implementation explanations.</p>
+<a href="finetuning.md">Continue with freezing and fine-tuning →</a>
+</div>
 
 The encoder’s first convolution expects three channels. Our TIFF also has three channels. The shapes fit, but the meanings differ: **pre-contrast, FLAIR, post-contrast are not red, green and blue**.
 
@@ -72,3 +78,6 @@ The channels represent different MRI sequences, not visible-light color. Hue/sat
 </details>
 
 Next: [freezing and fine-tuning](finetuning.md).
+
+
+[Finish this optional application and continue →](finetuning.md)

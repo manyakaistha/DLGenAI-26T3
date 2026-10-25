@@ -1,4 +1,4 @@
-# 6. Evaluate the evidence
+# 4. Evaluate the evidence
 
 You have already used BCE–Dice. Keep it fixed while testing pretraining. This page connects that familiar training objective to the evidence needed for a model comparison.
 
@@ -8,7 +8,7 @@ Let `z` be raw logits and `y` a binary mask. The numerically stable BCE term is 
 
 $$L_{\mathrm{Dice}}=1-\frac{2\sum py+\epsilon}{\sum p+\sum y+\epsilon}$$
 
-The notebook sums spatial dimensions per sample, then averages samples. Its fixed objective is `BCE + DiceLoss`, with epsilon `1e-6`. This is one explicit reduction convention; a batch-global Dice loss would weight examples differently. Neither term thresholds probabilities during training.
+In the binary-mask example below, we sum spatial dimensions per sample, then averages samples. Its fixed objective is `BCE + DiceLoss`, with epsilon `1e-6`. This is one explicit reduction convention; a batch-global Dice loss would weight examples differently. Neither term thresholds probabilities during training.
 
 ```python
 probability = torch.sigmoid(logits)
@@ -38,6 +38,13 @@ Our lesson assigns Dice 1 when both prediction and target are empty, and 0 when 
 <p><strong>Threshold and empty-mask lab.</strong> Inspect a fixed synthetic 8 × 8 probability field. Move the threshold and switch between a foreground target and an empty target. Read TP, FP, FN and hard Dice. These are exact calculations on a toy array, not MRI model predictions.</p>
 </div>
 
+## Do not let empty targets dominate the story
+
+A mean over samples can look high when many targets are empty. Check foreground examples and false positives on empty targets alongside your main metric. If several samples come from the same source, choose and state whether that source should receive equal weight rather than letting its sample count decide the weighting.
+
+<details class="optional-mri">
+<summary>Optional MRI application: patient-level aggregation and empty slices</summary>
+
 ## Do not let empty slices dominate the story
 
 A mean over slices gives patients with many slices more influence and can look high if many targets are empty. The notebook reports several distinct views:
@@ -49,9 +56,18 @@ A mean over slices gives patients with many slices more influence and can look h
 
 An undefined subgroup, such as no foreground slices in a tiny validation subset, is reported as unavailable rather than silently treated as 0 or 1. Do not compare these MRI summaries numerically with the industrial competition’s different scoring formula.
 
+</details>
+
 ## Inspect the same validation examples
 
-Choose validation examples by a documented rule independent of predictions. The notebook takes the first foreground and first empty slice in sorted validation order where available. For both arms, show the same FLAIR image, reference mask, predicted mask and probability overlay. An overlay helps reveal whether improvement comes from fewer false alarms, more complete regions or a boundary change.
+Choose validation examples by a documented rule independent of predictions. For both arms, inspect the same input, reference mask, predicted mask and probability overlay. This helps reveal whether a change comes from fewer false alarms, more complete regions or a boundary change.
+
+<details class="optional-mri">
+<summary>Optional MRI application: how the full notebook selects its figures</summary>
+
+The notebook takes the first foreground and first empty slice in sorted validation order where available. For both arms, show the same FLAIR image, reference mask, predicted mask and probability overlay. An overlay helps reveal whether improvement comes from fewer false alarms, more complete regions or a boundary change.
+
+</details>
 
 Do not pick a different easy example for each model. Save curves, per-patient metrics and the configuration, not only the nicest picture.
 
@@ -75,6 +91,9 @@ The complete pipeline performed differently under that evaluation, but you canno
 
 ## Your evidence checklist
 
-Save the patient split, selected slice manifest, seed, library versions, input settings, weight source, decoder start, loss, optimizer, batch size, training budget and fixed threshold. Include curves, per-patient outcomes and common prediction panels. Write one modest conclusion supported by those artifacts.
+Save the train/validation split, selected sample manifest, seed, library versions, input settings, weight source, decoder start, loss, optimizer, batch size, training budget and fixed threshold. Include curves, group-level outcomes where appropriate, and common prediction panels. Write one modest conclusion supported by those artifacts.
 
-Next: [run the notebook](notebook.md).
+<div class="lesson-note">
+<strong>Optional MRI practice — run the complete application.</strong>
+<a href="notebook.md">Read the real-data notebook setup and experiment walkthrough</a>. You can also use the <a href="classroom_walkthrough.ipynb">smaller concept notebook</a> or <a href="README.md">return to the session overview</a>.
+</div>

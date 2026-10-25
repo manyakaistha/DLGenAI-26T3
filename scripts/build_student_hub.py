@@ -26,8 +26,8 @@ SESSIONS = [
      'Revisit label counts, output heads and run-length encoding. Practice experiment tracking in the W&B notebook lab.'),
     ('session-2/index.html', '19 October 2026 · Session 2', 'Dataset, DataLoader & Augmentations',
      'Follow a sample from CSV row to training batch. Explore the split, paired transformations, interactive labs and notebook.'),
-    ('session-3/index.html', '26 October 2026 · Session 3', 'MRI Transfer Learning: From a Baseline to a Pretrained Encoder',
-     'Explore patient-level splits, MRI sequence channels, pretrained features, freezing and fine-tuning, then run a fair initialization comparison.'),
+    ('session-3/index.html', '26 October 2026 · Session 3', 'From a Baseline U-Net to a Pretrained Encoder',
+     'Detailed encoder-decoder, transfer-learning, fine-tuning and evaluation notes, with optional MRI applications placed alongside the relevant concepts.'),
 ]
 
 
@@ -42,8 +42,10 @@ def exits(parent, home):
 
 def cards(items, current, action):
     return '<div class="resource-list">' + ''.join(
-        f'<a class="resource-card" href="{relative(url, current)}"><span class="resource-meta">{html.escape(meta)}</span>'
+        '<div>' + f'<a class="resource-card" href="{relative(url, current)}"><span class="resource-meta">{html.escape(meta)}</span>'
         f'<h2>{html.escape(title)}</h2><p>{html.escape(description)}</p><span class="resource-action">{action} →</span></a>'
+        + (f'<p><a href="{relative("session-3/presentation/index.html", current)}">Present the 26 October session · interactive slides →</a></p>'
+           if url == 'session-3/index.html' else '') + '</div>'
         for url, meta, title, description in items) + '</div>'
 
 
