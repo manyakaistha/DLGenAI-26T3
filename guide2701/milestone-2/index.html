@@ -1,20 +1,21 @@
 <!doctype html>
 <html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Milestone 2 Overview · Milestone 2 Student Guide</title>
-<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<title>Milestone 2 Overview · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 2 student study guides: question-wise conceptual guides, PyTorch datasets, co-occurrence, spatial overlap, and baseline U-Net training dynamics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="true">
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="true" data-ai-help="study">
 <div class="reading-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a><div class="layout">
-<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
-<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>From tensors to submissions. Understand. Build. Validate.</p>
 <details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
 <button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
 <button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
@@ -23,156 +24,108 @@
 <button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
 <button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
 </div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
-<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
-<footer><span>Milestone 2 Student Guides</span></footer></aside>
-<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html" aria-current="page"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Student learning resources</span><a href="milestone-2.html">View questions ↗</a></div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
-<span class="section-label">Milestone 2 Overview</span><details class="toc"><summary>On this page</summary><div class="toc">
+<span class="section-label">Study guide overview</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
 <li><a href="#building-the-segmentation-pipeline-first-submission">Building the Segmentation Pipeline &amp; First Submission</a></li>
-<li><a href="#1-prerequisites-from-milestone-1">1. Prerequisites from Milestone 1</a></li>
-<li><a href="#2-curriculum-map-milestone-2-topics-study-guides">2. Curriculum Map: Milestone 2 Topics &amp; Study Guides</a></li>
-<li><a href="#3-guide-overviews-learning-sequence">3. Guide Overviews &amp; Learning Sequence</a></li>
-<li><a href="#4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</a></li>
-<li><a href="#5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</a></li>
+<li><a href="#curriculum-map-questions-guided-learning-modules">Curriculum Map: Questions &amp; Guided Learning Modules</a></li>
+<li><a href="#architectural-formulations-overview">Architectural Formulations Overview</a></li>
+<li><a href="#how-to-work-through-milestone-2">How to Work Through Milestone 2:</a></li>
 </ul>
 </div>
 </details>
 <article><h1 id="milestone-2-student-study-guides">Milestone 2 Student Study Guides</h1>
 <h2 id="building-the-segmentation-pipeline-first-submission">Building the Segmentation Pipeline &amp; First Submission</h2>
-<p>Welcome to Milestone 2 of the Industrial Surface Anomaly Segmentation project!</p>
-<p>In Milestone 1, you inspected raw annotations, unraveled Run-Length Encoding (RLE) memory layouts, examined the metric penalty on empty masks, and explored the physical constraints of line-scan imaging sensors. In <strong>Milestone 2</strong>, you move from analytical observation to active systems engineering: <strong>designing, training, and validating your first complete deep learning segmentation pipeline, and generating a valid Kaggle submission file</strong>.</p>
+<p>Welcome to Milestone 2! In Milestone 1, you inspected raw annotations, unraveled Run-Length Encoding (RLE) memory layouts, explored line-scan sensor geometry, and studied metric sensitivity. </p>
+<p>In Milestone 2, you move from analytical observation to <strong>active systems engineering</strong>: mastering RLE encoding and decoding on 2D grids, analyzing global defect prevalence and multi-label co-occurrence patterns, testing physical pixel-level exclusivity, choosing between multi-channel and prompt-conditioned architectures, and implementing a robust PyTorch training pipeline to diagnose model convergence.</p>
 <hr />
-<h2 id="1-prerequisites-from-milestone-1">1. Prerequisites from Milestone 1</h2>
-<p>Before embarking on Milestone 2, ensure you are comfortable with these core concepts established in Milestone 1:</p>
-<ol>
-<li><strong>Aspect Ratio Awareness</strong>: Industrial line-scan images are <span class="arithmatex">\(800 \times 128\)</span> pixels (<span class="arithmatex">\(6.25:1\)</span> ratio). You understand why square resizing (<span class="arithmatex">\(256 \times 256\)</span>) distorts thin longitudinal defects and why native resolutions must be preserved.</li>
-<li><strong>Fortran-Order RLE Traversal</strong>: You understand that RLE strings are 1-indexed and traverse columns from top to bottom (<code>order='F'</code>), requiring index clamping at <span class="arithmatex">\(102,400\)</span> pixels.</li>
-<li><strong>The Multi-Label Long-Format Schema</strong>: You understand that <code>train.csv</code> provides four rows per image (one per defect class) and that empty masks represent clean, defect-free material.</li>
-<li><strong>Metric Sensitivity</strong>: You understand the mathematical formulation of the Dice coefficient (<span class="arithmatex">\(F_1\)</span> score) and the official 70/20/10 weighted competition metric.</li>
-</ol>
-<hr />
-<h2 id="2-curriculum-map-milestone-2-topics-study-guides">2. Curriculum Map: Milestone 2 Topics &amp; Study Guides</h2>
-<p>The six core Milestone 2 competition requirements are organized into eight focused, progressive study guides:</p>
+<h2 id="curriculum-map-questions-guided-learning-modules">Curriculum Map: Questions &amp; Guided Learning Modules</h2>
+<p>Every study guide corresponds directly to an assessment question in <a href="milestone-2.html"><code>MILESTONE_2.md</code></a>. Study the core concepts, review the step-by-step guiding hints, and then compute your results on the competition data in <code>data/public/</code>.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Milestone 2 Core Topic</th>
-<th style="text-align: left;">Primary Study Guide(s)</th>
+<th style="text-align: left;">Milestone Question</th>
+<th style="text-align: left;">Guided Learning Document</th>
 <th style="text-align: left;">Theoretical Principles</th>
-<th style="text-align: left;">Practical Implementation Focus</th>
+<th style="text-align: left;">Guiding Focus &amp; Hints</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><strong>1. Dataset &amp; DataLoader</strong></td>
-<td style="text-align: left;"><a href="guide_01_dataset_contract_and_strip_tensors.html">Guide 01: The Dataset Contract</a><br><a href="guide_02_batching_dataloaders_and_isolation.html">Guide 02: Batching &amp; DataLoaders</a></td>
-<td style="text-align: left;">Industrial line-scan geometry, RLE decoding mechanics, tensor contracts <code>[C,H,W]</code>, multi-process IPC, pinned memory.</td>
-<td style="text-align: left;">Build a clean PyTorch <code>Dataset</code> and <code>DataLoader</code> yielding image <code>[B, 1, 128, 800]</code> and mask <code>[B, 4, 128, 800]</code>.</td>
+<td style="text-align: left;"><strong>Question 1</strong></td>
+<td style="text-align: left;"><a href="guide_01_rle_column_major_encoding.html">Guide 1: RLE Standards &amp; Column-Major Grid Encoding</a></td>
+<td style="text-align: left;">1-based indexing, Fortran column-major (<code>order='F'</code>) traversal, linear coordinate mapping, active run pair formation.</td>
+<td style="text-align: left;">Coordinate conversion formula, boundary run merging, manual tracing hints.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>2. Industrial Augmentations</strong></td>
-<td style="text-align: left;"><a href="guide_03_industrial_augmentations_and_alignment.html">Guide 03: Industrial Augmentations</a></td>
-<td style="text-align: left;">Domain invariances on moving strip, geometric vs photometric duality, mask discreteness, nearest-neighbor interpolation.</td>
-<td style="text-align: left;">Implement synchronized horizontal/vertical flips and image-only contrast jitter; diagnose spatial misalignment bugs.</td>
+<td style="text-align: left;"><strong>Question 2</strong></td>
+<td style="text-align: left;"><a href="guide_02_rle_decoding_and_pixel_mass.html">Guide 2: RLE Decoding &amp; Multi-Defect Pixel Mass</a></td>
+<td style="text-align: left;">Inverting RLE strings into 2D <span class="arithmatex">\((128, 800)\)</span> masks, handling empty/NaN entries, multi-defect row aggregation, total positive pixel mass.</td>
+<td style="text-align: left;">5-step decoding logic, parsing token pairs, multi-defect mass summation.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>3. Validation Split</strong></td>
-<td style="text-align: left;"><a href="guide_04_multilabel_stratification_and_leakage.html">Guide 04: Multi-Label Stratification</a></td>
-<td style="text-align: left;">The rare-defect "split lottery", hypergeometric sampling variance, combination signatures, data leakage vectors.</td>
-<td style="text-align: left;">Create a combination-stratified <span class="arithmatex">\(80/20\)</span> image-level holdout that guarantees support for rare classes like <code>defect_b</code>.</td>
+<td style="text-align: left;"><strong>Question 3</strong></td>
+<td style="text-align: left;"><a href="guide_03_global_class_distribution_and_prevalence.html">Guide 3: Global Class Distribution &amp; Defect Prevalence</a></td>
+<td style="text-align: left;">Long-format row structure (45,572 rows across 11,393 images), marginal defect frequencies, severe class imbalance in manufacturing.</td>
+<td style="text-align: left;">Filtering active defect entries, aggregating unique images per class, identifying extremes.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>4. W&amp;B Experiment Tracking</strong></td>
-<td style="text-align: left;"><a href="guide_05_wandb_experiment_tracking.html">Guide 05: W&amp;B Experiment Tracking</a></td>
-<td style="text-align: left;">The experiment lifecycle, step-axis synchronization, qualitative mask overlays, model artifact lineage, API security.</td>
-<td style="text-align: left;">Configure a reproducible W&amp;B logging workflow tracking training loss, validation Dice, and model checkpoints.</td>
+<td style="text-align: left;"><strong>Question 4</strong></td>
+<td style="text-align: left;"><a href="guide_04_defect_cooccurrence_matrix.html">Guide 4: Multi-Label Defect Co-Occurrence Matrix</a></td>
+<td style="text-align: left;">Compound manufacturing errors, multi-label indicator vectors, <span class="arithmatex">\(4 \times 4\)</span> co-occurrence matrix formulation <span class="arithmatex">\(C = \mathbf{Y}^T \mathbf{Y}\)</span>, joint failure patterns.</td>
+<td style="text-align: left;">Formulating symmetric indicator matrices, diagonal vs. off-diagonal pairs.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>5. Baseline U-Net &amp; Training</strong></td>
-<td style="text-align: left;"><a href="guide_06_baseline_unet_and_training_loop.html">Guide 06: Baseline U-Net &amp; Training</a></td>
-<td style="text-align: left;">Encoder-decoder contracting/expanding paths, skip connections, BCE + Soft Dice compound loss, optimization lifecycle.</td>
-<td style="text-align: left;">Implement and train a baseline U-Net for 5–10 epochs; monitor loss convergence and save the best checkpoint.</td>
+<td style="text-align: left;"><strong>Question 5</strong></td>
+<td style="text-align: left;"><a href="guide_05_cooccurrence_vs_correlation_base_rate.html">Guide 5: Co-Occurrence vs. Correlation (The Base-Rate Effect)</a></td>
+<td style="text-align: left;">The Base-Rate Fallacy in defect associations, expected independent co-occurrence, Pearson correlation coefficient (<span class="arithmatex">\(\phi\)</span> coefficient) for binary vectors.</td>
+<td style="text-align: left;">Normalizing co-occurrence for marginal base rates, interpreting correlation values.</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>6. Prediction, RLE &amp; Submission</strong></td>
-<td style="text-align: left;"><a href="guide_07_postprocessing_logits_to_masks.html">Guide 07: Logits to Binary Masks</a><br><a href="guide_08_rle_submission_and_verification.html">Guide 08: RLE &amp; First Submission</a></td>
-<td style="text-align: left;">Probability thresholding <span class="arithmatex">\(\tau\)</span>, 8-connected components, minimum area filtering <span class="arithmatex">\(A_{\min}\)</span>, Fortran RLE, single-space sentinel.</td>
-<td style="text-align: left;">Calibrate post-processing thresholds, encode binary masks to RLE strings, and generate a 12,001-row submission CSV.</td>
+<td style="text-align: left;"><strong>Question 6</strong></td>
+<td style="text-align: left;"><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html">Guide 6: Pixel-Level Spatial Overlap &amp; Mutual Exclusivity</a></td>
+<td style="text-align: left;">Image-level co-occurrence vs. pixel-level spatial intersection, pairwise mask overlap $</td>
+<td style="text-align: left;">M_i \cap M_j</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Question 7</strong></td>
+<td style="text-align: left;"><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html">Guide 7: PyTorch Dataset Architecture &amp; Loss Typing</a></td>
+<td style="text-align: left;">Multi-Channel Joint Prediction (Paradigm 1) vs. Prompt-Conditioned Segmentation (Paradigm 2), PyTorch <code>Dataset</code> contract, 4D tensor collation <span class="arithmatex">\([B, C, H, W]\)</span>, why <code>BCEWithLogitsLoss</code> requires <code>torch.float32</code>.</td>
+<td style="text-align: left;">Dataset methods contract, tensor dimensions, floating-point gradient arithmetic in BCE.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Question 8</strong></td>
+<td style="text-align: left;"><a href="guide_08_training_dynamics_and_convergence.html">Guide 8: Baseline Model Training Dynamics &amp; Convergence</a></td>
+<td style="text-align: left;">5-epoch baseline U-Net training lifecycle, monitoring train vs. val loss trajectories, diagnosing underfitting vs. overfitting, optimal checkpoint selection.</td>
+<td style="text-align: left;">Tracking epoch loss pairs, diagnosing generalization regimes, checkpoint selection.</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="3-guide-overviews-learning-sequence">3. Guide Overviews &amp; Learning Sequence</h2>
-<p>Follow this recommended reading and implementation sequence:</p>
-<ul>
+<h2 id="architectural-formulations-overview">Architectural Formulations Overview</h2>
+<p>In Milestone 2, you also explore two fundamentally different paradigms for formulating multi-defect segmentation:</p>
+<ol>
 <li>
-<p><strong><a href="guide_01_dataset_contract_and_strip_tensors.html">Guide 01: The Dataset Contract: From Annotation Rows to Aligned Strip Tensors</a></strong>:
-  Traces fictional image <code>STRIP_0042</code> from raw JPEG and CSV rows through grayscale loading, Fortran RLE decoding, boundary clamping, and 4-channel mask stacking. Teaches the empirical mask overlap audit.</p>
+<p><strong>Paradigm 1: Multi-Channel Joint Prediction (Concurrent Multi-Task):</strong>
+   A shared encoder-decoder backbone processes the steel strip and concurrently predicts all four defect channels in a single forward pass (<span class="arithmatex">\(f_\theta: \mathbf{X} \in \mathbb{R}^{3 \times H \times W} \to \mathbf{\hat{Y}} \in \mathbb{R}^{4 \times H \times W}\)</span>). Highly throughput-efficient, but subject to gradient competition between dominant and rare classes.</p>
 </li>
 <li>
-<p><strong><a href="guide_02_batching_dataloaders_and_isolation.html">Guide 02: Batching, DataLoaders, and Image-Level Isolation</a></strong>:
-  Explains how PyTorch's <code>DataLoader</code> collates tensors into 4D minibatches <code>[B, C, H, W]</code>, details worker seeding with <code>worker_init_fn</code>, and proves why splitting must occur strictly at the <strong>image ID level</strong> to prevent catastrophic row-level leakage.</p>
+<p><strong>Paradigm 2: Conditioned / Prompted Segmentation (Query-Based):</strong>
+   Inspired by Whisper's prefix prompt conditioning tokens, segmentation is reframed as an interactive query (<span class="arithmatex">\(f_\theta: (\mathbf{X}, c) \to \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\)</span>). Dedicated parameter capacity per defect query, but requires <span class="arithmatex">\(4\times\)</span> inference passes per image.</p>
 </li>
-<li>
-<p><strong><a href="guide_03_industrial_augmentations_and_alignment.html">Guide 03: Industrial Augmentations: Geometric Alignment and Photometric Invariance</a></strong>:
-  Separates geometric transforms (applied to image and mask identically) from photometric transforms (applied to image only). Discusses the physical plausibility of horizontal vs. vertical flips on steel strips and demonstrates why masks require nearest-neighbor interpolation.</p>
-</li>
-<li>
-<p><strong><a href="guide_04_multilabel_stratification_and_leakage.html">Guide 04: Validation Strategy: Multi-Label Stratification for Rare Defect Detection</a></strong>:
-  Demonstrates how naive random splits cause severe variance for rare defects (like <code>defect_b</code>), introduces multi-label combination stratification, and provides a strict data leakage prevention checklist.</p>
-</li>
-<li>
-<p><strong><a href="guide_05_wandb_experiment_tracking.html">Guide 05: Experiment Tracking with Weights &amp; Biases</a></strong>:
-  Walks through the complete W&amp;B experiment lifecycle: configuration logging, step axis synchronization, interactive qualitative mask overlays, model artifact versioning, and secure API key management.</p>
-</li>
-<li>
-<p><strong><a href="guide_06_baseline_unet_and_training_loop.html">Guide 06: Baseline Segmentation with U-Net: Architecture, Heads, and Optimization</a></strong>:
-  Dissects U-Net's contracting path, bottleneck, expanding path, and skip connections. Traces feature map shapes for a <span class="arithmatex">\(128 \times 800\)</span> strip, contrasts 4-Sigmoid vs. 5-Softmax heads, details the BCE + Soft Dice compound loss, and guides a modest 5-epoch sanity run.</p>
-</li>
-<li>
-<p><strong><a href="guide_07_postprocessing_logits_to_masks.html">Guide 07: Post-Processing &amp; The Decision Pipeline: Logits to Binary Masks</a></strong>:
-  Explains how to bridge continuous model logits to binary masks via decision thresholds <span class="arithmatex">\(\tau\)</span>, analyzes connected components with OpenCV, and applies minimum area filtering (<span class="arithmatex">\(A_{\min}\)</span>) to suppress sensor noise speckles.</p>
-</li>
-<li>
-<p><strong><a href="guide_08_rle_submission_and_verification.html">Guide 08: Run-Length Encoding and First Kaggle Submission</a></strong>:
-  Details the 1-indexed column-major Fortran RLE encoding algorithm, explains the mandatory single-space sentinel (<code>" "</code>) for empty masks, and provides a 7-point pre-submission validation checklist to guarantee Kaggle acceptance.</p>
-</li>
-</ul>
+</ol>
 <hr />
-<h2 id="4-standalone-code-examples-synthetic-walkthrough">4. Standalone Code Examples &amp; Synthetic Walkthrough</h2>
-<p>To support hands-on learning without disclosing competition training results, this curriculum includes complete, self-contained educational resources built entirely on <strong>synthetic data</strong>:</p>
-<h3 id="1-interactive-walkthrough-notebook">1. Interactive Walkthrough Notebook</h3>
-<ul>
-<li><strong>Jupyter Notebook</strong>: <a href="downloads/synthetic_pipeline_walkthrough.ipynb"><code>notebooks/synthetic_pipeline_walkthrough.ipynb</code></a></li>
-<li><strong>Paired Python Script</strong>: <a href="downloads/synthetic_pipeline_walkthrough.py"><code>notebooks/synthetic_pipeline_walkthrough.py</code></a></li>
-<li><strong>Notebook Setup Guide</strong>: <a href="walkthrough-notebook.html"><code>notebooks/README.md</code></a></li>
-</ul>
-<p>This walkthrough runs on CPU in under 5 seconds and demonstrates every stage of the pipeline from synthetic strip generation to U-Net optimization and RLE encoding.</p>
-<h3 id="2-standalone-diagnostic-scripts">2. Standalone Diagnostic Scripts</h3>
-<ul>
-<li>
-<p><strong>Dataset &amp; Batching Diagnostic</strong>: <a href="examples/toy_dataset_loader.py"><code>examples/toy_dataset_loader.py</code></a>
-  Validates <code>__getitem__</code> tensor shapes, normalization, and DataLoader collation.</p>
-</li>
-<li>
-<p><strong>RLE Roundtrip Diagnostic</strong>: <a href="examples/toy_rle_roundtrip.py"><code>examples/toy_rle_roundtrip.py</code></a>
-  Verifies column-major RLE encoding, empty-mask single-space handling, and boundary clamping.</p>
-</li>
-<li>
-<p><strong>U-Net Optimization Lifecycle</strong>: <a href="examples/toy_unet_step.py"><code>examples/toy_unet_step.py</code></a>
-  Executes a forward pass, BCE loss calculation, backward pass, and optimizer step on a lightweight 2-level U-Net on CPU.</p>
-</li>
-</ul>
-<hr />
-<h2 id="5-teaching-philosophy-and-boundaries">5. Teaching Philosophy and Boundaries</h2>
-<p>These study guides are designed as a <strong>guiding hand, not a shortcut</strong>:</p>
-<ul>
-<li>They explain the underlying mathematics, tensor dimensions, software interfaces, failure modes, and debugging techniques.</li>
-<li>They do <strong>not</strong> provide a copy-paste competition training script, pre-computed hyperparameter values, or trained model checkpoints.</li>
-<li>They do <strong>not</strong> reveal confidential exploratory data analysis findings or performance benchmarks from the private training set.</li>
-<li>You must write, audit, and debug your own segmentation pipeline against <code>data/public/</code>.</li>
-</ul></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="guide_01_dataset_contract_and_strip_tensors.html">Guide 01 · The Dataset Contract →</a></nav>
+<h2 id="how-to-work-through-milestone-2">How to Work Through Milestone 2:</h2>
+<ol>
+<li><strong>Read the corresponding Concept Guide</strong> before attempting each question to understand the engineering context and theoretical principles.</li>
+<li><strong>Review the Guiding Hints</strong> to understand how to approach the calculation or implementation without leaking solutions.</li>
+<li><strong>Write and run your own Python scripts</strong> against <code>data/public/</code> to solve the real task described in the "Your Assignment Task" section of each guide.</li>
+<li>Enter your final answers into the assessment sheet:
+   👉 <a href="milestone-2.html"><code>MILESTONE_2.md</code></a></li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><span></span><a href="milestone-2.html">Milestone 2 questions →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
@@ -183,4 +136,4 @@
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
 <path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
 <path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
-<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

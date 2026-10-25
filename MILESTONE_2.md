@@ -4,8 +4,6 @@ Industrial Surface Anomaly Segmentation · Milestone 2 Assessment
 
 Read the [student study guides](index.html) before attempting the questions. Use the competition data in `data/public/` and compute your own results. This document contains questions and response formats only.
 
-For the pipeline implementation and training questions (Questions 7 & 8), refer to the [walkthrough notebook and code examples](walkthrough-notebook.html).
-
 Questions 1–7 use concise numerical or categorical answers. Question 8 requires recorded loss metrics and a descriptive analysis of training dynamics. Image dimensions below are height × width unless stated otherwise.
 
 ## Question 1: RLE Standards — Column-Major Encoding on a 2D Grid

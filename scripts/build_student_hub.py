@@ -19,7 +19,7 @@ MILESTONES = [
     ('milestones/milestone-1/index.html', 'Milestone 1', 'Understand the data & build a baseline',
      'Nine concept guides on annotations, masks, evaluation and modeling, with 12 assessment questions and a Q11–Q12 starter notebook.'),
     ('milestones/milestone-2/index.html', 'Milestone 2', 'Build the segmentation pipeline & first submission',
-     'Eight concept guides on dataset contracts, batching, augmentations, W&B tracking, U-Net training and RLE submission, with 8 assessment questions and walkthrough code.'),
+     'Eight question-wise concept guides on RLE encoding and decoding, class prevalence, co-occurrence, correlation, spatial overlap, PyTorch datasets and training dynamics, with 8 assessment questions.'),
 ]
 SESSIONS = [
     ('session/index.html', '12 October 2026 · Session 1', 'Pixels, Masks & Experiments',

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q7 · PyTorch Dataset &amp; Paradigms · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 2 student study guides: question-wise conceptual guides, PyTorch datasets, co-occurrence, spatial overlap, and baseline U-Net training dynamics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>From tensors to submissions. Understand. Build. Validate.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html" aria-current="page"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html" aria-current="page"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Student learning resources</span><a href="milestone-2.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 7 Guided Study</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 07 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-architectural-paradigms-for-multi-defect-segmentation">1. Architectural Paradigms for Multi-Defect Segmentation</a></li>
+<li><a href="#2-the-pytorch-dataset-contract-for-paradigm-1">2. The PyTorch Dataset Contract for Paradigm 1</a></li>
+<li><a href="#3-why-must-the-target-mask-be-cast-to-torchfloat32">3. Why Must the Target Mask Be Cast to torch.float32?</a></li>
+<li><a href="#4-guiding-hints-for-question-7">4. Guiding Hints for Question 7</a></li>
+<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="pytorch-dataset-architecture-loss-typing-paradigms-1-2">PyTorch Dataset Architecture &amp; Loss Typing (Paradigms 1 &amp; 2)</h1>
+<p><em>(Milestone 2 · Question 7 Study Guide)</em></p>
+<hr />
+<h2 id="1-architectural-paradigms-for-multi-defect-segmentation">1. Architectural Paradigms for Multi-Defect Segmentation</h2>
+<p>When designing a segmentation system for multi-label industrial surface defects, there are two fundamentally different formulations:</p>
+<h3 id="paradigm-1-multi-channel-joint-prediction-concurrent-multi-task">Paradigm 1: Multi-Channel Joint Prediction (Concurrent Multi-Task)</h3>
+<p>A single neural network ingests the raw strip image and concurrently outputs segmentation predictions for all four defect categories in a single forward pass:</p>
+<div class="arithmatex">\[f_\theta : \mathbf{X} \in \mathbb{R}^{3 \times H \times W} \longrightarrow \mathbf{\hat{Y}} \in \mathbb{R}^{4 \times H \times W}\]</div>
+<ul>
+<li><strong>Advantage (High Throughput):</strong> Requires only one forward pass per image to evaluate all four defect classes, making it fast for high-speed industrial line-scan inspection.</li>
+<li><strong>Trade-off (Gradient Competition):</strong> Gradients from all four heads backpropagate through the shared backbone simultaneously; dominant, high-prevalence classes can overpower gradients from rare classes.</li>
+</ul>
+<h3 id="paradigm-2-conditioned-prompted-segmentation-query-based">Paradigm 2: Conditioned / Prompted Segmentation (Query-Based)</h3>
+<p>Inspired by prompt-conditioned architectures such as <strong>OpenAI's Whisper</strong> (which uses prefix prompt tokens like <code>&lt;|en|&gt;</code> to dynamically steer task execution), segmentation is reframed as an interactive query: <em>"Here is a steel strip image; segment only defect class <span class="arithmatex">\(k\)</span>."</em></p>
+<div class="arithmatex">\[f_\theta : (\mathbf{X} \in \mathbb{R}^{3 \times H \times W}, c \in \{\text{defect_a}, \dots\}) \longrightarrow \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\]</div>
+<ul>
+<li><strong>Advantage (Dedicated Capacity):</strong> The decoder concentrates its entire parameter capacity on isolating one defect mechanism at a time, and training batches can be balanced across prompt queries.</li>
+<li><strong>Trade-off (Inference Latency):</strong> Evaluating a single test image across all four defect classes requires <strong>four separate forward passes</strong> (one per defect prompt).</li>
+</ul>
+<hr />
+<h2 id="2-the-pytorch-dataset-contract-for-paradigm-1">2. The PyTorch Dataset Contract for Paradigm 1</h2>
+<p>To train under <strong>Paradigm 1</strong>, your custom PyTorch <code>Dataset</code> subclass must implement:</p>
+<ul>
+<li><code>__len__</code>: Returns the total count of unique training images (<span class="arithmatex">\(N = 11{,}393\)</span>).</li>
+<li><code>__getitem__(idx)</code>: Loads the <span class="arithmatex">\(idx\)</span>-th image from disk, normalizes pixel values to <span class="arithmatex">\([0.0, 1.0]\)</span> in shape <code>(3, 128, 800)</code>, decodes the four defect RLE masks into shape <code>(4, 128, 800)</code> with <code>torch.float32</code> dtype, and returns the tuple <code>(image, masks)</code>.</li>
+</ul>
+<p>When wrapped inside a PyTorch <code>DataLoader</code> with <code>batch_size = 4</code>, individual samples are collated along a new batch dimension, yielding 4-dimensional tensors of the form <span class="arithmatex">\([B, C, H, W]\)</span>.</p>
+<hr />
+<h2 id="3-why-must-the-target-mask-be-cast-to-torchfloat32">3. Why Must the Target Mask Be Cast to <code>torch.float32</code>?</h2>
+<p>A common question in PyTorch segmentation is:</p>
+<blockquote>
+<p><em>"Since defect masks contain only binary values (0 for background and 1 for defect), why can't we store target masks as <code>torch.uint8</code> or <code>torch.bool</code>?"</em></p>
+</blockquote>
+<p>The answer lies in the mathematical formulation and PyTorch kernel implementation of <code>nn.BCEWithLogitsLoss()</code>:</p>
+<ol>
+<li>
+<p><strong>Loss Formulation:</strong> For predicted logit <span class="arithmatex">\(z \in \mathbb{R}\)</span> and ground-truth target <span class="arithmatex">\(y \in \{0.0, 1.0\}\)</span>, the loss is:</p>
+<div class="arithmatex">\[\mathcal{L}(z, y) = \max(z, 0) - z \cdot y + \log\left(1 + e^{-|z|}\right)\]</div>
+</li>
+<li>
+<p><strong>Analytical Gradient:</strong> During backpropagation, the gradient of the loss with respect to logit <span class="arithmatex">\(z\)</span> is:</p>
+<div class="arithmatex">\[\frac{\partial \mathcal{L}}{\partial z} = \sigma(z) - y\]</div>
+</li>
+<li>
+<p><strong>Hardware Kernel Execution:</strong> The predicted probability <span class="arithmatex">\(\sigma(z) = \frac{1}{1 + e^{-z}}\)</span> is a continuous <strong>floating-point value</strong> between <span class="arithmatex">\(0.0\)</span> and <span class="arithmatex">\(1.0\)</span>. The PyTorch C++/CUDA kernel computes the subtraction <span class="arithmatex">\(\sigma(z) - y\)</span> directly in floating-point registers. Therefore, the target tensor <span class="arithmatex">\(y\)</span> <strong>must share the exact same floating-point type (<code>torch.float32</code>)</strong> as the predicted logits <span class="arithmatex">\(z\)</span>.</p>
+</li>
+</ol>
+<hr />
+<h2 id="4-guiding-hints-for-question-7">4. Guiding Hints for Question 7</h2>
+<p>To answer Question 7:</p>
+<ul>
+<li><strong>Hint 1 (Identify 4D Batch Shapes):</strong> Given a batch size of 4, 3 color channels, 4 defect classes, height 128, and width 800, write out the exact shapes <span class="arithmatex">\([B, C, H, W]\)</span> for both <code>images</code> and <code>masks</code>.</li>
+<li><strong>Hint 2 (Verify Channel Order):</strong> In Paradigm 1, mask channels strictly map to: Channel 0 <span class="arithmatex">\(\to\)</span> <code>defect_a</code>, Channel 1 <span class="arithmatex">\(\to\)</span> <code>defect_b</code>, Channel 2 <span class="arithmatex">\(\to\)</span> <code>defect_c</code>, Channel 3 <span class="arithmatex">\(\to\)</span> <code>defect_d</code>.</li>
+<li><strong>Hint 3 (Formulate the Loss Explanation):</strong> Explain why integer or boolean targets fail by highlighting the continuous gradient arithmetic <span class="arithmatex">\(\sigma(z) - y\)</span> inside the binary cross-entropy kernel.</li>
+<li><strong>Hint 4 (Explore Paradigm 2 Differences):</strong> For the optional question, consider how the dataset item would change if each sample yielded a single-channel mask and a condition prompt token rather than a 4-channel tensor.</li>
+</ul>
+<hr />
+<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-2.html#question-7-pytorch-dataset-for-paradigm-1">Milestone 2 Assessment: Question 7</a>.</li>
+<li>Implement your PyTorch <code>SurfaceAnomalyDataset</code> and DataLoader under Paradigm 1.</li>
+<li>Extract the first batch and report <code>images_shape, masks_shape, dtype, brief_loss_explanation</code>.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html">← Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_08_training_dynamics_and_convergence.html">Q8 · Training Dynamics &amp; Convergence →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

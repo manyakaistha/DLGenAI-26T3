@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q6 · Spatial Overlap &amp; Exclusivity · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 2 student study guides: question-wise conceptual guides, PyTorch datasets, co-occurrence, spatial overlap, and baseline U-Net training dynamics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>From tensors to submissions. Understand. Build. Validate.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html" aria-current="page"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html" aria-current="page"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Student learning resources</span><a href="milestone-2.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 6 Guided Study</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 06 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-concept-image-level-co-occurrence-vs-pixel-level-overlap">1. The Core Concept: Image-Level Co-Occurrence vs. Pixel-Level Overlap</a></li>
+<li><a href="#2-formulating-pixel-level-mask-intersection">2. Formulating Pixel-Level Mask Intersection</a></li>
+<li><a href="#3-the-architectural-consequence-output-head-design">3. The Architectural Consequence: Output Head Design</a></li>
+<li><a href="#4-guiding-hints-for-question-6">4. Guiding Hints for Question 6</a></li>
+<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="pixel-level-spatial-overlap-mutual-exclusivity">Pixel-Level Spatial Overlap &amp; Mutual Exclusivity</h1>
+<p><em>(Milestone 2 · Question 6 Study Guide)</em></p>
+<hr />
+<h2 id="1-the-core-concept-image-level-co-occurrence-vs-pixel-level-overlap">1. The Core Concept: Image-Level Co-Occurrence vs. Pixel-Level Overlap</h2>
+<p>In Questions 4 and 5, you analyzed defect co-occurrence at the <strong>image level</strong>: establishing how frequently distinct defect classes appear anywhere on the same <span class="arithmatex">\(128 \times 800\)</span> steel strip.</p>
+<p>However, sharing an image file does not mean sharing physical space:</p>
+<ul>
+<li>A steel strip could have a longitudinal scratch on the left edge and an oxide patch in the center. They appear in the same image, but their physical footprints are completely disjoint.</li>
+<li>Alternatively, do two defect categories ever physically overlap at the exact same pixel coordinates <span class="arithmatex">\((y, x)\)</span>?</li>
+</ul>
+<p>Answering this empirical question is critical because it dictates the mathematical validity of your neural network's output head.</p>
+<hr />
+<h2 id="2-formulating-pixel-level-mask-intersection">2. Formulating Pixel-Level Mask Intersection</h2>
+<p>For an image containing multiple defects, let <span class="arithmatex">\(M_i, M_j \in \{0, 1\}^{128 \times 800}\)</span> denote the decoded 2D binary masks for two distinct defect classes <span class="arithmatex">\(i \neq j\)</span>.</p>
+<h3 id="pairwise-pixel-intersection">Pairwise Pixel Intersection</h3>
+<p>The number of shared, overlapping pixels between the two masks is defined as their dot product:</p>
+<div class="arithmatex">\[|M_i \cap M_j| = \sum_{y=0}^{H-1} \sum_{x=0}^{W-1} \left( M_i(y, x) \cdot M_j(y, x) \right)\]</div>
+<h3 id="pairwise-dice-similarity-coefficient">Pairwise Dice Similarity Coefficient</h3>
+<p>The Dice similarity between the two ground-truth masks measures their relative spatial overlap:</p>
+<div class="arithmatex">\[\operatorname{Dice}(M_i, M_j) = \frac{2 |M_i \cap M_j|}{|M_i| + |M_j|}\]</div>
+<ul>
+<li>If <span class="arithmatex">\(|M_i \cap M_j| = 0\)</span>, then <span class="arithmatex">\(\operatorname{Dice}(M_i, M_j) = 0.0\)</span> (the masks are strictly disjoint).</li>
+<li>If the two masks share even a single pixel, then <span class="arithmatex">\(|M_i \cap M_j| &gt; 0\)</span>.</li>
+</ul>
+<hr />
+<h2 id="3-the-architectural-consequence-output-head-design">3. The Architectural Consequence: Output Head Design</h2>
+<p>Why does pixel overlap dictate model architecture?</p>
+<ul>
+<li><strong>Configuration A (4 Independent Sigmoids):</strong> Each output channel uses an independent Sigmoid activation (<span class="arithmatex">\(\hat{P}_k = \sigma(z_k)\)</span>) evaluated with <code>BCEWithLogitsLoss</code>. This formulation is valid whether masks overlap or not, because each pixel can independently belong to multiple classes.</li>
+<li><strong>Configuration B (5-Class Softmax Partition):</strong> Softmax across channels enforces <span class="arithmatex">\(\sum_{k=0}^4 \hat{P}_k = 1.0\)</span>. This formulation is valid <strong>only if</strong> classes are strictly mutually exclusive (<span class="arithmatex">\(|M_i \cap M_j| = 0\)</span> everywhere). If two defects share a pixel, forcing a single Softmax distribution creates conflicting target labels and corrupts training gradients.</li>
+</ul>
+<hr />
+<h2 id="4-guiding-hints-for-question-6">4. Guiding Hints for Question 6</h2>
+<p>To evaluate spatial overlap across the training data:</p>
+<ul>
+<li><strong>Hint 1 (Focus on Multi-Label Images):</strong> You only need to check images that contain at least two defects (identified in Question 4). Images with zero or one defect cannot have cross-defect pixel overlap.</li>
+<li><strong>Hint 2 (Decode 2D Binary Masks):</strong> For each multi-label image, decode the RLE masks for its present defect classes into <span class="arithmatex">\((128, 800)\)</span> binary arrays.</li>
+<li><strong>Hint 3 (Compute Pairwise Intersections):</strong> For every pair of active defect classes (<span class="arithmatex">\(i \neq j\)</span>) on that image, compute the intersection <span class="arithmatex">\(|M_i \cap M_j|\)</span>.</li>
+<li><strong>Hint 4 (Find the Maximum Overlap):</strong> Track the maximum number of overlapping pixels (or max Dice score) observed across any pair in the entire training set.</li>
+<li><strong>Hint 5 (Assess Mutual Exclusivity):</strong> If the maximum overlap is 0, the defect classes are spatially mutually exclusive at the pixel level (<code>Yes</code>). If it is greater than 0, they are not (<code>No</code>).</li>
+</ul>
+<hr />
+<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-2.html#question-6-pixel-level-spatial-overlap-and-mutual-exclusivity">Milestone 2 Assessment: Question 6</a>.</li>
+<li>Compute the pairwise pixel intersection across all multi-label images in <code>train.csv</code>.</li>
+<li>Report the maximum number of overlapping pixels (or max Dice) and state whether defect classes are spatially mutually exclusive: <code>max_overlap_pixels, Yes/No</code>.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_cooccurrence_vs_correlation_base_rate.html">← Q5 · Co-Occurrence vs. Correlation</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html">Q7 · PyTorch Dataset &amp; Paradigms →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

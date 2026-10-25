@@ -270,6 +270,8 @@ def build(output: Path):
     build_milestone_one(output / "milestones/milestone-1")
     from build_milestone_two import build_milestone_two
     build_milestone_two(output / "milestones/milestone-2")
+    if (ROOT / "guide2701/milestone-2").is_dir():
+        build_milestone_two(ROOT / "guide2701/milestone-2")
     from build_live_session import build as build_session
     build_session(output / "session")
     import build_live_session as session_renderer
