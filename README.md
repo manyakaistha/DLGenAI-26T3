@@ -47,12 +47,12 @@ A beginner-friendly continuation with an 80/20 split lesson, explained PyTorch c
 The notebook creates original synthetic cloud-like data locally and runs on CPU.
 
 
-## Live session: MRI Transfer Learning · 26 October 2026
+## Live session: Give Your U-Net a Head Start · 26 October 2026
 
-Move from a baseline U-Net to a pretrained encoder using the LGG MRI segmentation dataset. Eight student pages and seven interactive labs cover patient-level splits, feature shapes, weight provenance, MRI-channel normalization, fine-tuning and fair comparisons.
+Four short lessons build on the U-Net students have already trained: recognise its parts, borrow an encoder, freeze or fine-tune, and compare fairly. The MRI pictures are a shared example; dataset setup and full training are optional follow-up material.
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-3/)
-- [Companion notebook](docs/transfer_learning_live_session/transfer_learning.ipynb)
-- [Setup and execution guide](docs/transfer_learning_live_session/notebook.md)
+- [Small classroom notebook — no MRI files or training required](docs/transfer_learning_live_session/classroom_walkthrough.ipynb)
+- [Optional notebooks and practice](docs/transfer_learning_live_session/notebook.md)
 
-Download the MRI dataset separately. Dataset attribution and the CC BY-NC-SA 4.0 license are documented in the notes and selected teaching figure provenance.
+The original full MRI experiment remains available for independent exploration. Dataset attribution and the CC BY-NC-SA 4.0 license are documented in the notes and selected teaching figure provenance.

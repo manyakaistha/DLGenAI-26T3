@@ -40,7 +40,7 @@ def notebook():
     (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
 
 def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
-          downloads=None, extra_files=(), identity=None):
+          downloads=None, extra_files=(), identity=None, nav_groups=None):
     # Existing session adapters keep their defaults; new sessions pass explicit data.
     if source_dir is None:
         notebook()
@@ -53,7 +53,8 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
                   description='Interactive live lab: experiment tracking, label sparsity, output heads and run-length encoding.',
                   intro='Explore segmentation data, masks and experiment tracking.',
                   topline='Industrial surface segmentation', kicker='Observe. Represent. Measure.',
-                  hero='From pixels<br>to experiments.', caption='A live lab in industrial segmentation.')
+                  hero='From pixels<br>to experiments.', caption='A live lab in industrial segmentation.',
+                  download_label='Download notebook ↓')
     design.update(identity or {})
     if not (len(modules) == len(titles) == len(urls)):
         raise ValueError('Session modules, titles and URLs must align')
@@ -86,10 +87,22 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
         source=normalize_markdown((source_dir/f'{module}.md').read_text())
         source=re.sub(r'<details(?=\s|>)','<details markdown="1"',source)
         body=md.convert(source)
-        for name,target in mapping.items(): body=body.replace(f'href="{name}"',f'href="{target}"')
-        nav='<nav class="nav" aria-label="Session pages">'+''.join(f'<a href="{u}"'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>' for j,(t,u) in enumerate(zip(titles,urls)))+'</nav>'
+        for name,target in mapping.items():
+            body=body.replace(f'href="{name}"',f'href="{target}"')
+            body=body.replace(f'href="{name}#',f'href="{target}#')
+        nav='<nav class="nav" aria-label="Session pages">'
+        for j, (t, u) in enumerate(zip(titles, urls)):
+            if nav_groups and j in nav_groups:
+                nav += f'<span class="nav-group-label">{html.escape(nav_groups[j])}</span>'
+            nav += f'<a href="{u}"'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>'
+        nav += '</nav>'
         palette=''.join(f'<button class="theme-option" data-palette="{p}" aria-pressed="{str(p=="paper").lower()}">{p.title()}</button>' for p in ['paper','midnight','moss','butter','blush','mono'])
-        pager=(f'<a href="{urls[i-1]}">← {titles[i-1]}</a>' if i else '<span></span>')+(f'<a href="{urls[i+1]}">{titles[i+1]} →</a>' if i+1<len(urls) else '')
+        pager=(f'<a href="{urls[i-1]}">← {html.escape(titles[i-1])}</a>' if i else '<span></span>')
+        if i + 1 < len(urls):
+            if nav_groups and i > 0 and i + 1 in nav_groups:
+                pager += f'<a href="{urls[0]}">Back to session overview →</a>'
+            else:
+                pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
         page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · {html.escape(design["title"])}</title>
 <meta name="description" content="{html.escape(design["description"], quote=True)}">
 <link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}"><link rel="stylesheet" href="{asset('styles/generative/navigation.css')}">
@@ -101,7 +114,7 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
 <body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">{design["brand"]}</a><p>{html.escape(design["intro"])}</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options">{palette}</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
 <div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div>{nav}</div><details class="mobile-menu"><summary>Browse session</summary>{nav}</details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
-<main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span><a href="{downloads[0]}" download>Download notebook ↓</a></div>
+<main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span><a href="{downloads[0]}" download>{html.escape(design["download_label"])}</a></div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">{html.escape(design["kicker"])}</span><p class="hero-title">{design["hero"]}</p><p class="hero-caption">{html.escape(design["caption"])}</p></div></div>
 <span class="section-label">{html.escape(title)}</span><details class="toc"><summary>On this page</summary>{md.toc}</details><article>{body}</article><nav class="pagination">{pager}</nav><footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span></footer></div></main></div></body></html>'''
         (out/url).write_text(page)

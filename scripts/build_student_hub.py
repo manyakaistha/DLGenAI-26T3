@@ -16,8 +16,8 @@ SESSIONS = [
      'Revisit label counts, output heads and run-length encoding. Practice experiment tracking in the W&B notebook lab.'),
     ('session-2/index.html', '19 October 2026 · Session 2', 'Dataset, DataLoader & Augmentations',
      'Follow a sample from CSV row to training batch. Explore the split, paired transformations, interactive labs and notebook.'),
-    ('session-3/index.html', '26 October 2026 · Session 3', 'MRI Transfer Learning: From a Baseline to a Pretrained Encoder',
-     'Explore patient-level splits, MRI sequence channels, pretrained features, freezing and fine-tuning, then run a fair initialization comparison.'),
+    ('session-3/index.html', '26 October 2026 · Session 3', 'Give Your U-Net a Head Start',
+     'Follow four short lessons on borrowing an encoder, freezing or fine-tuning, and comparing fairly. MRI setup and full training are optional.'),
 ]
 
 

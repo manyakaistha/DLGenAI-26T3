@@ -11,25 +11,27 @@ from build_student_hub import validate_site
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs/transfer_learning_live_session'
-MODULES = ['README', 'dataset', 'encoder', 'transfer', 'inputs', 'finetuning', 'experiments', 'notebook']
-TITLES = ['Session overview', '1 · MRI data & patient split', '2 · Encoder & decoder',
-          '3 · Pretraining & fair comparisons', '4 · MRI channels & normalization',
-          '5 · Freeze & fine-tune', '6 · Evaluate the evidence', '7 · Companion notebook']
+MODULES = ['README', 'encoder', 'transfer', 'finetuning', 'experiments', 'dataset', 'inputs', 'notebook']
+TITLES = ['Session overview', '1 · The U-Net you know', '2 · Borrow an encoder',
+          '3 · Freeze or fine-tune', '4 · Compare fairly', 'About the MRI example',
+          'Input details', 'Notebooks & optional practice']
 URLS = ['index.html', *[name + '.html' for name in MODULES[1:]]]
 
 
 def build(out):
     build_notebook()
     render_session(out, source_dir=SOURCE, modules=MODULES, titles=TITLES, urls=URLS,
-                   downloads=('transfer_learning.ipynb', 'transfer_learning.py'),
+                   downloads=('classroom_walkthrough.ipynb', 'classroom_walkthrough.py',
+                              'transfer_learning.ipynb', 'transfer_learning.py'),
+                   nav_groups={1: 'Follow in class', 5: 'Explore later · optional'},
                    extra_files=('labs.css', 'labs.js', 'figures/provenance.json'),
-                   identity=dict(title='MRI Transfer Learning · 26 October 2026',
-                                 brand='MRI Transfer<br>Learning',
-                                 description='Learn pretrained encoders, patient-level splitting, MRI channels, fine-tuning and fair segmentation experiments.',
-                                 intro='26 October 2026 · From your baseline U-Net to a pretrained encoder.',
+                   identity=dict(title='Give Your U-Net a Head Start · 26 October 2026',
+                                 brand='Your U-Net,<br>with a head start',
+                                 description='Four short lessons on pretrained encoders, freezing, fine-tuning and fair comparisons. MRI setup and full training are optional.',
+                                 intro='26 October 2026 · Build on the U-Net you already know.',
                                  topline='26 October · Milestone 3 live session',
-                                 kicker='Inspect. Reuse. Compare.', hero='A different<br>starting point.',
-                                 caption='Transfer learning, tested fairly.'))
+                                 kicker='A familiar model. One new idea.', hero='Start with what<br>you know.',
+                                 caption='Borrow features. Keep learning.', download_label='Classroom notebook ↓'))
     validate_site(out)
 
 

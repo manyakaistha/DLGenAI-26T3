@@ -1,6 +1,50 @@
-# 5. Freeze, unfreeze and fine-tune
+# 3. Choose what should learn
 
-A newly initialized decoder needs to learn how to use encoder features. You can let all model parameters update, or temporarily keep the encoder fixed while training the decoder. The choice changes the training policy and should be recorded.
+**Main idea: we can keep the encoder fixed, or let it adapt to the new task.**
+
+The borrowed encoder already has learned weights. The new decoder starts without knowing how to make our masks. We choose which parts can change during training.
+
+## Option 1: freeze the encoder
+
+Keep its learned parameters fixed and train the decoder. This is a way to start by using the encoder as a feature extractor.
+
+```python
+for parameter in model.encoder.parameters():
+    parameter.requires_grad = False
+```
+
+`requires_grad=False` tells PyTorch not to compute gradients for those parameters. In the complete implementation, we also choose the right optimizer parameters and handle the encoder’s training/evaluation mode.
+
+## Option 2: fine-tune the model
+
+Let the encoder adapt as the decoder learns. The starting features are reused, but their weights can now change.
+
+```python
+for parameter in model.encoder.parameters():
+    parameter.requires_grad = True
+```
+
+Neither choice is always best. For now, understand the difference; we can compare their results in a later experiment.
+
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="freeze">
+<p>Choose “train the decoder only” or “fine-tune both.” The decoder learns in both cases; the encoder is fixed in the first and can update in the second.</p>
+</div>
+
+## Quick check
+
+If the encoder is frozen, can the model still learn?
+
+<details>
+<summary>Check your understanding</summary>
+
+Yes. The decoder can learn to use the features supplied by the fixed encoder. Frozen encoder parameters do not mean the entire model is frozen.
+
+</details>
+
+Next: [make a fair comparison](experiments.md).
+
+<details>
+<summary>Go deeper: optimizer settings and BatchNorm</summary>
 
 ## Three separate switches
 
@@ -39,10 +83,6 @@ Do this at the start of **each training epoch**, after the outer `model.train()`
 
 The [PyTorch BatchNorm documentation](https://docs.pytorch.org/docs/stable/generated/torch.nn.BatchNorm2d.html) explains the running estimates used in evaluation. For very small batches, how to handle those estimates becomes an experimental choice rather than a universal rule.
 
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="freeze">
-<p><strong>Gradient and buffer lab.</strong> One synthetic encoder weight starts at 1 and has an illustrative gradient of 0.4. With SGD learning rate 0.1, an enabled optimizer step changes it to 0.96. Freeze the weight, omit it from the optimizer, and independently toggle BatchNorm mode to see why a running-mean buffer can still change.</p>
-</div>
-
 ## Unfreeze deliberately
 
 ```python
@@ -66,19 +106,5 @@ print(f"{trainable:,} / {total:,} trainable parameters")
 
 During debugging, inspect `parameter.grad` after backward and compare a copied parameter before/after the step. To confirm a truly fixed encoder, also compare its BatchNorm buffers. A nonzero gradient alone does not prove an update occurred.
 
-## Which policy do we use today?
-
-The notebook’s main two arms use **full fine-tuning with the same learning rate**, so initialization is the intended difference. After that comparison, you may run a separate frozen-encoder experiment. Do not silently freeze only one main arm, change its learning rates, and still label the result “effect of pretraining alone.”
-
-## Activity: the encoder changed without gradients
-
-All encoder parameters have `requires_grad=False`, yet a saved encoder state differs after an epoch. What should you inspect first?
-
-<details>
-<summary>Reveal the reasoning</summary>
-
-Inspect BatchNorm `running_mean`, `running_var` and `num_batches_tracked`. A later `model.train()` may have re-enabled training behavior. Distinguish changing parameter tensors from changing buffers, then verify optimizer membership and stale gradients if actual weights changed.
 
 </details>
-
-Next: [evaluate the evidence](experiments.md).

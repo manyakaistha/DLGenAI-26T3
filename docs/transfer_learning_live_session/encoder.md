@@ -1,12 +1,57 @@
-# 2. Trace the encoder and decoder
+# 1. Start with the U-Net you already know
 
-You already know the U-Net idea: compress an image into features, then recover a dense prediction using high-resolution information from earlier stages. A pretrained encoder changes the source of those features. It does not remove the need for a decoder.
+**Main idea: an encoder finds useful features; a decoder uses them to draw a mask.**
 
-## Classification and segmentation ask different questions
+Think back to the U-Net you trained. Its left side gradually made the image smaller and built up features. Its right side used those features to produce a prediction at each pixel.
 
-A ResNet classifier finishes with global average pooling and a linear layer. Pooling summarizes the spatial grid; the linear layer predicts image-level categories. For segmentation we retain spatial feature maps, discard the classification endpoint and construct a decoder that predicts one logit at every output pixel.
+<div class="lesson-flow" aria-label="Segmentation flow">
+<span>Image</span><span>Encoder<br><small>Find features</small></span><span>Decoder<br><small>Build the mask</small></span><span>Predicted mask</span>
+</div>
 
-The encoder is the visual feature extractor. The decoder combines coarse context with finer spatial detail. A segmentation head is the final convolution mapping decoder features into the number of target channels. These are roles, not particular library names.
+## Give the familiar parts their names
+
+The **encoder** learns patterns in the input: edges, textures and more complex combinations. Its feature maps are intermediate representations, not finished masks.
+
+The **decoder** combines those features and increases the spatial size until it can predict a mask. U-Net’s **skip connections** bring earlier, more detailed features across to the decoder.
+
+You have already used all three. Today’s change is where the encoder’s starting weights come from.
+
+## What changes with a pretrained encoder?
+
+We can use the feature-extracting part of a network such as **ResNet18** as the encoder. “Backbone” is another name you may hear for this feature extractor.
+
+The decoder still has work to learn. A network trained to classify photographs does not arrive knowing how to draw our segmentation masks.
+
+<div class="lesson-note"><strong>Keep this picture in mind:</strong> familiar U-Net idea, a different starting point for the encoder.</div>
+
+## Quick check
+
+If we borrow a trained encoder, do we automatically get a trained segmentation model?
+
+<details>
+<summary>Check your understanding</summary>
+
+No. We have reused a feature extractor. The decoder and output layer still need to learn the new segmentation task, and the encoder may need to adapt too.
+
+</details>
+
+## Optional: explore the feature sizes
+
+Use the activity if you want to see how the image changes size through the encoder. You do not need to memorise the numbers to follow the lesson.
+
+<details>
+<summary>Try the feature-size activity</summary>
+
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="shapes">
+<p>A 256 × 256 input becomes a series of smaller feature maps. At one decoder join, 512 feature channels meet 256 skip channels, giving 768 channels before the next convolution. Try another input size.</p>
+</div>
+
+</details>
+
+Next: [borrow a trained encoder](transfer.md).
+
+<details>
+<summary>Go deeper: exact tensor shapes and decoder code</summary>
 
 ## Trace one 256 × 256 MRI slice
 
@@ -43,10 +88,6 @@ d4 = block(joined)
 
 Repeat with `s3`, `s2` and `s1`. Finally interpolate to the original input size, refine, and apply a one-channel `1×1` convolution. No final sigmoid is included in `forward`; the training loss expects logits.
 
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="shapes">
-<p><strong>Feature-shape lab.</strong> Choose the input dimensions and inspect the named feature stages. At 256 × 256, `s5` is `[B,512,8,8]`; resize it to `s4` at 16 × 16, concatenate to get 768 channels, then convolve to 256. Changing input height/width does not change these channel counts.</p>
-</div>
-
 ## Two kinds of skip connection
 
 A **ResNet residual shortcut** usually adds tensors of compatible shape: `output = branch(x) + shortcut(x)`. A projection can align channel counts or stride when necessary. The addition offers a route for information and gradients within the encoder.
@@ -69,17 +110,5 @@ assert torch.isfinite(logits).all()
 
 This checks geometry and finite outputs, not learned quality. Check target shape and visualization separately. A model can pass this test and still receive mismatched masks or a leaking split.
 
-## Activity: find the broken convolution
-
-A developer upsamples `[B,512,8,8]`, concatenates `[B,256,16,16]`, then creates `Conv2d(512,256,3)`. What is wrong?
-
-<details>
-<summary>Reveal the reasoning</summary>
-
-The concatenated tensor has 768 input channels. The convolution must accept 768, or an explicit projection must reduce the channels first. The height and width match after resizing; the channel contract is the failure.
 
 </details>
-
-The industrial strip is 128 × 800. The same feature-scale reasoning applies, but retain that aspect ratio instead of copying the MRI’s square resize. Reference: [torchvision ResNet implementation](https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py).
-
-Next: [what pretraining changes](transfer.md).
