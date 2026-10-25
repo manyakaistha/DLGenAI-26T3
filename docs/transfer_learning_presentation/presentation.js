@@ -183,3 +183,207 @@ optimizer.step()</pre><div class="controls" style="margin-top:20px">${btn('Try t
   window.Presentation=Object.freeze({go,slides:slides.map(({id,title,optional})=>({id,title,optional:!!optional})),get current(){return slides[current].id;},get animating(){return !!pending;},math:Object.freeze({convolutionAt,softMetrics,hardMetrics,bceLogit})});
   const hash=location.hash.slice(1);go(slides.some(s=>s.id===hash)?hash:0,false);
 })();
+
+// The presentation uses the same seeded garden language as the reading site:
+// procedural stems, leaves and spiral blooms keep the frame alive without
+// becoming another piece of slide content. Geometry is generated once, then
+// rendered deterministically at the current time.
+(() => {
+  'use strict';
+  const canvas = document.querySelector('#botanical-canvas');
+  const motionButton = document.querySelector('#motion');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const root = document.documentElement;
+  const stage = document.querySelector('#stage');
+  let width = 0, height = 0, dpr = 1, visible = true, frame = 0;
+  let lastNow = performance.now(), elapsed = 0, birth = performance.now();
+  let palette = {};
+
+  function mulberry32(seed) {
+    let state = seed | 0;
+    return () => {
+      state = (state + 0x6D2B79F5) | 0;
+      let t = Math.imul(state ^ (state >>> 15), 1 | state);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rand = mulberry32(261026);
+  const plants = [
+    [.94, .17, -.025], [1.01, .30, .045], [.95, .46, -.03],
+    [.88, .64, .02], [.08, .78, -.03], [.02, .59, .04], [.05, .92, .025]
+  ].map(([x, y, bend], i) => ({
+    x, y, bend,
+    curve: [[x + bend, 1.025], [x + bend, .70], [x - .014, .43], [x, y]],
+    radius: 12 + rand() * 9,
+    phase: rand() * Math.PI * 2,
+    petals: 5 + Math.floor(rand() * 3),
+    leaves: 3 + Math.floor(rand() * 2),
+    depth: i < 4 ? .94 : .68
+  }));
+  const pollen = Array.from({length:34}, () => ({
+    x: rand() < .55 ? .72 + rand() * .3 : rand() * .3,
+    y: .08 + rand() * .86,
+    size: .8 + rand() * 2.5,
+    alpha: .12 + rand() * .2
+  }));
+  for (const p of plants) {
+    p.contour = Array.from({length:73}, (_, i) => {
+      const a = i / 72 * Math.PI * 2;
+      const radius = p.radius * (1 + .13 * Math.sin(p.petals * a + p.phase));
+      return [Math.cos(a) * radius, Math.sin(a) * radius * .84];
+    });
+    p.spiral = Array.from({length:86}, (_, i) => {
+      const u = i / 85, a = u * Math.PI * 6 + p.phase;
+      const radius = p.radius * (.06 + u * .61);
+      return [Math.cos(a) * radius, Math.sin(a) * radius * .7];
+    });
+  }
+
+  const clamp = (v, lo=0, hi=1) => Math.max(lo, Math.min(hi, v));
+  const easeOut = t => 1 - Math.pow(1 - clamp(t), 3);
+  const spring = t => 1 - Math.exp(-6 * clamp(t)) * Math.cos(10 * clamp(t));
+  const cubic = (points, t) => {
+    const u = 1 - t;
+    return [
+      u*u*u*points[0][0] + 3*u*u*t*points[1][0] + 3*u*t*t*points[2][0] + t*t*t*points[3][0],
+      u*u*u*points[0][1] + 3*u*u*t*points[1][1] + 3*u*t*t*points[2][1] + t*t*t*points[3][1]
+    ];
+  };
+  function readPalette() {
+    const styles = getComputedStyle(root);
+    palette = Object.fromEntries(['line','stem','flower','flower-line'].map(name => [name, styles.getPropertyValue(`--${name}`).trim()]));
+  }
+  function resize() {
+    width = Math.max(1, canvas.clientWidth || stage?.clientWidth || 1280);
+    height = Math.max(1, canvas.clientHeight || stage?.clientHeight || 720);
+    dpr = Math.min(devicePixelRatio || 1, 2.5);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    readPalette();
+    repaint();
+  }
+  function drawLeaf(x, y, angle, length, growth, alpha) {
+    if (growth <= 0) return;
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(angle); ctx.scale(growth, growth);
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(length*.2, -length*.6, length*.8, -length*.45, length, 0);
+    ctx.bezierCurveTo(length*.7, length*.3, length*.2, length*.35, 0, 0);
+    ctx.fillStyle = palette.stem; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(length*.84, 0);
+    ctx.strokeStyle = palette['flower-line']; ctx.lineWidth = .65; ctx.stroke();
+    ctx.restore();
+  }
+  function drawBloom(p, x, y, scale, time, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(time * .00045 + p.phase) * .07);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = alpha;
+    const r = p.radius;
+    // A scalloped outer contour matches the reading site's inked blossoms.
+    ctx.beginPath();
+    for (let i = 0; i < p.contour.length; i++) {
+      const [px, py] = p.contour[i];
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = palette.flower;
+    ctx.strokeStyle = palette['flower-line'];
+    ctx.lineWidth = 1.1;
+    ctx.fill(); ctx.stroke();
+    // Fine spiral linework keeps the blooms from reading as flat stickers.
+    ctx.beginPath();
+    for (let i = 0; i < p.spiral.length; i++) {
+      const [px, py] = p.spiral[i];
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = palette['flower-line']; ctx.lineWidth = .85; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, r * .16, 0, Math.PI * 2);
+    ctx.fillStyle = palette['flower-line']; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, r * .16, 0, Math.PI * 2);
+    ctx.strokeStyle = palette.stem; ctx.lineWidth = .7; ctx.stroke();
+    ctx.restore();
+  }
+  function draw(now) {
+    frame = 0;
+    const dt = Math.min(64, Math.max(0, now - lastNow));
+    lastNow = now;
+    const motionOn = !reduced.matches && motionButton?.getAttribute('aria-pressed') !== 'true';
+    if (motionOn && visible && !document.hidden) elapsed += dt;
+    const time = motionOn ? elapsed : 0;
+    const grow = motionOn ? easeOut((now - birth) / 1100) : 1;
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = palette.line; ctx.lineWidth = .55; ctx.globalAlpha = .38;
+    for (let i = 0; i < 5; i++) {
+      const y = height * (.17 + i * .16);
+      ctx.beginPath(); ctx.moveTo(width * .04, y); ctx.lineTo(width * .96, y); ctx.stroke();
+    }
+    for (const dot of pollen) {
+      ctx.globalAlpha = dot.alpha;
+      ctx.fillStyle = palette.stem;
+      ctx.fillRect(dot.x * width, dot.y * height, dot.size, dot.size);
+    }
+
+    const boil = Math.floor(time / 110);
+    for (const p of plants) {
+      const sway = motionOn ? Math.sin(time * .0006 + p.phase) * Math.min(3.2, width * .004) : 0;
+      const jitter = Math.sin(boil * 1.71 + p.phase * 5.3) * .8;
+      const x = p.x * width + sway;
+      const y = p.y * height;
+      // The normalized curve is seeded once above; only its gentle sway and
+      // discrete line-boil offset change between frames.
+      const path = p.curve.map(([px, py], i) => [
+        px * width + (i === 2 ? jitter : 0) + (i > 1 ? sway : sway * .35),
+        py * height + (i === 0 ? 18 : 0)
+      ]);
+      const stemGrowth = clamp(grow * 1.14);
+      ctx.globalAlpha = p.depth;
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const point = cubic(path, i / 36 * stemGrowth);
+        if (i === 0) ctx.moveTo(point[0], point[1]); else ctx.lineTo(point[0], point[1]);
+      }
+      ctx.strokeStyle = palette.stem; ctx.lineWidth = 1.35; ctx.lineCap = 'round'; ctx.stroke();
+      for (let j = 0; j < p.leaves; j++) {
+        const t = .18 + j * .16;
+        if (t > stemGrowth) continue;
+        const point = cubic(path, t);
+        const side = j % 2 ? -.58 : -2.46;
+        drawLeaf(point[0], point[1], side + jitter * .01, 13 + j * 2.3, clamp((stemGrowth - t) * 5), p.depth * .72);
+      }
+      const bloomProgress = clamp((grow - .52) / .48);
+      if (bloomProgress > 0) drawBloom(p, x, y, spring(bloomProgress) * (width < 700 ? .74 : 1), time, p.depth);
+    }
+    if (motionOn && visible && !document.hidden) frame = requestAnimationFrame(draw);
+  }
+  function repaint() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    readPalette();
+    draw(performance.now());
+  }
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(entries => {
+    visible = entries[0]?.isIntersecting ?? true;
+    if (visible) repaint(); else if (frame) { cancelAnimationFrame(frame); frame = 0; }
+  }, {threshold: 0}).observe(canvas);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame = 0; }
+    else if (visible) repaint();
+  });
+  reduced.addEventListener('change', repaint);
+  new MutationObserver(repaint).observe(root, {attributes:true, attributeFilter:['data-theme']});
+  if (motionButton) new MutationObserver(repaint).observe(motionButton, {attributes:true, attributeFilter:['aria-pressed']});
+  window.addEventListener('resize', resize);
+  resize();
+})();

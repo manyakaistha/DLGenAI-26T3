@@ -42,14 +42,7 @@ dialog{border:1px solid var(--line);border-radius:16px;padding:30px;background:v
   .theme-option:hover,.theme-option[aria-pressed="true"]{background:var(--wash);border-color:var(--blue)}
   .theme-option span{display:block;width:23px;height:23px;border-radius:50%;background:var(--swatch);box-shadow:inset 0 0 0 1px #80808055;position:relative}
   .theme-option span::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;right:0;bottom:0;background:var(--dot)}
-  .botanical{position:absolute;z-index:0;pointer-events:none;opacity:.68}
-  .botanical svg{display:block;width:100%;height:100%;overflow:visible}
-  .botanical-a{right:9px;top:77px;width:74px;height:92px;transform:rotate(7deg)}
-  .botanical-b{left:10px;bottom:58px;width:68px;height:84px;transform:scaleX(-1) rotate(-7deg);opacity:.45}
-  .botanical .stem{fill:none;stroke:var(--stem);stroke-width:1.3;stroke-linecap:round}
-  .botanical .leaf{fill:var(--stem);opacity:.72}
-  .botanical .petal{fill:var(--flower);stroke:var(--flower-line);stroke-width:1}
-  .botanical .center{fill:var(--flower-line);stroke:var(--stem);stroke-width:1}
+  .botanical-canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%;pointer-events:none;opacity:.86}
   .deck-header{position:relative;z-index:3}
   .deck-footer{position:absolute;z-index:4}
   .slide{position:absolute;z-index:1;top:80px;bottom:72px;overflow:visible}
@@ -108,7 +101,7 @@ dialog{border:1px solid var(--line);border-radius:16px;padding:30px;background:v
 }
 
 @media(max-width:700px){
-  body{overflow-x:hidden}.header-actions{gap:3px;flex-shrink:0}.wordmark{font-size:10px;letter-spacing:.5px;white-space:nowrap}.wordmark i{padding:0 4px}.palette-popover{position:fixed;right:12px;top:58px;width:220px}.deck-header{height:58px}.deck-header #chapter{display:none}.botanical-a{right:6px;top:68px;opacity:.35}.botanical-b{left:5px;bottom:70px;opacity:.28}
+  body{overflow-x:hidden}.header-actions{gap:3px;flex-shrink:0}.wordmark{font-size:10px;letter-spacing:.5px;white-space:nowrap}.wordmark i{padding:0 4px}.palette-popover{position:fixed;right:12px;top:58px;width:220px}.deck-header{height:58px}.deck-header #chapter{display:none}.botanical-canvas{opacity:.52}
   #stage{position:relative;left:auto;top:auto;margin:0;transform:none;overflow:visible;height:auto;min-height:100vh}
   .slide{position:relative;inset:auto;top:auto;bottom:auto;overflow:visible;min-height:calc(100vh - 58px);padding:27px 20px 115px}.body{margin-top:18px;gap:20px}.panel{padding:17px}.body>.panel+.panel:not(:has([data-lab])){padding:0}.hero-left{padding:0}.hero .body{margin-top:12px}.hero .body>.panel{margin-top:0}.hero-left p{font-size:20px}.cover-diagram{height:205px}
   .deck-footer{position:static;left:auto;right:auto;bottom:auto;height:auto;min-height:70px;margin:0 12px;padding:13px 0;background:var(--paper);border-top:1px solid var(--line)}.tools{gap:2px}.tools button,.tools a{font-size:10px;padding:7px}.tools #fullscreen{display:none}.tools a{max-width:62px}.paging{gap:4px}.paging button{font-size:19px;padding:7px 11px}.paging span{font-size:10px;min-width:55px}

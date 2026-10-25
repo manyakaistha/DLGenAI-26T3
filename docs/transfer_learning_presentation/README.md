@@ -10,7 +10,10 @@ study Markdown, seven existing reading labs, and notebooks are unchanged.
   (slide content and activities). No framework, runtime packages, CDN, or font download.
 - The header palette picker follows the main site themes (`paper`, `midnight`,
   `moss`, `butter`, `blush`, `mono`) and remembers the selected theme locally.
-  The deck keeps its botanical marks decorative and theme-aware.
+  The deck keeps a seeded, theme-aware botanical canvas decorative and clear of
+  slide content. Its stems, leaves and spiral blooms share the main study
+  site's garden language, with Retina scaling, deterministic geometry,
+  line-boil jitter, reduced-motion/static fallback, and offscreen pausing.
 - The builder embeds styles, JavaScript and the attributed existing MRI contact
   sheet into one HTML file. Download it from Slide index for offline presentation.
   Links to the full study guides and external dataset still require internet.
@@ -38,8 +41,11 @@ rates, stable logit BCE, soft Dice, hard threshold Dice and experiment confounde
 Illustrative curves and hand-set filters are labelled; no model training or measured
 score is implied. The original figure’s attribution and license remain visible.
 
-Only the user-started finite convolution scan and BatchNorm-buffer update animate.
-Time-normalized timelines settle immediately when the slide changes, the tab hides,
-the menu opens, another activity starts, or reduced motion is requested. No idle
-loop, decorative motion, random regeneration, or automatic slide advancement.
-Motion off supports a static teaching mode and follows OS preference changes.
+The botanical frame uses a bounded, seeded decorative loop; it pauses while hidden
+or offscreen and becomes a static fully drawn frame when motion is disabled. The
+user-started finite convolution scan and BatchNorm-buffer update remain the only
+interactive activity animations. Time-normalized timelines settle immediately
+when the slide changes, the tab hides, the menu opens, another activity starts,
+or reduced motion is requested. There is no random regeneration or automatic
+slide advancement. Motion off supports a static teaching mode and follows OS
+preference changes.
