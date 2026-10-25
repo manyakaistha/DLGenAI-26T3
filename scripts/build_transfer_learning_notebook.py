@@ -7,7 +7,7 @@ SOURCE = ROOT / "docs/transfer_learning_live_session"
 
 
 def build_one(stem):
-    text = (SOURCE / (stem + ".py")).read_text()
+    text = (SOURCE / (stem + ".py")).read_text(encoding="utf-8", errors="ignore")
     cells, kind, lines = [], None, []
 
     def flush():
@@ -37,7 +37,7 @@ def build_one(stem):
         kernelspec=dict(display_name="Python 3", language="python", name="python3"),
         language_info=dict(name="python", version="3.11")), nbformat=4, nbformat_minor=5)
     out = SOURCE / (stem + ".ipynb")
-    out.write_text(json.dumps(notebook, indent=1) + "\n")
+    out.write_text(json.dumps(notebook, indent=1) + "\n", encoding="utf-8")
     print(f"Generated {len(cells)} unexecuted cells → {out}")
 
 

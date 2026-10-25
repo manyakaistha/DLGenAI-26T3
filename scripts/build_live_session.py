@@ -16,7 +16,7 @@ URLS=['index.html','wandb.html','01_data.html','02_heads.html','03_rle.html']
 
 def notebook():
     path=SOURCE/'wandb_tutorial.py'
-    source=path.read_text()
+    source=path.read_text(encoding="utf-8")
     lines=source.splitlines(keepends=True)
     tree=ast.parse(source)
     first=tree.body[0]
@@ -37,7 +37,7 @@ def notebook():
         cells.append(cell)
     doc=dict(cells=cells,metadata=dict(kernelspec=dict(display_name='Python 3',language='python',name='python3'),language_info=dict(name='python',version='3.11')),nbformat=4,nbformat_minor=5)
     for i,c in enumerate(cells): c['id']=f'session-{i:02d}'
-    (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
+    (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1), encoding="utf-8")
 
 def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
           downloads=None, extra_files=(), identity=None, nav_groups=None,
@@ -76,15 +76,15 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
     if (out/'figures').exists(): shutil.rmtree(out/'figures')
     (out/'figures').mkdir(parents=True)
     for module in modules:
-        text=(source_dir/f'{module}.md').read_text()
+        text=(source_dir/f'{module}.md').read_text(encoding="utf-8", errors="ignore")
         for asset in re.findall(r'!\[[^\]]*\]\((figures/[^)]+)\)', text):
             shutil.copy2(source_dir/asset, out/asset)
     shutil.copytree(ROOT/'styles/generative',out/'styles/generative',dirs_exist_ok=True)
     for name in (*downloads, *extra_files):
         (out/name).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source_dir/name, out/name)
-    (out/'site.css').write_text(CSS+'\n'+(ROOT/'styles/generative/session.css').read_text())
-    (out/'site.js').write_text(JS)
+    (out/'site.css').write_text(CSS+'\n'+(ROOT/'styles/generative/session.css').read_text(encoding="utf-8"), encoding="utf-8")
+    (out/'site.js').write_text(JS, encoding="utf-8")
     (out/'.nojekyll').touch()
     def asset(path):
         version=hashlib.sha256((out/path).read_bytes()).hexdigest()[:12]
@@ -94,7 +94,7 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
     pages={};search=[]
     for i,(module,title,url) in enumerate(zip(modules,titles,urls)):
         md=markdown.Markdown(tab_length=2,extensions=['tables','toc','sane_lists','md_in_html','pymdownx.superfences','pymdownx.arithmatex'],extension_configs={'pymdownx.arithmatex': {'generic': True}})
-        source=normalize_markdown((source_dir/f'{module}.md').read_text())
+        source=normalize_markdown((source_dir/f'{module}.md').read_text(encoding="utf-8", errors="ignore"))
         source=re.sub(r'<details(?=\s|>)','<details markdown="1"',source)
         body=md.convert(source)
         for name,target in mapping.items():
@@ -136,10 +136,10 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
 <main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span><a href="{downloads[0]}" download>{html.escape(design["download_label"])}</a></div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">{html.escape(design["kicker"])}</span><p class="hero-title">{design["hero"]}</p><p class="hero-caption">{html.escape(design["caption"])}</p></div></div>
 <span class="section-label">{html.escape(title)}</span><details class="toc"><summary>On this page</summary>{md.toc}</details><article>{body}</article><nav class="pagination">{pager}</nav><footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span></footer></div></main></div></body></html>'''
-        (out/url).write_text(page)
+        (out/url).write_text(page, encoding="utf-8")
         parsed=Inspect();parsed.feed(page);pages[url]=parsed
         text=Inspect();text.feed(body);search.append(dict(title=title,url=url,text=' '.join(text.text)))
-    (out/'search.json').write_text(json.dumps(search))
+    (out/'search.json').write_text(json.dumps(search), encoding="utf-8")
     for url,page in pages.items():
         for link in page.links:
             p=urlsplit(link)
@@ -148,6 +148,6 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
             assert (out/path).is_file(),f'Broken link: {url}: {link}'
             if p.fragment and path in pages: assert unquote(p.fragment) in pages[path].ids,(url,link)
     version_theme_assets(out)
-    print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((source_dir/downloads[0]).read_text())["cells"])} cells → {out}')
+    print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((source_dir/downloads[0]).read_text(encoding="utf-8"))["cells"])} cells → {out}')
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,default=ROOT/'runs/live_session_preview');build(ap.parse_args().output.resolve())

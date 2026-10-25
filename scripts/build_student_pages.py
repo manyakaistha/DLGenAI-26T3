@@ -11,9 +11,17 @@ import html
 import json
 import re
 import shutil
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 import markdown
 
@@ -145,10 +153,10 @@ def version_theme_assets(output: Path):
     version = digest.hexdigest()[:16]
     pattern = r'(styles/generative/[A-Za-z0-9_.-]+\.(?:js|css))(?:\?[^"\s<>]*)?'
     for page in output.rglob("*.html"):
-        source = page.read_text()
+        source = page.read_text(encoding="utf-8", errors="ignore")
         rendered = re.sub(pattern, lambda match: match.group(1) + "?v=" + version, source)
         if rendered != source:
-            page.write_text(rendered)
+            page.write_text(rendered, encoding="utf-8")
     return version
 
 
@@ -167,8 +175,8 @@ def build_milestone_one(output: Path):
     for name in ("starter.ipynb", "starter.py"):
         shutil.copy2(STARTERS / name, downloads / name)
         mapping[(STARTERS / name).resolve()] = "downloads/" + name
-    (output / "site.css").write_text(CSS)
-    (output / "site.js").write_text(JS)
+    (output / "site.css").write_text(CSS, encoding="utf-8")
+    (output / "site.js").write_text(JS, encoding="utf-8")
     shutil.copytree(ROOT / "styles/generative", output / "styles/generative", dirs_exist_ok=True)
     (output / ".nojekyll").touch()
     search = []
@@ -178,7 +186,7 @@ def build_milestone_one(output: Path):
             extensions=["tables", "toc", "sane_lists", "md_in_html", "pymdownx.superfences", "pymdownx.arithmatex"],
             extension_configs={"pymdownx.arithmatex": {"generic": True}, "toc": {"toc_depth": "2-2"}},
         )
-        markdown_source = normalize_markdown(source.read_text())
+        markdown_source = normalize_markdown(source.read_text(encoding="utf-8"))
         # Python-Markdown treats raw HTML blocks as opaque; opt <details> into
         # Markdown parsing so worked solutions render emphasis, lists and math.
         markdown_source = re.sub(r"<details(?=\s|>)", '<details markdown="1"', markdown_source)
@@ -248,11 +256,11 @@ def build_milestone_one(output: Path):
 <span class="section-label">{label}</span><details class="toc"><summary>On this page</summary>{md.toc}</details>
 <article>{body}</article><nav class="pagination" aria-label="Previous and next page">{pager}</nav>
 <footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>'''
-        (output / urls[i]).write_text(page)
+        (output / urls[i]).write_text(page, encoding="utf-8")
         parsed = Inspect()
         parsed.feed(body)
         search.append({"title": titles[i], "url": urls[i], "text": " ".join(parsed.text)})
-    (output / "search.json").write_text(json.dumps(search, ensure_ascii=False))
+    (output / "search.json").write_text(json.dumps(search, ensure_ascii=False), encoding="utf-8")
     print(f"Built {len(sources)} Milestone 1 pages → {output}")
 
 
@@ -260,6 +268,8 @@ def build(output: Path):
     from build_student_hub import build_hub, validate_site
     output.mkdir(parents=True, exist_ok=True)
     build_milestone_one(output / "milestones/milestone-1")
+    from build_milestone_two import build_milestone_two
+    build_milestone_two(output / "milestones/milestone-2")
     from build_live_session import build as build_session
     build_session(output / "session")
     import build_live_session as session_renderer
