@@ -122,7 +122,11 @@ def build_milestone_two(output: Path):
 
     # Copy assets
     if (SOURCE / "assets").is_dir():
+        if (output / "assets").is_dir():
+            shutil.rmtree(output / "assets")
         shutil.copytree(SOURCE / "assets", output / "assets", dirs_exist_ok=True)
+    if (output / "styles").is_dir():
+        shutil.rmtree(output / "styles")
     shutil.copytree(ROOT / "styles/generative", output / "styles/generative", dirs_exist_ok=True)
 
     (output / "site.css").write_text(CSS, encoding="utf-8")
