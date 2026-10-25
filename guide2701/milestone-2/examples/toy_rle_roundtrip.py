@@ -1,3 +1,4 @@
+# Legacy compatibility download. See walkthrough-notebook.html for the contract notice.
 """Toy RLE encoding and decoding roundtrip verification on synthetic binary masks.
 
 Demonstrates:

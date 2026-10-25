@@ -1,3 +1,4 @@
+# Legacy compatibility download. See walkthrough-notebook.html for the contract notice.
 """Minimal toy U-Net step demonstrating the forward, loss, and backward lifecycle on CPU.
 
 Demonstrates:

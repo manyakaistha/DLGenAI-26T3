@@ -1,3 +1,4 @@
+# Legacy compatibility download. See walkthrough-notebook.html for the contract notice.
 """Toy Dataset and DataLoader demonstration on synthetic industrial strip data.
 
 Demonstrates:

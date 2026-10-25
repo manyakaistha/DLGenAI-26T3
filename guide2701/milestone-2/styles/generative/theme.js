@@ -174,3 +174,14 @@
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else if(visible)repaint();});
   size();
 })();
+
+// Load the shared study helper relative to this theme, including nested session pages.
+(() => {
+  const current=document.currentScript;
+  if(!current)return;
+  const assetURL=(name)=>{const url=new URL(name,current.src);url.search=new URL(current.src).search;return url.href;};
+  const css=document.createElement('link');css.rel='stylesheet';css.href=assetURL('ask-ai.css');
+  const decoration=document.createElement('script');decoration.src=assetURL('ask-ai-botanical.js');
+  decoration.onload=()=>{const script=document.createElement('script');script.src=assetURL('ask-ai.js');document.head.append(script);};
+  document.head.append(css,decoration);
+})();

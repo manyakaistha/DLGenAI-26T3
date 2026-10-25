@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q1 · RLE Column-Major Encoding · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 2 student study guides: question-wise conceptual guides, PyTorch datasets, co-occurrence, spatial overlap, and baseline U-Net training dynamics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>From tensors to submissions. Understand. Build. Validate.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html" aria-current="page"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html" aria-current="page"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Student learning resources</span><a href="milestone-2.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 1 Guided Study</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 01 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-concept-why-run-length-encoding">1. The Core Concept: Why Run-Length Encoding?</a></li>
+<li><a href="#2-the-two-non-negotiable-rules">2. The Two Non-Negotiable Rules</a></li>
+<li><a href="#3-guiding-hints-for-question-1">3. Guiding Hints for Question 1</a></li>
+<li><a href="#4-your-assignment-task">4. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="rle-standards-column-major-encoding-on-a-2d-grid">RLE Standards: Column-Major Encoding on a 2D Grid</h1>
+<p><em>(Milestone 2 · Question 1 Study Guide)</em></p>
+<hr />
+<h2 id="1-the-core-concept-why-run-length-encoding">1. The Core Concept: Why Run-Length Encoding?</h2>
+<p>In automated surface inspection, segmentation masks are mostly background (clean metal), with defect anomalies occupying only a tiny fraction of pixels. Storing uncompressed 2D binary grids for thousands of images consumes excessive storage and network bandwidth.</p>
+<p><strong>Run-Length Encoding (RLE)</strong> solves this by storing only the locations of active pixels as pairs of space-separated integers:</p>
+<div class="arithmatex">\[\text{"start length start length ..."}\]</div>
+<ul>
+<li><strong><code>start</code></strong>: The index where a contiguous sequence of defect pixels begins.</li>
+<li><strong><code>length</code></strong>: The number of consecutive defect pixels in that run.</li>
+</ul>
+<hr />
+<h2 id="2-the-two-non-negotiable-rules">2. The Two Non-Negotiable Rules</h2>
+<p>When encoding masks for this competition, your index calculations must adhere strictly to two standards:</p>
+<h3 id="rule-1-1-based-indexing">Rule 1: 1-Based Indexing</h3>
+<p>Unlike Python arrays which begin at index 0, RLE strings are <strong>1-based</strong>:</p>
+<ul>
+<li>The first pixel in memory is assigned index <strong>1</strong>.</li>
+<li>The final pixel on an <span class="arithmatex">\(H \times W\)</span> canvas is index <strong><span class="arithmatex">\(H \times W\)</span></strong>.</li>
+</ul>
+<h3 id="rule-2-column-major-traversal-orderf">Rule 2: Column-Major Traversal (<code>order='F'</code>)</h3>
+<p>Pixels are flattened into a 1D sequence by traversing <strong>down columns first</strong> (Fortran order), rather than across rows (C order):</p>
+<ol>
+<li>Walk down Column 0 from top to bottom (row 0 to row <span class="arithmatex">\(H-1\)</span>).</li>
+<li>Move to Column 1 and walk top to bottom.</li>
+<li>Continue through all columns until Column <span class="arithmatex">\(W-1\)</span>.</li>
+</ol>
+<pre class="highlight"><code class="language-text">2D Grid Flattening Order (H=4, W=4, 1-based Fortran):
+       Col 0    Col 1    Col 2    Col 3
+Row 0:   1        5        9       13
+Row 1:   2        6       10       14
+Row 2:   3        7       11       15
+Row 3:   4        8       12       16</code></pre>
+<h3 id="the-coordinate-conversion-formula">The Coordinate Conversion Formula</h3>
+<p>For any 0-indexed coordinate <span class="arithmatex">\((\text{row } r, \text{col } c)\)</span> on a grid of height <span class="arithmatex">\(H\)</span>:</p>
+<div class="arithmatex">\[k = c \times H + r + 1\]</div>
+<hr />
+<h2 id="3-guiding-hints-for-question-1">3. Guiding Hints for Question 1</h2>
+<p>To determine the exact RLE string for the <span class="arithmatex">\(8 \times 8\)</span> grid in Question 1:</p>
+<ul>
+<li><strong>Hint 1 (Determine Canvas Height):</strong> The grid is of size <span class="arithmatex">\(8 \times 8\)</span>, so <span class="arithmatex">\(H = 8\)</span>. Each column contains 8 pixels. Column 0 spans indices 1–8, Column 1 spans indices 9–16, and so on.</li>
+<li><strong>Hint 2 (Traverse Column-by-Column):</strong> Inspect the grid column-by-column from left to right. Note the row positions of every highlighted (active) cell.</li>
+<li><strong>Hint 3 (Compute Linear Indices):</strong> Use the formula <span class="arithmatex">\(k = c \times 8 + r + 1\)</span> to convert each active cell's <span class="arithmatex">\((r, c)\)</span> position into its 1D linear index.</li>
+<li><strong>Hint 4 (Group Consecutive Integers):</strong> Sort the active indices in ascending order. Any run of consecutive integers <span class="arithmatex">\([k, k+1, \dots, k+L-1]\)</span> forms a single run: <code>k L</code>.</li>
+<li><strong>Pitfall to Watch For:</strong> In column-major order, the bottom cell of column <span class="arithmatex">\(c\)</span> (index <span class="arithmatex">\(c \times 8 + 8\)</span>) and the top cell of column <span class="arithmatex">\(c+1\)</span> (index <span class="arithmatex">\((c+1) \times 8 + 1\)</span>) are adjacent integers in 1D memory! If both are active, they merge into a single continuous run.</li>
+</ul>
+<hr />
+<h2 id="4-your-assignment-task">4. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-2.html#question-1-rle-standards-column-major-encoding-on-a-2d-grid">Milestone 2 Assessment: Question 1</a>.</li>
+<li>Inspect the <span class="arithmatex">\(8 \times 8\)</span> pixel grid in <code>assets/fig_q1_rle_grid_8x8.png</code>.</li>
+<li>Compute the 1-based Fortran linear indices for all active cells, group them into contiguous <code>start length</code> pairs, and enter your final RLE string.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="milestone-2.html">← Milestone 2 questions</a><a href="guide_02_rle_decoding_and_pixel_mass.html">Q2 · RLE Decoding &amp; Pixel Mass →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

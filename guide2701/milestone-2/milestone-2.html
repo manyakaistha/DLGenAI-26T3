@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milestone 2 questions · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 2 student study guides: question-wise conceptual guides, PyTorch datasets, co-occurrence, spatial overlap, and baseline U-Net training dynamics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="off">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Milestone 2<br>Study Guides</a>
+<p>From tensors to submissions. Understand. Build. Validate.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html" aria-current="page"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 2</summary><input class="search" aria-label="Search Milestone 2 guides" placeholder="Search Milestone 2…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="milestone-2.html" aria-current="page"><span class="num">ASSESSMENT · 8 QUESTIONS</span>Milestone 2 questions</a><a href="guide_01_rle_column_major_encoding.html"><span class="num">GUIDE 01</span>Q1 · RLE Column-Major Encoding</a><a href="guide_02_rle_decoding_and_pixel_mass.html"><span class="num">GUIDE 02</span>Q2 · RLE Decoding &amp; Pixel Mass</a><a href="guide_03_global_class_distribution_and_prevalence.html"><span class="num">GUIDE 03</span>Q3 · Global Class Distribution</a><a href="guide_04_defect_cooccurrence_matrix.html"><span class="num">GUIDE 04</span>Q4 · Defect Co-Occurrence Matrix</a><a href="guide_05_cooccurrence_vs_correlation_base_rate.html"><span class="num">GUIDE 05</span>Q5 · Co-Occurrence vs. Correlation</a><a href="guide_06_pixel_level_spatial_overlap_and_mutual_exclusivity.html"><span class="num">GUIDE 06</span>Q6 · Spatial Overlap &amp; Exclusivity</a><a href="guide_07_pytorch_dataset_and_architectural_paradigms.html"><span class="num">GUIDE 07</span>Q7 · PyTorch Dataset &amp; Paradigms</a><a href="guide_08_training_dynamics_and_convergence.html"><span class="num">GUIDE 08</span>Q8 · Training Dynamics &amp; Convergence</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 2"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Assessment questions</span><a href="milestone-2.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Assessment</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Assessment · 8 questions</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#question-1-rle-standards-column-major-encoding-on-a-2d-grid">Question 1: RLE Standards — Column-Major Encoding on a 2D Grid</a></li>
+<li><a href="#question-2-rle-decoding-in-practice-multi-defect-pixel-mass">Question 2: RLE Decoding in Practice — Multi-Defect Pixel Mass</a></li>
+<li><a href="#question-3-global-class-distribution-and-defect-prevalence">Question 3: Global Class Distribution and Defect Prevalence</a></li>
+<li><a href="#question-4-multi-label-defect-co-occurrence-matrix">Question 4: Multi-Label Defect Co-Occurrence Matrix</a></li>
+<li><a href="#question-5-co-occurrence-vs-correlation-the-base-rate-effect">Question 5: Co-Occurrence vs. Correlation (The Base-Rate Effect)</a></li>
+<li><a href="#question-6-pixel-level-spatial-overlap-and-mutual-exclusivity">Question 6: Pixel-Level Spatial Overlap and Mutual Exclusivity</a></li>
+<li><a href="#architectural-formulations-for-multi-defect-segmentation">Architectural Formulations for Multi-Defect Segmentation</a></li>
+<li><a href="#question-7-pytorch-dataset-for-paradigm-1">Question 7: PyTorch Dataset for Paradigm 1</a></li>
+<li><a href="#question-8-baseline-model-training-dynamics-and-convergence">Question 8: Baseline Model Training Dynamics and Convergence</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-2-building-the-segmentation-pipeline-first-submission">Milestone 2: Building the Segmentation Pipeline &amp; First Submission</h1>
+<p>Industrial Surface Anomaly Segmentation · Milestone 2 Assessment</p>
+<p>Read the <a href="index.html">student study guides</a> before attempting the questions. Use the competition data in <code>data/public/</code> and compute your own results. This document contains questions and response formats only.</p>
+<p>Questions 1–7 use concise numerical or categorical answers. Question 8 requires recorded loss metrics and a descriptive analysis of training dynamics. Image dimensions below are height × width unless stated otherwise.</p>
+<h2 id="question-1-rle-standards-column-major-encoding-on-a-2d-grid">Question 1: RLE Standards — Column-Major Encoding on a 2D Grid</h2>
+<p>Industrial line-scan segmentation competitions represent binary masks using Run-Length Encoding (RLE) to minimize disk storage and network bandwidth. The competition specification strictly enforces two non-negotiable standards:</p>
+<ol>
+<li><strong>1-based indexing:</strong> The top-left pixel of the canvas is assigned index 1.</li>
+<li><strong>Column-major traversal (<code>order='F'</code>):</strong> Pixels are traversed top-to-bottom down the first column, then down the second column, and so forth.</li>
+</ol>
+<p>The RLE format is stored as space-separated pairs:</p>
+<div class="arithmatex">\[\text{"start length start length ..."}\]</div>
+<p>which directly reference the 1D flattened column-major memory array.</p>
+<p><img alt="2D Pixel Grid (8 x 8)" src="assets/fig_q1_rle_grid_8x8.png" /></p>
+<p><strong>Question:</strong> Inspect the provided 2D pixel grid of size <span class="arithmatex">\(8 \times 8\)</span> in the figure above. What is the exact Run-Length Encoded (RLE) string for this mask?</p>
+<p><strong>Answer format:</strong> <code>rle_string</code> (space-separated integers).</p>
+<h2 id="question-2-rle-decoding-in-practice-multi-defect-pixel-mass">Question 2: RLE Decoding in Practice — Multi-Defect Pixel Mass</h2>
+<p>In production pipelines, Run-Length Encoded (RLE) annotations must be programmatically converted back into 2D binary masks of shape <span class="arithmatex">\((H, W) = (128, 800)\)</span> before they can be utilized in loss computation or visualized alongside the raw image strips.</p>
+<p>Using the competition training annotations in <code>train.csv</code>, locate the four corresponding defect rows for the image with identifier:</p>
+<div class="arithmatex">\[\text{image_id} = \text{"0ZUU8LH57Y"}\]</div>
+<p>Implement an RLE decoding function that converts each row's <code>mask_rle</code> into a binary mask where pixel values are 1 for defect regions and 0 for background (handling missing or empty entries by returning an all-zeros mask of shape <span class="arithmatex">\(128 \times 800\)</span>).</p>
+<p><strong>Question:</strong> Decode the segmentation masks across all four defect classes (<code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, and <code>defect_d</code>) for the image <code>"0ZUU8LH57Y"</code>. What is the exact total sum of all positive (active) pixel values across all four defect masks for this image?</p>
+<p><strong>Answer format:</strong> Integer (e.g., <code>1420</code>).</p>
+<h2 id="question-3-global-class-distribution-and-defect-prevalence">Question 3: Global Class Distribution and Defect Prevalence</h2>
+<p>Before designing model architectures, loss weights, or validation strategies, you must understand the degree of class imbalance in the training data. In <code>train.csv</code>, each unique image is represented across four distinct rows corresponding to the four defect categories (<code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, and <code>defect_d</code>), totaling 45,572 rows for the 11,393 unique training images.</p>
+<p>A row with a non-empty <code>mask_rle</code> entry indicates that the specific defect is present in that image.</p>
+<p>Analyze the occurrence frequency of each defect class across all unique training images in <code>train.csv</code>.</p>
+<p><strong>Question:</strong> Based on your calculations:</p>
+<ol>
+<li>Which defect class is the <strong>most common</strong> across the images, and how many images contain it?</li>
+<li>Which defect class is the <strong>rarest</strong> across the images, and how many images contain it?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>most_common (count), rarest (count)</code>.</p>
+<h2 id="question-4-multi-label-defect-co-occurrence-matrix">Question 4: Multi-Label Defect Co-Occurrence Matrix</h2>
+<p>Industrial steel sheets can suffer from multiple independent manufacturing errors simultaneously. To analyze how frequently different types of flaws appear together on the same strip, we construct a co-occurrence matrix.</p>
+<p>Compute the <span class="arithmatex">\(4 \times 4\)</span> defect co-occurrence matrix <span class="arithmatex">\(C\)</span>, where each entry <span class="arithmatex">\(C_{ij}\)</span> denotes the total number of images in which both defect <span class="arithmatex">\(i\)</span> and defect <span class="arithmatex">\(j\)</span> appear simultaneously (with diagonal entries <span class="arithmatex">\(C_{ii}\)</span> representing the total image count for defect <span class="arithmatex">\(i\)</span>).</p>
+<p><strong>Question:</strong> Based on your co-occurrence matrix:</p>
+<ol>
+<li>Which pair of distinct defect classes (<span class="arithmatex">\(i \neq j\)</span>) co-occurs the most across the training images?</li>
+<li>Exactly how many images contain both of these defect classes simultaneously?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>defect_pair, count</code>.</p>
+<h2 id="question-5-co-occurrence-vs-correlation-the-base-rate-effect">Question 5: Co-Occurrence vs. Correlation (The Base-Rate Effect)</h2>
+<p>In Question 4, you observed that certain defect pairs share a significant number of images (e.g., <code>defect_c</code> and <code>defect_d</code> appear together in over 700 images). However, a high absolute co-occurrence count does not necessarily imply a strong statistical association — it may simply be an artifact of high baseline marginal frequency (since <code>defect_c</code> alone appears in 4,100 images).</p>
+<p>To normalize for class frequencies, compute the Pearson correlation matrix for the binary indicator vectors across all images.</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>What is the exact Pearson correlation coefficient (rounded to 2 decimal places) between the defect pair with the highest co-occurrence count identified in Question 4?</li>
+<li>Does the strong association implied by the raw co-occurrence count sustain in the correlation matrix? Explain why or why not in 1–2 sentences.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>correlation_value, Yes/No</code>.</p>
+<h2 id="question-6-pixel-level-spatial-overlap-and-mutual-exclusivity">Question 6: Pixel-Level Spatial Overlap and Mutual Exclusivity</h2>
+<p>While Questions 4 and 5 examined defect co-occurrence at the <em>image level</em>, we must also determine whether different defects ever occupy the exact same physical coordinates at the <em>pixel level</em>.</p>
+<p>In semantic segmentation, the Dice similarity coefficient between two binary masks <span class="arithmatex">\(M_i\)</span> and <span class="arithmatex">\(M_j\)</span> is defined as:</p>
+<div class="arithmatex">\[\operatorname{Dice}(M_i, M_j) = \frac{2|M_i \cap M_j|}{|M_i| + |M_j|}\]</div>
+<p>where the numerator <span class="arithmatex">\(|M_i \cap M_j| = \sum_{y,x} M_i(y,x) \cdot M_j(y,x)\)</span> measures the exact pixel-level intersection (the count of shared active pixels).</p>
+<p>For all multi-label images identified in Question 4, decode the binary masks for each present defect onto the native <span class="arithmatex">\((128, 800)\)</span> canvas and compute the pairwise intersection <span class="arithmatex">\(|M_i \cap M_j|\)</span> (or pairwise Dice score) across all distinct defect pairs (<span class="arithmatex">\(i \neq j\)</span>).</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Across the entire training dataset, what is the maximum number of overlapping pixels (or maximum Dice score) observed between any two distinct defect classes on the same image?</li>
+<li>Are different defect classes on this industrial material <strong>spatially mutually exclusive</strong> at the pixel level?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>max_overlap_pixels, Yes/No</code>.</p>
+<hr />
+<h2 id="architectural-formulations-for-multi-defect-segmentation">Architectural Formulations for Multi-Defect Segmentation</h2>
+<p>When designing a deep learning segmentation system for multi-label industrial surface defects, there are two fundamentally different ways to formulate the relationship between the input image, the target defect categories, and the predicted masks:</p>
+<h3 id="paradigm-1-multi-channel-joint-prediction-concurrent-multi-task">Paradigm 1: Multi-Channel Joint Prediction (Concurrent Multi-Task)</h3>
+<p>In this formulation, the neural network ingests the raw strip image and concurrently outputs segmentation predictions for all four defect categories in a single forward pass:</p>
+<div class="arithmatex">\[f_\theta : \mathbf{X} \in \mathbb{R}^{C \times H \times W} \longrightarrow \mathbf{\hat{Y}} \in \mathbb{R}^{4 \times H \times W}\]</div>
+<p>where each output channel <span class="arithmatex">\(k \in \{0, 1, 2, 3\}\)</span> represents the continuous logit map for <code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, and <code>defect_d</code>, respectively.</p>
+<ul>
+<li><strong>Mechanism:</strong> A shared encoder-decoder backbone extracts general structural features (edges, roll textures, contrast gradients) from the steel strip. The final layer branches into a 4-channel <span class="arithmatex">\(1 \times 1\)</span> convolution evaluated with independent Sigmoid activations.</li>
+<li><strong>Advantage (High Throughput):</strong> Requires exactly one forward pass per image to evaluate all four defect classes, making it exceptionally fast for high-speed industrial line-scan inspection.</li>
+<li><strong>Trade-off (Gradient Competition):</strong> Loss gradients computed across all four heads backpropagate through the shared backbone simultaneously; dominant, high-prevalence classes (such as <code>defect_c</code>) can overpower gradients from rare classes (such as <code>defect_b</code>).</li>
+</ul>
+<h3 id="paradigm-2-conditioned-prompted-segmentation-query-based">Paradigm 2: Conditioned / Prompted Segmentation (Query-Based)</h3>
+<p>This approach is inspired by modern prompt-conditioned architectures such as <strong>OpenAI's Whisper</strong>.</p>
+<ul>
+<li><strong>How Whisper Works as an Analogy:</strong> In speech processing, rather than building separate models for English transcription, French translation, and voice activity detection, Whisper uses a single, unified neural network. At the start of decoding, Whisper is fed special <em>prefix conditioning tokens</em> (such as <code>&lt;|en|&gt;</code>, <code>&lt;|transcribe|&gt;</code>, or <code>&lt;|translate|&gt;</code>). These prompt tokens act as an internal steering wheel: they tell the exact same shared network <em>which task</em> to perform on the input audio, causing its internal attention layers to adapt dynamically.</li>
+<li><strong>Applying Prompt Conditioning to Segmentation:</strong> We can treat visual surface defect detection in the exact same manner. Instead of forcing the network to predict all four defect types at once, we reframe segmentation as an interactive query: <em>"Here is a steel strip image; segment only defect class <span class="arithmatex">\(k\)</span>."</em></li>
+</ul>
+<div class="arithmatex">\[f_\theta : (\mathbf{X} \in \mathbb{R}^{C \times H \times W}, c \in \{\text{defect_a}, \dots\}) \longrightarrow \mathbf{\hat{Y}} \in \mathbb{R}^{1 \times H \times W}\]</div>
+<p>Here, the target defect identifier <span class="arithmatex">\(c\)</span> is represented as a learned embedding vector or condition token that is injected into the network (e.g., concatenated to bottleneck feature maps or applied via feature-wise modulation).</p>
+<ul>
+<li><strong>Mechanism:</strong> The network acts as an adaptive query engine. When prompted with <code>&lt;|defect_b|&gt;</code>, its attention layers steer toward narrow, longitudinal scratches; when prompted with <code>&lt;|defect_c|&gt;</code>, it shifts focus toward broad, textured surface patches.</li>
+<li><strong>Advantage (Dedicated Capacity):</strong> The decoder concentrates its entire parameter capacity on isolating one defect mechanism at a time. Furthermore, training batches can be artificially balanced across prompt queries, naturally mitigating extreme class imbalance.</li>
+<li><strong>Trade-off (Inference Latency):</strong> Evaluating a single test image across all four defect classes requires <strong>four separate forward passes</strong> (one per defect prompt), making test-time inference roughly <span class="arithmatex">\(4\times\)</span> slower than joint prediction.</li>
+</ul>
+<hr />
+<h2 id="question-7-pytorch-dataset-for-paradigm-1">Question 7: PyTorch Dataset for Paradigm 1</h2>
+<p>To train a neural network under <strong>Paradigm 1 (Multi-Channel Joint Prediction)</strong>, our data pipeline must supply training batches where:</p>
+<ol>
+<li>Each input image is a 3-channel RGB float tensor: <span class="arithmatex">\(\mathbf{X} \in \mathbb{R}^{3 \times 128 \times 800}\)</span>, normalized to the range <span class="arithmatex">\([0.0, 1.0]\)</span>.</li>
+<li>
+<p>Each target label is a single 4-channel binary float tensor: <span class="arithmatex">\(\mathbf{Y} \in \mathbb{R}^{4 \times 128 \times 800}\)</span>, where the four channels strictly map to the four defect classes in fixed order:</p>
+<div class="arithmatex">\[\text{Channel 0} \rightarrow \text{defect_a}, \quad \text{Channel 1} \rightarrow \text{defect_b}, \quad \text{Channel 2} \rightarrow \text{defect_c}, \quad \text{Channel 3} \rightarrow \text{defect_d}\]</div>
+</li>
+</ol>
+<p>Construct a custom PyTorch Dataset class (e.g., <code>SurfaceAnomalyDataset</code>) that accepts the image dataframe and image directory, and implements:</p>
+<ul>
+<li><code>__len__</code>: returns the total count of unique training images.</li>
+<li><code>__getitem__(idx)</code>: loads the <span class="arithmatex">\(idx\)</span>-th image from disk (converting BGR to RGB and normalizing pixel values by 255.0), decodes its four defect RLE masks, stacks them along the channel dimension into shape <span class="arithmatex">\((4, 128, 800)\)</span> with <code>torch.float32</code> dtype, and returns the tuple <code>(image, masks)</code>.</li>
+</ul>
+<p>Instantiate your dataset with the training set, wrap it inside a PyTorch DataLoader with <code>batch_size = 4</code>, and extract the very first batch:
+<pre class="highlight"><code class="language-python">images, masks = next(iter(dataloader))</code></pre></p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>What are the exact 4D tensor shapes and data types (<code>dtype</code>) of images and masks yielded by the DataLoader?</li>
+<li>Why must the target mask tensor be cast to <code>torch.float32</code> rather than remaining as integer/boolean (<code>torch.uint8</code> or <code>torch.bool</code>) when using standard loss functions such as <code>nn.BCEWithLogitsLoss()</code>?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>images_shape, masks_shape, dtype, brief_loss_explanation</code>.</p>
+<p><em>Optional exploration:</em> If you were to create a Dataset class for Paradigm 2, what structural changes would be required compared to Paradigm 1?</p>
+<h2 id="question-8-baseline-model-training-dynamics-and-convergence">Question 8: Baseline Model Training Dynamics and Convergence</h2>
+<p>With the dataset pipeline constructed under <strong>Paradigm 1 (Multi-Channel Joint Prediction)</strong>, train a baseline segmentation model (such as a 3-stage U-Net) for <strong>5 epochs</strong>. Use an optimizer of your choice (e.g., Adam or AdamW with an initial learning rate around <span class="arithmatex">\(3 \times 10^{-4}\)</span>) and evaluate on your validation holdout at the end of each epoch.</p>
+<p>During training, log and monitor both the training loss and the validation loss across all 5 epochs.</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Report your recorded training loss and validation loss at the end of Epoch 1 and Epoch 5.</li>
+<li>At which epoch did your model achieve its lowest validation loss (the optimal checkpoint to save for inference)?</li>
+<li>Based on the trajectory of your training vs. validation loss curves across the 5 epochs, did your model begin to <strong>overfit</strong>, remain <strong>underfitting</strong>, or demonstrate <strong>healthy generalization</strong>? Briefly justify your observation in 1–2 sentences.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>epoch1_(train, val), epoch5_(train, val), best_epoch, generalization_assessment</code>.</p></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 2 Overview</a><a href="guide_01_rle_column_major_encoding.html">Q1 · RLE Column-Major Encoding →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

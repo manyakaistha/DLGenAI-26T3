@@ -3,6 +3,11 @@
 #
 # **Industrial Surface Anomaly Segmentation**
 #
+# **Legacy reference:** this demo uses grayscale `[1, 128, 800]` images, standardized
+# pixels and dictionary samples. Current Q7 requires RGB `[3, 128, 800]` images
+# scaled to `[0, 1]` and an `(image, masks)` tuple. The random textures do not
+# depict the annotation shapes: this is a pipeline smoke test, not a learnable benchmark.
+#
 # This educational notebook demonstrates the **conceptual mechanics** of every major stage in a surface anomaly segmentation pipeline using **100% synthetic data**:
 # 1. Synthetic Strip Generator & Long-Format Annotation Schema
 # 2. PyTorch Dataset Contract: Image `[1, 128, 800]` and Multi-Label Mask `[4, 128, 800]`
@@ -151,12 +156,13 @@ print("Unsynchronized transform: Mask coordinates no longer match image defect!"
 # %% [markdown]
 # ## 4. Multi-Label Combination Stratification
 #
-# Stratifying by unique combination signature ensures rare categories receive guaranteed support in validation.
+# Combination signatures help inspect rare groups before splitting. They cannot guarantee validation support when a group is too small; this example only counts signatures and does not perform a split.
 
 # %%
 def compute_combination_signatures(df: pd.DataFrame) -> pd.Series:
     """Create a combination signature string for each image."""
-    active = df[df["mask_rle"].str.strip() != ""]
+    present = df["mask_rle"].fillna("").astype(str).str.strip().ne("")
+    active = df[present]
     grouped = active.groupby("image_id")["defect_type"].apply(lambda s: "+".join(sorted(s)))
     # Map back to all unique image IDs; empty images become 'clean'
     all_ids = pd.Series(index=df["image_id"].unique(), data="clean", dtype=object)
