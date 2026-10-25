@@ -49,7 +49,7 @@ The notebook creates original synthetic cloud-like data locally and runs on CPU.
 
 ## Live session: Give Your U-Net a Head Start · 26 October 2026
 
-Four short lessons build on the U-Net students have already trained: recognise its parts, borrow an encoder, freeze or fine-tune, and compare fairly. The MRI pictures are a shared example; dataset setup and full training are optional follow-up material.
+Four connected lessons build on the U-Net students have already trained: trace encoder features and decoder joins, understand pretrained initialization, implement freezing/fine-tuning, and design controlled comparisons. The MRI pictures are a shared example; dataset setup and full training are optional follow-up material.
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-3/)
 - [Small classroom notebook — no MRI files or training required](docs/transfer_learning_live_session/classroom_walkthrough.ipynb)

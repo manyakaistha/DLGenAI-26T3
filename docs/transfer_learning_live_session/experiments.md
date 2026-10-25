@@ -1,53 +1,78 @@
-# 4. Change one thing and compare
+# 4. Compare models and explain the result
 
-**Main idea: a fair comparison helps us understand why a result changed.**
+A model comparison should answer a specific question. For this session: **does ImageNet encoder initialization help the same segmentation model under a fixed training budget?**
 
-Suppose you train a pretrained model and its Dice score improves. That is encouraging. To attribute the change to pretraining, check what else changed.
+This is a different question from “which complete pipeline gets the highest possible score?” Keeping the question narrow helps us interpret the result.
 
-## Start with one question
+## Write the experiment before running it
 
-> Does this model benefit from pretrained encoder weights under the same training budget?
+| Setting | Run A | Run B |
+| :--- | :--- | :--- |
+| Architecture | ResNet18 encoder + a fixed decoder design | Same |
+| Encoder initialization | Random | ImageNet |
+| Decoder initialization | One saved starting state | Same starting state |
+| Patient split and preprocessing | Fixed | Same |
+| BCE–Dice loss and training settings | Fixed | Same |
+| Parameters allowed to learn | Full model | Full model |
+| Evaluation threshold and examples | Fixed | Same |
 
-Use the **same ResNet-based U-Net** for both runs. Start its encoder randomly in one run and from ImageNet weights in the other.
+Initialization is the intended difference. Freezing only the pretrained encoder would also change the training policy. It could be a useful experiment, but its result would not isolate initialization.
 
-Keep the split, input preparation, decoder starting weights, BCE–Dice loss, learning settings and training budget the same. Let the same parts learn in both runs. Changing the architecture or freezing only one encoder would introduce another difference.
+For the MRI example, hold out **whole patients**, not individual slices, because slices from one person are related. For other datasets, identify their own source of dependence before choosing a split. The [optional patient-split activity](dataset.md) makes this visible.
 
 <div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="comparison">
-<p>Change the second experiment and decide whether you are still testing pretraining alone. The activity checks the setup; it does not invent model scores.</p>
+<p>Change an additional setting in Run B. Identify the extra difference and explain why a better score would then be harder to attribute to pretraining.</p>
 </div>
 
-## Look at evidence you already know
+## Read three kinds of evidence together
 
-- **Validation Dice:** how well did the predicted regions match the reference masks?
-- **Learning curves:** did training improve, and what happened on validation?
-- **The same example images:** which regions were missed, and where were false positives added?
+**Validation metric:** compare Dice on the same held-out examples using the same decision rule. Training loss alone cannot establish better performance on unseen data.
 
-Keep the validation examples the same for both models. A short run may tell us about early learning, but more patients and repeated runs are needed for a strong general conclusion.
+**Learning curves:** look at both training and validation. If training loss falls while validation loss rises, overfitting is one possibility. Check the split and preprocessing too. If one model learns faster in the first few epochs, distinguish faster convergence from a better fully trained result.
 
-## Quick check
+**Prediction panels:** compare the same images, reference masks and predictions. A score change might come from fewer false alarms, fewer missed regions or better boundaries. Show common examples rather than choosing a different “best” image for each model.
 
-A student changes the encoder weights **and** trains for more epochs. Can they say that pretraining alone caused the improvement?
+## Work through one metric example
+
+For a binary prediction, hard Dice is:
+
+$$\mathrm{Dice}=\frac{2TP}{2TP+FP+FN}$$
+
+Suppose an illustrative mask comparison has **TP=8, FP=2, FN=2**. Its Dice is `16 / 20 = 0.80`. This is a toy calculation, not a result from either model. A threshold changes which probabilities become predicted foreground, so changing it can change the score without changing model weights.
 
 <details>
-<summary>Check your understanding</summary>
+<summary>Try thresholds and an empty target</summary>
 
-No. Either change could have affected the result. Match the training budget and compare again.
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="threshold">
+<p>The synthetic 8 × 8 probability field is fixed. Change its threshold and inspect TP, FP and FN. For an empty target, any predicted foreground is a false positive. This activity defines Dice as 1 when prediction and target are both empty.</p>
+</div>
 
 </details>
 
-<div class="lesson-note"><strong>You have completed the classroom path.</strong> You can now explain a pretrained encoder, freezing versus fine-tuning, and a fair comparison. The MRI setup and full experiment are optional follow-up material.</div>
+## State a conclusion that matches the evidence
 
-[Return to the session overview](README.md) · [Optional short code demo](notebook.md)
+A supported statement might be: “On this patient split, the pretrained model reached a higher validation Dice within the fixed budget.” It does not prove that pretraining wins on every split or after every amount of training.
+
+A short run on a small validation sample is uncertain. Record the configuration and per-patient outcomes, then repeat across seeds or splits before making a strong claim. If there are many empty slices, inspect foreground cases and false positives separately so one average does not conceal the failure mode.
+
+## Check your understanding
+
+Run B has a better Dice score, but it also uses a different split and more epochs. What should you do before attributing the result to pretraining?
 
 <details>
-<summary>Go deeper: thresholds, empty masks and evaluation details</summary>
+<summary>Reveal the reasoning</summary>
 
-Keep the threshold fixed when comparing initialization. On empty target slices, a prediction can only add false positives. Decide how empty cases contribute to your metric and state that choice.
+Repeat the comparison with the same held-out cases and training budget. The current result compares two systems with several differences. Save the new configuration and use common validation examples to interpret what changed.
 
-The full notebook uses BCE plus per-sample soft Dice for training. At evaluation it reports patient-level Dice over the selected slices, foreground-slice Dice, and the fraction of empty slices with any predicted foreground. These are different views of the result; none should silently replace the industrial competition’s scoring rule.
+</details>
 
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="threshold">
-<p>This toy 8 × 8 probability field is fixed. Move the threshold to change the prediction. Try an empty target: any predicted foreground is a false positive. Both-empty Dice is defined as 1 in this activity.</p>
-</div>
+You have completed the classroom path. [Return to the overview](README.md) or [try the short code walkthrough](notebook.md).
+
+<details>
+<summary>Go deeper: the full notebook’s metric choices</summary>
+
+The full notebook trains with BCE plus per-sample soft Dice. Evaluation reports patient-level Dice over the selected slices, foreground-slice Dice and the fraction of empty slices with any predicted foreground. Missing subgroups are reported as unavailable. The MRI summaries do not replace the industrial competition’s different scoring rule.
+
+Keep the threshold fixed for the initialization comparison. If you want to tune it, do so as a separate validation experiment and keep a final test set untouched.
 
 </details>

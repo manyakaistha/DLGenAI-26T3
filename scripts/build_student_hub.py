@@ -17,7 +17,7 @@ SESSIONS = [
     ('session-2/index.html', '19 October 2026 · Session 2', 'Dataset, DataLoader & Augmentations',
      'Follow a sample from CSV row to training batch. Explore the split, paired transformations, interactive labs and notebook.'),
     ('session-3/index.html', '26 October 2026 · Session 3', 'Give Your U-Net a Head Start',
-     'Follow four short lessons on borrowing an encoder, freezing or fine-tuning, and comparing fairly. MRI setup and full training are optional.'),
+     'Connect encoder features, pretrained initialization and fine-tuning to a controlled segmentation experiment. Full MRI setup remains optional.'),
 ]
 
 

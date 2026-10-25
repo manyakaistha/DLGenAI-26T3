@@ -12,8 +12,8 @@ from build_student_hub import validate_site
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs/transfer_learning_live_session'
 MODULES = ['README', 'encoder', 'transfer', 'finetuning', 'experiments', 'dataset', 'inputs', 'notebook']
-TITLES = ['Session overview', '1 · The U-Net you know', '2 · Borrow an encoder',
-          '3 · Freeze or fine-tune', '4 · Compare fairly', 'About the MRI example',
+TITLES = ['Session overview', '1 · Encoder, decoder & skips', '2 · Pretraining & initialization',
+          '3 · Freezing & fine-tuning', '4 · Controlled comparisons', 'About the MRI example',
           'Input details', 'Notebooks & optional practice']
 URLS = ['index.html', *[name + '.html' for name in MODULES[1:]]]
 
@@ -27,7 +27,7 @@ def build(out):
                    extra_files=('labs.css', 'labs.js', 'figures/provenance.json'),
                    identity=dict(title='Give Your U-Net a Head Start · 26 October 2026',
                                  brand='Your U-Net,<br>with a head start',
-                                 description='Four short lessons on pretrained encoders, freezing, fine-tuning and fair comparisons. MRI setup and full training are optional.',
+                                 description='Four connected lessons with feature-shape examples, pretrained initialization, fine-tuning code and controlled comparisons. MRI setup and full training are optional.',
                                  intro='26 October 2026 · Build on the U-Net you already know.',
                                  topline='26 October · Milestone 3 live session',
                                  kicker='A familiar model. One new idea.', hero='Start with what<br>you know.',

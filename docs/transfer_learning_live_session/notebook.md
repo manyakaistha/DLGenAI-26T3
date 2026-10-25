@@ -2,7 +2,7 @@
 
 **Follow the browser notes first.** Running code is optional for this session.
 
-The small classroom notebook shows the same ideas as the four lessons: inspect encoder features, identify the starting weights, and choose which parameters can learn. It uses a clearly labelled dummy input tensor. You do not need to download MRI files or start a training job.
+The small classroom notebook shows the same ideas as the four lessons: trace encoder features, resize and concatenate a decoder skip, identify the starting weights, and choose which parameters can learn. It uses a clearly labelled dummy input tensor. You do not need to download MRI files or start a training job.
 
 [Download the small notebook](classroom_walkthrough.ipynb) · [Python version](classroom_walkthrough.py)
 
@@ -10,7 +10,7 @@ The small classroom notebook shows the same ideas as the four lessons: inspect e
 
 Open the notebook in your existing PyTorch environment or Colab and run its cells in order. It uses PyTorch and torchvision. A GPU is not needed.
 
-1. Look at the named encoder stages and their output sizes.
+1. Trace the named encoder stages and their output sizes, then execute a decoder join: 512 + 256 channels become 768 before convolution.
 2. Find the line that chooses random or ImageNet weights.
 3. Freeze the encoder, then unfreeze it. Check the trainable parameter count.
 4. Read the short experiment plan at the end.

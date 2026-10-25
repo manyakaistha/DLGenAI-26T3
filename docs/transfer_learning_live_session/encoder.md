@@ -1,54 +1,68 @@
-# 1. Start with the U-Net you already know
+# 1. Understand what the encoder contributes
 
-**Main idea: an encoder finds useful features; a decoder uses them to draw a mask.**
-
-Think back to the U-Net you trained. Its left side gradually made the image smaller and built up features. Its right side used those features to produce a prediction at each pixel.
+A pretrained encoder is useful only if we understand what it supplies to the rest of the model. Start with the U-Net you have already trained: **the encoder builds features, the decoder combines them into pixel-level predictions, and skip connections carry spatial detail across the network.**
 
 <div class="lesson-flow" aria-label="Segmentation flow">
-<span>Image</span><span>Encoder<br><small>Find features</small></span><span>Decoder<br><small>Build the mask</small></span><span>Predicted mask</span>
+<span>Image</span><span>Encoder<br><small>Extract features</small></span><span>Decoder<br><small>Combine and upsample</small></span><span>Mask logits</span>
 </div>
 
-## Give the familiar parts their names
+## What is a feature map?
 
-The **encoder** learns patterns in the input: edges, textures and more complex combinations. Its feature maps are intermediate representations, not finished masks.
+A feature map is a grid of responses produced by a learned filter. For example, a filter may respond strongly near a particular edge or texture. A layer usually produces many such maps, stacked along the channel dimension.
 
-The **decoder** combines those features and increases the spatial size until it can predict a mask. U-Net’s **skip connections** bring earlier, more detailed features across to the decoder.
+As the encoder goes deeper, its spatial grids become smaller. Later features can combine information from a larger region of the input. This helps with context, but precise locations become harder to recover. The decoder uses earlier, finer features as well as the deeper representation.
 
-You have already used all three. Today’s change is where the encoder’s starting weights come from.
+## Trace one example
 
-## What changes with a pretrained encoder?
+For a **128 × 128** image and a ResNet18 encoder, selected feature sizes are:
 
-We can use the feature-extracting part of a network such as **ResNet18** as the encoder. “Backbone” is another name you may hear for this feature extractor.
+| Point in the encoder | Tensor shape | What changed? |
+| :--- | :--- | :--- |
+| Input | `[B,3,128,128]` | Three input channels |
+| After the stem, before max pooling | `[B,64,64,64]` | More feature channels; smaller spatial grid |
+| After `layer3` | `[B,256,8,8]` | Coarser features with more context |
+| After `layer4` | `[B,512,4,4]` | Deepest feature in this example |
 
-The decoder still has work to learn. A network trained to classify photographs does not arrive knowing how to draw our segmentation masks.
+`B` is the batch size. A channel count of 512 means 512 learned feature maps; it does not mean 512 defect classes. The output layer decides how many target channels we predict.
 
-<div class="lesson-note"><strong>Keep this picture in mind:</strong> familiar U-Net idea, a different starting point for the encoder.</div>
+## How one decoder join works
 
-## Quick check
+To combine the deepest feature with the `layer3` skip, first resize it from 4 × 4 to 8 × 8. Then join the channels:
 
-If we borrow a trained encoder, do we automatically get a trained segmentation model?
+```python
+up = F.interpolate(deep, size=skip.shape[-2:],
+                   mode="bilinear", align_corners=False)
+joined = torch.cat([up, skip], dim=1)
+```
 
-<details>
-<summary>Check your understanding</summary>
+Here, `deep` has 512 channels and `skip` has 256. The result has **768 channels at 8 × 8**. A learned convolution block then mixes those features and can reduce the channel count.
 
-No. We have reused a feature extractor. The decoder and output layer still need to learn the new segmentation task, and the encoder may need to adapt too.
-
-</details>
-
-## Optional: explore the feature sizes
-
-Use the activity if you want to see how the image changes size through the encoder. You do not need to memorise the numbers to follow the lesson.
-
-<details>
-<summary>Try the feature-size activity</summary>
+`dim=1` is the channel axis in `[B,C,H,W]`. The spatial sizes must match before concatenation. This is why we resize to the skip’s actual height and width rather than assuming that doubling always fits.
 
 <div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="shapes">
-<p>A 256 × 256 input becomes a series of smaller feature maps. At one decoder join, 512 feature channels meet 256 skip channels, giving 768 channels before the next convolution. Try another input size.</p>
+<p>Trace the feature sizes, then select a decoder join. Predict the concatenated channel count before reading it. Try the 128 × 800 industrial input and notice which dimensions change.</p>
 </div>
+
+## What do we borrow from ResNet?
+
+A classification ResNet ends with pooling and an image-classification layer. For segmentation, we reuse its spatial feature layers and build a decoder that can produce a dense mask. “Backbone” refers to this feature-extracting part.
+
+The pretrained encoder does not supply a trained segmentation decoder. We still need to learn how its features should map to our target masks.
+
+For the MRI example, the target has one channel. Your industrial project has four independent targets and must preserve its **800 × 128** aspect ratio. Reusing the encoder idea does not change those task requirements.
+
+## Check your understanding
+
+A decoder receives `[B,512,4,4]` and a skip `[B,256,8,8]`. A student concatenates them immediately, then applies a convolution expecting 512 input channels. Identify both problems.
+
+<details>
+<summary>Reveal the reasoning</summary>
+
+First match the spatial sizes, for example by resizing the deeper feature to 8 × 8. Concatenation then produces 768 channels, so the next convolution must accept 768 unless an explicit projection changes that count.
 
 </details>
 
-Next: [borrow a trained encoder](transfer.md).
+Next: [understand what pretraining changes](transfer.md).
 
 <details>
 <summary>Go deeper: exact tensor shapes and decoder code</summary>

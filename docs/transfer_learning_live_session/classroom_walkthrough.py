@@ -5,13 +5,14 @@
 # %% [markdown]
 # # A small upgrade to the U-Net you already know
 # 26 October 2026. Optional classroom demo: no MRI download, GPU or training.
-# We inspect an encoder and its trainable parameters. This is not a new project.
+# We inspect encoder features, one decoder join and trainable parameters.
 # The dummy input below is only for checking tensor shapes, not a real MRI scan.
 
 # %%
 import os
 from collections import OrderedDict
 import torch
+from torch.nn import functional as F
 from torchvision.models import resnet18, ResNet18_Weights
 
 torch.set_num_threads(min(4, os.cpu_count() or 1))
@@ -20,7 +21,7 @@ torch.manual_seed(42)
 # %% [markdown]
 # ## 1. Find the encoder inside a familiar segmentation model
 # A U-Net encoder supplies features to a decoder. Here we inspect ResNet18's
-# feature layers. We do not build a decoder or predict masks in this small demo.
+# feature layers and one decoder block. We do not train or predict masks.
 # The complete MRI training notebook is a separate, optional exercise.
 
 # %%
@@ -43,13 +44,41 @@ print("ImageNet encoder weights loaded" if USE_PRETRAINED else
 # %%
 x = torch.zeros(1, 3, 128, 128)
 print("Input:", tuple(x.shape))
+feature_maps = {}
 with torch.no_grad():
     features = x
     for name, layer in encoder.named_children():
         features = layer(features)
+        feature_maps[name] = features
         print(f"{name}:", tuple(features.shape))
 assert features.shape == (1, 512, 4, 4)
 print("A segmentation decoder would use spatial features to learn a mask.")
+
+# %% [markdown]
+# ### A worked decoder join
+# layer4 gives [1,512,4,4]; layer3 provides the skip [1,256,8,8]. Resize the
+# deeper feature to match the skip, join channels, then learn a convolution that
+# mixes them. This is one decoder block, not a complete segmentation model.
+
+# %%
+deep = feature_maps["layer4"]
+skip = feature_maps["layer3"]
+up = F.interpolate(deep, size=skip.shape[-2:], mode="bilinear", align_corners=False)
+joined = torch.cat([up, skip], dim=1)
+print("Upsampled deep feature:", tuple(up.shape))
+print("Skip feature:", tuple(skip.shape))
+print("Joined feature:", tuple(joined.shape))
+assert joined.shape == (1, 768, 8, 8)
+
+decoder_block = torch.nn.Sequential(
+    torch.nn.Conv2d(768, 256, kernel_size=3, padding=1),
+    torch.nn.ReLU(),
+)
+with torch.no_grad():
+    decoded = decoder_block(joined)
+assert decoded.shape == (1, 256, 8, 8)
+print("After one new decoder block:", tuple(decoded.shape))
+print("These are shape checks on dummy inputs, not learned segmentation results.")
 
 # %% [markdown]
 # ## 3. Choose which parameters can learn

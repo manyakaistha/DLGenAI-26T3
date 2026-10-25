@@ -1,47 +1,79 @@
-# 3. Choose what should learn
+# 3. Freeze or fine-tune the encoder
 
-**Main idea: we can keep the encoder fixed, or let it adapt to the new task.**
+A pretrained encoder and a new decoder have different starting points. The encoder already contains learned features; the decoder must learn how to use those features for our masks. We choose whether the encoder should stay fixed or adapt too.
 
-The borrowed encoder already has learned weights. The new decoder starts without knowing how to make our masks. We choose which parts can change during training.
+## Start by freezing the encoder
 
-## Option 1: freeze the encoder
-
-Keep its learned parameters fixed and train the decoder. This is a way to start by using the encoder as a feature extractor.
+Freezing the encoder’s parameters lets us train the new decoder while using a fixed feature extractor:
 
 ```python
 for parameter in model.encoder.parameters():
-    parameter.requires_grad = False
+    parameter.requires_grad_(False)
+
+optimizer = torch.optim.AdamW(
+    model.decoder.parameters(), lr=1e-3
+)
 ```
 
-`requires_grad=False` tells PyTorch not to compute gradients for those parameters. In the complete implementation, we also choose the right optimizer parameters and handle the encoder’s training/evaluation mode.
+The loop disables gradients for encoder parameters. The optimizer explicitly contains the decoder parameters. We still run the encoder forward to obtain features; freezing does not eliminate that computation.
 
-## Option 2: fine-tune the model
+Here `1e-3` is an illustrative learning rate, not a tuned recommendation for this dataset. Choose and record learning rates as part of the experiment.
 
-Let the encoder adapt as the decoder learns. The starting features are reused, but their weights can now change.
+## Fine-tune when you want features to adapt
+
+Fine-tuning allows encoder parameters to update for the new task. For example, we might let a decoder learn first, then unfreeze the encoder:
 
 ```python
 for parameter in model.encoder.parameters():
-    parameter.requires_grad = True
+    parameter.requires_grad_(True)
+
+optimizer = torch.optim.AdamW([
+    {"params": model.encoder.parameters(), "lr": 1e-4},
+    {"params": model.decoder.parameters(), "lr": 1e-3},
+])
 ```
 
-Neither choice is always best. For now, understand the difference; we can compare their results in a later experiment.
+This example uses a smaller encoder learning rate so the existing features can change more cautiously. These rates are starting examples; the best policy depends on the data and training budget. Rebuilding the optimizer deliberately starts new optimizer state.
+
+Freezing first is one possible strategy, not a compulsory step. Full fine-tuning from the start is another. Compare policies separately from the question of random versus pretrained initialization.
+
+## Follow one numerical update
+
+For a simple SGD step:
+
+$$w_{\mathrm{new}} = w_{\mathrm{old}} - \eta g$$
+
+If a weight starts at 1.00, its gradient is 0.40 and the learning rate is 0.10, it becomes **0.96**. A frozen parameter stays at 1.00. This arithmetic explains an update; actual AdamW also maintains optimizer state and applies its own update rule.
 
 <div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="freeze">
-<p>Choose “train the decoder only” or “fine-tune both.” The decoder learns in both cases; the encoder is fixed in the first and can update in the second.</p>
+<p>Choose a policy, then open the toy update. Explain why the decoder can learn in both cases but the encoder weight changes in only one.</p>
 </div>
 
-## Quick check
+## A practical detail: BatchNorm mode
 
-If the encoder is frozen, can the model still learn?
+An encoder can contain BatchNorm layers with running-statistic buffers. Those buffers can change in training mode even when parameter gradients are disabled. For a fixed encoder in this example, use:
+
+```python
+model.train()          # put the decoder in training mode
+model.encoder.eval()   # keep encoder BatchNorm statistics fixed
+```
+
+Apply this ordering at the start of each training epoch. A later `model.train()` would put the encoder back into training mode too. Also remember that `eval()` changes layer behavior; it does not itself disable gradients.
+
+The complete “fixed encoder” policy therefore combines parameter flags, optimizer membership and module mode. The longer reference below explains how to inspect each one.
+
+## Check your understanding
+
+You unfreeze the encoder by changing `requires_grad`, but leave an optimizer containing only decoder parameters. Will encoder weights update?
 
 <details>
-<summary>Check your understanding</summary>
+<summary>Reveal the reasoning</summary>
 
-Yes. The decoder can learn to use the features supplied by the fixed encoder. Frozen encoder parameters do not mean the entire model is frozen.
+No. Encoder gradients can now be computed, but that optimizer has no encoder parameters to update. Include them in the optimizer or rebuild the optimizer for the new policy. Enabling gradients alone does not perform training.
 
 </details>
 
-Next: [make a fair comparison](experiments.md).
+Next: [design a controlled comparison](experiments.md).
 
 <details>
 <summary>Go deeper: optimizer settings and BatchNorm</summary>
