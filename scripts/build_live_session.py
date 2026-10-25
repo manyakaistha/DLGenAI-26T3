@@ -40,7 +40,8 @@ def notebook():
     (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
 
 def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
-          downloads=None, extra_files=(), identity=None, nav_groups=None):
+          downloads=None, extra_files=(), identity=None, nav_groups=None,
+          optional_urls=(), page_routes=None):
     # Existing session adapters keep their defaults; new sessions pass explicit data.
     if source_dir is None:
         notebook()
@@ -58,6 +59,15 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
     design.update(identity or {})
     if not (len(modules) == len(titles) == len(urls)):
         raise ValueError('Session modules, titles and URLs must align')
+    optional_urls = set(optional_urls)
+    page_routes = page_routes or {}
+    if not optional_urls.issubset(urls):
+        raise ValueError('Optional session URLs must be rendered pages')
+    for page_url, route in page_routes.items():
+        if page_url not in urls or len(route) != 2:
+            raise ValueError('Session routes must provide a previous/next pair for a rendered page')
+        if any(target is not None and target not in urls for target in route):
+            raise ValueError('Session routes must point to rendered pages')
     out.mkdir(parents=True,exist_ok=True)
     # Keep optional lessons in source, but never leave their old rendered pages published.
     for hidden in ['04_geometry.html', '05_texture.html', 'instructor.html']:
@@ -94,15 +104,24 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
         for j, (t, u) in enumerate(zip(titles, urls)):
             if nav_groups and j in nav_groups:
                 nav += f'<span class="nav-group-label">{html.escape(nav_groups[j])}</span>'
-            nav += f'<a href="{u}"'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>'
+            optional_class = ' class="optional-page"' if u in optional_urls else ''
+            nav += f'<a href="{u}"{optional_class}'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>'
         nav += '</nav>'
         palette=''.join(f'<button class="theme-option" data-palette="{p}" aria-pressed="{str(p=="paper").lower()}">{p.title()}</button>' for p in ['paper','midnight','moss','butter','blush','mono'])
-        pager=(f'<a href="{urls[i-1]}">← {html.escape(titles[i-1])}</a>' if i else '<span></span>')
-        if i + 1 < len(urls):
-            if nav_groups and i > 0 and i + 1 in nav_groups:
-                pager += f'<a href="{urls[0]}">Back to session overview →</a>'
-            else:
-                pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
+        if url in page_routes:
+            previous_url, next_url = page_routes[url]
+            title_by_url = dict(zip(urls, titles))
+            pager = f'<a href="{previous_url}">← {html.escape(title_by_url[previous_url])}</a>' if previous_url else '<span></span>'
+            if next_url:
+                next_label = 'Continue to ' if url in optional_urls else ''
+                pager += f'<a href="{next_url}">{next_label}{html.escape(title_by_url[next_url])} →</a>'
+        else:
+            pager=(f'<a href="{urls[i-1]}">← {html.escape(titles[i-1])}</a>' if i else '<span></span>')
+            if i + 1 < len(urls):
+                if nav_groups and i > 0 and i + 1 in nav_groups:
+                    pager += f'<a href="{urls[0]}">Back to session overview →</a>'
+                else:
+                    pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
         page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · {html.escape(design["title"])}</title>
 <meta name="description" content="{html.escape(design["description"], quote=True)}">
 <link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}"><link rel="stylesheet" href="{asset('styles/generative/navigation.css')}">

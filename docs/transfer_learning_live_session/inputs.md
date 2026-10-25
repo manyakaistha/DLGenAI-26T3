@@ -1,32 +1,26 @@
-# Optional: input channels and normalization
+# Optional MRI application: channels and normalization
 
-**This page is for later implementation.** You can understand pretrained encoders without learning another preprocessing pipeline today.
-
-## Two ideas to keep separate
-
-A **channel** is one part of the input tensor. In this dataset, the three channels contain pre-contrast, FLAIR and post-contrast MRI sequences. Their meanings differ from RGB photograph channels.
-
-**Normalization** changes the scale of the numbers the model receives. It applies to the input image; the target mask remains 0 or 1.
-
-## Why it matters when borrowing an encoder
-
-An ImageNet-trained encoder learned from inputs prepared in a particular way. We should prepare our new inputs deliberately and document the choice. Having three channels makes the shape fit; it does not make an MRI scan equivalent to a color photograph.
-
-The optional full notebook keeps the three supplied channels and uses fixed ImageNet normalization constants in both comparison runs. It also supports repeating the FLAIR channel as a separate input experiment.
-
-<details>
-<summary>Try the channel activity</summary>
-
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="channels">
-<p>These synthetic intensity values illustrate channel normalization. Choose three sequences or repeated FLAIR. When channel-specific means and scales differ, identical raw values can become different normalized values. The target mask stays unchanged.</p>
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page applies pretrained input requirements to MRI sequences. It includes the original normalization, grayscale adaptation and implementation explanations.</p>
+<a href="finetuning.md">Continue with freezing and fine-tuning →</a>
 </div>
 
-</details>
+The encoder’s first convolution expects three channels. Our TIFF also has three channels. The shapes fit, but the meanings differ: **pre-contrast, FLAIR, post-contrast are not red, green and blue**.
 
-[Back to the classroom path](README.md)
+## Two valid experimental inputs
 
-<details>
-<summary>Go deeper: normalization and grayscale adaptation</summary>
+**Three supplied sequences:** keep channels 0, 1 and 2 in the documented order. This can expose complementary information, although missing sequences may be duplicated FLAIR. This is the notebook default.
+
+**FLAIR repeated three times:** select `image[...,1]`, then repeat it across three channels. This keeps the network interface unchanged while removing information from the other supplied sequences. Treat it as a separate input ablation, applied to both initialization arms if you want to compare them fairly.
+
+```python
+# image is H × W × 3, in the dataset's sequence order.
+flair = image[..., 1:2]
+flair_three = np.repeat(flair, 3, axis=2)
+```
+
+Do not average the three sequences and call the result FLAIR. Do not use a color-space grayscale conversion. These operations mix the sequences with weights unrelated to their acquisition meaning.
 
 ## Scaling and normalization do different jobs
 
@@ -43,6 +37,10 @@ $$z_c = \frac{x_c-\mu_c}{\sigma_c}$$
 For torchvision’s ResNet18 ImageNet weights, the documented constants are `mean=(0.485,0.456,0.406)` and `std=(0.229,0.224,0.225)`. The notebook uses them as a fixed starting convention in **both** experiment arms. They do not become MRI population statistics, and using them does not eliminate the domain gap.
 
 For example, `x=0.5` in channel 0 becomes approximately `(0.5−0.485)/0.229 = 0.066`. A normalized value below zero is expected; it does not indicate a corrupted image. Never normalize the target mask with image constants.
+
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="channels">
+<p><strong>Channel and normalization lab.</strong> Select the three supplied MRI sequences or repeated FLAIR. Move synthetic intensity controls and compare raw values to normalized values. Repeated raw intensities become different normalized values when channel means and standard deviations differ. These numbers are illustrative, not measurements of a patient.</p>
+</div>
 
 ## Do not blindly copy the classification transform
 
@@ -68,5 +66,18 @@ Channel-specific ImageNet normalization complicates the equality: identical raw 
 
 For this session’s main three-sequence experiment, do **not** collapse the input convolution. That would throw away distinctions between sequences and change the experiment.
 
+## Activity: is “three channels” enough?
+
+A student displays the TIFF as a colored image and decides to apply hue and saturation jitter because the array has three channels. Explain the problem.
+
+<details>
+<summary>Reveal the reasoning</summary>
+
+The channels represent different MRI sequences, not visible-light color. Hue/saturation operations mix or reinterpret those sequences. Shape compatibility is not semantic compatibility. Start with conservative, explicitly justified transforms; any spatial transform must still be shared with the mask.
 
 </details>
+
+Next: [freezing and fine-tuning](finetuning.md).
+
+
+[Finish this optional application and continue →](finetuning.md)

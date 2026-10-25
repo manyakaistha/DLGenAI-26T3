@@ -1,73 +1,14 @@
-# 1. Understand what the encoder contributes
+# 1. Trace the encoder and decoder
 
-A pretrained encoder is useful only if we understand what it supplies to the rest of the model. Start with the U-Net you have already trained: **the encoder builds features, the decoder combines them into pixel-level predictions, and skip connections carry spatial detail across the network.**
+You already know the U-Net idea: compress an image into features, then recover a dense prediction using high-resolution information from earlier stages. A pretrained encoder changes the source of those features. It does not remove the need for a decoder.
 
-<div class="lesson-flow" aria-label="Segmentation flow">
-<span>Image</span><span>Encoder<br><small>Extract features</small></span><span>Decoder<br><small>Combine and upsample</small></span><span>Mask logits</span>
-</div>
+## Classification and segmentation ask different questions
 
-## What is a feature map?
+A ResNet classifier finishes with global average pooling and a linear layer. Pooling summarizes the spatial grid; the linear layer predicts image-level categories. For segmentation we retain spatial feature maps, discard the classification endpoint and construct a decoder that predicts one logit at every output pixel.
 
-A feature map is a grid of responses produced by a learned filter. For example, a filter may respond strongly near a particular edge or texture. A layer usually produces many such maps, stacked along the channel dimension.
+The encoder is the visual feature extractor. The decoder combines coarse context with finer spatial detail. A segmentation head is the final convolution mapping decoder features into the number of target channels. These are roles, not particular library names.
 
-As the encoder goes deeper, its spatial grids become smaller. Later features can combine information from a larger region of the input. This helps with context, but precise locations become harder to recover. The decoder uses earlier, finer features as well as the deeper representation.
-
-## Trace one example
-
-For a **128 × 128** image and a ResNet18 encoder, selected feature sizes are:
-
-| Point in the encoder | Tensor shape | What changed? |
-| :--- | :--- | :--- |
-| Input | `[B,3,128,128]` | Three input channels |
-| After the stem, before max pooling | `[B,64,64,64]` | More feature channels; smaller spatial grid |
-| After `layer3` | `[B,256,8,8]` | Coarser features with more context |
-| After `layer4` | `[B,512,4,4]` | Deepest feature in this example |
-
-`B` is the batch size. A channel count of 512 means 512 learned feature maps; it does not mean 512 defect classes. The output layer decides how many target channels we predict.
-
-## How one decoder join works
-
-To combine the deepest feature with the `layer3` skip, first resize it from 4 × 4 to 8 × 8. Then join the channels:
-
-```python
-up = F.interpolate(deep, size=skip.shape[-2:],
-                   mode="bilinear", align_corners=False)
-joined = torch.cat([up, skip], dim=1)
-```
-
-Here, `deep` has 512 channels and `skip` has 256. The result has **768 channels at 8 × 8**. A learned convolution block then mixes those features and can reduce the channel count.
-
-`dim=1` is the channel axis in `[B,C,H,W]`. The spatial sizes must match before concatenation. This is why we resize to the skip’s actual height and width rather than assuming that doubling always fits.
-
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="shapes">
-<p>Trace the feature sizes, then select a decoder join. Predict the concatenated channel count before reading it. Try the 128 × 800 industrial input and notice which dimensions change.</p>
-</div>
-
-## What do we borrow from ResNet?
-
-A classification ResNet ends with pooling and an image-classification layer. For segmentation, we reuse its spatial feature layers and build a decoder that can produce a dense mask. “Backbone” refers to this feature-extracting part.
-
-The pretrained encoder does not supply a trained segmentation decoder. We still need to learn how its features should map to our target masks.
-
-For the MRI example, the target has one channel. Your industrial project has four independent targets and must preserve its **800 × 128** aspect ratio. Reusing the encoder idea does not change those task requirements.
-
-## Check your understanding
-
-A decoder receives `[B,512,4,4]` and a skip `[B,256,8,8]`. A student concatenates them immediately, then applies a convolution expecting 512 input channels. Identify both problems.
-
-<details>
-<summary>Reveal the reasoning</summary>
-
-First match the spatial sizes, for example by resizing the deeper feature to 8 × 8. Concatenation then produces 768 channels, so the next convolution must accept 768 unless an explicit projection changes that count.
-
-</details>
-
-Next: [understand what pretraining changes](transfer.md).
-
-<details>
-<summary>Go deeper: exact tensor shapes and decoder code</summary>
-
-## Trace one 256 × 256 MRI slice
+## Trace one 256 × 256 input
 
 Our companion model uses the stem and four residual stages of torchvision’s ResNet18. For a batch size `B`, its feature shapes are:
 
@@ -102,6 +43,10 @@ d4 = block(joined)
 
 Repeat with `s3`, `s2` and `s1`. Finally interpolate to the original input size, refine, and apply a one-channel `1×1` convolution. No final sigmoid is included in `forward`; the training loss expects logits.
 
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="shapes">
+<p><strong>Feature-shape lab.</strong> Choose the input dimensions and inspect the named feature stages. At 256 × 256, `s5` is `[B,512,8,8]`; resize it to `s4` at 16 × 16, concatenate to get 768 channels, then convolve to 256. Changing input height/width does not change these channel counts.</p>
+</div>
+
 ## Two kinds of skip connection
 
 A **ResNet residual shortcut** usually adds tensors of compatible shape: `output = branch(x) + shortcut(x)`. A projection can align channel counts or stride when necessary. The addition offers a route for information and gradients within the encoder.
@@ -124,5 +69,20 @@ assert torch.isfinite(logits).all()
 
 This checks geometry and finite outputs, not learned quality. Check target shape and visualization separately. A model can pass this test and still receive mismatched masks or a leaking split.
 
+## Activity: find the broken convolution
+
+A developer upsamples `[B,512,8,8]`, concatenates `[B,256,16,16]`, then creates `Conv2d(512,256,3)`. What is wrong?
+
+<details>
+<summary>Reveal the reasoning</summary>
+
+The concatenated tensor has 768 input channels. The convolution must accept 768, or an explicit projection must reduce the channels first. The height and width match after resizing; the channel contract is the failure.
 
 </details>
+
+The industrial strip is 128 × 800. The same feature-scale reasoning applies, but retain that aspect ratio instead of copying the MRI’s square resize. Reference: [torchvision ResNet implementation](https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py).
+
+<div class="lesson-note">
+<strong>Optional MRI stop — apply the image/mask contract.</strong>
+<a href="dataset.md">Explore the MRI files, masks and patient split</a>, or continue with <a href="transfer.md">pretraining and fair comparisons</a>. The detailed model explanations continue on the next concept page.
+</div>

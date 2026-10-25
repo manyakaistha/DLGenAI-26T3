@@ -47,12 +47,12 @@ A beginner-friendly continuation with an 80/20 split lesson, explained PyTorch c
 The notebook creates original synthetic cloud-like data locally and runs on CPU.
 
 
-## Live session: Give Your U-Net a Head Start · 26 October 2026
+## Live session: From a Baseline U-Net to a Pretrained Encoder · 26 October 2026
 
-Four connected lessons build on the U-Net students have already trained: trace encoder features and decoder joins, understand pretrained initialization, implement freezing/fine-tuning, and design controlled comparisons. The MRI pictures are a shared example; dataset setup and full training are optional follow-up material.
+Detailed study notes explain encoder–decoder mechanics, pretrained initialization, freezing and fine-tuning, BCE–Dice, and controlled evaluation. Full MRI application pages appear between the relevant concept pages and are clearly optional, with skip/continue links back to the theory.
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-3/)
-- [Small classroom notebook — no MRI files or training required](docs/transfer_learning_live_session/classroom_walkthrough.ipynb)
-- [Optional notebooks and practice](docs/transfer_learning_live_session/notebook.md)
+- [Concept walkthrough notebook](docs/transfer_learning_live_session/classroom_walkthrough.ipynb)
+- [Optional complete MRI experiment](docs/transfer_learning_live_session/notebook.md)
 
-The original full MRI experiment remains available for independent exploration. Dataset attribution and the CC BY-NC-SA 4.0 license are documented in the notes and selected teaching figure provenance.
+Original technical depth, code examples and interactive controls are preserved. Dataset preparation and full training remain optional; dataset attribution and license are documented in the application notes.

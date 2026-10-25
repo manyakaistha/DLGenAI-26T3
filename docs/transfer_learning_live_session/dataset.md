@@ -1,35 +1,32 @@
-# Optional: about the MRI example
+# Optional MRI application: dataset and patient split
 
-**You can use the pictures in class without downloading this dataset.** This page is here when you want to explore the example yourself.
-
-## The familiar task: image in, mask out
-
-The input is an MRI slice. The reference mask marks an annotated region. The model learns to predict that mask, just as your existing U-Net learns to predict surface-defect masks.
-
-![One MRI slice shown as three input channels, alongside its reference mask](figures/mri_sequences.png)
-
-The three input panels show different MRI sequences, not red, green and blue. The middle channel is called **FLAIR**. The supplied target is a single binary FLAIR-abnormality mask. Missing sequences may be replaced with FLAIR in the supplied files.
-
-For today, the useful distinction is simply **input picture versus target mask**. The acquisition details can wait.
-
-## One new rule if you train on these images
-
-A patient contributes several slices. Keep all slices from the same patient on one side of the training/validation split. Otherwise the model can see a person’s slices during training and again during validation.
-
-<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="split">
-<p>Compare splitting whole patients with splitting slices within each patient. In the fictional four-patient example, a patient split has zero patients on both sides; a slice split can put all four on both sides.</p>
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page applies the encoder/decoder input contract to real MRI files. The complete pairing, loading and split explanations are preserved below.</p>
+<a href="transfer.md">Continue with pretraining and fair comparisons →</a>
 </div>
 
-## Connection to your project
+Our model receives one two-dimensional MRI slice and predicts one binary mask. A patient contributes several slices. **The sample we load and the unit we split are different:** load slices; split patients.
 
-For the MRI example, the target has one channel. Your industrial project has four independent defect targets and uses **800 × 128** images. Keep those task-specific requirements when applying the transfer-learning idea back to your own model.
+## Read the dataset’s own description first
 
-Source: [Mateusz Buda’s dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation), from TCIA / TCGA-LGG, with a listed **CC BY-NC-SA 4.0** license. The [figure provenance](figures/provenance.json) records the selected source files and teaching layout. The target is an annotated abnormal region, not a tumor-grade label.
+The [Kaggle dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation) describes brain MR images and manually annotated FLAIR-abnormality masks from TCIA / TCGA-LGG, corresponding to 110 patients. Count the folders and valid pairs in your downloaded version rather than hard-coding that number into a loader.
 
-[Back to the classroom path](README.md)
+The archive’s `kaggle_3m/README.md` specifies three image channels in this order:
 
-<details>
-<summary>Go deeper: TIFF loading and patient-split code</summary>
+| Array index | MRI sequence | Meaning for this exercise |
+| :--- | :--- | :--- |
+| `image[...,0]` | Pre-contrast | First supplied sequence, not “red” |
+| `image[...,1]` | FLAIR | Sequence available in every case |
+| `image[...,2]` | Post-contrast | Third supplied sequence, not “blue” |
+
+FLAIR stands for fluid-attenuated inversion recovery, the name of an MRI acquisition sequence. You do not need its imaging physics to follow the tensor contracts in this lesson.
+
+Missing sequences are replaced with FLAIR so the stored image still has three channels. Three array slots therefore do not guarantee three distinct measurements. Keep the order fixed. Display each sequence with a grayscale colormap rather than interpreting the three-sequence TIFF as a natural-color photograph.
+
+![An annotated real MRI slice showing the three supplied sequences and its binary abnormality mask](figures/mri_sequences.png)
+
+This selected teaching illustration is derived from the named Kaggle dataset; source case/slice, processing and attribution are recorded in the caption and [figure provenance](figures/provenance.json). The browser simulations elsewhere use synthetic arrays.
 
 ## Match each image to its mask
 
@@ -101,11 +98,28 @@ assert train_ids | val_ids == set(patients)
 
 Require at least two patients before this split. “80/20” refers to case counts; it need not produce exactly 80% of slices because patients contribute different numbers of slices. Save the exact IDs and reuse them in both experiment arms. A future site-held-out experiment would answer a different, harder question; patient separation alone does not prove robustness to new hospitals.
 
+<div class="mri-lab" data-lab="mri" data-ai-help="off" data-mri-lab="split">
+<p><strong>Patient split lab.</strong> Four fictional patients have four slices each. With slice splitting, the first three slices of every patient go to training and the fourth to validation: all four patients leak. With patient splitting, three whole patients train and one validates: zero patients overlap. Change the patient count and compare.</p>
+</div>
+
 ## Keep preprocessing on the correct side
 
 Random paired spatial transforms belong to training only. Validation preprocessing is deterministic. Any statistics learned across the dataset must use training patients only. The notebook uses fixed scaling and fixed channel-normalization constants, so no validation-fitted statistics are required.
 
 The teaching loader retains the full square field of view and resizes image and mask together. It does not use the mask to crop around the abnormality. A target-guided crop at validation would give the model information it would not have at inference.
 
+## Activity: predict the leak
+
+You have 20 slices from patient A and 30 from patient B. You reserve every fifth slice for validation. Have you held out an unseen patient?
+
+<details>
+<summary>Reveal the reasoning</summary>
+
+No. Both patients appear in both partitions. The slice counts may look like an 80/20 split, but the patient overlap is two. Hold out all slices of a patient instead. With only two patients this would be a very unstable estimate; use more cases for meaningful evaluation.
 
 </details>
+
+Next: [trace the encoder and decoder](encoder.md).
+
+
+[Finish this optional application and continue →](transfer.md)

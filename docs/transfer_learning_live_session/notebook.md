@@ -1,34 +1,16 @@
-# Optional: a small code demo
+# Optional MRI application: the complete experiment
 
-**Follow the browser notes first.** Running code is optional for this session.
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page preserves the complete real-data experiment and setup instructions. Run it when you want to apply the concepts; dataset download and a full training run are optional for following the main notes.</p>
+<a href="README.md">Return to the session overview →</a>
+</div>
 
-The small classroom notebook shows the same ideas as the four lessons: trace encoder features, resize and concatenate a decoder skip, identify the starting weights, and choose which parameters can learn. It uses a clearly labelled dummy input tensor. You do not need to download MRI files or start a training job.
+For a smaller, data-free walkthrough of encoder features and one decoder join: [classroom notebook](classroom_walkthrough.ipynb) · [Python version](classroom_walkthrough.py). The complete MRI notebook is introduced below.
 
-[Download the small notebook](classroom_walkthrough.ipynb) · [Python version](classroom_walkthrough.py)
+The notebook is a complete teaching pipeline for the supplied MRI TIFF dataset. It creates a paired index, splits patients, inspects feature shapes, verifies a first-convolution identity, trains two matched models and saves comparable validation evidence. It does not import this repository’s industrial training code.
 
-## If you want to try it
-
-Open the notebook in your existing PyTorch environment or Colab and run its cells in order. It uses PyTorch and torchvision. A GPU is not needed.
-
-1. Trace the named encoder stages and their output sizes, then execute a decoder join: 512 + 256 channels become 768 before convolution.
-2. Find the line that chooses random or ImageNet weights.
-3. Freeze the encoder, then unfreeze it. Check the trainable parameter count.
-4. Read the short experiment plan at the end.
-
-The default `USE_PRETRAINED=False` lets you inspect the structure without downloading weights. Its output explicitly says this is a **random-weight shape demo**. Set it to `True` only when you want to load the actual ImageNet weights; that needs a first-time download or a prepared cache. No masks are predicted, no model is trained, and no performance score is claimed by this small demo.
-
-## What you need to understand afterwards
-
-Which part could be reused? Which part of a segmentation model would still need to learn? What changes when the encoder is frozen? You can answer those questions using the website even if you never run the notebook.
-
-## Optional: the full MRI experiment
-
-The original complete training notebook remains available for independent exploration. It sets up real TIFF data, holds out patients, and trains matched models with random and ImageNet encoder weights. This is an additional practical exercise, with more setup than the classroom demo.
-
-[Full training notebook](transfer_learning.ipynb) · [Full Python script](transfer_learning.py)
-
-<details>
-<summary>Full experiment: setup, configuration and troubleshooting</summary>
+[Download notebook](transfer_learning.ipynb) · [Download Python script](transfer_learning.py)
 
 ## Option A: Kaggle
 
@@ -99,6 +81,5 @@ A classroom checkpoint is a local artifact, not bundled website content. Downloa
 
 Return to the [session overview](README.md).
 
-</details>
 
-[Back to the session overview](README.md)
+[Finish this optional application and continue →](README.md)
