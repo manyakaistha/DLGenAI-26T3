@@ -69,3 +69,19 @@ or cross markers and feedback. Native keyboard behavior is preserved in inputs,
 selects and the palette. A brief opacity entrance respects Motion off and OS
 reduced-motion preferences. All visual assets remain embedded or code-native;
 there are no additional runtime dependencies.
+
+## Editorial explanations and footer butterflies
+
+The approved opening slide is preserved. Later slides now use a composed
+explanation beside each activity: a serif takeaway, labelled reasoning rows and
+an anchored caveat or next step. Their `lesson(label, title, rows, foot)` helper
+keeps the text semantic and searchable. Tensor addition/concatenation uses an
+open paired comparison; the notebook uses an ordered pathway; the final slide
+pairs a four-question checklist with an exit discussion. On phones the notes
+follow the activity, separated by a single rule.
+
+Two miniature butterflies sit beside the three footer flowers inside the
+existing 112px canvas. Their cached vector wing paths and seeded phases use the
+same course palette. Bounded flutter/flight shares the garden's capped timeline,
+visibility/offscreen pause and static/reduced-motion controls; no extra loop,
+images, dependencies, pointer handling or focus behavior was added.
