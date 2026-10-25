@@ -111,6 +111,19 @@ def build_questions_page(output: Path) -> str:
     raw = re.sub(r"<details(?=\s|>)", '<details markdown="1"', raw)
     body = md.convert(raw)
 
+    # The assessment lives at the repository root; the published page lives
+    # beside the guides. Rebase only resource URLs, preserving its content.
+    source_prefix = "docs/milestone_2_student_guide/"
+
+    def rebase_resource(match):
+        parts = urlsplit(html.unescape(match[2]))
+        if not parts.scheme and not parts.netloc and parts.path.startswith(source_prefix):
+            parts = parts._replace(path=parts.path[len(source_prefix):])
+            return f'{match[1]}="{html.escape(parts.geturl(), quote=True)}"'
+        return match[0]
+
+    body = re.sub(r'(href|src)="([^"]+)"', rebase_resource, body)
+
     nav = render_sidebar_nav(1)
     pager = render_pagination(1)
 
@@ -196,9 +209,15 @@ def build_milestone_two(output: Path):
 
     for filename, idx in source_pages:
         src_file = SOURCE / filename
-        if not src_file.exists():
-            continue
         content = src_file.read_text(encoding="utf-8")
+
+        # These pages were copied from an unlisted review snapshot. Only the
+        # public output joins the discoverable milestone directory; keep the
+        # source and guide2701 review snapshot untouched.
+        content = content.replace(
+            '<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">',
+            '',
+        )
 
         # Ensure navigation.css is included in head
         if "styles/generative/navigation.css" not in content:
@@ -252,7 +271,12 @@ def build_milestone_two(output: Path):
 
         # Collect text for search index
         parsed = Inspect()
-        parsed.feed(content)
+        # Sidebar labels occur on every page and would make topic searches
+        # return every guide. Index the lesson itself, like Milestone 1.
+        article = re.search(r'<article>(.*?)</article>', content, flags=re.S)
+        if article is None:
+            raise ValueError(f"Missing lesson article in {src_file}")
+        parsed.feed(article[1])
         search.append({
             "title": LABELS[idx][1],
             "url": filename,

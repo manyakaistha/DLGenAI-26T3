@@ -8,7 +8,7 @@ Public milestone guides and live session resources for DLGenAI 26T3.
 - [Milestone 1 questions](MILESTONE_1.md)
 - [Milestone 1 study guide and nine learning modules](docs/milestone_1_student_guide_v2/README.md)
 - [Milestone 2 questions](MILESTONE_2.md)
-- [Milestone 2 study guides and eight concept modules](docs/milestone_2_student_guide/index.html)
+- [Milestone 2 study guides and eight concept modules](https://manyakaistha.github.io/DLGenAI-26T3/milestones/milestone-2/)
 - [Q11–Q12 starter notebook in Google Colab](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing)
 - [Colab setup instructions and notebook/Python downloads](docs/starter_code_q11_q12/README.md)
 
