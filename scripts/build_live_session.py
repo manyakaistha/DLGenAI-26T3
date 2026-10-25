@@ -72,7 +72,7 @@ def build(out):
         pager=(f'<a href="{URLS[i-1]}">← {TITLES[i-1]}</a>' if i else '<span></span>')+(f'<a href="{URLS[i+1]}">{TITLES[i+1]} →</a>' if i+1<len(URLS) else '')
         page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · Pixels, Masks & Experiments</title>
 <meta name="description" content="Interactive live lab: experiment tracking, label sparsity, output heads and run-length encoding.">
-<link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}">
+<link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}"><link rel="stylesheet" href="{asset('styles/generative/navigation.css')}">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try{{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}}catch{{}}</script>
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>

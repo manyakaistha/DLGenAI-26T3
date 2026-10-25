@@ -51,9 +51,3 @@ This is optional background reading, not a graded task. Use the milestone guides
 Save a copy in Drive, choose a GPU runtime, install the dependencies, and set `DATA_ROOT` to your competition data folder. Then run the notebook cells in order: complete the Q11 calculations, inspect the masks, train for 5–10 epochs, and evaluate thresholds 0.3, 0.5, 0.7 and 0.9 without minimum-area filtering. Write your Q12 bullet points from your own results.
 
 [Full setup instructions and notebook downloads](../starter_code_q11_q12/README.md) include the Colab dependency cell, data-path examples, and how to save your experiment outputs.
-
-
-## Live Session Notes
-
-- **[Live session 1 · 12 October: Pixels, Masks & Experiments](https://manyakaistha.github.io/DLGenAI-26T3/session/)** — labels, output heads, RLE and experiment tracking.
-- **[Live session 2 · 19 October: Dataset, DataLoader & Augmentations](https://manyakaistha.github.io/DLGenAI-26T3/session-2/)** — load images and masks, understand the 80/20 split, build batches, and explore interactive augmentation activities.

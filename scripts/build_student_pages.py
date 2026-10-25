@@ -2,7 +2,7 @@
 # requires-python = ">=3.10"
 # dependencies = ["Markdown==3.8.2", "pymdown-extensions==10.16.1"]
 # ///
-"""Build the public Milestone 1 guide; run with uv run --no-project."""
+"""Build the student resource hub, milestone guides and live sessions; run with uv run --no-project."""
 from __future__ import annotations
 
 import argparse
@@ -152,7 +152,7 @@ def version_theme_assets(output: Path):
     return version
 
 
-def build(output: Path):
+def build_milestone_one(output: Path):
     output.mkdir(parents=True, exist_ok=True)
     modules = sorted(GUIDES.glob("guide_*.md"))
     if len(modules) != 9:
@@ -201,14 +201,12 @@ def build(output: Path):
                 target += "#" + parts.fragment
             return f'{attr}="{html.escape(target, quote=True)}"'
         body = re.sub(r'(href|src)="([^"]+)"', link, body)
-        nav = '<input class="search" aria-label="Search guides" placeholder="Search the full guide…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Study guide">'
+        nav = '<input class="search" aria-label="Search Milestone 1 guides" placeholder="Search Milestone 1…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Study guide">'
         for j, (url, title) in enumerate(zip(urls, titles)):
             active = ' aria-current="page"' if i == j else ""
             label = "START HERE" if j == 0 else "ASSESSMENT · 12 QUESTIONS" if j == 1 else "STARTER CODE · Q11–Q12" if j == len(sources) - 1 else f"GUIDE {j-1:02d}"
             nav += f'<a href="{url}"{active}><span class="num">{label}</span>{html.escape(title)}</a>'
-        nav += '<a href="session/index.html"><span class="num">Live session 12/10/26</span>Pixels, Masks &amp; Experiments</a>'
-        nav += '<a href="session-2/index.html"><span class="num">Live session 19/10/26</span>Dataset, DataLoader &amp; Augmentations</a>'
-        nav += "</nav>"
+        nav += '</nav><nav class="nav section-exits" aria-label="Leave Milestone 1"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav>'
         pager = ""
         if i > 0:
             pager += f'<a href="{urls[i-1]}">← {html.escape(titles[i-1])}</a>'
@@ -227,12 +225,13 @@ def build(output: Path):
 <script>try {{ const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; }} catch {{}}</script>
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="{str(i == 0).lower()}" data-ai-help="{'off' if source == QUESTION or source == STARTERS / 'README.md' else 'study'}">
 <div class="reading-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a><div class="layout">
-<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3</span><a class="brand" href="index.html">Milestone 1<br>Study Guides</a>
 <p>A guided path from raw annotations to your first segmentation baseline.</p>
 <details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
 <button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
@@ -242,7 +241,7 @@ def build(output: Path):
 <button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
 <button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
 </div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
-<div class="desktop-nav">{nav}</div><details class="mobile-menu"><summary>Browse & search the guides</summary>{nav}</details>
+<div class="desktop-nav">{nav}</div><details class="mobile-menu"><summary>Browse Milestone 1</summary>{nav}</details>
 <footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
 <main id="main"><div class="content"><div class="topline"><span>Milestone 1 · Student learning resources</span><a href="milestone-1.html">View questions ↗</a></div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">A closer look at the details</span><p class="hero-title">From pixels<br>to patterns.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
@@ -254,10 +253,26 @@ def build(output: Path):
         parsed.feed(body)
         search.append({"title": titles[i], "url": urls[i], "text": " ".join(parsed.text)})
     (output / "search.json").write_text(json.dumps(search, ensure_ascii=False))
+    print(f"Built {len(sources)} Milestone 1 pages → {output}")
+
+
+def build(output: Path):
+    from build_student_hub import build_hub, validate_site
+    output.mkdir(parents=True, exist_ok=True)
+    build_milestone_one(output / "milestones/milestone-1")
     from build_live_session import build as build_session
     build_session(output / "session")
+    import build_live_session as session_renderer
     from build_dataset_session import build as build_dataset_session
-    build_dataset_session(output / "session-2")
+    # The Dataset adapter configures the shared renderer temporarily.
+    names = ("SOURCE", "MODULES", "TITLES", "URLS", "notebook")
+    original = {name: getattr(session_renderer, name) for name in names}
+    try:
+        build_dataset_session(output / "session-2")
+    finally:
+        for name, value in original.items():
+            setattr(session_renderer, name, value)
+    build_hub(output)
     review_source = ROOT / "guide2701"
     if review_source.is_dir():
         shutil.copytree(review_source, output / "guide2701", dirs_exist_ok=True)
@@ -266,22 +281,7 @@ def build(output: Path):
             for name in ("theme.js", "ask-ai.js", "ask-ai.css", "ask-ai-botanical.js"):
                 shutil.copy2(ROOT / "styles/generative" / name, theme.parent / name)
     version_theme_assets(output)
-    parsed_pages = {}
-    for file in output.glob("*.html"):
-        parsed = Inspect()
-        parsed.feed(file.read_text())
-        parsed_pages[file.name] = parsed
-    for name, page in parsed_pages.items():
-        for link in page.links:
-            parts = urlsplit(link)
-            if parts.scheme or parts.netloc:
-                continue
-            target = parts.path or name
-            if not (output / target).is_file():
-                raise ValueError(f"Broken link from {name}: {link}")
-            if parts.fragment and target in parsed_pages and unquote(parts.fragment) not in parsed_pages[target].ids:
-                raise ValueError(f"Broken anchor from {name}: {link}")
-    print(f"Built and checked {len(parsed_pages)} pages, {len(list((output / 'assets').glob('*')))} images → {output}")
+    validate_site(output)
 
 
 if __name__ == "__main__":

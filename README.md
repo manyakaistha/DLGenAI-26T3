@@ -1,8 +1,10 @@
 # Industrial Surface Anomaly Segmentation — Student Guides
 
-Public learning resources for DLGenAI 26T3, Milestone 1.
+Public milestone guides and live session resources for DLGenAI 26T3.
 
-- **[Read the full guide online](https://manyakaistha.github.io/DLGenAI-26T3/)**
+- **[Open the student resource hub](https://manyakaistha.github.io/DLGenAI-26T3/)**
+- [Milestone Guides](https://manyakaistha.github.io/DLGenAI-26T3/milestones/) — choose a milestone for its guides, questions and starter resources.
+- [Live Session Resources](https://manyakaistha.github.io/DLGenAI-26T3/live-sessions/) — find session notes, interactive activities and notebooks.
 - [Revised milestone questions](MILESTONE_1.md)
 - [Study guide index and nine learning modules](docs/milestone_1_student_guide_v2/README.md)
 - [Q11–Q12 starter notebook in Google Colab](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing)
