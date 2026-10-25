@@ -1,0 +1,22 @@
+{
+  "source": "https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation",
+  "creator": "Mateusz Buda; source imagery TCIA / TCGA-LGG",
+  "license": "CC BY-NC-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "case": "TCGA_CS_4941_19960909",
+  "image": "TCGA_CS_4941_19960909_15.tif",
+  "mask": "TCGA_CS_4941_19960909_15_mask.tif",
+  "image_sha256": "8c22423ad6fbbc4ff87160f6fc945bf33b2ff8d514f4a92e3b6d02cdad32bc18",
+  "mask_sha256": "cc36b053055ad29cf1bfcc201c8d283c106d287821bf35a176aecf006bd89ec8",
+  "image_shape": [
+    256,
+    256,
+    3
+  ],
+  "dtype": "uint8",
+  "mask_values": [
+    0,
+    255
+  ],
+  "adaptation": "Grayscale sequence panels and binary mask arranged into a labelled teaching contact sheet; no MRI model predictions."
+}

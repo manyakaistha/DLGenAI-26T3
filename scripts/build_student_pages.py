@@ -272,6 +272,8 @@ def build(output: Path):
     finally:
         for name, value in original.items():
             setattr(session_renderer, name, value)
+    from build_transfer_session import build as build_transfer_session
+    build_transfer_session(output / "session-3")
     build_hub(output)
     review_source = ROOT / "guide2701"
     if review_source.is_dir():

@@ -39,50 +39,70 @@ def notebook():
     for i,c in enumerate(cells): c['id']=f'session-{i:02d}'
     (SOURCE/'wandb_tutorial.ipynb').write_text(json.dumps(doc,indent=1))
 
-def build(out):
-    notebook(); out.mkdir(parents=True,exist_ok=True)
+def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
+          downloads=None, extra_files=(), identity=None):
+    # Existing session adapters keep their defaults; new sessions pass explicit data.
+    if source_dir is None:
+        notebook()
+    source_dir = SOURCE if source_dir is None else Path(source_dir)
+    modules = MODULES if modules is None else modules
+    titles = TITLES if titles is None else titles
+    urls = URLS if urls is None else urls
+    downloads = ('wandb_tutorial.ipynb', 'wandb_tutorial.py') if downloads is None else downloads
+    design = dict(title='Pixels, Masks & Experiments', brand='Pixels, Masks<br>& Experiments',
+                  description='Interactive live lab: experiment tracking, label sparsity, output heads and run-length encoding.',
+                  intro='Explore segmentation data, masks and experiment tracking.',
+                  topline='Industrial surface segmentation', kicker='Observe. Represent. Measure.',
+                  hero='From pixels<br>to experiments.', caption='A live lab in industrial segmentation.')
+    design.update(identity or {})
+    if not (len(modules) == len(titles) == len(urls)):
+        raise ValueError('Session modules, titles and URLs must align')
+    out.mkdir(parents=True,exist_ok=True)
     # Keep optional lessons in source, but never leave their old rendered pages published.
     for hidden in ['04_geometry.html', '05_texture.html', 'instructor.html']:
         (out / hidden).unlink(missing_ok=True)
     # Publish only figures referenced by the active student pages.
     if (out/'figures').exists(): shutil.rmtree(out/'figures')
     (out/'figures').mkdir(parents=True)
-    for module in MODULES:
-        text=(SOURCE/f'{module}.md').read_text()
+    for module in modules:
+        text=(source_dir/f'{module}.md').read_text()
         for asset in re.findall(r'!\[[^\]]*\]\((figures/[^)]+)\)', text):
-            shutil.copy2(SOURCE/asset, out/asset)
+            shutil.copy2(source_dir/asset, out/asset)
     shutil.copytree(ROOT/'styles/generative',out/'styles/generative',dirs_exist_ok=True)
-    for name in ['wandb_tutorial.ipynb','wandb_tutorial.py']: shutil.copy2(SOURCE/name,out/name)
+    for name in (*downloads, *extra_files):
+        (out/name).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_dir/name, out/name)
     (out/'site.css').write_text(CSS+'\n'+(ROOT/'styles/generative/session.css').read_text())
     (out/'site.js').write_text(JS)
     (out/'.nojekyll').touch()
     def asset(path):
         version=hashlib.sha256((out/path).read_bytes()).hexdigest()[:12]
         return f'{path}?v={version}'
-    mapping={f'{m}.md':u for m,u in zip(MODULES,URLS)}
+    extra_head = ''.join(f'<link rel="stylesheet" href="{asset(name)}">' if name.endswith('.css') else f'<script defer src="{asset(name)}"></script>' for name in extra_files if name.endswith(('.css', '.js')))
+    mapping={f'{m}.md':u for m,u in zip(modules,urls)}
     pages={};search=[]
-    for i,(module,title,url) in enumerate(zip(MODULES,TITLES,URLS)):
+    for i,(module,title,url) in enumerate(zip(modules,titles,urls)):
         md=markdown.Markdown(tab_length=2,extensions=['tables','toc','sane_lists','md_in_html','pymdownx.superfences','pymdownx.arithmatex'],extension_configs={'pymdownx.arithmatex': {'generic': True}})
-        source=normalize_markdown((SOURCE/f'{module}.md').read_text())
+        source=normalize_markdown((source_dir/f'{module}.md').read_text())
         source=re.sub(r'<details(?=\s|>)','<details markdown="1"',source)
         body=md.convert(source)
         for name,target in mapping.items(): body=body.replace(f'href="{name}"',f'href="{target}"')
-        nav='<nav class="nav" aria-label="Session pages">'+''.join(f'<a href="{u}"'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>' for j,(t,u) in enumerate(zip(TITLES,URLS)))+'</nav>'
+        nav='<nav class="nav" aria-label="Session pages">'+''.join(f'<a href="{u}"'+(' aria-current="page"' if i==j else '')+f'>{html.escape(t)}</a>' for j,(t,u) in enumerate(zip(titles,urls)))+'</nav>'
         palette=''.join(f'<button class="theme-option" data-palette="{p}" aria-pressed="{str(p=="paper").lower()}">{p.title()}</button>' for p in ['paper','midnight','moss','butter','blush','mono'])
-        pager=(f'<a href="{URLS[i-1]}">← {TITLES[i-1]}</a>' if i else '<span></span>')+(f'<a href="{URLS[i+1]}">{TITLES[i+1]} →</a>' if i+1<len(URLS) else '')
-        page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · Pixels, Masks & Experiments</title>
-<meta name="description" content="Interactive live lab: experiment tracking, label sparsity, output heads and run-length encoding.">
+        pager=(f'<a href="{urls[i-1]}">← {titles[i-1]}</a>' if i else '<span></span>')+(f'<a href="{urls[i+1]}">{titles[i+1]} →</a>' if i+1<len(urls) else '')
+        page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · {html.escape(design["title"])}</title>
+<meta name="description" content="{html.escape(design["description"], quote=True)}">
 <link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}"><link rel="stylesheet" href="{asset('styles/generative/navigation.css')}">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <script>try{{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}}catch{{}}</script>
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="{asset('site.js')}"></script><script defer src="{asset('styles/generative/theme.js')}"></script><script defer src="{asset('styles/generative/live_session_interactions.js')}"></script></head>
-<body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">Pixels, Masks<br>& Experiments</a><p>Explore segmentation data, masks and experiment tracking.</p>
+<script defer src="{asset('site.js')}"></script><script defer src="{asset('styles/generative/theme.js')}"></script><script defer src="{asset('styles/generative/live_session_interactions.js')}"></script>{extra_head}</head>
+<body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">{design["brand"]}</a><p>{html.escape(design["intro"])}</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options">{palette}</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
 <div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div>{nav}</div><details class="mobile-menu"><summary>Browse session</summary>{nav}</details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
-<main id="main"><div class="content"><div class="topline"><span>Industrial surface segmentation</span><a href="wandb_tutorial.ipynb" download>Download notebook ↓</a></div>
-<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Observe. Represent. Measure.</span><p class="hero-title">From pixels<br>to experiments.</p><p class="hero-caption">A live lab in industrial segmentation.</p></div></div>
+<main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span><a href="{downloads[0]}" download>Download notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">{html.escape(design["kicker"])}</span><p class="hero-title">{design["hero"]}</p><p class="hero-caption">{html.escape(design["caption"])}</p></div></div>
 <span class="section-label">{html.escape(title)}</span><details class="toc"><summary>On this page</summary>{md.toc}</details><article>{body}</article><nav class="pagination">{pager}</nav><footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span></footer></div></main></div></body></html>'''
         (out/url).write_text(page)
         parsed=Inspect();parsed.feed(page);pages[url]=parsed
@@ -96,6 +116,6 @@ def build(out):
             assert (out/path).is_file(),f'Broken link: {url}: {link}'
             if p.fragment and path in pages: assert unquote(p.fragment) in pages[path].ids,(url,link)
     version_theme_assets(out)
-    print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((SOURCE/"wandb_tutorial.ipynb").read_text())["cells"])} cells → {out}')
+    print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((source_dir/downloads[0]).read_text())["cells"])} cells → {out}')
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,default=ROOT/'runs/live_session_preview');build(ap.parse_args().output.resolve())

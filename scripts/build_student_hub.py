@@ -16,6 +16,8 @@ SESSIONS = [
      'Revisit label counts, output heads and run-length encoding. Practice experiment tracking in the W&B notebook lab.'),
     ('session-2/index.html', '19 October 2026 · Session 2', 'Dataset, DataLoader & Augmentations',
      'Follow a sample from CSV row to training batch. Explore the split, paired transformations, interactive labs and notebook.'),
+    ('session-3/index.html', '26 October 2026 · Session 3', 'MRI Transfer Learning: From a Baseline to a Pretrained Encoder',
+     'Explore patient-level splits, MRI sequence channels, pretrained features, freezing and fine-tuning, then run a fair initialization comparison.'),
 ]
 
 
@@ -79,7 +81,7 @@ def build_hub(output):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(page)
     # Keep session URLs stable; add exits inside both desktop and mobile menus.
-    for folder in ('session', 'session-2'):
+    for folder in (Path(item[0]).parts[0] for item in SESSIONS):
         for path in (output / folder).glob('*.html'):
             page = path.read_text()
             page = page.replace('</nav>', '</nav>' + exits('../live-sessions/index.html', '../index.html'), 2)
