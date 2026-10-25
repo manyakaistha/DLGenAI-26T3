@@ -1,4 +1,4 @@
-# 2. Trace the encoder and decoder
+# 1. Trace the encoder and decoder
 
 You already know the U-Net idea: compress an image into features, then recover a dense prediction using high-resolution information from earlier stages. A pretrained encoder changes the source of those features. It does not remove the need for a decoder.
 
@@ -8,7 +8,7 @@ A ResNet classifier finishes with global average pooling and a linear layer. Poo
 
 The encoder is the visual feature extractor. The decoder combines coarse context with finer spatial detail. A segmentation head is the final convolution mapping decoder features into the number of target channels. These are roles, not particular library names.
 
-## Trace one 256 × 256 MRI slice
+## Trace one 256 × 256 input
 
 Our companion model uses the stem and four residual stages of torchvision’s ResNet18. For a batch size `B`, its feature shapes are:
 
@@ -82,4 +82,7 @@ The concatenated tensor has 768 input channels. The convolution must accept 768,
 
 The industrial strip is 128 × 800. The same feature-scale reasoning applies, but retain that aspect ratio instead of copying the MRI’s square resize. Reference: [torchvision ResNet implementation](https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py).
 
-Next: [what pretraining changes](transfer.md).
+<div class="lesson-note">
+<strong>Optional MRI stop — apply the image/mask contract.</strong>
+<a href="dataset.md">Explore the MRI files, masks and patient split</a>, or continue with <a href="transfer.md">pretraining and fair comparisons</a>. The detailed model explanations continue on the next concept page.
+</div>

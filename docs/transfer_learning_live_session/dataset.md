@@ -1,4 +1,10 @@
-# 1. Understand the MRI data and patient split
+# Optional MRI application: dataset and patient split
+
+<div class="optional-route">
+<strong>Optional MRI application</strong>
+<p>This page applies the encoder/decoder input contract to real MRI files. The complete pairing, loading and split explanations are preserved below.</p>
+<a href="transfer.md">Continue with pretraining and fair comparisons →</a>
+</div>
 
 Our model receives one two-dimensional MRI slice and predicts one binary mask. A patient contributes several slices. **The sample we load and the unit we split are different:** load slices; split patients.
 
@@ -114,3 +120,6 @@ No. Both patients appear in both partitions. The slice counts may look like an 8
 </details>
 
 Next: [trace the encoder and decoder](encoder.md).
+
+
+[Finish this optional application and continue →](transfer.md)

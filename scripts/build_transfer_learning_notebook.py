@@ -31,13 +31,19 @@ def build():
                  source=["# Run only if this runtime needs the pinned teaching dependencies.\n",
                          "# Restart the kernel after replacing already-imported binary packages.\n",
                          "%pip install torch==2.8.0 torchvision==0.23.0 numpy==2.2.6 Pillow==12.3.0 matplotlib==3.10.9\n"])
-    cells.insert(1, setup)
+    if stem == "transfer_learning":
+        cells.insert(1, setup)
     notebook = dict(cells=cells, metadata=dict(
         kernelspec=dict(display_name="Python 3", language="python", name="python3"),
         language_info=dict(name="python", version="3.11")), nbformat=4, nbformat_minor=5)
     out = SOURCE / "transfer_learning.ipynb"
     out.write_text(json.dumps(notebook, indent=1) + "\n", encoding="utf-8")
     print(f"Generated {len(cells)} unexecuted cells → {out}")
+
+
+def build():
+    build_one("transfer_learning")
+    build_one("classroom_walkthrough")
 
 
 if __name__ == "__main__":

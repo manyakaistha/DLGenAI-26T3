@@ -1,4 +1,4 @@
-# 5. Freeze, unfreeze and fine-tune
+# 3. Freeze, unfreeze and fine-tune
 
 A newly initialized decoder needs to learn how to use encoder features. You can let all model parameters update, or temporarily keep the encoder fixed while training the decoder. The choice changes the training policy and should be recorded.
 
@@ -66,9 +66,9 @@ print(f"{trainable:,} / {total:,} trainable parameters")
 
 During debugging, inspect `parameter.grad` after backward and compare a copied parameter before/after the step. To confirm a truly fixed encoder, also compare its BatchNorm buffers. A nonzero gradient alone does not prove an update occurred.
 
-## Which policy do we use today?
+## Choose the policy for the question
 
-The notebook’s main two arms use **full fine-tuning with the same learning rate**, so initialization is the intended difference. After that comparison, you may run a separate frozen-encoder experiment. Do not silently freeze only one main arm, change its learning rates, and still label the result “effect of pretraining alone.”
+The optional full experiment’s main two arms use **full fine-tuning with the same learning rate**, so initialization is the intended difference. After that comparison, you may run a separate frozen-encoder experiment. Do not silently freeze only one main arm, change its learning rates, and still label the result “effect of pretraining alone.”
 
 ## Activity: the encoder changed without gradients
 
