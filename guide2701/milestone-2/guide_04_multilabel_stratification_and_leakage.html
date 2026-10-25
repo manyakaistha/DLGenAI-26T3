@@ -70,7 +70,7 @@ Draw C (Worst Case):    Validation receives ZERO rare defects!</code></pre>
 <hr />
 <h2 id="2-multi-label-combination-stratification">2. Multi-Label Combination Stratification</h2>
 <p>In standard single-label classification (e.g., ImageNet or MNIST), <code>StratifiedKFold</code> easily partitions classes by stratifying on the single target label. But in multi-label segmentation, each image possesses a vector of binary labels:</p>
-<div class="arithmatex">\[\mathbf{y}_i = [y_{\text{defect\_a}}, y_{\text{defect\_b}}, y_{\text{defect\_c}}, y_{\text{defect\_d}}] \in \{0, 1\}^4\]</div>
+<div class="arithmatex">\[\mathbf{y}_i = [y_{\text{defect_a}}, y_{\text{defect_b}}, y_{\text{defect_c}}, y_{\text{defect_d}}] \in \{0, 1\}^4\]</div>
 <p>With 4 binary classes, there are <span class="arithmatex">\(2^4 = 16\)</span> possible combinations:</p>
 <pre class="highlight"><code>Possible Defect Combination Signatures:
 • "clean"                 (no defect present)

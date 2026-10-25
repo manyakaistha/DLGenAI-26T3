@@ -127,7 +127,7 @@ Linear Pixel 129 ─► (r=0, c=1)</code></pre>
 <p>When decoding real-world segmentation masks, boundary rounding can produce a run whose endpoint exceeds total pixels:</p>
 <div class="arithmatex">\[k_{\text{end}} = k_{\text{start}} + L\]</div>
 <p>On a canvas of <span class="arithmatex">\(128 \times 800 = 102,400\)</span> pixels, an index <span class="arithmatex">\(k_{\text{end}} &gt; 102,400\)</span> causes an out-of-bounds <code>IndexError</code> when reshaped. Your decoder must clamp:</p>
-<div class="arithmatex">\[k_{\text{clamped\_end}} = \min(k_{\text{start}} + L - 1, H \times W)\]</div>
+<div class="arithmatex">\[k_{\text{clamped_end}} = \min(k_{\text{start}} + L - 1, H \times W)\]</div>
 <h3 id="step-5-multi-channel-target-stacking">Step 5: Multi-Channel Target Stacking</h3>
 <p>Because each image can exhibit any combination of the four defect classes, we construct a 4-channel binary target tensor:</p>
 <div class="arithmatex">\[\mathbf{Y} \in \{0.0, 1.0\}^{4 \times 128 \times 800}\]</div>

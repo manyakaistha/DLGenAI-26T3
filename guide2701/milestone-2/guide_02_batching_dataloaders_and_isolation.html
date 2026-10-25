@@ -224,7 +224,7 @@ The <code>default_collate</code> function inspects the types:</p>
 <ol>
 <li><strong>Worker Count Tuning</strong>: Benchmark data loading speed on your training machine:<ul>
 <li>Run 100 batches with <code>num_workers=0, 2, 4</code>.</li>
-<li>Measure batches loaded per second: <span class="arithmatex">\(\text{throughput} = \frac{N_{\text{batches}}}{\text{elapsed\_time}}\)</span>.</li>
+<li>Measure batches loaded per second: <span class="arithmatex">\(\text{throughput} = \frac{N_{\text{batches}}}{\text{elapsed_time}}\)</span>.</li>
 <li>Select the lowest worker count that saturates your GPU without consuming excessive system RAM.</li>
 </ul>
 </li>

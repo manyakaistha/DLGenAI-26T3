@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guide 04 · Validation Stratification · Milestone 2 Student Guide</title>
+<meta name="description" content="Milestone 2 student study guides: building the segmentation pipeline and first Kaggle submission.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer"></head><body data-overview="false">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 2</span><a class="brand" href="index.html">Industrial Surface<br>Anomaly Segmentation</a>
+<p>Building your segmentation pipeline and first Kaggle submission from scratch.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></div><details class="mobile-menu"><summary>Browse & search the guides</summary><input class="search" aria-label="Search guides" placeholder="Search Milestone 2 guides…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 2 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 2 Overview</a><a href="guide_01_dataset_contract_and_strip_tensors.html"><span class="num">GUIDE 01</span>Guide 01 · The Dataset Contract</a><a href="guide_02_batching_dataloaders_and_isolation.html"><span class="num">GUIDE 02</span>Guide 02 · Batching &amp; DataLoaders</a><a href="guide_03_industrial_augmentations_and_alignment.html"><span class="num">GUIDE 03</span>Guide 03 · Industrial Augmentations</a><a href="guide_04_multilabel_stratification_and_leakage.html" aria-current="page"><span class="num">GUIDE 04</span>Guide 04 · Validation Stratification</a><a href="guide_05_wandb_experiment_tracking.html"><span class="num">GUIDE 05</span>Guide 05 · W&amp;B Experiment Tracking</a><a href="guide_06_baseline_unet_and_training_loop.html"><span class="num">GUIDE 06</span>Guide 06 · Baseline U-Net &amp; Training</a><a href="guide_07_postprocessing_logits_to_masks.html"><span class="num">GUIDE 07</span>Guide 07 · Post-Processing &amp; Thresholds</a><a href="guide_08_rle_submission_and_verification.html"><span class="num">GUIDE 08</span>Guide 08 · RLE &amp; First Submission</a><a href="walkthrough-notebook.html"><span class="num">NOTEBOOK & CODE</span>Walkthrough Notebook &amp; Code Examples</a></nav></details>
+<footer><span>Milestone 2 Student Guides</span></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 2 · Building the Segmentation Pipeline & First Submission</span><a href="walkthrough-notebook.html">View walkthrough code ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 2 Curriculum</span><p class="hero-title">From tensors<br>to submissions.</p><p class="hero-caption">Understand. Build. Validate.</p></div></div>
+<span class="section-label">Concept guide 04 / 08</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-motivation-the-split-lottery-of-rare-defects">1. Motivation: The "Split Lottery" of Rare Defects</a></li>
+<li><a href="#2-multi-label-combination-stratification">2. Multi-Label Combination Stratification</a></li>
+<li><a href="#3-the-edge-case-singleton-combinations">3. The Edge Case: Singleton Combinations</a></li>
+<li><a href="#4-preventing-data-leakage-the-verification-checklist">4. Preventing Data Leakage: The Verification Checklist</a></li>
+<li><a href="#5-single-holdout-vs-5-fold-cross-validation">5. Single Holdout vs. 5-Fold Cross-Validation</a></li>
+<li><a href="#6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</a></li>
+<li><a href="#7-decisions-you-must-make">7. Decisions You Must Make</a></li>
+<li><a href="#8-try-it-build-a-combination-stratified-split-on-toy-data">8. Try It: Build a Combination Stratified Split on Toy Data</a></li>
+<li><a href="#9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="validation-strategy-multi-label-stratification-for-rare-defect-detection">Validation Strategy: Multi-Label Stratification for Rare Defect Detection</h1>
+<p>A reliable validation strategy is the compass of every machine learning project. If your validation score rises while your actual test performance falls, your compass is broken, and every subsequent engineering decision—from choosing architectures to tuning learning rates—will be guided by noise.</p>
+<p>In industrial surface anomaly detection, establishing an honest validation split is especially challenging because <strong>anomalies are rare events</strong>. Furthermore, our dataset is <strong>multi-label</strong>: images can display zero, one, or multiple co-occurring defect classes.</p>
+<p>In this guide, you will learn why naive random splitting causes extreme variance for rare defect categories, how <strong>multi-label combination stratification</strong> stabilizes validation metrics, and how to protect your pipeline against subtle data leakage.</p>
+<hr />
+<h2 id="1-motivation-the-split-lottery-of-rare-defects">1. Motivation: The "Split Lottery" of Rare Defects</h2>
+<p>Consider a dataset where one defect class—say, <code>defect_b</code>—appears in only a small fraction of training images (for instance, around <span class="arithmatex">\(2.7\%\)</span> prevalence).</p>
+<p>Suppose you evaluate your model using a single <span class="arithmatex">\(80/20\)</span> train/validation holdout (where <span class="arithmatex">\(20\%\)</span> of images are held out for validation). If you partition images <strong>purely at random</strong>, the number of positive <code>defect_b</code> images allocated to the validation set is a random variable drawn from a hypergeometric distribution.</p>
+<h3 id="the-variance-of-random-sampling">The Variance of Random Sampling</h3>
+<p>Let <span class="arithmatex">\(N\)</span> be the total number of images, <span class="arithmatex">\(K\)</span> be the number of positive instances of a rare defect, and <span class="arithmatex">\(n = 0.20 \times N\)</span> be the size of the validation partition.</p>
+<p>The expected number of positive instances in validation is:</p>
+<div class="arithmatex">\[\mathbb{E}[X] = n \times \frac{K}{N} = 0.20 \times K\]</div>
+<p>However, the standard deviation of this draw is:</p>
+<div class="arithmatex">\[\sigma = \sqrt{n \times \frac{K}{N} \times \left(1 - \frac{K}{N}\right) \times \frac{N - n}{N - 1}}\]</div>
+<p>For a common class (where <span class="arithmatex">\(K\)</span> is large), <span class="arithmatex">\(\frac{\sigma}{\mathbb{E}[X]}\)</span> is small (perhaps <span class="arithmatex">\(\pm 3\%\)</span>). But for an extremely rare class, the relative standard deviation <span class="arithmatex">\(\frac{\sigma}{\mathbb{E}[X]}\)</span> can exceed <span class="arithmatex">\(\pm 50\%\)</span>!</p>
+<pre class="highlight"><code>Random Holdout (The Split Lottery):
+Draw A (Lucky Split):   Validation receives 1.6× the expected rare defects.
+Draw B (Unlucky Split): Validation receives 0.4× the expected rare defects.
+Draw C (Worst Case):    Validation receives ZERO rare defects!</code></pre>
+<p>If your validation partition receives zero or near-zero instances of a rare defect:</p>
+<ol>
+<li>Per-class metrics (like Foreground Dice for <code>defect_b</code>) become undefined (<span class="arithmatex">\(0/0\)</span>) or hyper-sensitive: a single misclassified pixel can collapse the score from <span class="arithmatex">\(0.80\)</span> to <span class="arithmatex">\(0.00\)</span>.</li>
+<li>Your validation score reflects <strong>split luck</strong>, not model architecture or learning progress.</li>
+</ol>
+<p><img alt="Stratification Lottery vs Combination" src="assets/fig04_stratification_lottery_vs_combination.png" />
+<em>Figure 4.1: (A) Naive random holdout distribution across 1,000 simulations showing high variance and the risk of empty validation sets. (B) Multi-label combination stratification guaranteeing proportional representation across all defect combinations.</em></p>
+<hr />
+<h2 id="2-multi-label-combination-stratification">2. Multi-Label Combination Stratification</h2>
+<p>In standard single-label classification (e.g., ImageNet or MNIST), <code>StratifiedKFold</code> easily partitions classes by stratifying on the single target label. But in multi-label segmentation, each image possesses a vector of binary labels:</p>
+<div class="arithmatex">\[\mathbf{y}_i = [y_{\text{defect_a}}, y_{\text{defect_b}}, y_{\text{defect_c}}, y_{\text{defect_d}}] \in \{0, 1\}^4\]</div>
+<p>With 4 binary classes, there are <span class="arithmatex">\(2^4 = 16\)</span> possible combinations:</p>
+<pre class="highlight"><code>Possible Defect Combination Signatures:
+• "clean"                 (no defect present)
+• "defect_a"              (isolated defect a)
+• "defect_b"              (isolated defect b)
+• "defect_c"              (isolated defect c)
+• "defect_d"              (isolated defect d)
+• "defect_a+defect_c"     (co-occurring a and c)
+• "defect_b+defect_c"     (co-occurring b and c)
+... up to all 4 co-occurring</code></pre>
+<h3 id="the-combination-stratification-algorithm">The Combination Stratification Algorithm</h3>
+<p>To guarantee balanced representation without distorting co-occurrence patterns:</p>
+<ol>
+<li><strong>Group by Image ID</strong>: Condense the 4 rows of <code>train.csv</code> per image into a single record.</li>
+<li><strong>Compute the Combination Signature</strong>: For each image, create an alphabetical string indicating all active defect categories (or <code>"clean"</code> if no defect is present).</li>
+<li><strong>Partition Stratified by Signature</strong>: Allocate the holdout within each combination stratum so that the validation set receives the exact same proportion of clean images, single defects, and rare multi-defect pairs as the full dataset.</li>
+</ol>
+<pre class="highlight"><code class="language-python"># Constructing the Combination Signature
+def get_combination_signatures(df):
+    # Filter to active defect annotations
+    active = df[df["mask_rle"].str.strip() != ""]
+    # Group by image and join sorted defect names
+    signatures = active.groupby("image_id")["defect_type"].apply(lambda s: "+".join(sorted(s)))
+    # Map back to all image IDs (unannotated images become 'clean')
+    all_signatures = pd.Series(index=df["image_id"].unique(), data="clean", dtype=object)
+    all_signatures.update(signatures)
+    return all_signatures</code></pre>
+<hr />
+<h2 id="3-the-edge-case-singleton-combinations">3. The Edge Case: Singleton Combinations</h2>
+<p>When you inspect the combination distribution in real-world industrial data, you will discover that some multi-defect combinations are <strong>extremely rare</strong>—appearing in only 1, 2, or 3 images across the entire dataset!</p>
+<div class="arithmatex">\[\text{What do you do if combination } \text{"defect_a+defect_b+defect_d"} \text{ has exactly } 1 \text{ sample?}\]</div>
+<p>Mathematically, you cannot split a single sample into an <span class="arithmatex">\(80\%\)</span> train and <span class="arithmatex">\(20\%\)</span> validation slice. You must establish a deterministic rule:</p>
+<ul>
+<li><strong>Rule Option A (Train Priority)</strong>: Allocate singletons (<span class="arithmatex">\(N=1\)</span>) to the <strong>training partition</strong>. Rationale: The neural network cannot learn a complex multi-defect interaction if it never sees it during training.</li>
+<li><strong>Rule Option B (Iterative Stratification)</strong>: Use an algorithm like Sechidis et al.'s <em>Iterative Multi-label Stratification</em>, which greedily optimizes marginal label distributions rather than exact combination strings.</li>
+</ul>
+<p>Whichever rule you adopt, document it explicitly and fix your random seed (<code>seed=42</code>) so that your split is <span class="arithmatex">\(100\%\)</span> reproducible across runs.</p>
+<hr />
+<h2 id="4-preventing-data-leakage-the-verification-checklist">4. Preventing Data Leakage: The Verification Checklist</h2>
+<p>Data leakage occurs when information from outside the training dataset is used to create or tune the model. In segmentation pipelines, leakage takes several subtle forms:</p>
+<h3 id="1-image-level-isolation-check">1. Image-Level Isolation Check</h3>
+<p>Never allow an image ID to appear in both training and validation sets:</p>
+<div class="arithmatex">\[\text{Train}_{\text{IDs}} \cap \text{Val}_{\text{IDs}} = \emptyset\]</div>
+<h3 id="2-preprocessing-normalization-leakage">2. Preprocessing &amp; Normalization Leakage</h3>
+<p>If you normalize images using dataset mean <span class="arithmatex">\(\mu\)</span> and standard deviation <span class="arithmatex">\(\sigma\)</span>:</p>
+<ul>
+<li><strong>WRONG</strong>: Computing <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> across all 11,393 images in <code>data/public/train/</code>. (The validation set leaks into your training statistics!)</li>
+<li><strong>CORRECT</strong>: Computing <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> strictly on your <span class="arithmatex">\(80\%\)</span> training partition, then applying those exact frozen parameters to normalize the <span class="arithmatex">\(20\%\)</span> validation partition.</li>
+</ul>
+<h3 id="3-holdout-overfitting-validation-degradation">3. Holdout Overfitting (Validation Degradation)</h3>
+<p>If you train 50 different model variations and repeatedly tune decision thresholds or minimum-area filters to maximize the score on your single <span class="arithmatex">\(20\%\)</span> validation holdout, you will <strong>overfit the validation set</strong>.</p>
+<ul>
+<li>The validation score will steadily climb from <span class="arithmatex">\(0.62\)</span> to <span class="arithmatex">\(0.71\)</span>, but your performance on the hidden Kaggle test leaderboard will fail to improve.</li>
+<li><strong>Defense</strong>: Reserve threshold searches for candidate models only, or adopt <span class="arithmatex">\(5\)</span>-fold cross-validation when conducting extensive hyperparameter sweeps.</li>
+</ul>
+<hr />
+<h2 id="5-single-holdout-vs-5-fold-cross-validation">5. Single Holdout vs. 5-Fold Cross-Validation</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Property</th>
+<th style="text-align: left;">Single <span class="arithmatex">\(80/20\)</span> Holdout</th>
+<th style="text-align: left;">5-Fold Cross-Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Training Budget</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(1\times\)</span> training time (Fast iteration)</td>
+<td style="text-align: left;"><span class="arithmatex">\(5\times\)</span> training time (Substantial compute)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Validation Size</strong></td>
+<td style="text-align: left;"><span class="arithmatex">\(20\%\)</span> of training data</td>
+<td style="text-align: left;"><span class="arithmatex">\(100\%\)</span> of data evaluated out-of-fold (OOF)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Variance on Rare Classes</strong></td>
+<td style="text-align: left;">Low (if combination-stratified), but fixed</td>
+<td style="text-align: left;">Averaged across all 5 folds; highly robust</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Ensembling</strong></td>
+<td style="text-align: left;">Single model inference</td>
+<td style="text-align: left;">Natural 5-model ensemble for test predictions</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Recommended Stage</strong></td>
+<td style="text-align: left;"><strong>Milestone 2 Baseline Pipeline</strong></td>
+<td style="text-align: left;"><strong>Milestone 3 Advanced Modeling</strong></td>
+</tr>
+</tbody>
+</table>
+<p>For Milestone 2, a single combination-stratified <span class="arithmatex">\(80/20\)</span> holdout provides the optimal balance of speed, stability, and fast debugging.</p>
+<hr />
+<h2 id="6-common-mistakes-and-diagnostics">6. Common Mistakes and Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Bug / Pitfall</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Observable Symptom</th>
+<th style="text-align: left;">Practical Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Duplicate Image IDs</strong></td>
+<td style="text-align: left;">Failing to deduplicate image IDs when creating splits.</td>
+<td style="text-align: left;">Same image ID appears in both partitions.</td>
+<td style="text-align: left;">Assert <code>len(set(train_ids) &amp; set(val_ids)) == 0</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Unstratified Split</strong></td>
+<td style="text-align: left;">Calling standard <code>KFold</code> or random sampling.</td>
+<td style="text-align: left;">Validation set receives 0 positive samples for rare defect.</td>
+<td style="text-align: left;">Check <code>val_df[val_df['defect_type'] == 'defect_b']['mask_rle'].count() &gt; 0</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Leaked Normalization</strong></td>
+<td style="text-align: left;">Calculating Z-score mean/std on all images combined.</td>
+<td style="text-align: left;">Small optimistic score bias; poor test generalizability.</td>
+<td style="text-align: left;">Save normalization parameters from <code>train_df</code> only.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Unfixed Random Seed</strong></td>
+<td style="text-align: left;">Not setting <code>random_state=42</code> in split generator.</td>
+<td style="text-align: left;">Training and validation partitions shift on every script execution!</td>
+<td style="text-align: left;">Verify that <code>hash(tuple(sorted(val_ids)))</code> is identical across runs.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-decisions-you-must-make">7. Decisions You Must Make</h2>
+<ol>
+<li><strong>Holdout Ratio</strong>: Standard ratios are <span class="arithmatex">\(80/20\)</span> (9,114 train / 2,279 val) or <span class="arithmatex">\(85/15\)</span>. Choose a ratio that leaves at least 50+ positive samples of your rarest defect in validation.</li>
+<li><strong>Stratification Granularity</strong>: Will you stratify on exact combination strings (e.g., <code>"defect_a+defect_c"</code>), or will you use an iterative multi-label stratification library?</li>
+<li><strong>Artifact Persistence</strong>: Save your split assignments to a CSV file (e.g., <code>reports/folds.csv</code> or <code>splits/holdout.csv</code> containing <code>image_id,split</code>) so that every subsequent experiment loads the <strong>exact same partition</strong>.</li>
+</ol>
+<hr />
+<h2 id="8-try-it-build-a-combination-stratified-split-on-toy-data">8. Try It: Build a Combination Stratified Split on Toy Data</h2>
+<p>Run this self-contained script to observe how combination stratification balances rare classes across a toy dataset of 10 fictional images:</p>
+<pre class="highlight"><code class="language-python">import pandas as pd
+from sklearn.model_selection import StratifiedShuffleSplit
+
+# 1. Create toy dataset of 10 images with combination labels
+# Image 0..4: clean; Image 5..7: common defect c; Image 8..9: rare defect b
+toy_data = pd.DataFrame({
+    "image_id": [f"STRIP_{i:04d}" for i in range(10)],
+    "combo": ["clean"] * 5 + ["defect_c"] * 3 + ["defect_b"] * 2
+})
+
+print("Full Toy Distribution:")
+print(toy_data["combo"].value_counts())
+
+# 2. Stratified 80/20 split (8 train, 2 val)
+splitter = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+train_idx, val_idx = next(splitter.split(toy_data, toy_data["combo"]))
+
+train_set = toy_data.iloc[train_idx]
+val_set = toy_data.iloc[val_idx]
+
+print("\nTrain Partition (8 images):")
+print(train_set["combo"].value_counts())
+
+print("\nValidation Partition (2 images):")
+print(val_set["combo"].value_counts())
+
+# Assertions
+assert len(val_set) == 2
+assert "defect_b" in val_set["combo"].values, "Rare defect missing from validation!"
+assert len(set(train_set["image_id"]) &amp; set(val_set["image_id"])) == 0, "Leakage detected!"
+print("\n✓ Stratified split verified: rare class represented, zero leakage!")</code></pre>
+<hr />
+<h2 id="9-authoritative-documentation-references">9. Authoritative Documentation &amp; References</h2>
+<ul>
+<li><strong>Sechidis et al. (2011)</strong>: <a href="https://doi.org/10.1007/978-3-642-23808-6_10">On the Stratification of Multi-Label Data</a></li>
+<li><strong>Scikit-Learn <code>StratifiedShuffleSplit</code></strong>: <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html">Scikit-Learn Splitter Documentation</a></li>
+<li><strong>Iterative Stratification Library</strong>: <a href="https://github.com/trent-b/iterative-stratification">Iterative-Stratification on GitHub</a></li>
+</ul></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_03_industrial_augmentations_and_alignment.html">← Guide 03 · Industrial Augmentations</a><a href="guide_05_wandb_experiment_tracking.html">Guide 05 · W&amp;B Experiment Tracking →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Understand the concepts. Practice on synthetic examples. Build and audit your own pipeline.</footer></div></main></div></body></html>

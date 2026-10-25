@@ -4,12 +4,22 @@ import json
 import os
 import re
 import shutil
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 MILESTONES = [
     ('milestones/milestone-1/index.html', 'Milestone 1', 'Understand the data & build a baseline',
      'Nine concept guides on annotations, masks, evaluation and modeling, with 12 assessment questions and a Q11–Q12 starter notebook.'),
+    ('milestones/milestone-2/index.html', 'Milestone 2', 'Build the segmentation pipeline & first submission',
+     'Eight concept guides on dataset contracts, batching, augmentations, W&B tracking, U-Net training and RLE submission, with 8 assessment questions and walkthrough code.'),
 ]
 SESSIONS = [
     ('session/index.html', '12 October 2026 · Session 1', 'Pixels, Masks & Experiments',
@@ -39,7 +49,7 @@ def cards(items, current, action):
 
 def build_hub(output):
     milestone = output / 'milestones/milestone-1'
-    template = (milestone / 'index.html').read_text()
+    template = (milestone / 'index.html').read_text(encoding='utf-8')
     # Directory pages share the existing accessible shell, palettes and garden header.
     directories = [
         ('index.html', 'Student Resource Hub', 'Choose your next step.',
@@ -49,7 +59,7 @@ def build_hub(output):
          'Open resources', 'Choose a section below. Use Milestone Guides for assessment preparation, or Live Session Resources to revisit a class and practice its activities.'),
         ('milestones/index.html', 'Milestone Guides', 'One milestone at a time.',
          'Find your milestone, understand its goals, and work through its study resources.', MILESTONES,
-         'Open Milestone 1', 'Choose a milestone below. Start with its overview, read the concept guides, then use the assessment questions to apply what you have learned. Guides, questions and starter code stay together inside that milestone.'),
+         'Open milestone', 'Choose a milestone below. Start with its overview, read the concept guides, then use the assessment questions to apply what you have learned. Guides, questions and starter code stay together inside that milestone.'),
         ('live-sessions/index.html', 'Live Session Resources', 'Return to the lesson.',
          'Notes, guides and hands-on activities, organised by live session.', SESSIONS,
          'Open session', 'Choose the session you want to revisit. Its overview introduces the topics and links to the detailed notes, interactive guides and notebook. Use the session menu to move between resources.'),
@@ -79,20 +89,20 @@ def build_hub(output):
         page = page.replace('Study the concepts. Practice on toy examples. Compute your own assessment results.', 'Learn the concepts. Try the activities. Build your understanding.')
         path = output / current
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(page)
+        path.write_text(page, encoding='utf-8')
     # Keep session URLs stable; add exits inside both desktop and mobile menus.
     for folder in (Path(item[0]).parts[0] for item in SESSIONS):
         for path in (output / folder).glob('*.html'):
-            page = path.read_text()
+            page = path.read_text(encoding='utf-8')
             page = page.replace('</nav>', '</nav>' + exits('../live-sessions/index.html', '../index.html'), 2)
             page = page.replace('https://manyakaistha.github.io/DLGenAI-26T3/', '../index.html').replace('Milestone study guides ↗', 'App homepage')
-            path.write_text(page)
+            path.write_text(page, encoding='utf-8')
     # Retain old deep links, including fragments, and direct download URLs.
     for path in milestone.glob('*.html'):
         if path.name == 'index.html':
             continue
         target = 'milestones/milestone-1/' + path.name
-        (output / path.name).write_text(f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guide moved</title><meta http-equiv="refresh" content="0;url={target}"><script>location.replace({json.dumps(target)}+location.search+location.hash)</script></head><body><p>This guide has moved. <a href="{target}">Continue to Milestone 1</a>.</p></body></html>''')
+        (output / path.name).write_text(f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guide moved</title><meta http-equiv="refresh" content="0;url={target}"><script>location.replace({json.dumps(target)}+location.search+location.hash)</script></head><body><p>This guide has moved. <a href="{target}">Continue to Milestone 1</a>.</p></body></html>''', encoding='utf-8')
     for folder in ('downloads', 'assets'):
         shutil.copytree(milestone / folder, output / folder, dirs_exist_ok=True)
 
@@ -103,7 +113,7 @@ def validate_site(output):
     pages = {}
     for path in output.rglob('*.html'):
         parsed = Inspect()
-        parsed.feed(path.read_text())
+        parsed.feed(path.read_text(encoding='utf-8', errors='ignore'))
         pages[path.resolve()] = parsed
     for path, page in pages.items():
         for link in page.links:

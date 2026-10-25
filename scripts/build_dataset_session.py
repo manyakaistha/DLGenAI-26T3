@@ -19,9 +19,9 @@ def build(out):
     stage.mkdir(parents=True, exist_ok=True)
     for name in ("README.md", "notes.md", "dataset.md", "split.md", "dataloader.md", "augmentations.md", "dataset_tutorial.ipynb", "dataset_tutorial.py"):
         shutil.copy2(SOURCE / name, stage / name)
-    overview = (stage / "README.md").read_text()
+    overview = (stage / "README.md").read_text(encoding="utf-8", errors="ignore")
     overview = overview.replace("- [Instructor timing and answers](instructor.md)\n", "")
-    (stage / "README.md").write_text(overview)
+    (stage / "README.md").write_text(overview, encoding="utf-8")
     session.SOURCE = stage
     session.MODULES = ["README", "dataset", "split", "dataloader", "augmentations", "notes"]
     session.TITLES = ["Session overview", "1 · Dataset", "2 · 80/20 split", "3 · DataLoader", "4 · Augmentations", "Topic index"]
@@ -49,10 +49,10 @@ def build(out):
         "Observe. Represent. Measure.": "Read. Decode. Stack.",
     }
     for page in out.glob("*.html"):
-        text = page.read_text()
+        text = page.read_text(encoding="utf-8", errors="ignore")
         for old, new in replacements.items():
             text = text.replace(old, new)
-        page.write_text(text)
+        page.write_text(text, encoding="utf-8")
     for alias in ("wandb_tutorial.ipynb", "wandb_tutorial.py"):
         (out / alias).unlink(missing_ok=True)
     print("Independent Dataset session ready:", out / "index.html")
