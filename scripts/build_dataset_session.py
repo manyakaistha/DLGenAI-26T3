@@ -24,7 +24,7 @@ def build(out):
     (stage / "README.md").write_text(overview)
     session.SOURCE = stage
     session.MODULES = ["README", "dataset", "split", "dataloader", "augmentations", "notes"]
-    session.TITLES = ["Session overview", "1 · Dataset", "80/20 split", "2 · DataLoader", "3 · Augmentations", "Topic index"]
+    session.TITLES = ["Session overview", "1 · Dataset", "2 · 80/20 split", "3 · DataLoader", "4 · Augmentations", "Topic index"]
     session.URLS = ["index.html", "dataset.html", "split.html", "dataloader.html", "augmentations.html", "notes.html"]
     # The original renderer expects two download names; stage aliases only.
     shutil.copy2(stage / "dataset_tutorial.ipynb", stage / "wandb_tutorial.ipynb")
