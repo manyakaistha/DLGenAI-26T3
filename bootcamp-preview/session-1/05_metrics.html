@@ -1,0 +1,191 @@
+<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5 · Metrics &amp; error costs · Bootcamp Session 1 · 30 October 2026</title>
+<meta name="description" content="Elementary segmentation foundations, RLE, geometry, texture, Dice, validation and diagnostic and trainable starter baselines with optional depth and three notebooks.">
+<link rel="stylesheet" href="site.css?v=7f4054ffa00e"><link rel="stylesheet" href="styles/generative/theme.css?v=8b85dd5e88eca2c1"><link rel="stylesheet" href="styles/generative/navigation.css?v=8b85dd5e88eca2c1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
+<details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html" aria-current="page">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></div><details class="mobile-menu"><summary>Browse Bootcamp 1</summary><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html" aria-current="page">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Bootcamp · Teaching 1 · 30 October 2026</span><a href="foundations_walkthrough.ipynb" download>Foundations notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Read. Reconstruct. Reason.</span><p class="hero-title">First understand<br>the pixels.</p><p class="hero-caption">A careful beginning. A stronger next step.</p></div></div>
+<span class="section-label">5 · Metrics &amp; error costs</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#5-calculate-a-score-you-can-explain">5 · Calculate a score you can explain</a><ul>
+<li><a href="#core-count-four-outcomes">Core · Count four outcomes</a></li>
+<li><a href="#core-dice-measures-overlap">Core · Dice measures overlap</a></li>
+<li><a href="#core-empty-masks-are-a-policy-decision">Core · Empty masks are a policy decision</a></li>
+<li><a href="#core-averaging-changes-the-question">Core · Averaging changes the question</a></li>
+<li><a href="#core-a-projects-official-metric-is-a-separate-contract">Core · A project's official metric is a separate contract</a></li>
+<li><a href="#core-thresholds-and-area-filters-change-predictions">Core · Thresholds and area filters change predictions</a></li>
+<li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
+<li><a href="#threshold-errors-and-dice">Threshold, errors and Dice</a></li>
+<li><a href="#small-regions-and-filtering">Small regions and filtering</a></li>
+<li><a href="#optional-pair-mean-versus-pooled-dice">Optional · pair mean versus pooled Dice</a></li>
+</ul>
+</li>
+<li><a href="#checkpoint-score-and-interpret">Checkpoint · Score and interpret</a></li>
+<li><a href="#optional-extension-iou-and-dice">Optional extension · IoU and Dice</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><article><h1 id="5-calculate-a-score-you-can-explain">5 · Calculate a score you can explain</h1>
+<p><strong>Core question:</strong> which errors does this number notice, and over which examples is it averaged?</p>
+<p>A correct metric implementation can still answer the wrong question. “Dice” without an empty convention, averaging population and evaluation geometry is incomplete. A useful score report names those choices and includes simple predictions whose behaviour we already understand.</p>
+<h2 id="core-count-four-outcomes">Core · Count four outcomes</h2>
+<p>Compare one binary prediction <code>P</code> with one binary ground-truth mask <code>G</code> at the same geometry:</p>
+<table>
+<thead>
+<tr>
+<th>Ground truth</th>
+<th>Prediction</th>
+<th>Name</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>True positive, TP</td>
+<td>A marked location was found.</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>False positive, FP</td>
+<td>An unmarked location was predicted.</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>False negative, FN</td>
+<td>A marked location was missed.</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>True negative, TN</td>
+<td>A background location stayed background.</td>
+</tr>
+</tbody>
+</table>
+<p>Imagine a toy mask with five foreground locations. A prediction marks six locations, three of them correct. Then TP = 3, FP = 3 and FN = 2. Foreground recall is <code>TP/(TP+FN) = 3/5</code>. Foreground precision is <code>TP/(TP+FP) = 3/6</code>. Recall asks how much target was found; precision asks how much predicted foreground was correct. Empty denominators require their own stated convention.</p>
+<h2 id="core-dice-measures-overlap">Core · Dice measures overlap</h2>
+<p>For one pair of masks,</p>
+<div class="arithmatex">\[
+\operatorname{Dice}(P,G)=\frac{2|P\cap G|}{|P|+|G|}
+=\frac{2TP}{2TP+FP+FN}.
+\]</div>
+<p>Vertical bars count foreground pixels. In the toy example, <code>|P| = 6</code>, <code>|G| = 5</code> and <code>|P ∩ G| = 3</code>, so Dice is <code>6/11</code>, approximately 0.545. The factor of two accounts for the common foreground appearing in both set sizes in the denominator. Perfectly matching nonempty masks have Dice 1. Disjoint masks with at least one nonempty mask have Dice 0.</p>
+<p>True negatives do not appear in this formula. Adding a large blank border can raise pixel accuracy while leaving Dice unchanged, if TP/FP/FN remain unchanged. This makes Dice useful for inspecting sparse foreground, though it cannot describe every error that matters.</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+def dice_pair(prediction, target):
+    prediction = np.asarray(prediction, dtype=bool)
+    target = np.asarray(target, dtype=bool)
+    if prediction.shape != target.shape:
+        raise ValueError("Masks must have the same shape")
+    denominator = prediction.sum() + target.sum()
+    if denominator == 0:
+        return 1.0   # explicit convention for this teaching exercise
+    intersection = np.logical_and(prediction, target).sum()
+    return float(2 * intersection / denominator)</code></pre>
+<p>This function measures one pair only. Averaging it is a separate decision. It also deliberately uses hard binary masks; a differentiable soft Dice training loss is a later topic.</p>
+<h2 id="core-empty-masks-are-a-policy-decision">Core · Empty masks are a policy decision</h2>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>Prediction</th>
+<th style="text-align: right;">Our exercise value</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nonempty</td>
+<td>Exact match</td>
+<td style="text-align: right;">1</td>
+<td>Full agreement.</td>
+</tr>
+<tr>
+<td>Nonempty</td>
+<td>Empty</td>
+<td style="text-align: right;">0</td>
+<td>All foreground missed.</td>
+</tr>
+<tr>
+<td>Empty</td>
+<td>Nonempty</td>
+<td style="text-align: right;">0</td>
+<td>No foreground overlap.</td>
+</tr>
+<tr>
+<td>Empty</td>
+<td>Empty</td>
+<td style="text-align: right;">1 by convention</td>
+<td>The raw ratio is <code>0/0</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Empty–empty Dice is not universally 1. Different tools omit empty pairs, return a chosen value or apply smoothing. Read the task specification and test your implementation. Adding a small epsilon does not remove the need to decide what should happen: adding it to numerator and denominator versus denominator only gives different empty–empty values.</p>
+<p>For the cloud practice competition, the published metric uses mean image–label Dice with empty–empty agreement rewarded. A local Dice mean at the notebook's small teaching resolution is a <strong>local diagnostic</strong>; it is not a reproduced leaderboard result at the official evaluation geometry. See the <a href="https://www.kaggle.com/c/understanding_cloud_organization/">cloud competition overview</a> and its evaluation section for its format and scoring rules.</p>
+<h2 id="core-averaging-changes-the-question">Core · Averaging changes the question</h2>
+<p>An invented batch has four image–class pairs: one target is positive and three are empty. An all-empty prediction has per-pair Dice <code>[0, 1, 1, 1]</code> under our convention, so its all-pair mean is 0.75. Its mean over target-positive pairs is 0. It has detected nothing. Both numbers are mathematically correct; they describe different populations.</p>
+<p>Also distinguish <strong>mean of pair Dice values</strong> from <strong>pooled-pixel Dice</strong>. If one pair is tiny and another is large, averaging their scores weights each pair equally. Pooling TP/FP/FN first gives larger masks more influence. Neither operation can be inferred merely from the name Dice.</p>
+<p>Report at least the number of positive and empty pairs alongside their separate diagnostics. A class with no positive validation examples has no positive-pair localisation evidence. Mark that case unavailable rather than silently calling it perfect. If a small sample has no empty pairs, empty-pair behaviour is likewise unmeasured.</p>
+<h2 id="core-a-projects-official-metric-is-a-separate-contract">Core · A project's official metric is a separate contract</h2>
+<p>The industrial project's evaluation description, archived by the instructor on 7 October 2026 from its <a href="https://www.kaggle.com/competitions/industrial-surface-defect-detection/overview/evaluation">competition evaluation page</a>, describes a weighted score with 70% foreground Dice, 20% false-positive score and 10% empty-prediction accuracy. Verify current organiser rules if that page is unavailable or has changed. This is different from the cloud competition's Dice mean. The archived description alone does not specify every detail of foreground averaging, false-positive normalisation or empty-subset handling. Do not invent a precise local formula and label it the official scorer.</p>
+<p>When an exact scorer is unavailable, identify what is confirmed, ask the organiser for missing definitions, and clearly label any local approximation. We use ordinary binary diagnostics for the practice notebook. They teach arithmetic and error analysis; they do not supply an official industrial score, all-empty score or assessment calculation.</p>
+<p>For practice, consider a <strong>fictional</strong> metric <code>0.6 × positive_pair_Dice + 0.4 × empty_pair_accuracy</code>. It gives different importance to errors than an all-pair Dice average. Before calculating it, write which subset supplies each term. This fictional rule is only an exercise in reading metric definitions.</p>
+<h2 id="core-thresholds-and-area-filters-change-predictions">Core · Thresholds and area filters change predictions</h2>
+<p>A threshold selects score locations with <code>score &gt;= threshold</code>. A component-area filter removes selected connected regions below a specified size. One changes pixel decisions using scores; the other uses the geometry of the resulting mask. Neither operation improves a score by definition.</p>
+<p>For a toy target with two components of 3 and 12 pixels, a perfect prediction initially has Dice 1. A rule removing components smaller than 5 pixels deletes the real 3-pixel component. Recall falls to <code>12/15 = 0.8</code>, and Dice becomes <code>24/27</code>, approximately 0.889. The same filter might remove a false alarm elsewhere. Inspect the trade-off on held-out data and report the area unit and connectivity. Pixel area changes with resolution, so a cutoff in one geometry is not directly portable to another.</p>
+<p>We introduce filtering to recognise its effect. Selecting a project filter and building a post-processing pipeline belong in later sessions. Keep the initial baseline unfiltered so its behaviour remains easy to inspect.</p>
+<h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
+<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
+<h3 id="threshold-errors-and-dice">Threshold, errors and Dice</h3>
+<div class="bc-lab" data-bc="dice"><p>Use the worked examples in this guide to reason about threshold, errors and dice. The interactive controls appear when JavaScript is available.</p></div>
+
+<h3 id="small-regions-and-filtering">Small regions and filtering</h3>
+<div class="bc-lab" data-bc="area"><p>Use the worked examples in this guide to reason about small regions and filtering. The interactive controls appear when JavaScript is available.</p></div>
+
+<h3 id="optional-pair-mean-versus-pooled-dice">Optional · pair mean versus pooled Dice</h3>
+<div class="bc-lab" data-bc="averaging"><p>Use the worked examples in this guide to reason about optional · pair mean versus pooled dice. The interactive controls appear when JavaScript is available.</p></div>
+
+<h2 id="checkpoint-score-and-interpret">Checkpoint · Score and interpret</h2>
+<ol>
+<li><code>G = {1,2,3,4}</code> and <code>P = {3,4,5}</code>. Find TP/FP/FN and Dice.</li>
+<li>A 100-pixel canvas has two positive pixels. What is all-background accuracy? What is its foreground Dice?</li>
+<li>Why can “mean Dice = 0.9” be insufficient evidence that small foreground regions are found?</li>
+<li>Can a tiny false-positive region on an empty pair receive full empty-prediction accuracy?</li>
+</ol>
+<details>
+<summary>Hints and explanations</summary>
+<ol>
+<li>TP = 2, FP = 1, FN = 2; Dice = <code>4/7</code>, approximately 0.571.</li>
+<li>Accuracy is <code>98/100 = 98%</code>; Dice is zero because both target pixels were missed.</li>
+<li>The empty convention, pair composition, class weighting and size distribution may hide poor foreground behaviour. Ask for positive-pair and class-wise evidence plus overlays.</li>
+<li>Under an exact-empty criterion it receives zero: some foreground was predicted. A pixel-fraction penalty can treat it differently. This is why the precise metric definition matters.</li>
+</ol>
+</details>
+<h2 id="optional-extension-iou-and-dice">Optional extension · IoU and Dice</h2>
+<p>Intersection over union is <code>TP/(TP+FP+FN)</code>. For a defined nonempty comparison, <code>Dice = 2 × IoU/(1+IoU)</code>. Dice is at least IoU; they are equal at zero overlap and perfect overlap. Their numeric scales differ, so a Dice of 0.6 cannot be compared directly with an IoU of 0.6 as if the values meant the same quality.</p>
+<p>For a research discussion of validation choices, see the original <a href="https://doi.org/10.1038/s41592-023-02151-z">Metrics Reloaded paper</a>. Read it after the hand examples, not as a prerequisite.</p>
+<p><strong>Transfer question:</strong> before implementing another task's metric, what examples would you hand-check? Include an empty pair, a missed nonempty target, a false positive and two unequal-size masks.</p>
+<p><a href="04_intensity_and_texture.html">Previous: intensity and texture</a> · <a href="06_validation.html">Next: validation</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="04_intensity_and_texture.html">← 4 · Intensity &amp; texture</a><a href="06_validation.html">6 · Validation &amp; rare labels →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span></footer></div></main></div></body></html>

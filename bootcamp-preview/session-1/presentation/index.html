@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en" data-theme="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive classroom presentation: images, labels, RLE, geometry, Dice, validation and diagnostic baselines. 30 October 2026.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23253c87'/%3E%3Ctext x='4' y='22' font-size='17' font-family='Arial' fill='white'%3EDL%3C/text%3E%3C/svg%3E">
+  <title>Bootcamp · Read the Data · 30 October</title>
+  <script>try{const t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+  <style>/* Warm paper, garden green and terracotta. All dimensions refer to the 1280×720 stage. */
+:root{color-scheme:light;--paper:#f7f6f0;--white:#fffefa;--ink:#242d29;--muted:#666c62;--blue:#315e54;--light-blue:#e5eee7;--coral:#a45c43;--green:#315e54;--line:#dedfd4}
+*{box-sizing:border-box}body{margin:0;background:#e5e5dc;color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer;border:1px solid var(--line);background:var(--white);color:var(--ink);padding:10px 15px;border-radius:8px;font-size:17px;font-weight:600;line-height:1.25;transition:background .15s,border-color .15s}button:disabled{cursor:default;opacity:.4}button:hover:not(:disabled){border-color:var(--blue);background:#edf2eb}button.primary,button[aria-pressed=true]{background:var(--blue);color:white;border-color:var(--blue)}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--coral);outline-offset:4px}a{color:var(--blue);text-underline-offset:4px}input[type=range]{accent-color:var(--blue);width:180px;max-width:100%;vertical-align:middle}input[type=checkbox]{width:21px;height:21px;accent-color:var(--blue);vertical-align:middle;flex-shrink:0}select{padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--white);color:var(--ink);font-size:17px;max-width:100%}kbd,.mono,code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}kbd{font-size:11px;border:1px solid var(--line);padding:2px 4px;border-radius:3px;margin-left:7px;font-weight:400}
+#viewport{min-height:100vh;display:flex;align-items:center;justify-content:center}#stage{width:1280px;height:720px;flex-shrink:0;background:var(--paper);position:relative;overflow:hidden;transform-origin:center;box-shadow:0 12px 70px #28362b15}.deck-header{height:61px;margin:0 48px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:12px;letter-spacing:1px;text-transform:uppercase}.wordmark{font-weight:700;letter-spacing:1px}.wordmark i{font-style:normal;color:var(--coral);padding:0 9px}.deck-header button{font-size:13px;padding:7px 11px;border-radius:20px;background:transparent}.deck-header #chapter{color:var(--muted)}
+.slide{position:absolute;left:48px;right:48px;top:86px;bottom:84px}.slide[hidden]{display:none}.eyebrow{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;font-weight:700;color:var(--coral);margin:0 0 12px}h1,h2,h3,p{margin:0}h1,h2{font-family:Georgia,'Times New Roman',serif;font-weight:400;letter-spacing:-1.3px;line-height:1.12}h1{font-size:58px}h1 em{font-weight:400;color:var(--blue)}h2{font-size:42px}h1:focus,h2:focus{outline:none}h3{font-size:22px;line-height:1.3;font-weight:600;letter-spacing:-.3px}p{font-size:22px;line-height:1.45}.lede{margin-top:12px;color:var(--muted);font-size:20px;line-height:1.4;max-width:1140px}.body{margin-top:25px;display:grid;gap:28px;align-items:start}.two{grid-template-columns:1.08fr 1fr}.wide-left{grid-template-columns:1.5fr 1fr}.wide-right{grid-template-columns:1fr 1.4fr}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:23px;min-width:0}.body>.panel:has([data-lab]){box-shadow:0 4px 16px #293f3010}.body>.panel+ .panel:not(:has([data-lab])){background:transparent;border-color:transparent;border-radius:0;padding:12px 0 12px 5px}.panel h3{margin-bottom:15px}.panel.blue{background:var(--blue)!important;color:white;border-radius:14px!important;padding:23px!important}.panel.blue .muted,.panel.blue .note-line{color:#d8e5da}.panel.blue a{color:white}.stack{display:flex;flex-direction:column;gap:16px}.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.spread{justify-content:space-between}.muted{color:var(--muted)}.small{font-size:17px;line-height:1.5}.tiny{font-size:13px;line-height:1.45}.big{font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-1px}.number{font-variant-numeric:tabular-nums}.formula{font-size:27px;line-height:1.55;overflow-wrap:anywhere}.formula.small{font-size:19px;line-height:1.7}.callout{border-left:3px solid var(--coral);padding:12px 16px;font-size:20px;line-height:1.45;background:#eeeee3;border-radius:0 7px 7px 0}.question{font-size:22px;line-height:1.45}.chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:5px 11px;font-size:13px;font-weight:600}.chip.optional{color:var(--coral);border-color:#a45c4366}.rule{height:1px;background:var(--line);margin:18px 0}.controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:22px;font-size:17px}.controls label{display:flex;align-items:center;gap:10px;min-width:0}.controls label:has(input[type=checkbox]){align-items:flex-start;line-height:1.45}.controls button[data-action=reset]{font-size:14px;color:var(--muted);background:transparent}.answer{font-size:18px;line-height:1.45;color:var(--blue);margin-top:15px;min-height:28px}.answer.wrong{color:var(--coral)}.note-line{font-size:16px;line-height:1.5;color:var(--muted);margin-top:16px}.tag{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.flow{display:flex;align-items:center;gap:12px;justify-content:center}.node{border:1px solid var(--line);background:var(--white);padding:20px 12px;border-radius:9px;text-align:center;flex:1;min-width:0}.node strong{display:block;font-size:21px;line-height:1.35}.node span{font-size:15px;line-height:1.5;display:block;margin-top:10px;color:var(--muted)}.node.active{background:var(--light-blue);color:var(--blue);border-color:#b6c9ba}.node.active span{color:var(--blue)}.arrow{color:var(--coral);font-size:25px;flex-shrink:0}.hero .body{margin-top:26px;grid-template-columns:1.15fr 1fr;gap:36px}.hero-left{padding:22px 0}.hero-left p{font-size:23px;margin-top:24px;max-width:570px}.hero-left p.small{font-size:16px;max-width:470px}.hero .body>.panel{background:var(--white)!important;border:1px solid var(--line)!important;border-radius:16px!important;padding:24px!important;margin-top:16px}.cover-diagram{height:270px;position:relative;display:flex;align-items:center;justify-content:center;gap:12px}.feature-column{width:100px;display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0}.feature-map{background:var(--light-blue);border:1px solid #9db6a5;border-radius:7px;display:grid;place-items:center;font-size:12px;color:var(--blue);box-shadow:5px 5px 0 #315e5410}.cover-skip{position:absolute;top:17px;left:25px;right:25px;height:36px;border:1px solid var(--coral);border-bottom:0;border-radius:10px 10px 0 0}.cover-skip span{display:block;width:max-content;margin:-10px auto 0;padding:0 9px;background:var(--white);font-size:14px;color:var(--coral)}
+.deck-footer{position:absolute;left:48px;right:48px;bottom:19px;display:flex;justify-content:space-between;align-items:center;height:43px;border-top:1px solid var(--line);padding-top:13px}.tools{display:flex;gap:8px;align-items:center}.tools button,.tools a{font-size:12px;padding:8px 10px;border-radius:20px}.tools button{background:transparent}.tools a{text-decoration:none}.tools a:hover{text-decoration:underline}.paging{display:flex;gap:14px;align-items:center}.paging button{font-size:23px;line-height:1;padding:7px 14px;border-radius:20px}.paging span{font-size:13px;min-width:80px;text-align:center;font-variant-numeric:tabular-nums;color:var(--muted)}#progress{position:absolute;bottom:0;left:0;height:3px;background:var(--blue);width:0}
+.pixel-grid{display:grid;gap:4px;width:max-content}.pixel{width:32px;height:32px;background:#efefe9;display:grid;place-items:center;font-size:15px;border-radius:4px;border:1px solid #00000008;font-variant-numeric:tabular-nums}.pixel.on,.pixel.tp{background:var(--blue);color:white}.pixel.hot{outline:2px solid var(--coral);outline-offset:-2px;background:#f2d5ba;color:var(--ink)}.pixel.filter{background:var(--light-blue);color:var(--blue)}.pixel.fp{background:#f1cebd;color:#713f2c}.pixel.fn{background:#eddfa8;color:#65531a}.pixel.tn{background:#eeeee7;color:#71766d}.grid-label{font-size:14px;font-weight:600;margin-bottom:12px;white-space:nowrap}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.metric{border-top:1px solid var(--line);padding-top:13px;min-width:0}.metric strong{font-size:32px;font-weight:500;display:block;font-variant-numeric:tabular-nums}.metric span{font-size:14px;line-height:1.5;color:var(--muted);display:block;margin-top:4px}
+.shape-steps{display:flex;gap:9px;align-items:flex-end;height:202px;margin-top:4px}.shape-step{flex:1;min-width:0;text-align:center;padding:0 3px 6px;background:transparent;border:0;font-weight:400;font-size:14px}.shape-step:hover:not(:disabled){background:#edf2eb}.shape-box{border:1px solid #9db6a5;background:var(--light-blue);margin:0 auto 12px;display:grid;place-items:center;width:100%;color:var(--blue);font-weight:600;border-radius:5px}.shape-step[aria-pressed=true]{background:transparent;color:var(--ink)}.shape-step[aria-pressed=true] .shape-box{background:var(--blue);color:white}.shape-step span{display:block;line-height:1.6}.join-block{width:108px;height:120px;display:grid;place-items:center;border:1px solid #9db6a5;border-radius:6px;background:var(--light-blue);color:var(--blue);font-size:25px;font-weight:600}.join-block.skip{border-color:#c29782;background:#f2dfd2;color:var(--coral)}.join-block.joined{width:177px;background:linear-gradient(90deg,var(--light-blue) 66.66%,#f2dfd2 66.66%)}.join-visual{height:175px;display:flex;gap:20px;align-items:center;justify-content:center}.join-label{text-align:center;font-size:14px;margin-top:9px}.join-operation{font-size:15px;color:var(--coral);min-width:48px;text-align:center}.step-indicator{display:flex;gap:6px;margin-bottom:13px}.step-indicator span{height:4px;background:var(--line);flex:1;border-radius:4px}.step-indicator .done{background:var(--blue)}
+.code{background:#293730;color:#f6f4ea;font-size:18px;line-height:1.55;padding:18px;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;tab-size:2}.code .accent{color:#f4c8a5}.switches{display:grid;gap:15px}.switches label{display:flex;justify-content:space-between;gap:16px;font-size:20px;border-bottom:1px solid var(--line);padding-bottom:12px;align-items:center}.status{font-size:17px;line-height:1.45;min-height:50px;margin-top:16px}.ok{color:var(--green)}.warning{color:var(--coral)}.bn-bar{height:28px;background:#e7eae1;border-radius:5px;overflow:hidden;margin:21px 0 14px}.bn-bar div{height:100%;background:var(--blue);width:0}.track-labels{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}.check-table{width:100%;border-collapse:collapse;font-size:18px;table-layout:auto}.check-table td,.check-table th{padding:12px 9px;border-bottom:1px solid var(--line);text-align:left}.check-table th{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600}.check-table select{font-size:16px;padding:7px;max-width:160px}.feature-options{display:flex;gap:8px;margin-bottom:25px}.feature-options button{flex:1;font-size:15px;padding:10px}.curve-svg{width:100%;height:230px;overflow:hidden;display:block}.curve-svg text{font-family:Arial,sans-serif;font-size:14px;fill:var(--muted)}.curve-svg path,.curve-svg line{vector-effect:non-scaling-stroke}.mri-image{width:100%;height:240px;object-fit:contain;background:#141414;border-radius:8px}.optional-nav{display:flex;gap:12px;align-items:center;margin-top:21px}.optional-nav button{font-size:16px}.concept-list{display:flex;flex-direction:column;gap:20px}.concept-list p{padding-left:18px;border-left:2px solid #b8c9b9;font-size:21px;line-height:1.45}.answer-button{width:100%;text-align:left;font-size:19px;font-weight:400;line-height:1.4;padding:12px 14px}.quiz-options{display:flex;flex-direction:column;gap:10px}.checkpoint{display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid var(--line);padding:18px 0;font-size:18px}.checkpoint button{font-size:14px;white-space:nowrap}.summary-line{display:flex;gap:20px;padding:18px 0;border-top:1px solid var(--line);font-size:21px}.summary-line:first-child{border-top:0;padding-top:0}.summary-line span{color:var(--coral);font-family:Georgia,serif;font-size:29px;line-height:1.25}.summary-line p{font-size:21px}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+/* Explicit grid tracks reserve room for labels, matrices and readouts. */
+.conv-layout{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:20px;align-items:start}.soft-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;align-items:start}.threshold-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}.threshold-layout>div:last-child{grid-column:1/-1;display:flex;align-items:baseline;gap:18px;width:auto!important;padding-top:14px;border-top:1px solid var(--line)}.threshold-layout>div:last-child p{margin:0!important;display:flex;gap:14px;line-height:1.4}.threshold-layout>div:last-child p br{display:none}.threshold-layout .tag{margin:0}.threshold-layout .big{font-size:35px}#soft-dice .pixel{width:33px}#soft-dice .controls{display:grid;grid-template-columns:1fr 1fr;gap:16px}#soft-dice .controls label{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:15px}#soft-dice .controls input{width:100%}#threshold .controls{gap:12px}#threshold .controls label{font-size:15px}#threshold .controls input{width:130px}#threshold .pixel{width:31px;height:31px;font-size:13px}#task .flow{justify-content:space-between;gap:14px}#task .pixel{width:31px;height:31px}#join .code{font-size:15px!important;line-height:1.5}#join .note-line{margin-top:12px}#join .panel h3{font-size:20px;margin-bottom:0}#unfreeze .code{font-size:16px!important}#unfreeze .controls{gap:8px;margin-top:16px!important;margin-bottom:10px}#unfreeze .controls button{font-size:15px}#rates .controls{margin-top:16px!important;margin-bottom:12px}#rates .check-table{font-size:16px}#rates .check-table td{padding:9px 6px}#rates .stack{gap:12px}#rates .status{min-height:0;margin-top:12px}#audit .check-table td{padding:8px}#review .answer-button{font-size:17px;padding:10px 13px}#review .question{font-size:20px}#review .answer{font-size:16px}#review .quiz-options{margin-top:14px!important}#review .panel:has([data-lab=quiz]){padding:20px}#skip .formula{font-size:25px!important;margin:14px 0!important}#skip .body>.panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:23px}#finish .summary-line{padding:15px 0}#finish .summary-line:first-child{padding-top:0}#finish .summary-line p{font-size:20px}
+dialog{border:1px solid var(--line);border-radius:16px;padding:30px;background:var(--paper);color:var(--ink);width:min(940px,94vw);max-height:90vh;overflow:auto}dialog::backdrop{background:#23382d80;backdrop-filter:blur(5px)}dialog h2{font-size:33px}dialog p{font-size:16px;margin:12px 0;color:var(--muted)}.dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:20px}.route-setting{display:flex;gap:12px;align-items:center;font-size:16px;padding:16px 0;border-block:1px solid var(--line);margin:20px 0}#index-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}#index-list button{text-align:left;font-size:15px;font-weight:400;display:flex;gap:12px;align-items:center}#index-list button span{color:var(--coral);min-width:25px}#index-list button.optional{border-style:dashed}#index-list button[aria-current=page]{border-color:var(--blue);background:var(--light-blue)}noscript{display:block;background:var(--paper);padding:30px}
+@media(max-width:700px){#viewport{display:block;min-height:100vh}#stage{width:100%;height:auto;min-height:100vh;transform:none!important;overflow:visible;box-shadow:none}.deck-header{margin:0 20px;gap:10px}.deck-header #chapter{display:none}.slide{position:relative;inset:auto;padding:27px 20px 115px;min-height:calc(100vh - 61px)}h1{font-size:43px}h2{font-size:34px;line-height:1.15;letter-spacing:-.8px}h3{font-size:21px}.lede{font-size:18px}p{font-size:20px}.body.two,.body.wide-left,.body.wide-right,.body.three,.hero .body{grid-template-columns:minmax(0,1fr)}.body{gap:23px;margin-top:25px}.panel{padding:18px}.body>.panel+.panel:not(:has([data-lab])){padding:0}.hero-left{padding:0}.hero-left p{font-size:22px}.hero .body>.panel{margin-top:0}.cover-diagram{height:240px;gap:7px}.feature-column{width:76px}.feature-map{max-width:76px;max-height:90px}.deck-footer{position:fixed;left:0;right:0;bottom:0;height:auto;min-height:72px;padding:13px 12px;background:var(--paper);border-top:1px solid var(--line);gap:5px;z-index:4}.tools{gap:2px}.tools button,.tools a{font-size:11px;padding:7px}.tools #fullscreen{display:none}.tools a{max-width:62px}.paging{gap:5px}.paging span{font-size:11px;min-width:58px}.paging button{font-size:20px;padding:7px 11px}.shape-steps{height:200px;gap:3px}.shape-step{font-size:11px;padding:0 1px 6px}.shape-box{font-size:12px}.pixel{width:27px;height:27px;font-size:13px}.check-table{font-size:14px}.check-table td,.check-table th{padding:9px 4px}.check-table th{font-size:10px;letter-spacing:.3px}.check-table select{font-size:13px;max-width:113px}#progress{display:none}.flow{gap:8px}.node{padding:15px 7px}.node strong{font-size:16px}.node span{font-size:13px}.arrow{font-size:22px}#index-list{grid-template-columns:1fr}.code{font-size:15px}.metric strong{font-size:28px}.metric span{font-size:12px}.big{font-size:38px}.formula{font-size:23px}.checkpoint{font-size:16px}.join-block{width:80px}.join-block.joined{width:145px}.join-visual{gap:12px}.join-operation{min-width:35px;font-size:12px}.grid-label{font-size:12px;white-space:normal}.conv-layout{grid-template-columns:1.4fr 1fr;gap:18px 14px}.conv-layout>div:last-child{grid-column:2;grid-row:2}.conv-layout>div:first-child{grid-row:1/3}.conv-layout .pixel{width:27px;height:27px}.soft-layout{grid-template-columns:1fr 1fr;gap:18px}.soft-layout>div:last-child{grid-column:1/-1;max-width:none!important;flex-direction:row}.soft-layout>div:last-child p{flex:1}#soft-dice .pixel{width:29px}.threshold-layout{gap:16px 10px}.threshold-layout .grid-label{max-width:140px}#threshold .pixel,#task .pixel{width:22px;height:25px;font-size:10px}.pixel-grid{gap:3px}#threshold .controls label{flex-wrap:wrap}#threshold .controls input{width:160px}.threshold-layout>div:last-child{gap:12px;flex-wrap:wrap}.threshold-layout>div:last-child p{font-size:14px;gap:10px}.threshold-layout .big{font-size:30px}#task .flow{gap:8px}#task .node{width:140px!important;height:160px!important}#task .node strong{font-size:18px}.feature-options button{font-size:13px;padding:8px 6px}.concept-list p{font-size:20px}.controls{gap:9px}.controls label{flex-wrap:wrap}.hero .body{margin-top:10px}#review .answer{font-size:17px}#audit .check-table td{padding:8px 3px}#rates .check-table{font-size:13px}#rates .check-table td{padding:9px 3px}#join .code{font-size:12px!important}#shapes .row strong{font-size:21px!important}.summary-line p{font-size:19px}.summary-line{padding:16px 0}.optional-nav{flex-wrap:wrap}.curve-svg{height:auto;aspect-ratio:575/275}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+@media print{body{background:white}#viewport{display:block;height:auto!important;min-height:0}#stage{width:auto;height:auto;position:static!important;margin:0!important;transform:none!important;box-shadow:none;overflow:visible}.slide,.slide[hidden]{display:block!important;position:relative;inset:auto;width:1184px;height:550px;break-after:page;margin:30px}.deck-header,.deck-footer,#progress,dialog{display:none}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* Shared course themes: the presentation follows the same palette picker as the
+   reading site. The compact stage rules below keep every activity inside the
+   footer-safe 16:9 frame. */
+:root,[data-theme="paper"]{--paper:#f3eee4;--ink:#211f1b;--muted:#625e53;--blue:#24388c;--green:#24388c;--coral:#e7462b;--flower:#e7462b;--stem:#24388c;--line:#d8d0c0;--light-blue:#e8e1d4;--wash:#e8e1d4;--white:#faf6ee;--panel:#faf6ee;--code:#e5dfd4;--on-accent:#fff;--flower-line:#ffe0cf;--pre:#242a37;--pre-ink:#faf6ee;color-scheme:light}
+[data-theme="midnight"]{--paper:#101b38;--ink:#f5f0e6;--muted:#b2bad1;--blue:#afc2ff;--green:#9fb4ff;--coral:#ff7568;--flower:#ff7568;--stem:#9fb4ff;--line:#354361;--light-blue:#1b2a4c;--wash:#1b2a4c;--white:#172443;--panel:#172443;--code:#263653;--on-accent:#101b38;--flower-line:#ffe1d6;--pre:#091226;--pre-ink:#f5f0e6;color-scheme:dark}
+[data-theme="moss"]{--paper:#133a2a;--ink:#f6f1e7;--muted:#b7cbbd;--blue:#b2e6b8;--green:#7fd18b;--coral:#ffb7c5;--flower:#ffb7c5;--stem:#7fd18b;--line:#3b604b;--light-blue:#214a37;--wash:#214a37;--white:#194330;--panel:#194330;--code:#2c5441;--on-accent:#133a2a;--flower-line:#663a4c;--pre:#0d2b1f;--pre-ink:#f6f1e7;color-scheme:dark}
+[data-theme="butter"]{--paper:#ffe9a8;--ink:#26241b;--muted:#655a36;--blue:#18503b;--green:#18503b;--coral:#d72d43;--flower:#d72d43;--stem:#18503b;--line:#dbca90;--light-blue:#f5dfa0;--wash:#f5dfa0;--white:#fff0c3;--panel:#fff0c3;--code:#eed796;--on-accent:#fff6df;--flower-line:#ffd5c6;--pre:#263e32;--pre-ink:#fff6df;color-scheme:light}
+[data-theme="blush"]{--paper:#fad4d8;--ink:#32202b;--muted:#70515e;--blue:#314d83;--green:#314d83;--coral:#bd2348;--flower:#bd2348;--stem:#314d83;--line:#dab4bf;--light-blue:#efc6cf;--wash:#efc6cf;--white:#ffe3e6;--panel:#ffe3e6;--code:#e8bdc8;--on-accent:#fff;--flower-line:#ffcfda;--pre:#30263f;--pre-ink:#ffeef0;color-scheme:light}
+[data-theme="mono"]{--paper:#141414;--ink:#f2f2f2;--muted:#b9b9b9;--blue:#dedede;--green:#939393;--coral:#f2f2f2;--flower:#f2f2f2;--stem:#939393;--line:#414141;--light-blue:#262626;--wash:#262626;--white:#1d1d1d;--panel:#1d1d1d;--code:#333;--on-accent:#141414;--flower-line:#555;--pre:#080808;--pre-ink:#f2f2f2;color-scheme:dark}
+
+@media screen {
+  body{background:var(--wash);color:var(--ink);font-family:"DM Sans","Segoe UI",Arial,sans-serif;letter-spacing:-.01em}
+  #stage{background:var(--paper);box-shadow:0 18px 60px color-mix(in srgb,var(--ink) 12%,transparent)}
+  .deck-header{height:58px;position:relative;z-index:3}
+  .header-actions{display:flex;align-items:center;gap:8px;position:relative}
+  .deck-header #chapter{font-size:11px;letter-spacing:1.2px}
+  .deck-header button,.palette-menu summary{font-size:12px;padding:7px 10px;border-radius:18px;background:transparent}
+  .deck-header button:hover,.palette-menu summary:hover{background:var(--panel);border-color:var(--blue)}
+  .palette-menu{position:relative;text-transform:uppercase;letter-spacing:1px}
+  .palette-menu summary{list-style:none;cursor:pointer;border:1px solid var(--line);color:var(--muted);font-weight:700}
+  .palette-menu summary::-webkit-details-marker{display:none}
+  .palette-menu summary::after{content:' ·';color:var(--coral)}
+  .palette-popover{position:absolute;right:0;top:38px;z-index:20;width:228px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:9px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 30px color-mix(in srgb,var(--ink) 16%,transparent);text-transform:none;letter-spacing:0}
+  .theme-option{display:grid;justify-items:center;gap:5px;padding:7px 4px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--ink);font:10px/1.1 ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:500}
+  .theme-option:hover,.theme-option[aria-pressed="true"]{background:var(--wash);border-color:var(--blue)}
+  .theme-option span{display:block;width:23px;height:23px;border-radius:50%;background:var(--swatch);box-shadow:inset 0 0 0 1px #80808055;position:relative}
+  .theme-option span::after{content:'';position:absolute;width:9px;height:9px;border-radius:50%;right:0;bottom:0;background:var(--dot)}
+  .botanical-canvas{position:absolute;inset:0;z-index:0;display:block;width:100%;height:100%;pointer-events:none;opacity:.86}
+  .deck-header{position:relative;z-index:3}
+  .deck-footer{position:absolute;z-index:4}
+  .slide{position:absolute;z-index:1;top:80px;bottom:72px;overflow:visible}
+  .eyebrow{font-size:10px;letter-spacing:1.65px;margin-bottom:9px}
+  h1,h2{font-family:"Playfair Display",Georgia,"Times New Roman",serif;letter-spacing:-1.45px}
+  h1{font-size:55px}h2{font-size:38px;line-height:1.08}
+  h1 em{color:var(--blue)}
+  h3{font-size:20px;line-height:1.25;letter-spacing:-.25px}
+  p{font-size:18px;line-height:1.38}
+  .lede{margin-top:9px;font-size:18px;line-height:1.35}
+  .body{margin-top:18px;gap:24px}
+  .panel{background:var(--panel);border-color:var(--line);border-radius:11px;padding:18px}
+  .body>.panel:has([data-lab]){box-shadow:0 7px 16px color-mix(in srgb,var(--ink) 7%,transparent)}
+  .body>.panel+.panel:not(:has([data-lab])){padding:5px 0 0 4px}
+  .panel h3{margin-bottom:11px}
+  .panel.blue{background:var(--blue)!important;color:var(--on-accent);padding:18px!important}
+  .panel.blue .muted,.panel.blue .note-line{color:color-mix(in srgb,var(--on-accent) 72%,transparent)}
+  button{font-size:15px;padding:8px 12px;border-radius:7px;background:var(--panel);color:var(--ink)}
+  button:hover:not(:disabled){border-color:var(--blue);background:var(--wash)}
+  button.primary,button[aria-pressed="true"]{background:var(--blue);color:var(--on-accent);border-color:var(--blue)}
+  button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline-color:var(--coral)}
+  a{color:var(--blue)}
+  select{font-size:15px;padding:7px 9px;border-radius:6px;background:var(--panel);color:var(--ink)}
+  input[type=range]{accent-color:var(--blue);width:160px}
+  input[type=checkbox]{accent-color:var(--blue);width:19px;height:19px}
+  .small{font-size:15px;line-height:1.45}.tiny{font-size:12px;line-height:1.4}.big{font-size:39px}
+  .formula{font-size:24px;line-height:1.45}.formula.small{font-size:17px;line-height:1.55}
+  .callout{font-size:17px;line-height:1.4;padding:10px 14px;background:var(--wash)}
+  .note-line{font-size:14px;line-height:1.42;margin-top:12px}
+  .rule{margin:12px 0}.controls{gap:8px;margin-bottom:14px;font-size:15px}.controls button[data-action=reset]{font-size:13px}
+  .concept-list{gap:13px}.concept-list p{padding-left:14px;border-left-color:color-mix(in srgb,var(--stem) 45%,var(--line));font-size:18px;line-height:1.35}
+  .question{font-size:19px;line-height:1.38}.answer-button{font-size:16px;padding:9px 12px}.quiz-options{gap:8px}
+  .flow{gap:10px}.node{padding:15px 10px}.node strong{font-size:19px}.node span{font-size:14px;margin-top:7px}.arrow{font-size:23px}
+  .hero .body{margin-top:18px;gap:30px}.hero-left{padding:14px 0}.hero-left p{font-size:21px;margin-top:19px}.hero-left p.small{font-size:14px}.hero .body>.panel{padding:18px!important;margin-top:8px}
+  .cover-diagram{height:228px}.cover-skip{top:11px}.feature-column{gap:10px}.feature-map{box-shadow:4px 4px 0 color-mix(in srgb,var(--blue) 10%,transparent)}
+  .deck-footer{z-index:4;bottom:13px;height:38px;padding-top:10px}
+  .tools{gap:6px}.tools button,.tools a{font-size:11px;padding:7px 9px}.paging{gap:11px}.paging button{font-size:22px;padding:7px 13px}.paging span{font-size:12px}
+  #progress{background:var(--coral)}
+  .pixel-grid{gap:3px}.pixel{width:28px;height:28px;font-size:13px;background:var(--wash)}.pixel.on,.pixel.tp{background:var(--blue);color:var(--on-accent)}.pixel.hot{background:color-mix(in srgb,var(--coral) 23%,var(--panel));color:var(--ink)}.pixel.filter{background:var(--light-blue);color:var(--blue)}.pixel.fp{background:color-mix(in srgb,var(--coral) 27%,var(--panel));color:var(--ink)}.pixel.fn{background:#eddfa8;color:#65531a}.pixel.tn{background:var(--wash);color:var(--muted)}
+  .grid-label{font-size:12px;margin-bottom:9px}.metric-grid{gap:12px}.metric{padding-top:10px}.metric strong{font-size:29px}.metric span{font-size:12px;margin-top:3px}
+  .shape-steps{height:177px;gap:7px}.shape-step{font-size:12px;padding-bottom:3px}.shape-box{margin-bottom:8px}
+  .join-block{width:100px;height:105px;font-size:23px}.join-block.joined{width:160px}.join-visual{height:150px;gap:16px}.join-label{font-size:12px;margin-top:7px}.join-operation{font-size:14px;min-width:40px}.step-indicator{margin-bottom:10px}
+  .code{background:var(--pre);color:var(--pre-ink);font-size:16px;line-height:1.45;padding:14px;border-radius:7px}.code .accent{color:var(--flower-line)}
+  .switches{gap:11px}.switches label{font-size:18px;padding-bottom:9px}.status{font-size:14px;line-height:1.4;min-height:40px;margin-top:12px}.bn-bar{height:23px;margin:16px 0 11px}.track-labels{font-size:12px}
+  .check-table{font-size:16px}.check-table td,.check-table th{padding:8px 7px}.check-table th{font-size:10px;letter-spacing:.8px}.check-table select{font-size:14px;padding:5px 6px;max-width:140px}
+  .feature-options{gap:6px;margin-bottom:16px}.feature-options button{font-size:13px;padding:8px 7px}.curve-svg{height:195px}.mri-image{height:205px;border-radius:6px}.optional-nav{gap:9px;margin-top:15px}.optional-nav button{font-size:14px}
+  .checkpoint{padding:13px 0;font-size:16px}.checkpoint button{font-size:13px}.summary-line{gap:15px;padding:14px 0;font-size:18px}.summary-line span{font-size:25px}.summary-line p{font-size:18px}
+  #soft-dice .pixel{width:29px}#soft-dice .controls{gap:12px}#soft-dice .controls label{gap:6px;font-size:13px}#soft-dice .controls input{width:100%}
+  #threshold .controls{gap:9px}#threshold .controls label{font-size:13px}#threshold .controls input{width:116px}#threshold .pixel{width:26px;height:26px;font-size:11px}.threshold-layout{gap:14px 16px}.threshold-layout>div:last-child{gap:13px;padding-top:11px}.threshold-layout>div:last-child p{font-size:13px;gap:10px}.threshold-layout .big{font-size:32px}
+  #audit .check-table{font-size:15px}#audit .check-table td{padding:7px 6px}#audit .controls{margin-top:10px!important;margin-bottom:0}#audit .status{min-height:36px;margin-top:10px}
+  #rates .controls{margin-top:13px!important;margin-bottom:10px}#rates .stack{gap:10px}#rates .check-table{font-size:14px}#rates .check-table td{padding:8px 5px}
+  #review .answer-button{font-size:15px;padding:8px 11px}#review .question{font-size:18px}#review .answer{font-size:14px}#review .quiz-options{margin-top:11px!important}#review .panel:has([data-lab=quiz]){padding:18px}
+  #join .code{font-size:14px!important}#join .note-line{margin-top:10px}#unfreeze .code{font-size:14px!important}#unfreeze .controls{gap:7px;margin-top:13px!important;margin-bottom:8px}#unfreeze .controls button{font-size:13px}
+  #finish .summary-line{padding:12px 0}#finish .summary-line p{font-size:17px}
+  dialog{background:var(--paper);color:var(--ink);border-color:var(--line)}dialog::backdrop{background:color-mix(in srgb,var(--ink) 60%,transparent)}
+}
+
+@media(max-width:700px){
+  body{overflow-x:hidden}.header-actions{gap:3px;flex-shrink:0}.wordmark{font-size:10px;letter-spacing:.5px;white-space:nowrap}.wordmark i{padding:0 4px}.palette-popover{position:fixed;right:12px;top:58px;width:220px}.deck-header{height:58px}.deck-header #chapter{display:none}.botanical-canvas{opacity:.52}
+  #stage{position:relative;left:auto;top:auto;margin:0;transform:none;overflow:visible;height:auto;min-height:100vh}
+  .slide{position:relative;inset:auto;top:auto;bottom:auto;overflow:visible;min-height:calc(100vh - 58px);padding:27px 20px 115px}.body{margin-top:18px;gap:20px}.panel{padding:17px}.body>.panel+.panel:not(:has([data-lab])){padding:0}.hero-left{padding:0}.hero .body{margin-top:12px}.hero .body>.panel{margin-top:0}.hero-left p{font-size:20px}.cover-diagram{height:205px}
+  .deck-footer{position:static;left:auto;right:auto;bottom:auto;height:auto;min-height:70px;margin:0 12px;padding:13px 0;background:var(--paper);border-top:1px solid var(--line)}.tools{gap:2px}.tools button,.tools a{font-size:10px;padding:7px}.tools #fullscreen{display:none}.tools a{max-width:62px}.paging{gap:4px}.paging button{font-size:19px;padding:7px 11px}.paging span{font-size:10px;min-width:55px}
+  h1{font-size:43px}h2{font-size:33px}h3{font-size:20px}.lede{font-size:17px}p{font-size:18px}.small{font-size:15px}.concept-list p{font-size:17px}.panel.blue{padding:18px!important}.shape-steps{height:175px}.conv-layout{gap:16px 12px}.conv-layout .pixel{width:25px;height:25px}.threshold-layout{gap:14px 8px}.threshold-layout .grid-label{max-width:140px}.threshold-layout .pixel{width:23px;height:23px}.threshold-layout>div:last-child{gap:10px;flex-wrap:wrap}.threshold-layout>div:last-child p{font-size:12px}.soft-layout{gap:16px}.soft-layout .pixel{width:25px;height:25px}.code{font-size:14px}.check-table{font-size:14px}.check-table td,.check-table th{padding:8px 4px}.check-table select{font-size:12px;max-width:120px}.mri-image{height:190px}.curve-svg{height:auto;aspect-ratio:575/275}.summary-line p{font-size:17px}
+}
+
+/* Quiet botanical signature: decoration has its own space, never behind a slide. */
+@media screen {
+  .botanical-canvas{inset:auto;left:50%;bottom:0;transform:translateX(-50%);width:112px;height:42px;opacity:.8}
+  .deck-footer{isolation:isolate}
+  .deck-footer .tools,.deck-footer .paging{position:relative;z-index:1}
+  .body>.panel:has([data-lab]){box-shadow:none}
+  .panel,.hero .body>.panel{border-radius:8px!important}
+  .feature-map{box-shadow:3px 3px 0 color-mix(in srgb,var(--stem) 6%,transparent)}
+  .eyebrow,.tag,.deck-header #chapter{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:400}
+  .eyebrow{color:var(--muted)}
+  .hero-left p{max-width:530px;line-height:1.5}
+  .hero-left p.small{max-width:460px}
+  .panel.blue{background:var(--panel)!important;color:var(--ink);border-color:var(--line)}
+  .panel.blue .muted,.panel.blue .note-line{color:var(--muted)}
+  .panel.blue a{color:var(--blue)}
+  .summary-line span{font-size:23px;color:var(--muted)}
+  #progress{height:2px;opacity:.65}
+}
+@media(max-width:700px){
+  .deck-footer{flex-wrap:wrap;row-gap:8px;padding-top:8px}
+  .botanical-canvas{position:relative;left:auto;bottom:auto;transform:none;flex:0 0 112px;margin-inline:calc((100% - 112px)/2);height:34px;width:112px;opacity:.8}
+  .deck-footer .tools{flex:1}
+  .slide{padding-bottom:44px}
+}
+@media print{.botanical-canvas{display:none}}
+
+/* Session 3 design system · editorial lesson / interactive workbench. */
+@media screen {
+  body{font-family:'Avenir Next','Segoe UI',Arial,sans-serif}
+  #stage{box-shadow:0 24px 80px color-mix(in srgb,var(--ink) 10%,transparent)}
+  .deck-header{height:64px;border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent)}
+  .wordmark{font-size:11px;letter-spacing:1.4px}
+  .chapter-nav{display:flex;gap:5px;align-items:center}
+  .deck-header .chapter-nav button{border:0;border-radius:5px;padding:7px 10px;font-size:11px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted)}
+  .chapter-nav button span{font:10px ui-monospace,SFMono-Regular,Consolas,monospace;opacity:.65;margin-right:4px}
+  .deck-header .chapter-nav button[aria-current=step]{background:var(--wash);color:var(--ink)}
+  .chapter-nav button[aria-current=step] span{color:var(--coral);opacity:1}
+  .deck-header #contents{color:var(--ink);font-weight:500}
+  .slide{top:90px;bottom:78px}
+  h1,h2{font-family:Georgia,'Times New Roman',serif;font-weight:400}
+  h2{font-size:39px;letter-spacing:-1.3px;line-height:1.12;max-width:1140px}
+  h3{font-size:20px;font-weight:600;letter-spacing:-.4px}
+  .eyebrow{font-size:10px;letter-spacing:1.9px;margin-bottom:11px}
+  .lede{font-size:18px;margin-top:10px;line-height:1.45;max-width:1080px}
+  .body{gap:32px;margin-top:23px}
+  .body.two{grid-template-columns:1.1fr 1fr}
+  .body.wide-left{grid-template-columns:1.45fr 1fr}
+  .body>.panel:has([data-lab]){background:var(--panel);border:1px solid var(--line);padding:22px;border-radius:12px!important}
+  .body>.panel+.panel:not(:has([data-lab])){padding:8px 0 0 4px}
+  .panel h3{margin-bottom:15px}
+  .concept-list{gap:22px}
+  .concept-list p{border-left:1px solid var(--line);padding-left:20px;font-size:19px;line-height:1.5}
+  .note-line{line-height:1.5}
+  .controls{gap:9px;margin-bottom:20px}
+  button{border-radius:6px;padding:9px 13px;font-weight:500;transition:background .16s,border-color .16s,box-shadow .16s}
+  button:hover:not(:disabled){box-shadow:0 2px 5px color-mix(in srgb,var(--ink) 5%,transparent)}
+  button:active:not(:disabled){box-shadow:inset 0 1px 3px color-mix(in srgb,var(--ink) 12%,transparent)}
+  button.primary,button[aria-pressed=true]{color:var(--on-accent)}
+  input[type=range]{height:20px;cursor:ew-resize}
+  .range-value{display:inline-block;min-width:3.7em;padding:4px 6px;border:1px solid var(--line);border-radius:5px;font:12px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;text-align:center;font-variant-numeric:tabular-nums;background:var(--paper);color:var(--ink)}
+  .metric strong{font-family:Georgia,'Times New Roman',serif;font-size:34px;font-weight:400;letter-spacing:-1px}
+  .metric span{font-size:12px;line-height:1.45}
+  .metric{padding-top:14px;border-top-color:var(--line)}
+  .status{padding-top:10px;line-height:1.5}
+  .code{padding:18px;line-height:1.55;border-radius:8px}
+  .check-table thead{background:var(--paper)}
+  .check-table th{padding-block:11px;letter-spacing:1px;font-weight:500}
+  .check-table td{padding-block:11px}
+  .answer-button{position:relative;padding-right:40px!important;background:transparent}
+  .answer-button[data-result]::after{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:21px}
+  .answer-button[data-result=correct]::after{content:'✓'}
+  .answer-button[data-result=incorrect]::after{content:'×'}
+  .answer-button[data-result=incorrect]{background:var(--wash);color:var(--ink);border-color:var(--coral)}
+  .answer{border-top:1px solid var(--line);padding-top:12px;line-height:1.5}
+  .deck-footer{bottom:18px;height:42px;padding-top:11px;border-top-color:color-mix(in srgb,var(--line) 70%,transparent)}
+  .tools button,.tools a{font-size:11px;padding:7px 10px}
+  .paging{gap:10px}
+  .paging button{width:40px;height:32px;padding:0;font-size:21px;border-radius:6px;background:transparent}
+  .paging button:last-child:not(:disabled){background:var(--blue);border-color:var(--blue);color:var(--on-accent)}
+  .paging span{font:11px ui-monospace,SFMono-Regular,Consolas,monospace;min-width:65px}
+  .is-entering{animation:lesson-enter .18s ease-out both}
+  [data-motion=off] .is-entering{animation:none}
+  @keyframes lesson-enter{from{opacity:.25}to{opacity:1}}
+
+}
+
+  /* The cover is a complete composition: statement, mechanism, learning route. */
+  .hero .body{grid-template-columns:1.02fr 1fr;gap:44px;margin-top:10px;align-items:center}
+  .hero-left{padding:10px 0}
+  .hero h1{font-size:64px;line-height:1.04;letter-spacing:-2.9px;margin-top:17px}
+  .hero h1 em{font-weight:400}
+  .hero-left p{font-size:20px;line-height:1.5;max-width:490px;margin-top:23px}
+  .hero-left p.small{font-size:14px;line-height:1.55}
+  .hero-left button{padding:11px 18px;background:var(--blue);color:var(--on-accent);border-color:var(--blue);font-size:15px}
+  .hero-left button span{padding-left:20px;font-size:18px}
+  .cover-workbench{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:23px 22px 19px}
+  .cover-workbench figcaption{display:flex;flex-direction:column;gap:9px}
+  .cover-workbench .tag{margin:0;font-size:9px;letter-spacing:1.2px}
+  .cover-caption{font:24px Georgia,'Times New Roman',serif;letter-spacing:-.5px}
+  .cover-model{position:relative;display:grid;grid-template-columns:86px 18px 1fr 18px 86px;align-items:start;gap:8px;padding-top:74px;margin:0 0 24px;min-height:230px}
+  .cover-unit{text-align:center;min-width:0;display:flex;flex-direction:column;align-items:center}
+  .cover-unit strong{font-size:12px;margin-top:17px;font-weight:600;white-space:nowrap}
+  .cover-unit>span{font-size:10px;line-height:1.5;margin-top:6px;color:var(--muted)}
+  .model-arrow{font-size:22px;color:var(--coral);padding-top:29px;text-align:center}
+  .cover-sample{width:82px;height:82px;display:grid;grid-template-columns:repeat(8,1fr);gap:1px;padding:7px;background:var(--wash);border:1px solid var(--line);border-radius:5px}
+  .cover-sample i{background:color-mix(in srgb,var(--stem) 12%,var(--paper))}
+  .cover-sample i:nth-child(3n){background:color-mix(in srgb,var(--stem) 23%,var(--paper))}
+  .cover-sample .sample-mark{background:var(--coral)!important}
+  .cover-sample.mask{background:var(--paper)}
+  .cover-sample.mask i{background:var(--paper)}
+  .cover-sample.mask .sample-mark{background:var(--blue)!important}
+  .encoder-stack{position:relative;height:82px;width:90px;display:grid;place-items:center}
+  .encoder-stack i{position:absolute;inset:8px 8px 8px 18px;background:var(--wash);border:1px solid var(--stem);border-radius:4px}
+  .encoder-stack i:nth-child(2){transform:translate(-6px,-5px);opacity:.6}
+  .encoder-stack i:nth-child(3){transform:translate(-12px,-10px);opacity:.4}
+  .encoder-stack span{position:relative;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--blue)}
+  .cover-bridge{position:absolute;top:37px;left:41px;right:41px;height:26px;border:1px solid var(--coral);border-bottom:0;border-radius:8px 8px 0 0}
+  .cover-bridge span{display:block;width:max-content;max-width:100%;margin:-6px auto 0;background:var(--panel);padding:0 9px;color:var(--coral);font:10px ui-monospace,SFMono-Regular,Consolas,monospace}
+  .cover-key{display:flex;gap:15px;flex-wrap:wrap;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+  .cover-key span{display:flex;gap:6px;align-items:center}
+  .cover-key i{width:7px;height:7px;background:var(--blue);border-radius:50%}
+  .cover-key span+span i{background:var(--coral)}
+  .cover-workbench>p{margin-top:11px;font-size:10px}
+  .session-route{display:grid;grid-template-columns:repeat(4,1fr);gap:23px;margin-top:30px;border-top:1px solid var(--line);padding-top:17px}
+  .session-route button{position:relative;border:0;background:transparent;text-align:left;padding:0 25px 0 29px;color:var(--ink);box-shadow:none}
+  .session-route button>span{position:absolute;top:1px;left:0;font:11px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--coral)}
+  .session-route strong{display:block;font-size:14px;font-weight:500}
+  .session-route small{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
+  .session-route i{position:absolute;right:3px;top:0;color:var(--muted);font-style:normal}
+  .session-route button:hover{background:transparent;color:var(--blue)}
+  .session-route button:hover i{color:var(--coral)}
+
+@media screen {
+  /* A topic index, grouped by the same four learning chapters. */
+  dialog{padding:30px 34px;border-radius:14px;width:min(860px,94vw)}
+  dialog h2{font-size:34px}
+  .dialog-heading .eyebrow{margin-bottom:8px}
+  #close-index{border:0;background:transparent;font-size:26px;font-weight:400;padding:6px 10px}
+  .index-search{display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--muted);margin-top:26px}
+  .index-search input{width:100%;padding:13px 15px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);font-family:inherit;font-size:16px}
+  .route-setting{font-size:13px;line-height:1.5;margin:16px 0;padding:12px 0;gap:10px}
+  #index-list{display:block;margin-bottom:20px}
+  .index-group{display:grid;grid-template-columns:110px 1fr;gap:16px;border-bottom:1px solid var(--line);padding:14px 0}
+  .index-group h3{font:10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted);padding-top:10px;letter-spacing:.7px}
+  .index-group>div{display:grid;gap:3px}
+  #index-list button{border-color:transparent;border-radius:5px;padding:9px 11px;font-size:14px;gap:10px;background:transparent;font-weight:400}
+  #index-list button strong{font-weight:400;flex:1}
+  #index-list button span{font:10px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted);min-width:20px}
+  #index-list button i{font-style:normal;color:var(--muted);opacity:0}
+  #index-list button:hover{background:var(--wash)}
+  #index-list button:hover i{opacity:1}
+  #index-list button[aria-current=page]{background:var(--wash);border-color:var(--line)}
+  #index-list button[aria-current=page] span{color:var(--coral)}
+  #index-list button.optional{border-style:solid}
+  #index-list button[hidden],.index-group[hidden]{display:none}
+  .index-bottom{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+  .index-bottom a{font-size:12px}
+  .index-bottom p{font:10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;margin:0}
+  #index-empty{padding:25px 0;font-size:16px}
+}
+@media(max-width:700px){
+  .deck-header{height:60px;margin:0 20px}.chapter-nav{display:none}.wordmark{font-size:9px;letter-spacing:.8px}
+  .deck-header button,.palette-menu summary{font-size:11px;padding:7px 9px}.deck-header kbd{display:none}
+  .slide{top:auto;bottom:auto;padding:28px 20px 40px}
+  .body.two,.body.wide-left,.hero .body{grid-template-columns:minmax(0,1fr);gap:24px}
+  .body{margin-top:23px}.body>.panel:has([data-lab]){padding:17px}
+  h2{font-size:34px;letter-spacing:-1px}.lede{font-size:17px}.concept-list p{font-size:18px}
+  .hero .body{margin-top:0;gap:28px}.hero-left{padding:0}.hero h1{font-size:52px;letter-spacing:-2px;line-height:1.05}
+  .hero-left p{font-size:19px}.hero-left p.small{font-size:14px}.hero-left p.small br{display:none}
+  .cover-workbench{padding:20px 15px}.cover-model{grid-template-columns:68px 12px 1fr 12px 68px;gap:4px;min-height:214px;padding-top:67px;margin-bottom:14px}
+  .cover-sample{width:64px;height:72px;padding:5px}.encoder-stack{width:74px;height:72px}.cover-unit strong{font-size:10px;white-space:normal;min-height:25px}.cover-unit>span{font-size:10px;max-width:95px}
+  .cover-bridge{left:30px;right:30px;top:31px}.cover-bridge span{font-size:8px;padding:0 6px}.cover-caption{font-size:24px}.cover-key{font-size:10px;gap:12px}
+  .session-route{grid-template-columns:1fr 1fr;gap:24px 15px;margin-top:30px;padding-top:23px}.session-route button{padding-left:24px;padding-right:16px}.session-route strong{font-size:13px}.session-route small{font-size:10px;line-height:1.4}
+  .range-value{font-size:11px}.controls{gap:10px}.controls label{gap:8px}
+  #soft-dice .controls label{flex-direction:row;flex-wrap:wrap}#soft-dice .controls input{width:calc(100% - 56px)}
+  .deck-footer{position:static;height:auto;margin:0 16px;padding:8px 0 16px;gap:8px 3px}.tools button,.tools a{font-size:10px;padding:7px 6px}.paging{gap:4px}.paging button{width:32px;height:30px}.paging span{min-width:50px;font-size:10px}
+  .metric strong{font-size:29px}.metric span{font-size:11px}.check-table td{padding-block:9px}.code{padding:14px}
+  dialog{padding:23px 20px}dialog h2{font-size:29px}.index-group{grid-template-columns:1fr;gap:6px}.index-group h3{padding-top:0}.index-search input{font-size:16px}.index-bottom{align-items:flex-start;flex-direction:column}.route-setting{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.is-entering{animation:none!important}}
+
+@media(max-width:700px){
+  #task .pixel{width:20px;height:24px}
+  #threshold .pixel{width:21px;height:24px;font-size:10px}
+}
+@media(max-width:360px){
+  .deck-header{margin:0 14px}.wordmark{font-size:8px;letter-spacing:.4px}.deck-header .header-actions{gap:3px}.deck-header button,.palette-menu summary{padding:7px;font-size:10px}
+  .hero h1{font-size:44px}.slide{padding-inline:16px}
+  #task .flow{display:grid;grid-template-columns:1fr;justify-items:center}#task .flow>.arrow{transform:rotate(90deg)}
+  .threshold-layout{grid-template-columns:1fr}.threshold-layout>div:last-child{grid-column:1}
+  .cover-model{grid-template-columns:54px 10px 1fr 10px 54px;gap:2px}.cover-sample{width:52px;height:62px}.encoder-stack{width:62px;height:62px}.cover-unit strong{font-size:9px}.cover-unit>span{font-size:9px}.cover-bridge span{font-size:7px;padding:0 4px}
+  .tools button,.tools a{padding:7px 4px;font-size:9px}.paging button{width:28px}.paging span{min-width:43px;font-size:9px}
+}
+
+@media(max-width:700px){
+  .metric-grid{gap:16px}.metric span{font-size:10px;max-width:75px;text-wrap:balance}
+}
+@media print{
+  .chapter-nav{display:none}.session-route{margin-top:20px}
+  .is-entering{animation:none!important}
+  .cover-workbench{break-inside:avoid}
+}
+
+/* Explanations are composed as part of the lesson, with a visible reading order. */
+@media screen,print {
+  .body:has(> .lesson-notes){align-items:stretch;gap:34px}
+  .lesson-notes{display:flex;flex-direction:column;min-width:0;border-left:1px solid var(--line);padding:9px 0 3px 27px}
+  .notes-kicker,.comparison-label{font:10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1.35px;text-transform:uppercase;color:var(--muted)}
+  .notes-title{font:32px/1.12 Georgia,'Times New Roman',serif;letter-spacing:-.9px;margin:13px 0 24px;max-width:490px}
+  .notes-title .notes-equation{font-size:43px;line-height:1.1;letter-spacing:-1px}
+  .notes-reasoning{margin:0;display:grid;gap:17px}
+  .notes-reasoning>div{display:grid;grid-template-columns:100px minmax(0,1fr);gap:15px;padding-top:14px;border-top:1px solid var(--line)}
+  .notes-reasoning dt{font:10px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.35px;color:var(--muted);padding-top:2px}
+  .notes-reasoning dd{margin:0;font-size:16px;line-height:1.48;color:var(--ink);min-width:0}
+  .notes-reasoning code{font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+  .notes-number{display:block;font:25px/1.3 Georgia,'Times New Roman',serif;color:var(--blue);margin-top:7px}
+  .notes-math{display:block;font:18px/1.5 Georgia,'Times New Roman',serif;margin-bottom:5px;overflow-wrap:anywhere}
+  .notes-foot{margin-top:auto;padding-top:22px;font-size:13px;line-height:1.5;color:var(--muted)}
+  .notes-foot strong{font-weight:600;color:var(--ink)}
+  .notes-foot code{font-size:12px;color:var(--ink)}
+  .notes-links{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:13px}
+  .notes-links button{font-size:12px;padding:8px 11px;background:transparent;border-color:var(--line);color:var(--blue)}
+  .notes-links a{font-size:13px}
+  .notes-source{display:block;margin-top:12px;font-size:11px}
+  .notes-source a{font-size:inherit}
+  .notes-code{margin:0;background:var(--pre);color:var(--pre-ink);border-radius:6px;padding:13px 14px;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+  .notes-code strong{color:var(--flower-line);font-weight:400}
+  .notes-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+  .notes-legend span{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap}
+  .notes-legend i{width:10px;height:10px;border-radius:2px;flex-shrink:0;border:1px solid #00000012}
+  .notes-legend .tp{background:var(--blue)}.notes-legend .fp{background:#f1cebd}.notes-legend .fn{background:#eddfa8}.notes-legend .tn{background:#eeeee7}
+  #batchnorm .notes-reasoning>div:first-child{grid-template-columns:1fr;gap:9px}
+  #batchnorm .notes-title{font-size:31px}
+  #soft-dice .notes-title,#threshold .notes-title{font-size:30px}
+  #soft-dice .notes-reasoning>div,#threshold .notes-reasoning>div{grid-template-columns:68px minmax(0,1fr);gap:13px}
+  #soft-dice .notes-reasoning{gap:12px}
+  #soft-dice .notes-foot{font-size:12px;padding-top:16px}
+  #review .notes-title{margin-bottom:19px}
+  #review .notes-reasoning{gap:12px}
+  #review .notes-reasoning>div{padding-top:12px}
+  #review .notes-links{margin-top:8px}
+
+  .comparison-spread{display:grid;grid-template-columns:1fr 1fr;gap:46px;margin-top:30px}
+  .comparison-spread article{min-width:0}
+  .comparison-spread article+article{border-left:1px solid var(--line);padding-left:34px}
+  .comparison-spread h3{font:31px/1.15 Georgia,'Times New Roman',serif;letter-spacing:-.7px;margin-top:13px}
+  .tensor-equation{display:grid;grid-template-columns:minmax(0,1fr) max-content minmax(0,1fr);gap:13px 10px;align-items:center;padding:24px 0 21px}
+  .tensor-equation code{font-size:20px;letter-spacing:-.6px;white-space:nowrap}
+  .tensor-equation>span{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--coral)}
+  .tensor-equation>strong{grid-column:1/-1;font:22px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--blue);font-weight:400}
+  .comparison-spread article>p{font-size:16px;line-height:1.5;min-height:48px;max-width:510px}
+  .comparison-result{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);margin-top:20px;padding-top:15px;gap:15px}
+  .comparison-result>span{font-size:12px;color:var(--muted)}
+  .comparison-result>strong{font:27px Georgia,'Times New Roman',serif;color:var(--ink);letter-spacing:-.5px}
+  .slide-takeaway{margin-top:30px;padding:15px 20px;border-left:2px solid var(--coral);background:var(--wash);font-size:17px;line-height:1.5;max-width:1184px}
+
+  .notebook-path,.closing-checklist{list-style:none;padding:0;margin:0;counter-reset:lesson-step;min-width:0}
+  .notebook-path li,.closing-checklist li{position:relative;padding:18px 0 18px 48px;border-top:1px solid var(--line);counter-increment:lesson-step}
+  .notebook-path li::before,.closing-checklist li::before{content:'0' counter(lesson-step);position:absolute;left:0;top:20px;font:13px ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--coral)}
+  .notebook-path li>span,.closing-checklist li>span{display:block;font-size:18px;font-weight:600;letter-spacing:-.3px}
+  .notebook-path li>p,.closing-checklist li>p{margin-top:7px;font-size:16px;line-height:1.45;color:var(--muted);max-width:510px}
+  .closing-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:28px}
+  .closing-question{display:flex;flex-direction:column;padding:18px 0 0 36px;border-left:1px solid var(--line);min-width:0}
+  .closing-question blockquote{font:36px/1.17 Georgia,'Times New Roman',serif;letter-spacing:-.9px;margin:23px 0 22px}
+  .closing-question>p{font-size:20px;line-height:1.5;max-width:430px}
+  .closing-question .notes-links{margin-top:26px;gap:16px}
+  .closing-question small{font-size:12px;line-height:1.5;color:var(--muted);margin-top:auto;padding-top:24px}
+}
+@media(max-width:700px){
+  .body:has(> .lesson-notes){gap:29px}
+  .lesson-notes{border-left:0;border-top:1px solid var(--line);padding:23px 0 0}
+  .notes-title{font-size:31px;margin:12px 0 23px}.notes-title .notes-equation{font-size:39px}
+  .notes-reasoning>div{grid-template-columns:88px minmax(0,1fr);gap:13px}.notes-reasoning dd{font-size:16px}
+  .notes-foot{margin-top:5px;padding-top:21px;font-size:13px}
+  .notes-reasoning code{font-size:12px}.notes-links button{font-size:12px}.notes-number{font-size:24px}
+  #soft-dice .notes-reasoning>div,#threshold .notes-reasoning>div{grid-template-columns:65px minmax(0,1fr);gap:10px}
+  .notes-legend{grid-template-columns:1fr;gap:8px}
+  .comparison-spread{grid-template-columns:minmax(0,1fr);gap:26px;margin-top:27px}
+  .comparison-spread article+article{padding:25px 0 0;border-left:0;border-top:1px solid var(--line)}
+  .comparison-spread h3{font-size:30px}.tensor-equation{gap:13px 7px;padding:21px 0 17px}.tensor-equation code{font-size:15px;letter-spacing:-.7px}.tensor-equation>span{font-size:10px}.tensor-equation>strong{font-size:19px}
+  .comparison-spread article>p{font-size:16px;min-height:0}.comparison-result{margin-top:17px}.comparison-result>strong{font-size:25px}
+  .slide-takeaway{font-size:16px;margin-top:25px;padding:13px 15px}
+  .notebook-path li,.closing-checklist li{padding:18px 0 18px 39px}.notebook-path li::before,.closing-checklist li::before{font-size:11px;top:22px}
+  .notebook-path li>span,.closing-checklist li>span{font-size:18px}.notebook-path li>p,.closing-checklist li>p{font-size:16px}
+  .closing-layout{grid-template-columns:minmax(0,1fr);gap:27px;margin-top:25px}
+  .closing-question{border-left:0;border-top:1px solid var(--line);padding:24px 0 0}.closing-question blockquote{font-size:32px;margin:20px 0}.closing-question>p{font-size:18px}
+}
+@media(max-width:360px){
+  .notes-title{font-size:28px}.notes-reasoning>div{grid-template-columns:74px minmax(0,1fr);gap:10px}.notes-reasoning dd{font-size:15px}.notes-number{font-size:22px}
+  .tensor-equation code{font-size:13px}.tensor-equation>strong{font-size:17px}.comparison-result>strong{font-size:21px}
+}
+@media screen,print{
+  .body:has(> .lesson-notes)>.panel{align-self:start}
+  .notes-title{margin-bottom:20px}
+  .notes-reasoning{gap:14px}
+  .notes-reasoning>div{padding-top:12px}
+  .notes-foot{padding-top:18px}
+}
+
+/* Bootcamp compositions: workbench plus concise reasoning, not dense slide notes. */
+.bc-cover-labels{display:grid;gap:7px;font:13px ui-monospace,monospace;min-width:110px;text-align:left}.bc-cover-labels span{border-bottom:1px solid var(--line);padding:5px 14px;color:var(--blue)}
+.bc-steps{list-style:none;counter-reset:steps;padding:0;margin:20px 0 0}.bc-steps li{counter-increment:steps;position:relative;padding:0 0 16px 35px}.bc-steps li:before{content:counter(steps,decimal-leading-zero);position:absolute;left:0;top:3px;font:12px ui-monospace,monospace;color:var(--coral)}.bc-steps strong{font-size:19px;font-weight:600}.bc-steps p{font-size:18px;margin-top:5px;color:var(--muted);line-height:1.45}.comparison-spread article>p{font-size:20px;line-height:1.5;margin-top:16px}.comparison-spread{margin-top:26px}.bc-display-equation{font:30px Georgia,serif;line-height:1.4;color:var(--blue);margin:22px 0}.comparison-spread .code{margin-top:20px;font-size:18px}.bc-lab .bc-grid button{transition:none}.bc-lab .bc-grid button.on{background:var(--blue);color:var(--paper)}.bc-lab .bc-grid button:not(.on){background:var(--paper);color:var(--ink)}.bc-lab .bc-viz{min-width:0}.bc-lab .bc-stat strong{font-size:29px}.bc-lab .bc-stats{margin-top:17px}.hero-left h1{font-size:56px}.bc-lab details[open]{max-height:65px;overflow:auto}
+@media(max-width:700px){.bc-steps p{font-size:18px}.comparison-spread article>p{font-size:19px}.bc-display-equation{font-size:27px}.hero-left h1{font-size:43px}.comparison-spread .code{font-size:15px}.cover-model{gap:8px}.bc-cover-labels{min-width:85px;font-size:11px}.bc-cover-labels span{padding:4px 7px}}
+/* The reading guides retain fuller lab notes; the deck keeps the worked example focal. */
+@media(min-width:701px){
+.comparison-spread article>p{min-height:0}
+.slide-takeaway{margin-top:20px;padding:12px 18px}
+.bc-lab .bc-caption{display:none}
+.bc-lab .bc-geometry{max-width:375px}
+.bc-lab .bc-texture .bc-grid>span{width:22px;height:22px}
+.bc-lab .bc-viz .bc-note{margin-top:12px}
+}
+@media(min-width:701px){#optional-annotations .slide-takeaway{margin-top:12px}}
+.slide code{overflow-wrap:anywhere}
+
+.bc-lab{--bc-ink:var(--ink,#24362f);--bc-accent:var(--accent,var(--blue,#315343));--bc-line:var(--line,#c9d1c8);color:var(--bc-ink);font-family:Arial,sans-serif;min-width:0}.bc-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:17px;font-size:15px}.bc-controls label{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.bc-controls select,.bc-controls button,.bc-controls input{font:inherit;max-width:100%}.bc-controls select,.bc-controls button{padding:7px 9px;border:1px solid var(--bc-line);border-radius:5px;background:var(--paper,#f7f4eb);color:inherit}.bc-controls button[data-reset]{margin-left:auto;font-size:13px}.bc-controls input{width:140px;accent-color:var(--bc-accent)}.bc-controls output{font-variant-numeric:tabular-nums;min-width:30px}.bc-lab :focus-visible{outline:3px solid var(--coral,#a83d28);outline-offset:3px}.bc-viz p{font-size:17px;line-height:1.5;margin:12px 0}.bc-viz h4{font-size:13px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.7px}.bc-grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:4px;width:max-content;max-width:100%}.bc-grid>span,.bc-grid>button{width:35px;height:35px;display:grid;place-items:center;border:1px solid var(--bc-line);border-radius:3px;background:var(--paper,#f3eee4);color:var(--bc-ink);font:15px Arial,sans-serif;padding:0}.bc-grid .on,.bc-geometry .on{background:var(--bc-accent);color:var(--paper,#fff)}.bc-grid>button{width:44px;height:48px;position:relative;padding-top:8px;cursor:pointer}.bc-grid>button small{font-size:9px;position:absolute;left:4px;top:3px;opacity:.8}.bc-grid>button b{font-size:17px}.bc-pair{display:flex;justify-content:space-around;gap:20px;flex-wrap:wrap}.bc-stats{display:flex;gap:20px;justify-content:space-around;margin:20px 0 8px}.bc-stat{display:flex;flex-direction:column;gap:5px}.bc-stat strong{font-size:29px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--bc-accent)}.bc-stat span{font-size:12px;line-height:1.4;color:var(--muted,#657366)}.bc-viz .bc-note{font-size:15px;line-height:1.5;color:var(--muted,#657366);margin:15px 0 0}.bc-caption{font-size:10px!important;line-height:1.4!important;letter-spacing:.7px;text-transform:uppercase;color:var(--muted,#657366);margin:13px 0 0!important}.bc-array-shape{font:35px Georgia,serif;color:var(--bc-accent);margin:22px 0}.bc-table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}.bc-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted,#657366)}.bc-table td,.bc-table th{padding:10px 5px;border-bottom:1px solid var(--bc-line)}.bc-rle-layout{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}.bc-output{font-size:21px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--bc-accent);margin:15px 0}.bc-geometry{display:grid;grid-template-columns:repeat(var(--w),1fr);width:100%;max-width:450px;aspect-ratio:var(--w)/var(--h);gap:1px;border:1px solid var(--bc-line);margin:10px auto;background:var(--bc-line)}.bc-geometry i{background:var(--paper,#eee);min-width:0}.bc-texture .bc-grid{margin:auto}.bc-texture .bc-grid>span{width:26px;height:26px}.bc-partitions{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:15px 0}.bc-partitions span{display:inline-block;margin:5px;padding:12px;border:1px solid var(--bc-line);border-radius:5px;font-size:23px;color:var(--bc-accent)}.bc-lab details{margin-top:10px;font-size:14px}.bc-lab details code{font-size:13px;overflow-wrap:anywhere}.bc-lab summary{cursor:pointer}.bc-lab code{font-family:ui-monospace,monospace}article>.bc-lab{border:1px solid var(--bc-line);padding:24px;margin:26px 0;border-radius:10px;background:var(--card,transparent)}
+@media(max-width:700px){.bc-rle-layout{grid-template-columns:1fr}.bc-pair{gap:16px 10px}.bc-grid>span{width:28px;height:28px;font-size:12px}.bc-grid>button{width:39px;height:44px}.bc-stats{gap:12px;flex-wrap:wrap}.bc-stat strong{font-size:27px}.bc-array-shape{font-size:30px}.bc-viz p{font-size:17px}.bc-controls{font-size:14px}.bc-controls label{width:100%}.bc-controls button[data-reset]{margin-left:0}.bc-table{font-size:13px}.bc-table th{font-size:9px}.bc-table td,.bc-table th{padding:9px 3px}.bc-texture .bc-grid>span{width:24px;height:24px}article>.bc-lab{padding:17px}.bc-lab select{min-width:0}.bc-partitions{gap:10px}.bc-partitions span{font-size:20px;padding:9px}}
+@media(max-width:360px){.bc-grid>span{width:24px;height:25px}.bc-grid>button{width:37px}.bc-stats{justify-content:flex-start}.bc-controls select{font-size:12px}.bc-pair{justify-content:flex-start}}
+
+.bc-learning-metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;margin:18px 0}.bc-learning-metrics .bc-stat{border-top:1px solid var(--bc-line);padding-top:10px}
+
+.bc-step-count{font:12px Arial,sans-serif;color:var(--muted,#657366);padding-left:15px;white-space:nowrap}
+</style>
+<meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body>
+<noscript>This interactive presentation needs JavaScript. The full <a href="../">study notes</a> work without it.</noscript>
+<div id="viewport">
+  <main id="stage" aria-label="Interactive live session presentation">
+    <header class="deck-header"><span class="wordmark">DLGenAI <i>/</i> BOOTCAMP 01</span><span id="chapter"></span><div class="header-actions"><details class="palette-menu"><summary>Palette</summary><div class="palette-popover" role="group" aria-label="Choose your palette"><button type="button" class="theme-option" data-palette="paper" aria-pressed="true"><span style="--swatch:#f3eee4;--dot:#e7462b"></span>Paper</button><button type="button" class="theme-option" data-palette="midnight" aria-pressed="false"><span style="--swatch:#101b38;--dot:#ff7568"></span>Midnight</button><button type="button" class="theme-option" data-palette="moss" aria-pressed="false"><span style="--swatch:#133a2a;--dot:#ffb7c5"></span>Moss</button><button type="button" class="theme-option" data-palette="butter" aria-pressed="false"><span style="--swatch:#ffe9a8;--dot:#d72d43"></span>Butter</button><button type="button" class="theme-option" data-palette="blush" aria-pressed="false"><span style="--swatch:#fad4d8;--dot:#bd2348"></span>Blush</button><button type="button" class="theme-option" data-palette="mono" aria-pressed="false"><span style="--swatch:#141414;--dot:#f2f2f2"></span>Mono</button></div></details><button id="contents" aria-haspopup="dialog">Slide index <kbd>I</kbd></button></div></header>
+    <div id="slides"></div>
+    <footer class="deck-footer">
+      <canvas id="botanical-canvas" class="botanical-canvas" aria-hidden="true"></canvas>
+      <div class="tools"><button id="motion" aria-pressed="false">Motion on</button><button id="fullscreen">Fullscreen</button><a id="notes" href="../" target="_blank" rel="noopener">Study notes ↗</a></div>
+      <div class="paging"><button id="previous" aria-label="Previous slide">←</button><span id="counter" aria-live="polite"></span><button id="next" aria-label="Next slide">→</button></div>
+    </footer>
+    <div id="progress" aria-hidden="true"></div>
+  </main>
+</div>
+<dialog id="index-dialog" aria-labelledby="index-title"><div class="dialog-heading"><div><div class="eyebrow">Find your place</div><h2 id="index-title">The session, at a glance.</h2></div><button id="close-index" aria-label="Close slide index">×</button></div><label class="index-search">Find a slide<input id="slide-search" type="search" placeholder="Try: RLE, Dice, validation…" autocomplete="off"></label><label class="route-setting"><input id="include-optional" type="checkbox"> Include optional advanced stops in the slide sequence</label><div id="index-list"></div><p id="index-empty" hidden role="status">No matching slides. Try a different topic.</p><div class="index-bottom"><a href="index.html" download="30-october-bootcamp-presentation.html">Save the offline presentation ↓</a><p>← → Navigate · I Index · F Fullscreen · Esc Close</p></div></dialog>
+<div id="announcer" class="sr-only" aria-live="polite"></div>
+<script>/* Interaction contract: fixed, deterministic toy data; native controls; semantic
+   diagrams. Only user-started convolution scans and scalar updates animate.
+   A finite timeline settles on navigation, interruption, or reduced motion. */
+(() => {
+  'use strict';
+  const $ = (s, root=document) => root.querySelector(s);
+  const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+  const notesBase = '../';
+  const escape = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const btn = (text, action, cls='') => `<button type="button" data-action="${action}" class="${cls}">${text}</button>`;
+  const jump = (text, id) => `<button type="button" data-jump="${id}">${text}</button>`;
+  const reset = () => btn('Reset', 'reset');
+  const panel = (content, cls='') => `<div class="panel ${cls}">${content}</div>`;
+  const callout = text => `<div class="callout">${text}</div>`;
+  const quiz = (question, options, correct, explanation) => `<div data-lab="quiz" data-correct="${correct}" data-explanation="${escape(explanation)}"><div class="question">${question}</div><div class="quiz-options" style="margin-top:18px">${options.map((text,i)=>btn(text,`answer-${i}`,'answer-button')).join('')}</div><div class="answer" role="status">Choose an answer, then explain your reasoning.</div>${reset()}</div>`;
+  // Explanations have a deliberate reading order: takeaway, reasoning, then caveat.
+  const lesson = (label, title, rows, foot='') => `<aside class="lesson-notes"><div class="notes-kicker">${label}</div><h3 class="notes-title">${title}</h3><dl class="notes-reasoning">${rows.map(([label,text])=>`<div><dt>${label}</dt><dd>${text}</dd></div>`).join('')}</dl>${foot?`<div class="notes-foot">${foot}</div>`:''}</aside>`;
+/* Authorable lesson content. Core: ~110 minutes; optional stops are self-study. */
+  const lab = name => `<div class="bc-lab" data-bc="${name}"><p>Interactive ${name} example; use the corresponding guide for the worked text explanation.</p></div>`;
+  const split = (visual,label,title,rows,foot='') => `<div class="body wide-left">${panel(visual)}${lesson(label,title,rows,foot)}</div>`;
+  const spread = (leftTitle,left,rightTitle,right,foot='') => `<div class="comparison-spread"><article><div class="comparison-label">Observe</div><h3>${leftTitle}</h3>${left}</article><article><div class="comparison-label">Explain</div><h3>${rightTitle}</h3>${right}</article></div>${foot?`<p class="slide-takeaway">${foot}</p>`:''}`;
+  const code = text => `<pre class="code">${escape(text)}</pre>`;
+  const checklist = items => `<ol class="bc-steps">${items.map(([a,b])=>`<li><strong>${a}</strong><p>${b}</p></li>`).join('')}</ol>`;
+  const slides=[];
+  function S(id,chapter,title,lede,note,body,optional=false){slides.push({id,chapter,title,lede,note,body,optional});}
+  slides.push({id:'start',chapter:'30 October 2026 · Bootcamp teaching 1',title:'Read the data before you train',note:'index.html',hero:true,body:`<div class="body two"><div class="hero-left"><div class="eyebrow">Bootcamp / Teaching 01 · 30 October 2026</div><h1>From pixels<br>to <em>understanding.</em></h1><p>Read an image. Reconstruct its labels. Decide what evidence you can trust.</p><div class="row" style="margin-top:24px">${jump('Start with one image ↗','learning-map')}</div><p class="small muted" style="margin-top:20px">Beginner core path · optional deeper stops<br>Practice on clouds. Transfer the reasoning.</p></div><figure class="cover-workbench"><figcaption><span class="tag">The first step is a data contract</span><span class="cover-caption">Synthetic teaching schematic</span></figcaption><div class="cover-model"><div class="cover-unit"><div class="cover-sample">${Array.from({length:64},(_,i)=>`<i class="${[17,18,25,26,37,38,45,46].includes(i)?'sample-mark':''}"></i>`).join('')}</div><strong>Image</strong><span>What is measured?</span></div><span class="model-arrow" aria-hidden="true">→</span><div class="cover-unit"><div class="bc-cover-labels"><span>Fish</span><span>Flower</span><span>Gravel</span><span>Sugar</span></div><strong>Four masks</strong><span>What is annotated?</span></div><span class="model-arrow" aria-hidden="true">→</span><div class="cover-unit"><div class="cover-sample mask">${Array.from({length:64},(_,i)=>`<i class="${[17,18,25,26].includes(i)?'sample-mark':''}"></i>`).join('')}</div><strong>Evidence</strong><span>What can we conclude?</span></div></div><p class="tiny muted">Labels are cloud-pattern names, not literal fish or flowers.</p></figure></div><nav class="session-route" aria-label="Session roadmap">${[['01','Read','Arrays & labels','learning-map'],['02','Reconstruct','RLE & geometry','rle-coordinates'],['03','Measure','Dice & error costs','dice'],['04','Validate','Split & baseline','split']].map(([n,t,d,id])=>`<button data-jump="${id}"><span>${n}</span><strong>${t}</strong><small>${d}</small><i aria-hidden="true">↗</i></button>`).join('')}</nav>`});
+  S('learning-map','01 / Read the data','What should you leave with?','A reliable data audit, not a finished competition solution.','index.html',spread('A small, complete first step',checklist([['Inspect','Explain image shape, value scale and mask channels.'],['Reconstruct','Decode RLE and verify it with a visible overlay.'],['Measure','Count labels and reason about metric edge cases.']]),'A clear next experiment',checklist([['Separate','Hold out independent images or groups before fitting.'],['Compare','Use a diagnostic baseline and a recorded threshold.'],['Explain','State what transfers and what must be checked again.']]),'Today: concepts + small CPU examples. Next hands-on session: your own audit. Trace a starter-model update today; the full spatial pipeline follows in Session 2.'));
+  S('task','01 / Read the data','Image, target and prediction are different objects','A training example contains evidence and an annotation; a model produces a guess.','01_foundations.html',spread('The input is measured',`<div class="bc-display-equation">image → features → prediction</div><p>A colour image has three intensity channels. They describe appearance at each location.</p><p class="small muted">The learning algorithm sees numerical arrays, not the filename’s meaning.</p>`,'The target is supplied',`<div class="bc-display-equation">target ≠ prediction</div><p>A binary target mask marks annotated membership: 1 inside the region, 0 outside.</p><p class="small muted">An image label says what is present. Segmentation also says where.</p>`,'A pixel intensity of 0.8 is not a class probability of 0.8. A mask channel is not an RGB channel.'));
+  S('arrays','01 / Read the data','Read the shape before the values','Change the representation of one tiny image. Predict what should stay the same.','01_foundations.html',split(lab('arrays'),'A tensor is an array','Three axes.<br>Three meanings.',[['Index','image[row, column, channel] in HWC form.'],['Scale','uint8 / 255 gives floating-point intensities in [0,1].'],['Reorder','transpose changes axis order without changing the scene.']],'Record shape, dtype and value range together. Mean/std normalization is another operation, fitted on training data when learned from this dataset.'));
+  S('four-masks','01 / Read the data','One image can have four independent targets','Absence belongs to a particular class, not automatically to the entire image.','02_labels_and_counts.html',spread('Input and target contracts',`${code('image: [3, H, W]  # RGB input\nmask:  [4, H, W]  # binary targets\n\nmask[k, r, c] in {0, 1}')}`,'Ask two questions',checklist([['Image-level','Which classes have any annotated pixel?'],['Pixel-level','Can more than one class be 1 at this exact location?']]),'Independent binary channels preserve all annotations. A mutually exclusive output head needs evidence that its constraints match the label meaning.'));
+  S('counts','01 / Read the data','Always name the thing you are counting','A made-up dataset: three images and two classes. Count before seeing the totals.','02_labels_and_counts.html',spread('Toy long-format annotations',`<table class="check-table"><tr><th>Image</th><th>A mask</th><th>B mask</th></tr><tr><td>one</td><td>present</td><td>empty</td></tr><tr><td>two</td><td>present</td><td>present</td></tr><tr><td>three</td><td>empty</td><td>empty</td></tr></table>`,'Three useful denominators',`<div class="bc-display-equation">3 images · 6 image–class pairs</div><p>Cardinality per image: <strong>1, 2, 0</strong>.</p><p>Three positive pairs; three empty pairs. One fully empty image.</p><p class="small muted">Row counts do not give pixel area. Parse valid RLE lengths or decode the masks to measure foreground.</p>`,'Never infer “clean image” from one empty CSV row. Inspect every class for that image. These counts are illustrative, not Clouds statistics.'));
+  S('overlap','01 / Read the data','Co-occurrence is not pixel overlap','Select both arrangements. Which count changes?','02_labels_and_counts.html',split(lab('overlap'),'Two levels of evidence','Together in an image.<br>Not always at a pixel.',[['Presence','A.any() and B.any() tests co-occurrence.'],['Intersection','(A & B).sum() counts overlapping pixels.'],['Audit','Measure actual masks before imposing exclusive labels.']],'If labels overlap, one softmax class per pixel cannot represent both annotations. '+jump('Optional: head design →','optional-head')));
+  S('optional-head','Optional / Beyond the core','The output head encodes an assumption','Optional depth · label meaning comes before architecture preference.','02_labels_and_counts.html',spread('Independent binary outputs',`${code('logits: [B, K, H, W]\nprobabilities = sigmoid(logits)\n# each class has its own value') }<p>Two classes can both have high probability at one pixel. Background means every target channel is 0.</p>`,'Mutually exclusive outputs',`${code('logits: [B, K+1, H, W]\nprobabilities = softmax(logits, dim=1)\n# includes background') }<p>Per-pixel probabilities sum to 1. One hard class wins at that location.</p>`,'Image-level multi-label data can still be pixel-exclusive. Inspect annotation semantics and overlap; do not decide from the title alone.'),true);
+  S('dataset','01 / Read the data','Our practice dataset: cloud patterns','Understanding Clouds from Satellite Images · a separate Kaggle competition.','08_practice_and_resources.html',spread('Why this is a close teaching fit',checklist([['Four labels','Fish, Flower, Gravel and Sugar. Patterns can coexist.'],['Native RLE','Image_Label + EncodedPixels link images to masks.'],['Full pipeline','Supports later training and model comparisons.']]),'What must not be transferred blindly',`<div class="bc-display-equation">H 1400 × W 2100</div><p>Original masks/image grid; competition submissions use <strong>H 350 × W 525</strong>.</p><p class="small muted">Coarse region labels differ from thin defects. An absent class does not make an image clean. Kaggle rules apply.</p>`,'2019 cloud data · four labels + native RLE. '+`<a href="https://www.kaggle.com/competitions/understanding_cloud_organization/data" target="_blank" rel="noopener">Original data description ↗</a>`));
+  S('variants','01 / Read the data','Choose one coherent image–mask variant','The notebook checks your declared variant. It never guesses from a filename.','08_practice_and_resources.html',spread('Canonical competition files',`<div class="bc-display-equation">H 1400 × W 2100</div><p><code>CLOUD_DATA_VARIANT=original</code></p><p>Original CSV and original images. Obtain access under the official competition rules.</p>`,'Smaller CPU practice option',`<div class="bc-display-equation">H 384 × W 576</div><p><code>CLOUD_DATA_VARIANT=resized_384x576</code></p><p>Resized mirror CSV and its matching images. This is the notebook default; upstream terms still apply.</p>`,'Both use four masks and F-order RLE. Never pair one variant’s CSV with the other’s images. Official submission grid: H 350 × W 525.'));
+  S('rle-coordinates','02 / Reconstruct the mask','Coordinates first, compression second','Use a non-square mask so a transpose cannot hide the mistake.','03_rle_and_geometry.html',spread('NumPy coordinates are zero-based',`${code('mask.shape == (H, W)\nmask[row, column]\n\nH = 3; W = 5\nrow = 1; column = 0\n# second row, first column')}`,'Cloud RLE positions are one-based',`<div class="bc-display-equation">index = column × H + row + 1</div><p>Column-major traversal moves down a column before moving right.</p><p>For row 1, column 0: <strong>0 × 3 + 1 + 1 = 2</strong>.</p><p class="small muted">“2 2” means start at position 2, label two consecutive traversal positions.</p>`,'A start–length pair is not a bounding box. Some datasets use another encoding; read the contract again every time.'));
+  S('rle','02 / Reconstruct the mask','Make a mask. Watch its RLE change.','Predict the next start–length pair before clicking a pixel.','03_rle_and_geometry.html',split(lab('rle'),'A reversible representation','Same pixels.<br>A shared traversal rule.',[['Start','Subtract 1 when converting a 1-based start to a Python index.'],['Length','Write length consecutive foreground values.'],['Reshape','Use the original H × W and the same F-order convention.']],'Changing traversal changes the string, even when the drawn mask stays the same. A round trip alone does not prove your convention matches the dataset.'));
+  S('rle-checks','02 / Reconstruct the mask','Make a decoder earn your trust','Run small known cases before opening thousands of images.','03_rle_and_geometry.html',spread('Four checks before an overlay',checklist([['Empty','An absent class reconstructs an all-zero mask.'],['Corners','Check first/last pixels on a non-square canvas.'],['Runs','Require pairs, positive lengths and in-bounds positions.']]),'Then check the real image',checklist([['Round trip','encode(decode(rle)) preserves the canonical mask.'],['Visual alignment','Mask and image have the same orientation and dimensions.'],['Audit exceptions','Fail with a useful message; repair only under a documented dataset rule.']]),'If encoder and decoder share the same wrong assumption, the round trip can still pass. A hand-checked mask plus overlay catches what it misses.'));
+  S('geometry','02 / Reconstruct the mask','A resize changes the evidence','Compare axis scales; then ask what a one-pixel feature can become.','03_rle_and_geometry.html',split(lab('geometry'),'Geometry is a data decision','Preserve shape.<br>Track lost detail.',[['Aspect','sx = new W / old W; sy = new H / old H.'],['Mask labels','Nearest-neighbour avoids fractional class IDs.'],['Alignment','Apply geometric transforms to image and masks together.']],'Clouds and steel have different aspect ratios. Use their own native dimensions. '+jump('Optional: sampling →','optional-aliasing')));
+  S('optional-aliasing','Optional / Beyond the core','Nearest-neighbour is not a guarantee of survival','Optional depth · a discrete label can still disappear when the grid is coarser.','03_rle_and_geometry.html',spread('Imagine a one-pixel stripe',`<div class="bc-display-equation">sampling phase matters</div><p>If the new pixel centres miss the stripe, it disappears. Shift the stripe slightly and a sample may hit it.</p><p>The same resize ratio can preserve one placement and remove another.</p>`,'Interpolation and information differ',`<p>Nearest-neighbour chooses existing labels. It cannot represent every detail after reduction.</p><p>Image anti-aliasing can reduce high-frequency artifacts, but masks require an explicit semantic resampling policy.</p><p class="small muted">Cropping, tiling, resolution and computational cost are later design choices to validate.</p>`,'Minimum component area must be stated in the grid where filtering occurs. Scaling dimensions changes area by approximately sx × sy.'),true);
+  S('texture','02 / Reconstruct the mask','A histogram forgets where pixels are','Predict whether the mean changes when the arrangement changes.','04_intensity_and_texture.html',split(lab('texture'),'Intensity and texture','Same brightness counts.<br>Different spatial pattern.',[['Intensity','Statistics such as mean describe value distributions.'],['Texture','Local differences and arrangement carry extra information.'],['Evidence','Inspect regions and local context, not only global histograms.']],'A brightness threshold may separate some regions and fail on others. Contrast enhancement cannot create missing structural information.'));
+  S('break','02 / Pause & consolidate','Ten-minute break','Before you return, explain one RLE run and one geometry failure to a partner.','index.html',spread('You can already inspect a label',`<div class="bc-display-equation">image → mask → overlay</div><p>Use this chain to locate shape, indexing and orientation bugs.</p>`,'Next: decide what “better” means',`<div class="bc-display-equation">prediction → error → evidence</div><p>We will measure overlap, inspect empties and design a comparison we can trust.</p>`,'Resume at Dice. Optional slides are not required for the core lesson. No automatic timer or slide advancement.'));
+  S('dice','03 / Measure the evidence','Count the error before reading the score','Move the threshold. Explain TP, FP and FN on the toy grid.','05_metrics.html',split(lab('dice'),'The overlap calculation','Dice = 2TP<br>÷ (2TP + FP + FN)',[['TP','Predicted foreground that is truly foreground.'],['FP','Predicted foreground where the target is 0.'],['FN','Target foreground missed by the prediction.']],'True negatives are absent from this foreground formula. Soft training losses and thresholded hard metrics are different quantities.'));
+  S('empty','03 / Measure the evidence','What if both masks are empty?','The formula gives 0/0. A scoring contract must supply a convention.','05_metrics.html',spread('Our lab and cloud benchmark',`<div class="bc-display-equation">empty + empty → 1</div><p>With an empty target, one predicted foreground pixel gives Dice 0.</p><p class="small muted">The raw formula handles one nonempty mask. Only the both-empty case needs an extra rule.</p>`,'Do not assume every scorer agrees',`<p>A library may skip empty targets, assign a value, smooth the formula or reduce over a whole batch.</p><p>Report the empty rule and count of evaluated pairs.</p><p>Also report positive-target overlap and false positives on empty targets.</p>`,'A correctly absent class is not the same as detecting a positive region. '+jump('Optional: averaging →','optional-averaging')));
+  S('optional-averaging','Optional / Beyond the core','The reduction changes the question','Optional depth · score the same two predictions in two different ways.','05_metrics.html',split(lab('averaging'),'Aggregation is a weight','Pair equality.<br>Or pixel influence.',[['Macro','Compute Dice for each image–class pair, then average.'],['Pooled','Add counts first, then compute one Dice.'],['Reporting','Keep per-class support and both positive/empty behaviour visible.']],'Neither reduction is automatically the official competition score. Match the documented evaluator.'),true);
+  S('accuracy','03 / Measure the evidence','High pixel accuracy can hide a useless model','Toy example: 10 foreground pixels on a 1000-pixel canvas.','05_metrics.html',spread('Predict all background',`<div class="bc-display-equation">990 / 1000 = 99% accuracy</div><p>All 10 target pixels are missed.</p><p>TP = 0, FP = 0, FN = 10. Foreground Dice = <strong>0</strong>.</p>`,'Use a diagnostic, not a victory claim',`<p>Inspect foreground overlap separately from background correctness.</p><p>Count image prevalence and pixel prevalence: a class can occur often yet occupy very few pixels.</p><p class="small muted">Do not treat an all-empty baseline as a successful segmenter.</p>`,'The denominator determines what a metric rewards. Always ask which mistakes can be hidden by the average.'));
+  S('score-contract','03 / Measure the evidence','Cloud Dice is not the steel competition score','Transfer metric literacy; re-read the actual evaluation rules.','05_metrics.html',spread('Cloud practice contract',`<p>Official cloud evaluation averages Dice over image–class pairs and scores submissions on its stated grid.</p><p>Empty/empty receives 1.</p><p class="small muted">Our CPU notebook reports its own diagnostic Dice at the declared working resolution; it does not claim a leaderboard score.</p>`,'Industrial project contract',`<p>The published project description lists foreground overlap, false-positive behaviour and empty accuracy components.</p><p>Read its current evaluator for exact reductions and edge cases.</p><p class="small muted">Component names or weights do not reveal an unpublished implementation. No invented replica is supplied here.</p>`,'Never compare numbers produced by different resolutions, reductions or scoring rules as if they were the same measure.'));
+  S('area','03 / Measure the evidence','Small does not always mean noise','Change the cutoff. Notice which true regions are lost with the false speck.','05_metrics.html',split(lab('area'),'Post-processing has a cost','Remove a false alarm.<br>Or remove the target.',[['Component','A connected region of predicted foreground, under a declared connectivity.'],['Trade-off','Area filtering can improve precision while reducing recall.'],['Validate','Choose the rule using held-out predictions and record the grid.']],'These component areas are invented to show the trade-off. They are not recommended project cutoffs.'));
+  S('split','04 / Validate the comparison','Split the independent unit first','A model should not see one part of the validation example during training.','06_validation.html',split(lab('split'),'Separate before deriving','One original.<br>One partition.',[['Order','Split images or acquisition groups before tiling and augmentation.'],['Fit','Estimate learned normalization and baselines using training only.'],['Audit','Verify disjoint IDs/groups; save the split manifest and seed.']],'Image-disjoint does not guarantee scene-independent. If acquisition metadata exists, choose a grouping that matches the intended generalization claim.'));
+  S('stratification','04 / Validate the comparison','Balance labels without breaking independence','Stratification reduces imbalance; it does not create new independent evidence.','06_validation.html',spread('Audit the held-out support',checklist([['Presence table','One row per original image, one binary column per class.'],['Balance','Compare class prevalence, cardinality and rare combinations.'],['Keep groups intact','The acquisition group wins over a tidier class ratio.']]),'Handle small strata explicitly',`<div class="bc-display-equation">20% of 3 = 0.6 images</div><p>Actual splits need integer counts. Singleton combinations cannot be spread across partitions.</p><p>Use an explicit fallback, save the outcome, and state absent-class limitations.</p>`,'A random seed makes a split reproducible. It does not make it representative. '+jump('Optional: rare groups →','optional-stratum')));
+  S('optional-stratum','Optional / Beyond the core','When the desired split is impossible','Optional depth · move the number of independent rare-positive groups.','06_validation.html',split(lab('stratum'),'A limit of the evidence','A rare label is not<br>many independent cases.',[['No duplication','Putting the same group in train and validation creates leakage.'],['No false certainty','Zero positive validation support means that subgroup is unassessed.'],['More data','Independent examples resolve limits that a fancier splitter cannot.']],'Sampling without replacement has finite-population uncertainty; simple binomial calculations are only approximations.'),true);
+  S('baseline','04 / Validate the comparison','Start with a baseline you can explain','A diagnostic checks your pipeline. It is not a substitute for a learned segmentation model.','07_diagnostic_baseline.html',spread('Two deliberately weak references',checklist([['Always empty','Checks empty-pair bookkeeping and exposes missed foreground.'],['Training spatial prior','Average training masks on a small grid, without image features.'],['Held-out check','Apply the fixed prior without using validation masks to build it.']]),'What this teaches',`<p>A spatial prior knows training-region positions, not the new image’s content.</p><p>A global constant prior is simpler still: its thresholded masks are all empty or all full.</p><p class="small muted">The notebook compares diagnostics, not leaderboard recipes. Next, compare this with a trainable pixel baseline.</p>`,'If a complex model cannot beat a transparent diagnostic under a fair split, first inspect your data contract, loss, masks and evaluation.'));
+  S('learned-baseline','04 / Validate the comparison','A starter model can learn from image values','Fit four independent pixel classifiers; keep the saved image-level split.','07_diagnostic_baseline.html',spread('One pixel → four binary questions',`${code('features = [R, G, B]  # scaled to 0–1\nlogits = features @ weights + bias\nscores = sigmoid(logits)\n# four independent target channels')}<p>Weights and biases are adjusted using training masks.</p>`,'A useful limitation to understand',`<p>The model receives RGB but no neighbouring pixels. Identical colours receive identical predictions regardless of surrounding texture.</p><p>Compare its held-out masks against the spatial prior using the same grid and metric.</p><p class="small muted">This is equivalent to a 1 × 1 convolutional pixel head, not a complete U-Net.</p>`,'The third notebook trains this small CPU baseline on the separate cloud dataset. A cloud model or threshold is not a solution to the steel project.'));
+  S('learning-step','04 / Validate the comparison','Follow one prediction into one weight update','Use one intensity feature and one target so the arithmetic stays visible.','07_diagnostic_baseline.html',split(lab('learning'),'Learning means changing parameters','Predict → loss<br>→ gradient → update',[['Prediction','z = wx + b; probability = sigmoid(z).'],['Error','For BCE, the logit gradient is probability − target.'],['Update','Move parameters opposite the loss gradient; then predict again.']],'This lab fits one example. A lower training loss is not evidence of generalization. Reset before comparing different examples.'));
+  S('thresholds','04 / Validate the comparison','A decision threshold is another fitted choice','For fixed probabilities, raising τ can only remove positive predictions.','07_diagnostic_baseline.html',spread('What follows mathematically',`<div class="bc-display-equation">mask = probability ≥ τ</div><p>As τ rises, FP and TP cannot increase on a fixed map. FN cannot decrease.</p><p>Dice can improve, worsen or plateau.</p>`,'What requires evidence',`<p>Choose a small declared set of candidate thresholds using validation.</p><p>Keep the model, split, resolution and metric fixed.</p><p>Record the chosen threshold and inspect errors, rather than reusing it in a new domain.</p>`,'0.5 is not guaranteed to maximize Dice, even with calibrated probabilities. '+jump('Optional: selection bias →','optional-selection')));
+  S('optional-selection','Optional / Beyond the core','Validation can become a training signal','Optional depth · repeatedly choosing settings from one score adapts to that set.','07_diagnostic_baseline.html',spread('A thousand searches are not one test',`<p>Try many architectures, seeds, thresholds and filters on the same small holdout.</p><p>The best observed score can partly reflect chance peculiarities of that holdout.</p>`,'Protect the final question',`<p>Separate exploratory validation from a final untouched evaluation where feasible.</p><p>For stronger studies, use nested selection or independent repetitions with sufficient support.</p><p class="small muted">A public leaderboard is not a replacement for local validation.</p>`,'Optional extension: predict how selection bias changes as the candidate count increases. Do not invent a confidence interval from a single run.'),true);
+  S('evidence','04 / Validate the comparison','An audit should be reproducible','Save enough information for another student to explain your result.','07_diagnostic_baseline.html',spread('Record the contract',checklist([['Dataset','Source, version, file names, grid and annotation meaning.'],['Split','Original IDs/groups, seed, label support and exceptions.'],['Processing','Scaling, mask decoding, resize and evaluation resolution.']]),'Record the evidence',checklist([['Numbers','Metric definition, class support, threshold and empty rule.'],['Pictures','Correct examples, failures and image/mask overlays.'],['Conclusion','One supported observation and one limitation.']]),'Keep a short observation log: “I expected …; I changed …; I observed …; this does/does not show …”.'));
+  S('optional-annotations','Optional / Beyond the core','Annotations define what the model is asked to learn','Optional depth · a visually plausible boundary need not be the labelled boundary.','08_practice_and_resources.html',spread('Cloud regions are coarse annotations',`<p>Cloud-pattern labels refer to organized regions and may contain uncertain boundaries or internal gaps.</p><p>A pixelwise model is evaluated against those supplied annotations, not against an unknowable perfect physical mask.</p>`,'Transfer the method, question the assumptions',`<p>Steel defects differ in shape, scale, appearance and label semantics.</p><p>Audit those properties again. Do not transfer cloud thresholds, class statistics, spatial priors or resizing choices.</p><p class="small muted">Use error panels to separate decoding bugs, annotation ambiguity and model failure.</p>`,'Discuss: would a boundary-tolerant metric answer a different question?'),true);
+  S('notebooks','04 / Practice independently','Three notebooks, one learning path','No GPU is required for today’s core exercises.','08_practice_and_resources.html',spread('1 / Foundations → 2 / real-data audit',checklist([['Run offline','Deterministic small arrays and masks, no Kaggle files.'],['Audit real clouds','Then run the data-audit notebook for labels and overlays.'],['Check the result','Use assertions and explain why they should pass.']])+`<p class="small"><a href="${notesBase}foundations_walkthrough.ipynb" download>Download foundations notebook ↓</a><br><a href="${notesBase}practice_dataset_lab.ipynb" download>Download real-data audit notebook ↓</a></p>`,'3 / Train a starter pixel model',checklist([['Reuse','Load the audit’s saved train/validation IDs.'],['Fit','Learn four RGB pixel classifiers on training only.'],['Evaluate','Compare held-out masks, loss and threshold behaviour.']])+`<p class="small"><a href="${notesBase}starter_pixel_model.ipynb" download>Download starter-model notebook ↓</a></p>`,''));
+  S('transfer','04 / Return to the project','Transfer your questions, then make your own decisions','Explain these before implementing anything on the industrial dataset.','08_practice_and_resources.html',spread('Ask about the target data',checklist([['Geometry','What are the native width, height, channels and aspect ratio?'],['Annotations','What is the RLE convention? Which classes coexist or overlap?'],['Evidence','Which labels are rare, which masks are empty, and what is the official scorer?']]),'Design your own project audit',checklist([['Validation','What independent unit should be held out?'],['Diagnostic','What failure would an empty or prior baseline expose?'],['Next step','What one trainable experiment would you run and why?']]),'No project masks, measured answers, trained weights or tuned project parameters are supplied in this bootcamp package.'));
+  S('finish','04 / Exit checkpoint','Can you explain it without running the code?','Pick a claim. Find the missing evidence.','index.html',`<div class="closing-layout"><ol class="closing-checklist"><li><span>“My RLE round trip passes.”</span><p>Does that prove the image overlay has the right orientation?</p></li><li><span>“Both classes are present.”</span><p>Does that prove their mask pixels overlap?</p></li><li><span>“Accuracy is 99%.”</span><p>Could the model still miss every foreground pixel?</p></li><li><span>“The threshold improved Dice.”</span><p>Where was it chosen, under which reduction and resolution?</p></li></ol><aside class="closing-question"><div class="notes-kicker">Before the hands-on session</div><blockquote>Inspect one example.<br>Explain every step.</blockquote><p>Complete the foundations, audit one real example, then trace or run the starter pixel model. Save your evidence.</p><div class="notes-links"><a href="${notesBase}">Detailed guides →</a>${jump('Revisit the learning map','learning-map')}</div><small>Advanced stops are optional. A careful core audit is the goal.</small></aside></div>`);
+
+  $('#slides').innerHTML=slides.map((s,i)=>`<section id="${s.id}" class="slide ${s.hero?'hero':''}" aria-labelledby="title-${i}" ${i?'hidden inert':''}>${s.hero?'':`<div class="eyebrow">${escape(s.chapter)}</div><h2 id="title-${i}" tabindex="-1">${escape(s.title)}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:''}`} ${s.body}</section>`).join('');
+  $('#start h1').id='title-0'; $('#start h1').tabIndex=-1;
+  const chapters=[['01','Read','learning-map'],['02','Reconstruct','rle-coordinates'],['03','Measure','dice'],['04','Validate','split']];
+  $('#chapter').classList.add('sr-only');
+  $('#chapter').insertAdjacentHTML('afterend',`<nav class="chapter-nav" aria-label="Jump to a chapter">${chapters.map(([n,label,id])=>`<button data-jump="${id}"><span>${n}</span> ${label}</button>`).join('')}</nav>`);
+  const themes=['paper','midnight','moss','butter','blush','mono'];
+  const themeRoot=document.documentElement;
+  function applyTheme(name){
+    if(!themes.includes(name))name='paper';
+    themeRoot.dataset.theme=name;
+    $$('.theme-option').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.palette===name)));
+    try{localStorage.setItem('guide-garden-theme',name);}catch{}
+  }
+  try{applyTheme(localStorage.getItem('guide-garden-theme')||themeRoot.dataset.theme||'paper');}catch{applyTheme(themeRoot.dataset.theme||'paper');}
+  $$('.theme-option').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.palette)));
+  let current=0, includeOptional=false, motionOff=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let pending=null;
+  const media=matchMedia('(prefers-reduced-motion: reduce)');
+  function settle(){if(pending){const p=pending;pending=null;cancelAnimationFrame(p.frame);p.finish();}}
+  function animate(duration,draw,finish=()=>{}){
+    settle();
+    if(motionOff||document.hidden){draw(1);finish();return;}
+    const birth=performance.now();
+    const animation={frame:0,finish:()=>{draw(1);finish();}};
+    pending=animation;
+    const tick=now=>{if(pending!==animation)return;const u=Math.min(1,(now-birth)/duration);draw(u);if(u<1)animation.frame=requestAnimationFrame(tick);else{pending=null;finish();}};
+    animation.frame=requestAnimationFrame(tick);
+  }
+  const route=()=>slides.map((s,i)=>!s.optional||includeOptional?i:null).filter(i=>i!==null);
+  function go(target,focus=true){
+    const n=typeof target==='string'?slides.findIndex(s=>s.id===target):target;
+    if(n<0||n>=slides.length)return;
+    settle();current=n;
+    $$('.slide').forEach((el,i)=>{el.classList.remove('is-entering');el.hidden=i!==n;el.inert=i!==n;});
+    if(focus&&!motionOff) { void $$('.slide')[n].offsetWidth; $$('.slide')[n].classList.add('is-entering'); }
+    const chapter=slides[n].chapter.match(/^0[1-4]/)?.[0];
+    $$('.chapter-nav button').forEach((button,i)=>{if(chapters[i][0]===chapter)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+    $('#chapter').textContent=slides[n].chapter;
+    const path=route(),position=path.indexOf(n);
+    $('#counter').textContent=position<0?`Optional · ${slides.filter(s=>s.optional).findIndex(s=>s.id===slides[n].id)+1}/${slides.filter(s=>s.optional).length}`:`${String(position+1).padStart(2,'0')} / ${path.length}`;
+    
+    const next=path.find(i=>i>n),prev=path.filter(i=>i<n).at(-1);
+    $('#previous').disabled=prev===undefined;$('#next').disabled=next===undefined;
+    $('#next').title=next===undefined?'End of session':`Next: ${slides[next].title}`;
+    $('#previous').title=prev===undefined?'Start of session':`Previous: ${slides[prev].title}`;
+    $('#notes').href=notesBase+slides[n].note;
+    $('#progress').style.width=`${(position<0?(n+1)/slides.length:(position+1)/path.length)*100}%`;
+    try{history.replaceState(null,'',`#${slides[n].id}`);}catch{/* Embedded/offline viewers may restrict URL changes. */}
+    if(focus)$(`#title-${n}`).focus({preventScroll:true});
+    if(innerWidth<=700)scrollTo({top:0,behavior:'instant'});
+    $$('#index-list button').forEach(b=>b.setAttribute('aria-current',b.dataset.jump===slides[n].id?'page':'false'));
+  }
+  function move(direction){let n=current+direction;while(n>=0&&n<slides.length&&!includeOptional&&slides[n].optional)n+=direction;go(n);}
+  $('#previous').onclick=()=>move(-1);$('#next').onclick=()=>move(1);
+  const dialog=$('#index-dialog');
+  $('#contents').onclick=()=>{settle();$('#slide-search').value='';filterIndex();dialog.showModal();$('#slide-search').focus();};$('#close-index').onclick=()=>dialog.close();
+  $('#include-optional').onchange=e=>{includeOptional=e.target.checked;go(current,false);};
+  const indexGroups=[['Opening',[slides[0]]],...chapters.map(([n,label])=>[`${n} / ${label}`,slides.filter(s=>s.chapter.startsWith(n))]),['Optional / Beyond the core',slides.filter(s=>s.optional)]];
+  $('#index-list').innerHTML=indexGroups.map(([label,items])=>`<section class="index-group"><h3>${label}</h3><div>${items.map(s=>`<button type="button" data-jump="${s.id}" data-search="${escape((s.title+' '+s.chapter+' '+(s.lede||'')+' '+s.body.replace(/<[^>]*>/g,' ')).toLowerCase())}" class="${s.optional?'optional':''}"><span>${String(slides.indexOf(s)+1).padStart(2,'0')}</span><strong>${escape(s.title)}</strong><i aria-hidden="true">↗</i></button>`).join('')}</div></section>`).join('');
+  function filterIndex(){
+    const terms=$('#slide-search').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    $$('#index-list button').forEach(b=>b.hidden=!terms.every(term=>b.dataset.search.includes(term)));
+    $$('.index-group').forEach(group=>group.hidden=!$$('button',group).some(b=>!b.hidden));
+    $('#index-empty').hidden=$$('#index-list button').some(b=>!b.hidden);
+  }
+  $('#slide-search').addEventListener('input',filterIndex);
+  document.addEventListener('click',e=>{const target=e.target.closest('[data-jump]');if(target){if(dialog.open)dialog.close();go(target.dataset.jump);}});
+  function motionUI(){ themeRoot.dataset.motion=motionOff?'off':'on'; $('#motion').textContent=motionOff?'Motion off':'Motion on';$('#motion').setAttribute('aria-pressed',String(motionOff)); }
+  $('#motion').onclick=()=>{motionOff=!motionOff;settle();motionUI();};
+  media.addEventListener('change',e=>{motionOff=e.matches;settle();motionUI();});motionUI();
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)settle();});
+  window.addEventListener('pagehide',settle);
+  async function fullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else await $('#viewport').requestFullscreen();}catch{$('#announcer').textContent='Fullscreen is unavailable here. Open the presentation in its own browser tab or use browser fullscreen.';}}
+  $('#fullscreen').onclick=fullscreen;
+  document.addEventListener('fullscreenchange',()=>{$('#fullscreen').textContent=document.fullscreenElement?'Exit fullscreen':'Fullscreen';fit();});
+  document.addEventListener('keydown',e=>{
+    if(e.altKey||e.ctrlKey||e.metaKey||e.isComposing||dialog.open)return;
+    const palette=$('.palette-menu');
+    if(palette.open){if(e.key==='Escape'){palette.open=false;$('summary',palette).focus();}return;}
+    const editing=e.target.closest('input,select,textarea,[contenteditable]');
+    if(editing)return;
+    if(e.key===' '&&e.target.closest('button,a'))return;
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();move(1);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();move(-1);}
+    else if(e.key==='Home'){e.preventDefault();go(0);}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1);}
+    else if(e.key.toLowerCase()==='i'){$('#contents').click();}
+    else if(e.key.toLowerCase()==='f')fullscreen();
+  });
+  window.addEventListener('hashchange',()=>{const id=location.hash.slice(1);if(slides.some(s=>s.id===id))go(id,false);});
+  function fit(){
+    const stage=$('#stage');
+    if(innerWidth<=700){for(const key of ['transform','position','left','top','marginLeft','marginTop'])stage.style[key]='';$('#viewport').style.height='';return;}
+    const scale=Math.min(innerWidth/1280,innerHeight/720);
+    stage.style.transform=`scale(${scale})`;
+    // The unscaled stage must not enlarge the document's scrollable area.
+    $('#viewport').style.height=`${innerHeight}px`;
+    stage.style.position='absolute';stage.style.left='50%';stage.style.top='50%';
+    stage.style.marginLeft='-640px';stage.style.marginTop='-360px';
+  }
+  window.addEventListener('resize',fit);fit();
+  try{history.scrollRestoration='manual';}catch{}
+  if(innerWidth<=700)setTimeout(()=>scrollTo(0,0),80);
+
+
+  window.Presentation=Object.freeze({go, slides:slides.map(({id,title,optional})=>({id,title,optional:!!optional})),get current(){return slides[current].id;}});
+  $('.index-bottom a[download]').href=location.href.split('#')[0];
+  const hash=location.hash.slice(1);go(slides.some(s=>s.id===hash)?hash:0,false);
+})();
+// The presentation uses the same seeded garden language as the reading site:
+// miniature stems, leaves and spiral blooms form a quiet footer signature.
+// Geometry is generated once, then
+// rendered deterministically at the current time.
+(() => {
+  'use strict';
+  const canvas = document.querySelector('#botanical-canvas');
+  const motionButton = document.querySelector('#motion');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const root = document.documentElement;
+  let width = 0, height = 0, dpr = 1, visible = true, frame = 0;
+  let lastNow = performance.now(), elapsed = 0;
+  let palette = {};
+
+  function mulberry32(seed) {
+    let state = seed | 0;
+    return () => {
+      state = (state + 0x6D2B79F5) | 0;
+      let t = Math.imul(state ^ (state >>> 15), 1 | state);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rand = mulberry32(261026);
+  // A miniature specimen group, confined to the footer's empty centre.
+  // Use the reading site's flower contour/spiral, at a much quieter scale.
+  const plants = [[.27,.38,-.08],[.52,.24,.04],[.76,.48,.08]]
+    .map(([x,y,bend]) => ({
+      x, y, bend,
+      curve: [[x+bend,.96],[x+bend,.72],[x-.025,.54],[x,y]],
+      radius: 5 + rand() * 1.7,
+      phase: rand() * Math.PI * 2,
+      petals: 5 + Math.floor(rand() * 3),
+      leaves: 2,
+      depth: .78
+    }));
+  const butterflies = [[.11,.30,6.3],[.90,.24,5.7]].map(([x,y,size]) => ({
+    x,y,size,phase:rand()*Math.PI*2,tilt:-.3+rand()*.4
+  }));
+  // Cache the course butterfly silhouette and its inlaid panels once.
+  const wings = new Path2D();
+  wings.moveTo(.04,-.12);
+  wings.bezierCurveTo(.26,-.78,.78,-1.18,1.04,-.92);
+  wings.bezierCurveTo(1.26,-.63,.88,-.1,.16,.13);
+  wings.bezierCurveTo(.68,-.06,1.02,.36,.72,.7);
+  wings.bezierCurveTo(.44,.97,.1,.57,.04,.17);wings.closePath();
+  const wingPanels = new Path2D();
+  wingPanels.moveTo(.2,-.18);wingPanels.bezierCurveTo(.4,-.62,.8,-.91,.91,-.77);
+  wingPanels.bezierCurveTo(.98,-.62,.65,-.27,.2,-.18);wingPanels.closePath();
+  wingPanels.moveTo(.45+.17*Math.cos(-.4),.38+.17*Math.sin(-.4));
+  wingPanels.ellipse(.45,.38,.17,.23,-.4,0,Math.PI*2);
+  const wingVeins = new Path2D();
+  wingVeins.moveTo(.08,.02);wingVeins.quadraticCurveTo(.45,-.38,.86,-.76);
+  wingVeins.moveTo(.08,.12);wingVeins.quadraticCurveTo(.3,.3,.53,.56);
+  for (const p of plants) {
+    p.contour = Array.from({length:73}, (_, i) => {
+      const a = i / 72 * Math.PI * 2;
+      const radius = p.radius * (1 + .13 * Math.sin(p.petals * a + p.phase));
+      return [Math.cos(a) * radius, Math.sin(a) * radius * .84];
+    });
+    p.spiral = Array.from({length:86}, (_, i) => {
+      const u = i / 85, a = u * Math.PI * 6 + p.phase;
+      const radius = p.radius * (.06 + u * .61);
+      return [Math.cos(a) * radius, Math.sin(a) * radius * .7];
+    });
+  }
+
+  const clamp = (v, lo=0, hi=1) => Math.max(lo, Math.min(hi, v));
+  const easeOut = t => 1 - Math.pow(1 - clamp(t), 3);
+  const spring = t => 1 - Math.exp(-6 * clamp(t)) * Math.cos(10 * clamp(t));
+  const cubic = (points, t) => {
+    const u = 1 - t;
+    return [
+      u*u*u*points[0][0] + 3*u*u*t*points[1][0] + 3*u*t*t*points[2][0] + t*t*t*points[3][0],
+      u*u*u*points[0][1] + 3*u*u*t*points[1][1] + 3*u*t*t*points[2][1] + t*t*t*points[3][1]
+    ];
+  };
+  function readPalette() {
+    const styles = getComputedStyle(root);
+    palette = Object.fromEntries(['line','stem','flower','flower-line'].map(name => [name, styles.getPropertyValue(`--${name}`).trim()]));
+  }
+  function resize() {
+    width = Math.max(1, canvas.clientWidth || 112);
+    height = Math.max(1, canvas.clientHeight || 42);
+    dpr = Math.min(devicePixelRatio || 1, 2.5);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    readPalette();
+    repaint();
+  }
+  function drawLeaf(x, y, angle, length, growth, alpha) {
+    if (growth <= 0) return;
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(angle); ctx.scale(growth, growth);
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(length*.2, -length*.6, length*.8, -length*.45, length, 0);
+    ctx.bezierCurveTo(length*.7, length*.3, length*.2, length*.35, 0, 0);
+    ctx.fillStyle = palette.stem; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(length*.84, 0);
+    ctx.strokeStyle = palette['flower-line']; ctx.lineWidth = .65; ctx.stroke();
+    ctx.restore();
+  }
+  function drawBloom(p, x, y, scale, time, alpha) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(time * .00045 + p.phase) * .07);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = alpha;
+    // A scalloped outer contour matches the reading site's inked blossoms.
+    ctx.beginPath();
+    for (let i = 0; i < p.contour.length; i++) {
+      const [px, py] = p.contour[i];
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = palette.flower;
+    ctx.strokeStyle = palette['flower-line'];
+    ctx.lineWidth = 1.1;
+    ctx.fill();
+    // Fine spiral linework keeps the blooms from reading as flat stickers.
+    ctx.beginPath();
+    for (let i = 0; i < p.spiral.length; i++) {
+      const [px, py] = p.spiral[i];
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = palette['flower-line']; ctx.lineWidth = .85; ctx.stroke();
+    ctx.restore();
+  }
+  function drawButterfly(b,time,animate) {
+    const flutter=animate?.76+.24*Math.pow(Math.sin(time*.005+b.phase),2):.94;
+    const dx=animate?Math.sin(time*.0007+b.phase)*1.6:0;
+    const dy=animate?Math.cos(time*.0009+b.phase)*1.1:0;
+    ctx.save();ctx.translate(b.x*width+dx,b.y*height+dy);
+    ctx.rotate(b.tilt);ctx.scale(b.size,b.size);ctx.globalAlpha=.88;
+    ctx.lineJoin='round';ctx.lineCap='round';
+    for(const side of [-1,1]) {
+      ctx.save();ctx.scale(side*flutter,1);
+      ctx.fillStyle=palette.flower;ctx.strokeStyle=palette.stem;ctx.lineWidth=.075;
+      ctx.fill(wings);ctx.stroke(wings);
+      ctx.fillStyle=palette['flower-line'];ctx.fill(wingPanels);
+      ctx.lineWidth=.035;ctx.stroke(wingVeins);ctx.restore();
+    }
+    ctx.fillStyle=palette.stem;ctx.beginPath();ctx.ellipse(0,.07,.07,.47,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(0,-.43,.09,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=palette.stem;ctx.lineWidth=.05;ctx.beginPath();
+    ctx.moveTo(-.03,-.46);ctx.quadraticCurveTo(-.1,-.75,-.27,-.78);
+    ctx.moveTo(.03,-.46);ctx.quadraticCurveTo(.1,-.75,.27,-.78);ctx.stroke();ctx.restore();
+  }
+  function draw(now) {
+    frame = 0;
+    const dt = Math.min(64, Math.max(0, now - lastNow));
+    lastNow = now;
+    const motionOn = !reduced.matches && motionButton?.getAttribute('aria-pressed') !== 'true';
+    if (motionOn && visible && !document.hidden) elapsed += dt;
+    const time = motionOn ? elapsed : 0;
+    const grow = motionOn ? easeOut(elapsed / 1100) : 1;
+    ctx.clearRect(0, 0, width, height);
+
+    for (const p of plants) {
+      const sway = motionOn ? Math.sin(time * .0006 + p.phase) * Math.min(.55, width * .004) : 0;
+
+      const x = p.x * width + sway;
+      const y = p.y * height;
+      // The normalized curve is seeded once; only a subpixel sway changes.
+      const path = p.curve.map(([px, py], i) => [
+        px * width + (i > 1 ? sway : sway * .35),
+        py * height
+      ]);
+      const stemGrowth = clamp(grow * 1.14);
+      ctx.globalAlpha = p.depth;
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const point = cubic(path, i / 36 * stemGrowth);
+        if (i === 0) ctx.moveTo(point[0], point[1]); else ctx.lineTo(point[0], point[1]);
+      }
+      ctx.strokeStyle = palette.stem; ctx.lineWidth = .8; ctx.lineCap = 'round'; ctx.stroke();
+      for (let j = 0; j < p.leaves; j++) {
+        const t = .28 + j * .27;
+        if (t > stemGrowth) continue;
+        const point = cubic(path, t);
+        const side = j % 2 ? -.58 : -2.46;
+        drawLeaf(point[0], point[1], side, 5 + j * .8, clamp((stemGrowth - t) * 5), p.depth * .72);
+      }
+      const bloomProgress = clamp((grow - .52) / .48);
+      if (bloomProgress > 0) drawBloom(p, x, y, spring(bloomProgress), time, p.depth);
+    }
+    for (const b of butterflies) drawButterfly(b,time,motionOn);
+    if (motionOn && visible && !document.hidden) frame = requestAnimationFrame(draw);
+  }
+  function repaint() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    readPalette();
+    draw(performance.now());
+  }
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(entries => {
+    visible = entries[0]?.isIntersecting ?? true;
+    if (visible) repaint(); else if (frame) { cancelAnimationFrame(frame); frame = 0; }
+  }, {threshold: 0}).observe(canvas);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { if (frame) cancelAnimationFrame(frame); frame = 0; }
+    else if (visible) repaint();
+  });
+  reduced.addEventListener('change', repaint);
+  new MutationObserver(repaint).observe(root, {attributes:true, attributeFilter:['data-theme']});
+  if (motionButton) new MutationObserver(repaint).observe(motionButton, {attributes:true, attributeFilter:['aria-pressed']});
+  window.addEventListener('resize', resize);
+  resize();
+})();
+
+/* Shared bootcamp workbenches. Fixed toy data; no model or real-data score implied. */
+(() => {
+  'use strict';
+  const esc = v => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const table = (rows,headers) => `<table class="bc-table"><thead><tr>${headers.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const grid = (a,h,w,{numbers=true,order='',editable=false}={}) => `<div class="bc-grid" style="--cols:${w}" ${editable?'role="group" aria-label="Editable toy mask"':`role="img" aria-label="${h} rows by ${w} columns: ${a.join(', ')}"`}>${a.map((x,i)=>{const r=Math.floor(i/w),c=i%w,n=order==='F'?c*h+r+1:i+1;return editable?`<button type="button" data-pixel="${i}" class="${x?'on':''}" aria-pressed="${!!x}" aria-label="Row ${r+1}, column ${c+1}, value ${x}, traversal index ${n}"><small>${n}</small><b>${x}</b></button>`:`<span class="${x?'on':''}">${numbers?esc(x):''}</span>`;}).join('')}</div>`;
+  const encode = (a,h,w,order='F') => {
+    const flat=Array.from({length:h*w},(_,i)=>order==='F'?a[(i%h)*w+Math.floor(i/h)]:a[i]);
+    const runs=[];let start=-1;
+    for(let i=0;i<=flat.length;i++){if(flat[i]===1&&start<0)start=i;if(flat[i]!==1&&start>=0){runs.push(start+1,i-start);start=-1;}}
+    return runs.join(' ');
+  };
+  const decode = (text,h,w,order='F') => {
+    const a=Array(h*w).fill(0),tokens=text.trim()?text.trim().split(/\s+/).map(Number):[];
+    if(tokens.length%2)throw Error('Each run requires a start and a length.');
+    let end=0;
+    for(let i=0;i<tokens.length;i+=2){const [s,n]=tokens.slice(i,i+2);if(!Number.isInteger(s)||!Number.isInteger(n)||s<1||n<1||s+n-1>h*w||s<=end)throw Error('Runs must be positive, ordered, nonoverlapping and inside the canvas.');for(let j=s-1;j<s-1+n;j++)a[order==='F'?(j%h)*w+Math.floor(j/h):j]=1;end=s+n-1;}
+    return a;
+  };
+  const counts=(p,y)=>p.reduce((o,x,i)=>{o[x?(y[i]?'tp':'fp'):(y[i]?'fn':'tn')]++;return o;},{tp:0,fp:0,fn:0,tn:0});
+  const dice=(p,y)=>{const {tp,fp,fn}=counts(p,y);return 2*tp+fp+fn?2*tp/(2*tp+fp+fn):1;};
+  const metric=(label,value)=>`<div class="bc-stat"><strong>${value}</strong><span>${label}</span></div>`;
+  const control=(text,name,options)=>`<label>${text}<select data-control="${name}">${options.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`;
+  const range=(text,name,min,max,step,val)=>`<label>${text}<input data-control="${name}" type="range" min="${min}" max="${max}" step="${step}" value="${val}"><output>${val}</output></label>`;
+  const definitions={
+    learning:{controls:range('Input intensity x','x',0,1,.1,.8)+control('Training target','target',[['1','1 · foreground'],['0','0 · background']])+'<button type="button" data-update>Train one step</button>',state:()=>({w:0,b:0,steps:0}),click(s,b,root){if(!b.hasAttribute('data-update'))return;const x=+root.querySelector('input').value,y=+root.querySelector('select').value,p=1/(1+Math.exp(-(s.w*x+s.b))),error=p-y;s.w-=.5*error*x;s.b-=.5*error;s.steps++;},render(s,root){const x=+root.querySelector('input').value,y=+root.querySelector('select').value,z=s.w*x+s.b,p=1/(1+Math.exp(-z)),loss=Math.max(z,0)+Math.log1p(Math.exp(-Math.abs(z)))-y*z;return `<div class="bc-array-shape">z = wx + b <small class="bc-step-count">step ${s.steps}</small></div><div class="bc-learning-metrics">${metric('Weight w',s.w.toFixed(3))}${metric('Bias b',s.b.toFixed(3))}${metric('Probability',p.toFixed(3))}${metric('BCE loss',loss.toFixed(3))}</div><p class="bc-note">η = 0.5. w ← w − η(p−y)x; b ← b − η(p−y). Changing inputs keeps weights; Reset starts at zero.</p>`;}},
+    arrays:{controls:control('View','view',[['rgb','HWC · RGB bytes'],['scaled','HWC · divide by 255'],['chw','CHW · axes rearranged']]),state:()=>({}),render(s,root){const mode=root.querySelector('select').value;const bytes=[0,128,255],values=mode==='scaled'?bytes.map(x=>(x/255).toFixed(3)):bytes;return `<div class="bc-array-shape">${mode==='chw'?'[3, 2, 4]':'[2, 4, 3]'}</div><p>One selected pixel: <code>[${values.join(', ')}]</code></p>${table([['Height','2','number of rows'],['Width','4','number of columns'],['Channels','3','red, green, blue']],['Axis','Size','Meaning'])}<p class="bc-note">${mode==='chw'?'transpose(2, 0, 1) moves the channel axis; reshape is not a substitute. Values stay the same.':mode==='scaled'?'Cast to floating point before arithmetic. These are scaled intensities, not predicted class probabilities.':'RGB is an input representation. The number of target classes is a separate decision.'}</p>`;}},
+    overlap:{controls:control('Toy mask arrangement','mode',[['separate','Both labels present · disjoint pixels'],['overlap','Both labels present · shared pixels'],['absent','Only A present']]),state:()=>({}),render(s,root){const mode=root.querySelector('select').value,a=Array(24).fill(0),b=Array(24).fill(0);[7,8,13,14].forEach(i=>a[i]=1);(mode==='overlap'?[8,9,14,15]:mode==='separate'?[10,11,16,17]:[]).forEach(i=>b[i]=1);const shared=a.filter((x,i)=>x&&b[i]).length;return `<div class="bc-pair"><div><h4>Mask A</h4>${grid(a,4,6)}</div><div><h4>Mask B</h4>${grid(b,4,6)}</div></div><div class="bc-stats">${metric('Image cardinality',1+Number(b.some(Boolean)))}${metric('Shared pixels',shared)}</div><p class="bc-note">Image-level co-occurrence asks whether both masks are nonempty. Pixel overlap asks whether <code>A & B</code> has any 1s. They answer different questions.</p>`;}},
+    rle:{controls:control('Traversal','order',[['F','Column-major · F order'],['C','Row-major · C order']]),state:()=>({a:[0,0,1,0,0,1,0,1,0,0,1,0,0,0,0]}),click(s,b){if(b.dataset.pixel!==undefined)s.a[+b.dataset.pixel]^=1;},render(s,root){const order=root.querySelector('select').value,text=encode(s.a,3,5,order);return `<div class="bc-rle-layout">${grid(s.a,3,5,{order,editable:true})}<div><h4>1-based start–length pairs</h4><pre class="bc-output">${text||'(empty string)'}</pre><p><strong>${s.a.reduce((a,b)=>a+b,0)}</strong> foreground pixels</p><p class="bc-note">Click a pixel to edit. The small index shows traversal order; the bold value is its binary mask label.</p></div></div><p class="bc-note">${order==='F'?'For height H=3: 1-based index = column × 3 + row + 1, using zero-based row/column.':'Same visible mask, different encoded sequence. A decoder must use the encoder’s traversal contract.'}</p>`;}},
+    geometry:{controls:control('Transformation','mode',[['native','Native · 15 × 6'],['square','Stretch · 6 × 6'],['reduce','Downsample · 5 × 2']]),state:()=>({}),render(s,root){const mode=root.querySelector('select').value;const w=mode==='native'?15:mode==='square'?6:5,h=mode==='reduce'?2:6;let a=Array(w*h).fill(0);for(let r=0;r<h;r++)for(let c=0;c<w;c++){const srcC=Math.min(14,Math.floor((c+.5)*15/w));a[r*w+c]=srcC===7?1:0;}return `<div class="bc-geometry" style="--w:${w};--h:${h}">${a.map(x=>`<i class="${x?'on':''}"></i>`).join('')}</div><div class="bc-stats">${metric('x scale',(w/15).toFixed(2))}${metric('y scale',(h/6).toFixed(2))}${metric('x/y distortion',((w/15)/(h/6)).toFixed(2))}</div><p class="bc-note">Fixed nearest-neighbour centre sampling. Unequal axis scales distort shape. Thin features can survive or vanish depending on alignment; nearest-neighbour keeps labels discrete but cannot prevent information loss.</p>`;}},
+    texture:{controls:control('Arrangement','mode',[['blocks','Large uniform regions'],['checker','Alternating checkerboard']]),state:()=>({}),render(s,root){const checker=root.querySelector('select').value==='checker',a=Array.from({length:64},(_,i)=>checker?(Math.floor(i/8)+i%8)%2:Number(i%8>=4));let delta=0,n=0;for(let r=0;r<8;r++)for(let c=0;c<7;c++){delta+=Math.abs(a[r*8+c+1]-a[r*8+c]);n++;}return `<div class="bc-texture">${grid(a,8,8,{numbers:false})}</div><div class="bc-stats">${metric('Mean intensity','0.50')}${metric('Fraction bright','0.50')}${metric('Horizontal change',(delta/n).toFixed(3))}</div><p class="bc-note">Both images have 32 dark and 32 bright pixels: identical histograms. The neighbour differences expose spatial arrangement. This toy statistic is not a complete texture classifier.</p>`;}},
+    dice:{controls:range('Decision threshold τ','threshold',0,1,.05,.5)+control('Target','target',[['positive','Foreground present'],['empty','Empty mask']]),state:()=>({}),render(s,root){const t=+root.querySelector('input').value,empty=root.querySelector('select').value==='empty',probs=[.05,.3,.55,.8,.1,.45,.7,.9,.05,.2,.4,.6],y=empty?Array(12).fill(0):[0,0,1,1,0,0,1,1,0,0,0,0],p=probs.map(x=>Number(x>=t)),c=counts(p,y);return `<div class="bc-pair"><div><h4>Target · 3 × 4</h4>${grid(y,3,4)}</div><div><h4>Prediction · p ≥ ${t.toFixed(2)}</h4>${grid(p,3,4)}</div></div><div class="bc-stats">${metric('TP / FP / FN',`${c.tp} / ${c.fp} / ${c.fn}`)}${metric('Hard Dice',dice(p,y).toFixed(3))}</div><p class="bc-note">Fixed illustrative probabilities, not a trained model. Empty/empty = 1 by this lab’s convention. TN is excluded from Dice. Raise τ to remove predictions; Dice itself need not rise monotonically.</p><details><summary>Inspect the probability map</summary><code>${probs.join(', ')}</code></details>`;}},
+    area:{controls:range('Remove components smaller than','area',0,8,1,3),state:()=>({}),render(s,root){const limit=+root.querySelector('input').value,items=[{name:'Small true region',area:2,gt:true},{name:'False speck',area:1,gt:false},{name:'Large true region',area:7,gt:true}],kept=items.filter(x=>x.area>=limit),tp=kept.filter(x=>x.gt).reduce((a,b)=>a+b.area,0),fp=kept.filter(x=>!x.gt).reduce((a,b)=>a+b.area,0);return `${table(items.map(x=>[x.name,x.area,x.area>=limit?'Kept':'Removed']),['Known toy component','Area (pixels)','Decision'])}<div class="bc-stats">${metric('Foreground recall',`${tp} / 9`)}${metric('False pixels',fp)}</div><p class="bc-note">Rule: keep area ≥ ${limit}. We know truth here only to explain the cost. Real post-processing sees predicted components, so size alone cannot tell a speck from a genuine small target. Area units depend on resolution.</p>`;}},
+    split:{controls:control('Split unit','unit',[['tile','Tiles · leaks source images'],['image','Original images · disjoint']]),state:()=>({}),render(s,root){const tile=root.querySelector('select').value==='tile';const train=tile?['A1','B1','C1']:['A1','A2','B1','B2'],val=tile?['A2','B2','C2']:['C1','C2'];return `<div class="bc-partitions"><div><h4>Training</h4>${train.map(x=>`<span>${x}</span>`).join('')}</div><div><h4>Validation</h4>${val.map(x=>`<span>${x}</span>`).join('')}</div></div><div class="bc-stats">${metric('Shared original images',tile?3:0)}</div><p class="bc-note">A1 and A2 are tiles from original image A. Split originals before making crops or augmentations. If originals share a patient, acquisition or scene, that higher grouping may be the right split unit instead.</p>`;}},
+    averaging:{controls:control('Aggregation','mode',[['macro','Mean of per-pair Dice'],['pooled','Pool pixels before Dice']]),state:()=>({}),render(s,root){const macro=root.querySelector('select').value==='macro';return `${table([['Small target',1,1,1,'1.000'],['Large target',100,100,0,'0.000']],['Pair','|Y|','|P|','TP','Dice'])}<div class="bc-array-shape">${macro?'(1 + 0) / 2 = 0.500':'2 × 1 / (101 + 101) = 0.0099'}</div><p class="bc-note">Identical predictions. Different weighting. Macro gives every pair equal weight; pooled Dice gives large masks more influence through the denominator. State the reduction, empty rule and evaluation resolution.</p>`;}},
+    stratum:{controls:range('Independent rare-positive groups','groups',1,10,1,3),state:()=>({}),render(s,root){const n=+root.querySelector('input').value;return `<div class="bc-array-shape">${n} rare-positive group${n>1?'s':''}</div><p>20% target validation support: <strong>${(n*.2).toFixed(1)}</strong> groups</p><p>Actual support must be an integer: floor = ${Math.floor(n*.2)}, ceil = ${Math.ceil(n*.2)}.</p><p class="bc-note">${n===1?'One group cannot appear in both partitions without leakage. Exact balance and independence cannot both be achieved.':'A rounded allocation may preserve support, but inspect every class and co-occurrence pattern after splitting.'} Keep groups intact, record the compromise, and never manufacture support by duplicating held-out images.</p>`;}}
+  };
+  let serial=0;
+  function mount(root){const def=definitions[root.dataset.bc];if(!def)return;let state=def.state();const id=++serial;root.innerHTML=`<div class="bc-controls">${def.controls}<button type="button" data-reset>Reset</button></div><div class="bc-viz"></div><p class="bc-caption">Deterministic teaching example · not a dataset result</p>`;root.querySelectorAll('[data-control]').forEach((el,i)=>{el.id=`bc-${id}-${i}`;const label=el.closest('label');if(label)label.htmlFor=el.id;const output=el.nextElementSibling;if(output?.tagName==='OUTPUT')output.htmlFor=el.id;});const inputs=[...root.querySelectorAll('[data-control]')],defaults=inputs.map(x=>x.value);function render(){root.querySelector('.bc-viz').innerHTML=def.render(state,root);inputs.forEach(x=>{if(x.type==='range'){x.nextElementSibling.value=x.value;x.setAttribute('aria-valuetext',x.value);}});}root.addEventListener('input',render);root.addEventListener('change',render);root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-reset')){state=def.state();inputs.forEach((x,i)=>x.value=defaults[i]);render();return;}if(b.hasAttribute('data-pixel')){const index=b.dataset.pixel;def.click?.(state,b,root);render();root.querySelector(`[data-pixel="${index}"]`)?.focus({preventScroll:true});}else if(b.hasAttribute('data-update')){def.click?.(state,b,root);render();}});render();}
+  document.querySelectorAll('[data-bc]').forEach(mount);
+  window.BootcampMath=Object.freeze({encode,decode,counts,dice});
+})();
+</script>
+</body>
+</html>

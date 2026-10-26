@@ -1,0 +1,122 @@
+<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bootcamp Session 1 overview · Bootcamp Session 1 · 30 October 2026</title>
+<meta name="description" content="Elementary segmentation foundations, RLE, geometry, texture, Dice, validation and diagnostic and trainable starter baselines with optional depth and three notebooks.">
+<link rel="stylesheet" href="site.css?v=7f4054ffa00e"><link rel="stylesheet" href="styles/generative/theme.css?v=8b85dd5e88eca2c1"><link rel="stylesheet" href="styles/generative/navigation.css?v=8b85dd5e88eca2c1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body data-overview="true"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
+<details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Session pages"><a href="index.html" aria-current="page">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></div><details class="mobile-menu"><summary>Browse Bootcamp 1</summary><nav class="nav" aria-label="Session pages"><a href="index.html" aria-current="page">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Bootcamp · Teaching 1 · 30 October 2026</span><a href="foundations_walkthrough.ipynb" download>Foundations notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Read. Reconstruct. Reason.</span><p class="hero-title">First understand<br>the pixels.</p><p class="hero-caption">A careful beginning. A stronger next step.</p></div></div>
+<span class="section-label">Bootcamp Session 1 overview</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#bootcamp-session-1-read-the-data-before-you-train">Bootcamp Session 1 · Read the Data Before You Train</a><ul>
+<li><a href="#start-here">Start here</a></li>
+<li><a href="#the-eight-guides">The eight guides</a></li>
+<li><a href="#our-practice-data">Our practice data</a></li>
+<li><a href="#a-manageable-learning-route">A manageable learning route</a></li>
+<li><a href="#what-belongs-in-your-notebook">What belongs in your notebook</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><article><h1 id="bootcamp-session-1-read-the-data-before-you-train">Bootcamp Session 1 · Read the Data Before You Train</h1>
+<p><strong>30 October 2026 · Milestone 1: Data Understanding, Defect Exploration and Metrics</strong></p>
+<blockquote>
+<p><strong><a href="presentation/index.html">Open the interactive classroom presentation →</a></strong>
+Follow the core lesson in class; use the six optional stops for deeper study. The presentation can be saved for offline use from its slide index.</p>
+</blockquote>
+<p>A photograph is an input. A mask is an answer someone has drawn. A prediction is a proposed answer. This session makes those three objects concrete before introducing a large neural network.</p>
+<p>These notes are written for students who need more support with Python, ML or DL. You can follow the core route without knowing calculus, convolutional networks or GPU programming. By the end, you should be able to explain a small mask calculation, inspect a real image–mask pair, and recognise a misleading validation result. These are steps toward a reliable project; no guide can promise a qualifying score.</p>
+<h2 id="start-here">Start here</h2>
+<ol>
+<li>Open <a href="01_foundations.html">Guide 1: arrays, images and notebooks</a>. If indexing is unfamiliar, do its three small exercises before opening a data folder.</li>
+<li>Download the <a href="foundations_walkthrough.ipynb">foundations notebook</a> and run it from the top. It works with tiny teaching examples and needs no competition download or GPU. Its <a href="foundations_walkthrough.py">paired Python file</a> is useful when a notebook is unavailable.</li>
+<li>Open the <a href="practice_dataset_lab.ipynb">real-data practice notebook</a> only after reading the <a href="08_practice_and_resources.html">practice dataset instructions</a>. Its <a href="practice_dataset_lab.py">paired Python file</a> follows the same sequence.</li>
+<li>After the audit, use the <a href="starter_pixel_model.ipynb">starter pixel-model notebook</a> to train a small image-dependent baseline. Its <a href="starter_pixel_model.py">paired Python file</a> uses the same held-out split; the core ideas are explained in <a href="07_diagnostic_baseline.html">Guide 7</a>.</li>
+<li>Keep a short evidence log: <strong>question → check → observation → explanation → next question</strong>. A printed number without its denominator or a plot without its axes is incomplete evidence.</li>
+</ol>
+<p>The notebooks contain their own installation and path instructions. For a local terminal, use the repository's <code>uv</code> environment workflow. For a hosted notebook, follow its setup instructions before running the imports. Restart the runtime and run all cells in order before sharing your work; old variables can hide mistakes.</p>
+<h2 id="the-eight-guides">The eight guides</h2>
+<table>
+<thead>
+<tr>
+<th>Guide</th>
+<th>Main question</th>
+<th>Core checkpoint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01_foundations.html">1 · Foundations</a></td>
+<td>What do shape, axes and dtype mean?</td>
+<td>Read one image pixel and explain a batch shape.</td>
+</tr>
+<tr>
+<td><a href="02_labels_and_counts.html">2 · Labels and counts</a></td>
+<td>What exactly are we counting?</td>
+<td>Separate images, image–class pairs, pixels and regions.</td>
+</tr>
+<tr>
+<td><a href="03_rle_and_geometry.html">3 · RLE and geometry</a></td>
+<td>Does the decoded mask occupy the right places?</td>
+<td>Hand-decode a small RLE and inspect an aligned overlay.</td>
+</tr>
+<tr>
+<td><a href="04_intensity_and_texture.html">4 · Intensity and texture</a></td>
+<td>Can brightness alone identify this region?</td>
+<td>Explain two patterns with the same histogram.</td>
+</tr>
+<tr>
+<td><a href="05_metrics.html">5 · Metrics</a></td>
+<td>What does this score reward?</td>
+<td>Compute Dice and explain an empty-mask convention.</td>
+</tr>
+<tr>
+<td><a href="06_validation.html">6 · Validation</a></td>
+<td>Have we tested on genuinely held-out examples?</td>
+<td>Split by source image and audit rare-label support.</td>
+</tr>
+<tr>
+<td><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline</a></td>
+<td>What can a deliberately simple rule teach us?</td>
+<td>Compare trivial predictions and explain a threshold change.</td>
+</tr>
+<tr>
+<td><a href="08_practice_and_resources.html">8 · Practice and resources</a></td>
+<td>How do we practise and transfer the reasoning?</td>
+<td>Complete the evidence checklist and explain limitations.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="our-practice-data">Our practice data</h2>
+<p>We use <strong>Understanding Clouds from Satellite Images</strong>, a separate Kaggle competition about cloud organisation. Its four labels are Fish, Flower, Gravel and Sugar. This gives us real images, multiple labels, RLE and empty class masks without supplying the industrial project's data analysis or solution. The <a href="08_practice_and_resources.html">dataset guide</a> explains access, annotation meaning, geometry and limitations.</p>
+<p>Cloud labels describe organisation regions; they are not precise masks of every visible cloud. Cloud scores, class frequencies, preprocessing choices and useful thresholds do not establish anything about industrial defects. The small toy examples in these notes are invented for explanation. The notebooks do not import the industrial project pipeline, models, splits or results.</p>
+<h2 id="a-manageable-learning-route">A manageable learning route</h2>
+<p><strong>During the teaching session:</strong> follow the “Core” sections and answer one checkpoint per guide. The instructor runs selected notebook cells. A complete individual data download, all exercises and a full audit do not fit into a two-hour lecture.</p>
+<p><strong>If you are catching up:</strong> finish Guides 1–3 first, then the Dice example in Guide 5. Ask a peer to check one mask by hand. Continue with the split and baseline after those objects make sense.</p>
+<p><strong>After the session:</strong> do the longer practice tasks in Guide 8. These prepare you for the next hands-on meeting; they are separate from the 110 minutes of teaching plus a 10-minute break. Sections labelled <strong>Optional extension</strong> can wait. No advanced reading is required to complete the core checkpoints.</p>
+<h2 id="what-belongs-in-your-notebook">What belongs in your notebook</h2>
+<ul>
+<li>A shape/range/dtype check and one correctly aligned image–mask overlay.</li>
+<li>A table whose counts identify their units and denominators.</li>
+<li>A distinction between image-level co-occurrence and actual pixel overlap.</li>
+<li>A hand-checked Dice example and a stated empty-mask convention.</li>
+<li>A saved image-level split with class support and overlap checks.</li>
+<li>A simple baseline record with its limitations, rather than an unsupported performance claim.</li>
+</ul>
+<p>When you return to your assessed project, repeat the checks on its own documented conventions. Write your own observations and conclusions. The transfer questions teach the method without providing assessment answers.</p></article><nav class="pagination"><span></span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span></footer></div></main></div></body></html>

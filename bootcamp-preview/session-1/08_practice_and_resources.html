@@ -1,0 +1,297 @@
+<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>8 · Dataset setup &amp; independent practice · Bootcamp Session 1 · 30 October 2026</title>
+<meta name="description" content="Elementary segmentation foundations, RLE, geometry, texture, Dice, validation and diagnostic and trainable starter baselines with optional depth and three notebooks.">
+<link rel="stylesheet" href="site.css?v=7f4054ffa00e"><link rel="stylesheet" href="styles/generative/theme.css?v=8b85dd5e88eca2c1"><link rel="stylesheet" href="styles/generative/navigation.css?v=8b85dd5e88eca2c1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
+<details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html" aria-current="page">8 · Dataset setup &amp; independent practice</a></nav></div><details class="mobile-menu"><summary>Browse Bootcamp 1</summary><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html" aria-current="page">8 · Dataset setup &amp; independent practice</a></nav></details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Bootcamp · Teaching 1 · 30 October 2026</span><a href="foundations_walkthrough.ipynb" download>Foundations notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Read. Reconstruct. Reason.</span><p class="hero-title">First understand<br>the pixels.</p><p class="hero-caption">A careful beginning. A stronger next step.</p></div></div>
+<span class="section-label">8 · Dataset setup &amp; independent practice</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#8-practise-on-clouds-then-transfer-the-reasoning">8 · Practise on clouds, then transfer the reasoning</a><ul>
+<li><a href="#core-access-and-verify-the-practice-files">Core · Access and verify the practice files</a></li>
+<li><a href="#core-understand-what-the-labels-mean">Core · Understand what the labels mean</a></li>
+<li><a href="#guided-practice-evidence-before-explanation">Guided practice · Evidence before explanation</a></li>
+<li><a href="#independent-exercises-after-the-teaching-session">Independent exercises · After the teaching session</a></li>
+<li><a href="#glossary-for-review">Glossary for review</a></li>
+<li><a href="#transfer-questions-bring-these-to-the-assessed-project">Transfer questions · Bring these to the assessed project</a></li>
+<li><a href="#primary-sources-and-optional-further-study">Primary sources and optional further study</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><article><h1 id="8-practise-on-clouds-then-transfer-the-reasoning">8 · Practise on clouds, then transfer the reasoning</h1>
+<p><strong>Core question:</strong> can I produce evidence and explain what it establishes?</p>
+<p>The real-data exercise uses <strong>Understanding Clouds from Satellite Images</strong>, hosted on Kaggle. It is a separate task about cloud organisation, chosen because it has four labels, image–class RLE records and class-absent masks. It supplies realistic data-handling difficulties without providing the industrial project's analysis, fitted models or answers.</p>
+<h2 id="core-access-and-verify-the-practice-files">Core · Access and verify the practice files</h2>
+<p>Open the <a href="https://www.kaggle.com/c/understanding_cloud_organization/">original competition</a>, read its <a href="https://www.kaggle.com/competitions/understanding_cloud_organization/data">data page</a> and <a href="https://www.kaggle.com/competitions/understanding_cloud_organization/rules">rules</a>, and obtain the files through your own authorised account. Kaggle may require sign-in and competition-rule acceptance. These materials do not accept terms or redistribute images on your behalf.</p>
+<p>The official competition is the canonical source. The notebook also supports a named smaller Kaggle mirror so the CPU exercise can remain manageable. <strong>Its default is the 384 × 576 variant</strong>, not the original competition variant. Choose one coherent source and set the variant explicitly when changing it.</p>
+<table>
+<thead>
+<tr>
+<th>Notebook setting</th>
+<th>Source and exact geometry</th>
+<th>Default local folder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLOUD_DATA_VARIANT=resized_384x576</code> (default)</td>
+<td><a href="https://www.kaggle.com/datasets/phunghieu/understanding-clouds-from-satellite-images-384x576">Kaggle resized mirror</a>: height 384, width 576 for both images and its re-encoded masks</td>
+<td><code>data/bootcamp/clouds_384x576/</code></td>
+</tr>
+<tr>
+<td><code>CLOUD_DATA_VARIANT=original</code></td>
+<td><a href="https://www.kaggle.com/competitions/understanding_cloud_organization/data">Official competition files</a>: height 1400, width 2100 for both training images and original masks</td>
+<td><code>data/bootcamp/understanding_cloud_organization/</code></td>
+</tr>
+</tbody>
+</table>
+<p>In either case, <code>CLOUD_DATA_ROOT</code> selects the folder containing <strong>that variant's own</strong> <code>train.csv</code> and <code>train_images/</code>. You can edit the setup cell instead of using environment variables. The common semantic contract is:</p>
+<table>
+<thead>
+<tr>
+<th>Contract item</th>
+<th>Expected interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Training table</td>
+<td><code>train.csv</code> with <code>Image_Label</code> and <code>EncodedPixels</code></td>
+</tr>
+<tr>
+<td>Image key</td>
+<td>Filename plus final underscore-delimited class label</td>
+</tr>
+<tr>
+<td>Class order for this lab</td>
+<td>Fish, Flower, Gravel, Sugar</td>
+</tr>
+<tr>
+<td>Image content</td>
+<td>RGB photographs; exact dimensions depend on the named variant above</td>
+</tr>
+<tr>
+<td>Training annotation canvas</td>
+<td>Must match the selected variant's CSV, not a geometry guessed from a filename</td>
+</tr>
+<tr>
+<td>RLE interpretation</td>
+<td>One-based start–length pairs, down columns (<code>F</code> order)</td>
+</tr>
+<tr>
+<td>Absent class</td>
+<td>Empty/missing <code>EncodedPixels</code>, interpreted as an all-zero mask after explicit CSV cleaning</td>
+</tr>
+<tr>
+<td>Original submission geometry</td>
+<td>Height 350, width 525; this is distinct from original training geometry</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="practice_dataset_lab.ipynb">practice notebook</a> validates dimensions, class records and RLE coordinate bounds. Point it to one variant's corresponding CSV and training-image folder. Keep downloads and generated results in your own local working area, outside committed teaching sources. Do not change an expected height or width merely to silence an assertion.</p>
+<p><strong>Dataset-variant trap:</strong> the supported mirror supplies <strong>re-encoded RLE</strong> at its resized geometry. A familiar filename and the same two column names do not prove compatibility. Never combine original labels with resized images, or the mirror CSV with original decoding dimensions. The mirror is not the official submission/scoring grid either. If neither authorised source is available, complete the <a href="foundations_walkthrough.ipynb">offline foundations notebook</a>, and record that the real-data audit remains pending. Synthetic practice is useful preparation, but it is not evidence about real cloud files.</p>
+<p>Preparation note: the original download required authenticated/rules-gated access, so these notes do not claim a complete local audit of that archive. The smaller mirror's CSV and a limited real-image smoke check were audited separately; a smoke check is not a full visual audit. Learners must verify their own files using the notebook's checks. No measured real-data totals or guaranteed cloud overlap findings are supplied as answers here.</p>
+<p>Read the source's usage terms before obtaining either variant. The mirror identifies its data as <strong>Data files © Original Authors</strong>; that is not an unrestricted licence or a replacement for upstream permissions. No terms have been accepted for you and no raw dataset is redistributed with the teaching materials.</p>
+<h2 id="core-understand-what-the-labels-mean">Core · Understand what the labels mean</h2>
+<p>Fish, Flower, Gravel and Sugar name patterns of cloud organisation. They are not four colours, weather probabilities or industrial defect categories. The regional annotations are coarse and reflect human interpretation; a region can include spaces between visible clouds. Do not treat every annotated boundary as a precise physical cloud edge. The organisers' <a href="https://journals.ametsoc.org/view/journals/bams/101/11/bamsD190324.xml">scientific paper</a> describes the cloud-pattern labelling context and its limitations.</p>
+<p>An absent class is different from an image containing no labelled class. Calculate image cardinality and class-absent pair counts separately. Do not assume the real dataset includes fully label-empty images simply because the toy table does.</p>
+<p>The practice competition's metric and geometry also differ from the industrial task. A local small-canvas Dice diagnostic can validate code behaviour. It does not establish an official score or a transferable choice of model, threshold or noise filter.</p>
+<h2 id="guided-practice-evidence-before-explanation">Guided practice · Evidence before explanation</h2>
+<p>Work with a partner if possible: one person predicts the output; the other runs the cell; then switch. Preserve your own notebook and explanations.</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Evidence to keep</th>
+<th>Hint if stuck</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Read one image</td>
+<td>Filename, shape, dtype, range and display</td>
+<td>Compare width/height with the documented source variant.</td>
+</tr>
+<tr>
+<td>2. Audit the annotation table</td>
+<td>Column names, unique keys, label vocabulary and missing-mask handling</td>
+<td>Count images independently of CSV rows.</td>
+</tr>
+<tr>
+<td>3. Decode one positive class</td>
+<td>Original mask and translucent overlay</td>
+<td>Hand-check a tiny RLE before debugging a large one.</td>
+</tr>
+<tr>
+<td>4. Inspect an absent class</td>
+<td>Empty mask with full shape</td>
+<td>An empty target is still an array, not <code>None</code>.</td>
+</tr>
+<tr>
+<td>5. Build a count sheet</td>
+<td>Counts with image/pair/pixel denominators</td>
+<td>Report full-table counts separately from decoded-subset estimates.</td>
+</tr>
+<tr>
+<td>6. Compare two class masks</td>
+<td>Presence, union and intersection at native geometry</td>
+<td>Co-occurrence does not establish intersection.</td>
+</tr>
+<tr>
+<td>7. Save a split</td>
+<td>Image-ID lists and support table</td>
+<td>Keep every class row and derivative of an image on one side.</td>
+</tr>
+<tr>
+<td>8. Compare simple baselines</td>
+<td>Same validation IDs and declared diagnostic</td>
+<td>Explain what the spatial prior cannot observe.</td>
+</tr>
+<tr>
+<td>9. Train a starter pixel model</td>
+<td>Train-only loss trace and held-out predictions</td>
+<td>Run <a href="starter_pixel_model.ipynb">the small trainable model</a> after saving the practice split; it sees RGB, not spatial context.</td>
+</tr>
+<tr>
+<td>10. Vary a threshold</td>
+<td>Small table and fixed example overlays</td>
+<td>More conservative does not imply higher Dice.</td>
+</tr>
+</tbody>
+</table>
+<p>A lightweight lab may decode only a declared subset to stay responsive. Record exactly which IDs and how many masks were inspected. A subset's observed pixel coverage or overlap is not an exhaustive whole-dataset claim. Read all annotation metadata when feasible, but avoid holding every native mask in memory at once.</p>
+<h2 id="independent-exercises-after-the-teaching-session">Independent exercises · After the teaching session</h2>
+<p><strong>Exercise A: teach one RLE.</strong> Draw a non-square grid with two runs, including one crossing a column boundary. Give a peer only the RLE, shape and format contract. Compare their decoded grid with yours. If both encoders share a mistake, a round trip alone will not expose it.</p>
+<p><strong>Exercise B: challenge a claim.</strong> A fictional report says, “The baseline achieved 92% accuracy, so it detects small regions well.” Write two questions and propose one diagnostic. Hint: ask about foreground coverage, then calculate an all-background reference.</p>
+<p><strong>Exercise C: audit a split.</strong> Construct six toy image IDs with one singleton label combination. Explain why exact proportional representation of every combination is impossible. Write a policy before assigning the singleton. Never place a copy on both sides.</p>
+<p><strong>Exercise D: explain a threshold table.</strong> Use the four-location scores in Guide 7. Add a threshold of 0.95, compute the mask and Dice, and explain why its empty output is wrong for that target. Then consider an empty target with the same scores. Which error changes?</p>
+<details>
+<summary>Exercise D explanation</summary>
+<p>At 0.95, no score passes, so the prediction is empty. On the two-positive target, TP = 0 and FN = 2, so Dice is zero. On an empty target it removes all false positives, producing empty–empty agreement under the exercise convention. The same decision rule has different consequences for positive and empty pairs.</p>
+</details>
+<p><strong>Optional extension:</strong> explain one apparent success and one failure of the spatial-prior baseline using location bias and annotation geometry. Compare the trained RGB pixel model with the spatial prior, then propose a context-aware model hypothesis without implementing a full project pipeline.</p>
+<h2 id="glossary-for-review">Glossary for review</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Plain-language meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Annotation / target</td>
+<td>A supplied answer against which predictions are compared.</td>
+</tr>
+<tr>
+<td>Array / tensor</td>
+<td>Values arranged along named axes with a shape and dtype.</td>
+</tr>
+<tr>
+<td>Batch</td>
+<td>Several examples grouped for one computation.</td>
+</tr>
+<tr>
+<td>Binary mask</td>
+<td>A yes/no value at every image location.</td>
+</tr>
+<tr>
+<td>Cardinality</td>
+<td>Number of present labels in one image.</td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>One axis of measurements or class scores; its meaning depends on the object.</td>
+</tr>
+<tr>
+<td>Co-occurrence</td>
+<td>Two labels are present somewhere in the same image.</td>
+</tr>
+<tr>
+<td>Pixel overlap</td>
+<td>The same location belongs to more than one class mask.</td>
+</tr>
+<tr>
+<td>Connected component</td>
+<td>A foreground region connected under a stated neighbourhood rule.</td>
+</tr>
+<tr>
+<td>Dice</td>
+<td>A foreground-overlap score with an explicitly chosen empty convention.</td>
+</tr>
+<tr>
+<td>Dtype</td>
+<td>How numbers or Boolean values are stored.</td>
+</tr>
+<tr>
+<td>Leakage</td>
+<td>Examined information influences fitting or invalidates an independence claim.</td>
+</tr>
+<tr>
+<td>Normalisation</td>
+<td>A declared change of numerical scale; its exact meaning must be stated.</td>
+</tr>
+<tr>
+<td>RLE</td>
+<td>A sequence of foreground start positions and run lengths.</td>
+</tr>
+<tr>
+<td>Stratification</td>
+<td>Allocation intended to preserve chosen label proportions, subject to constraints.</td>
+</tr>
+<tr>
+<td>Texture</td>
+<td>Spatial arrangement and local relationships among image values.</td>
+</tr>
+<tr>
+<td>Threshold</td>
+<td>A decision boundary that converts scores into selected pixels.</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Held-out data used to assess and select development choices.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="transfer-questions-bring-these-to-the-assessed-project">Transfer questions · Bring these to the assessed project</h2>
+<ol>
+<li>Which fields, mask conventions and geometry must you verify from that dataset's own documentation?</li>
+<li>Which quantities must be counted from its own annotations rather than copied from cloud practice?</li>
+<li>How will you establish whether image-level labels imply pixel overlap?</li>
+<li>What independent source unit must remain on one side of the split?</li>
+<li>Which parts of its metric are precisely specified, and which require organiser clarification?</li>
+<li>What would falsify your explanation of a baseline's apparent success?</li>
+</ol>
+<p>Answer with a planned check and the evidence it would produce. These are reasoning prompts, not supplied results for milestone questions.</p>
+<h2 id="primary-sources-and-optional-further-study">Primary sources and optional further study</h2>
+<ul>
+<li><a href="https://www.kaggle.com/c/understanding_cloud_organization/">Cloud competition overview and evaluation</a>, <a href="https://www.kaggle.com/competitions/understanding_cloud_organization/data">data</a> and <a href="https://www.kaggle.com/competitions/understanding_cloud_organization/rules">rules</a>: dataset and access contracts. Check the current pages in your own account.</li>
+<li><a href="https://www.kaggle.com/datasets/phunghieu/understanding-clouds-from-satellite-images-384x576">Supported 384 × 576 Kaggle mirror</a>: smaller images and its own resized-mask CSV; source usage terms apply.</li>
+<li><a href="https://journals.ametsoc.org/view/journals/bams/101/11/bamsD190324.xml">Organisers' cloud-pattern paper</a>: why the region labels describe cloud organisation.</li>
+<li><a href="https://numpy.org/doc/stable/user/basics.indexing.html">NumPy array indexing</a> and <a href="https://numpy.org/doc/stable/reference/generated/numpy.reshape.html">reshape</a>: axes, slices and traversal order.</li>
+<li><a href="https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html">PyTorch tensor tutorial</a>: shape, dtype and device; optional after the NumPy exercises.</li>
+<li><a href="https://pillow.readthedocs.io/en/stable/reference/Image.html">Pillow image API</a>: image loading and explicit resize/resampling semantics.</li>
+<li><a href="https://scikit-learn.org/stable/common_pitfalls.html">Scikit-learn common pitfalls</a>: leakage and training-only fitted transformations.</li>
+<li><a href="https://doi.org/10.1007/978-3-642-23808-6_10">Original multi-label stratification paper</a>: optional extension beyond combination-based splitting.</li>
+<li><a href="https://doi.org/10.1038/s41592-023-02151-z">Metrics Reloaded</a>: optional research reading about validation choices.</li>
+<li><a href="https://udlbook.github.io/udlbook/">Understanding Deep Learning, author website</a>: optional background on supervised learning and neural networks. Start with inputs, predictions, targets and generalisation; the core lab does not require completing a textbook.</li>
+</ul>
+<p><a href="07_diagnostic_baseline.html">Previous: diagnostic baseline</a> · <a href="index.html">Session overview</a></p></article><nav class="pagination"><a href="07_diagnostic_baseline.html">← 7 · Diagnostic baseline &amp; thresholds</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span></footer></div></main></div></body></html>

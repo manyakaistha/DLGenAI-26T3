@@ -1,0 +1,155 @@
+<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>2 · Labels &amp; counts · Bootcamp Session 1 · 30 October 2026</title>
+<meta name="description" content="Elementary segmentation foundations, RLE, geometry, texture, Dice, validation and diagnostic and trainable starter baselines with optional depth and three notebooks.">
+<link rel="stylesheet" href="site.css?v=7f4054ffa00e"><link rel="stylesheet" href="styles/generative/theme.css?v=8b85dd5e88eca2c1"><link rel="stylesheet" href="styles/generative/navigation.css?v=8b85dd5e88eca2c1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
+<details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html" aria-current="page">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></div><details class="mobile-menu"><summary>Browse Bootcamp 1</summary><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html" aria-current="page">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Bootcamp · Teaching 1 · 30 October 2026</span><a href="foundations_walkthrough.ipynb" download>Foundations notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Read. Reconstruct. Reason.</span><p class="hero-title">First understand<br>the pixels.</p><p class="hero-caption">A careful beginning. A stronger next step.</p></div></div>
+<span class="section-label">2 · Labels &amp; counts</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#2-count-images-labels-and-pixels-separately">2 · Count images, labels and pixels separately</a><ul>
+<li><a href="#core-classification-detection-and-segmentation">Core · Classification, detection and segmentation</a></li>
+<li><a href="#core-read-a-long-annotation-table">Core · Read a long annotation table</a></li>
+<li><a href="#core-three-kinds-of-imbalance">Core · Three kinds of imbalance</a></li>
+<li><a href="#core-co-occurrence-and-overlap-are-different-audits">Core · Co-occurrence and overlap are different audits</a></li>
+<li><a href="#core-why-output-semantics-matter-later">Core · Why output semantics matter later</a></li>
+<li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
+<li><a href="#co-occurrence-versus-shared-pixels">Co-occurrence versus shared pixels</a></li>
+</ul>
+</li>
+<li><a href="#checkpoint-a-small-audit-on-paper">Checkpoint · A small audit on paper</a></li>
+<li><a href="#practice-build-a-count-sheet">Practice · Build a count sheet</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><article><h1 id="2-count-images-labels-and-pixels-separately">2 · Count images, labels and pixels separately</h1>
+<p><strong>Core question:</strong> what is the denominator of this claim?</p>
+<p>“There are many examples of this class” can refer to many annotation rows, many photographs or many pixels. Those statements have different implications. Before calculating a percentage, write its numerator and denominator in words.</p>
+<h2 id="core-classification-detection-and-segmentation">Core · Classification, detection and segmentation</h2>
+<p>Classification answers which labels occur in an image. Detection adds approximate locations, commonly boxes. Semantic segmentation assigns a category or categories to locations in the image. A mask does not necessarily distinguish separate instances of the same category: two disconnected Fish regions can be stored in one Fish mask.</p>
+<p><strong>Multiclass classification</strong> chooses one class from mutually exclusive choices for a single decision. <strong>Multi-label classification</strong> permits several independent labels for the same example. An image can contain Fish and Sugar, so its image-level label can be <code>[1, 0, 0, 1]</code> in the fixed Fish/Flower/Gravel/Sugar order. That vector does not tell us whether Fish and Sugar occupy the same pixel.</p>
+<h2 id="core-read-a-long-annotation-table">Core · Read a long annotation table</h2>
+<p>The cloud practice CSV uses <code>Image_Label</code> to combine the image filename with a class label, and <code>EncodedPixels</code> for that class's mask. The notebook separates the final underscore-delimited label, checks the label vocabulary, and verifies that each image–class key is unique. Never split a filename at every underscore and assume the first piece is its complete name.</p>
+<p>An empty annotation means “this class has no marked region here” under this dataset's convention. Preserve it as an empty mask. A missing image file, an invalid RLE and an empty target are three different conditions. An image is fully label-empty only if <strong>all</strong> its class masks are empty; one absent class does not make the whole image clean.</p>
+<p>Use this invented presence matrix, not a measured cloud distribution:</p>
+<table>
+<thead>
+<tr>
+<th>Toy image</th>
+<th style="text-align: right;">Fish</th>
+<th style="text-align: right;">Flower</th>
+<th style="text-align: right;">Gravel</th>
+<th style="text-align: right;">Sugar</th>
+<th style="text-align: right;">Cardinality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>q</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>r</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>s</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td>t</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>Cardinality is the number of present labels in one image: sum across a row. It is not foreground area or the count of connected regions.</p>
+<p>There are 5 images, 20 image–class pairs and 6 positive pairs. Four images have at least one label. Thus the label-positive image fraction is <code>4/5</code>, while the positive-pair fraction is <code>6/20</code>. Neither tells us foreground pixel coverage. Even when every real cloud image has some cloud label, individual image–class pairs may still be empty. Measure both quantities rather than transferring assumptions from another dataset.</p>
+<h2 id="core-three-kinds-of-imbalance">Core · Three kinds of imbalance</h2>
+<ol>
+<li><strong>Image-label imbalance:</strong> one class occurs in few images. A model has fewer distinct positive examples from which to learn that class.</li>
+<li><strong>Pair imbalance:</strong> many image–class questions have an empty answer. A model may learn that predicting absence is often rewarded.</li>
+<li><strong>Pixel imbalance:</strong> a positive image can contain a small labelled area surrounded by background. Most pixel decisions can be negative even when image-level class counts seem balanced.</li>
+</ol>
+<p>Suppose a toy mask covers 5 of 100 pixels. Predicting background everywhere has 95% pixel accuracy but detects none of its foreground. This is why an impressive accuracy figure needs a foreground-focused diagnostic. <a href="05_metrics.html">Guide 5</a> calculates one.</p>
+<p>When reporting pixel coverage, specify whether it is <code>sum(mask_k)/(N*H*W)</code> for one class across all images or coverage only among positive images. They answer different questions. For overlapping labels, summing all class areas can exceed the union area; use a union when asking “what fraction of image locations has any label?”</p>
+<h2 id="core-co-occurrence-and-overlap-are-different-audits">Core · Co-occurrence and overlap are different audits</h2>
+<p>Draw a 3 × 4 grid. Mark Fish in the leftmost column and Sugar in the rightmost column. They co-occur in the image but share no pixels. Now move one Sugar pixel into the Fish column. The presence vector stays the same, while pixel overlap changes.</p>
+<pre class="highlight"><code class="language-python"># masks is a stack of registered Boolean targets: (classes, height, width)
+present = masks.reshape(masks.shape[0], -1).any(axis=1)
+cardinality = present.sum()
+occupancy = masks.astype(np.int16).sum(axis=0)
+overlap_locations = (occupancy &gt; 1).sum()
+union_area = (occupancy &gt; 0).sum()</code></pre>
+<p><code>present</code> asks whether each class marks <strong>anywhere</strong>. <code>occupancy</code> asks how many classes mark <strong>each location</strong>. Report the number of images inspected as well as overlapping pixels. Finding no overlap in a handful of overlays is not proof that the full annotation set is disjoint. Check at native mask geometry; resizing can erase small overlaps or create artefacts.</p>
+<h2 id="core-why-output-semantics-matter-later">Core · Why output semantics matter later</h2>
+<p>At a pixel, four independent sigmoid outputs answer four yes/no questions. They can all be low, or several can be high. A softmax distributes a total of one across mutually exclusive categories; a background-inclusive argmax selects one category. If a dataset permits overlapping targets, converting them to one class ID discards information.</p>
+<p>For this session, keep four separate binary masks. You do not need to choose or implement a neural-network head. First establish what the annotations can represent. “Four labels” by itself does not imply a four-category softmax; it also says nothing about the input image's three colour channels.</p>
+<h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
+<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
+<h3 id="co-occurrence-versus-shared-pixels">Co-occurrence versus shared pixels</h3>
+<div class="bc-lab" data-bc="overlap"><p>Use the worked examples in this guide to reason about co-occurrence versus shared pixels. The interactive controls appear when JavaScript is available.</p></div>
+
+<h2 id="checkpoint-a-small-audit-on-paper">Checkpoint · A small audit on paper</h2>
+<p>For the five-image toy table above:</p>
+<ol>
+<li>Count Fish-positive images, label-empty images and cardinality-two images.</li>
+<li>Add a second disconnected Fish region to image q. Which table entries change?</li>
+<li>Can the table establish whether image r contains overlapping masks?</li>
+<li>A class appears in 50 of 100 images, but covers 2% of each positive image. What fraction of all class-mask pixel decisions are positive, assuming equal image sizes?</li>
+</ol>
+<details>
+<summary>Hints and explanations</summary>
+<ol>
+<li>Fish-positive = 2; fully label-empty = 1; cardinality-two = 2. State that the denominator for each image count is five.</li>
+<li>Presence and cardinality do not change; mask area and possibly component count change.</li>
+<li>No. It records presence only. Decode the registered masks and test their intersection.</li>
+<li><code>0.50 × 0.02 = 0.01</code>, or 1% across all images for that class. This illustrates the difference between image prevalence and pixel prevalence.</li>
+</ol>
+</details>
+<h2 id="practice-build-a-count-sheet">Practice · Build a count sheet</h2>
+<p>In the <a href="practice_dataset_lab.ipynb">practice notebook</a>, label each output as <strong>image</strong>, <strong>pair</strong>, <strong>class</strong> or <strong>pixel</strong>. Record the full table size separately from a small decoded subset. Use filenames to join image and annotation records; an image reader's file order is not a reliable match to CSV row order. Keep zeros when making count plots so absent combinations do not disappear silently.</p>
+<p><strong>Optional extension:</strong> draw a class co-occurrence matrix whose entry <code>(i, j)</code> counts images containing both classes. Compare it with a pixel-intersection matrix. Explain why the two matrices need not have similar relative values.</p>
+<p><strong>Transfer question:</strong> in a new dataset, what evidence would justify saying “most examples are clean”? How would you distinguish unannotated material from explicitly labelled absence?</p>
+<p><a href="01_foundations.html">Previous: foundations</a> · <a href="03_rle_and_geometry.html">Next: RLE and geometry</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="01_foundations.html">← 1 · Arrays, images &amp; notebooks</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span></footer></div></main></div></body></html>

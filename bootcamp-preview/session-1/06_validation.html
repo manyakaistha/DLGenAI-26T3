@@ -1,0 +1,123 @@
+<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>6 · Validation &amp; rare labels · Bootcamp Session 1 · 30 October 2026</title>
+<meta name="description" content="Elementary segmentation foundations, RLE, geometry, texture, Dice, validation and diagnostic and trainable starter baselines with optional depth and three notebooks.">
+<link rel="stylesheet" href="site.css?v=7f4054ffa00e"><link rel="stylesheet" href="styles/generative/theme.css?v=8b85dd5e88eca2c1"><link rel="stylesheet" href="styles/generative/navigation.css?v=8b85dd5e88eca2c1">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+</head>
+<body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
+<details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html" aria-current="page">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></div><details class="mobile-menu"><summary>Browse Bootcamp 1</summary><nav class="nav" aria-label="Session pages"><a href="index.html">Bootcamp Session 1 overview</a><span class="nav-group-label">First teaching session · core + optional extensions</span><a href="01_foundations.html">1 · Arrays, images &amp; notebooks</a><a href="02_labels_and_counts.html">2 · Labels &amp; counts</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry</a><a href="04_intensity_and_texture.html">4 · Intensity &amp; texture</a><a href="05_metrics.html">5 · Metrics &amp; error costs</a><a href="06_validation.html" aria-current="page">6 · Validation &amp; rare labels</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds</a><a href="08_practice_and_resources.html">8 · Dataset setup &amp; independent practice</a></nav></details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Bootcamp · Teaching 1 · 30 October 2026</span><a href="foundations_walkthrough.ipynb" download>Foundations notebook ↓</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Read. Reconstruct. Reason.</span><p class="hero-title">First understand<br>the pixels.</p><p class="hero-caption">A careful beginning. A stronger next step.</p></div></div>
+<span class="section-label">6 · Validation &amp; rare labels</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#6-keep-the-examination-separate-from-the-lesson">6 · Keep the examination separate from the lesson</a><ul>
+<li><a href="#core-split-images-before-their-derivatives">Core · Split images before their derivatives</a></li>
+<li><a href="#core-stratification-tries-to-preserve-representation">Core · Stratification tries to preserve representation</a></li>
+<li><a href="#core-rounding-and-rare-combinations-are-real-constraints">Core · Rounding and rare combinations are real constraints</a></li>
+<li><a href="#core-audit-a-split-then-keep-it-fixed">Core · Audit a split, then keep it fixed</a></li>
+<li><a href="#core-fit-transform-and-choose-have-different-boundaries">Core · Fit, transform and choose have different boundaries</a></li>
+<li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
+<li><a href="#choose-the-independent-split-unit">Choose the independent split unit</a></li>
+<li><a href="#optional-rare-group-rounding-constraints">Optional · rare-group rounding constraints</a></li>
+</ul>
+</li>
+<li><a href="#checkpoint-decide-what-leaks">Checkpoint · Decide what leaks</a></li>
+<li><a href="#optional-extension-expected-support-is-not-guaranteed-support">Optional extension · Expected support is not guaranteed support</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><article><h1 id="6-keep-the-examination-separate-from-the-lesson">6 · Keep the examination separate from the lesson</h1>
+<p><strong>Core question:</strong> could information about a validation example have influenced the fitted rule?</p>
+<p>Training examples teach a model. Validation examples help us compare choices such as thresholds. A final independent evaluation estimates how the chosen system behaves on new data. Reusing validation for many decisions makes it less independent, even if no gradient was calculated on it.</p>
+<h2 id="core-split-images-before-their-derivatives">Core · Split images before their derivatives</h2>
+<p>One cloud photograph contributes four class rows. If those rows are shuffled separately, some labels from the same photograph can enter training and others validation. The model has already seen the image it is being examined on. Similar leakage occurs if crops, flipped copies or resized variants of the same original land on both sides.</p>
+<p>Create one image-level table first, assign each image to one partition, and join its class rows back afterwards. If several photographs come from the same source scene or acquisition group, consider that group as the indivisible unit. An image-ID check prevents identical-ID leakage; it does not prove independence from near-duplicate scenes. <a href="https://scikit-learn.org/stable/common_pitfalls.html">Scikit-learn's leakage guidance</a> explains why preprocessing fitted on held-out data also creates leakage.</p>
+<pre class="highlight"><code class="language-text">Original source / image IDs
+            ↓ assign each source once
+Training IDs                         Validation IDs
+     ↓                                      ↓
+Training-only fitting                Apply fixed transformations
+and derived examples                 and measure predictions</code></pre>
+<h2 id="core-stratification-tries-to-preserve-representation">Core · Stratification tries to preserve representation</h2>
+<p>A random split does not guarantee that rare labels appear on both sides. Stratification tries to represent selected label information in each partition. For multi-label data, one simple approach treats the entire presence vector as a combination label:</p>
+<pre class="highlight"><code class="language-text">[0,0,0,0] → 0000
+[1,0,0,0] → 1000
+[1,0,0,1] → 1001</code></pre>
+<p>This preserves combinations approximately when there are enough examples. It is different from pretending that every image has one of four mutually exclusive labels. A class can belong to several combinations.</p>
+<p>For an invented 20-image table with combination counts <code>[8, 4, 4, 4]</code>, a 25% validation target can allocate <code>[2, 1, 1, 1]</code>: five validation images, with every combination represented. This convenient arithmetic does not generalise to all datasets.</p>
+<h2 id="core-rounding-and-rare-combinations-are-real-constraints">Core · Rounding and rare combinations are real constraints</h2>
+<p>An actual split contains whole images. A combination appearing three times cannot place exactly 20% of itself in validation. A singleton cannot appear in both partitions without duplication and leakage. Some stratification routines reject strata with too few members; a small validation set can also be too small to hold every distinct combination.</p>
+<p>Use a declared policy rather than hiding this problem:</p>
+<ol>
+<li>Count images per combination and per class before splitting.</li>
+<li>Set an image-level validation size and random seed.</li>
+<li>Use combination stratification where feasible; if necessary, use a documented rare-stratum fallback or a multi-label stratification method.</li>
+<li>Give source-group separation priority over an attractive label balance.</li>
+<li>Audit the resulting integer counts and disclose exceptions.</li>
+</ol>
+<p>Grouping rare combinations into a broader splitting stratum changes only how the split is allocated; it must not erase or relabel their original targets. No method can manufacture independent examples of a class that appears only once. If a class lacks validation positives, say that its positive-case performance cannot be established on this split.</p>
+<p>The <a href="practice_dataset_lab.ipynb">practice notebook</a> records its actual policy. Read that cell's printed support table rather than assuming the word “stratified” guarantees exact proportions. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html">Scikit-learn's <code>train_test_split</code> reference</a> describes its <code>stratify</code> and <code>random_state</code> arguments; it is not a general guarantee of multi-label or grouped independence.</p>
+<h2 id="core-audit-a-split-then-keep-it-fixed">Core · Audit a split, then keep it fixed</h2>
+<pre class="highlight"><code class="language-python">train_ids = set(train_table["image_id"])
+valid_ids = set(valid_table["image_id"])
+assert not (train_ids &amp; valid_ids)
+assert train_ids | valid_ids == set(all_table["image_id"])</code></pre>
+<p>Set equality checks coverage and disjointness, but duplicate rows still need their own check. Also record:</p>
+<ul>
+<li>Number of source images and, where known, acquisition groups per partition.</li>
+<li>Positive count for each class and count for each label combination.</li>
+<li>Label-empty images and empty image–class pairs as separate quantities.</li>
+<li>Partition proportions and any rare-stratum exceptions.</li>
+<li>Seed, source CSV identity and the saved list of image IDs.</li>
+</ul>
+<p>Save the split IDs, not only the seed. Different file ordering or library behaviour can otherwise produce a different allocation from apparently similar code. Use the same split when comparing baselines so a change in validation difficulty is not mistaken for an improvement.</p>
+<h2 id="core-fit-transform-and-choose-have-different-boundaries">Core · Fit, transform and choose have different boundaries</h2>
+<p>Training-only fitting includes learned normalisation statistics, a spatial-prior baseline and any learned model. Apply the resulting fixed transformation or rule to validation images. A declared conversion from confirmed 8-bit intensity to 0–1 does not estimate a statistic from the validation set.</p>
+<p>Choosing a threshold using validation targets is allowed for model development, but its chosen validation score is then a selection score. Do not present it as a fresh independent test. Choose from a small, predeclared set of candidates, keep a record of the comparison, and reserve an untouched final evaluation when one is available. Do not choose the split seed that makes your model look best.</p>
+<h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
+<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
+<h3 id="choose-the-independent-split-unit">Choose the independent split unit</h3>
+<div class="bc-lab" data-bc="split"><p>Use the worked examples in this guide to reason about choose the independent split unit. The interactive controls appear when JavaScript is available.</p></div>
+
+<h3 id="optional-rare-group-rounding-constraints">Optional · rare-group rounding constraints</h3>
+<div class="bc-lab" data-bc="stratum"><p>Use the worked examples in this guide to reason about optional · rare-group rounding constraints. The interactive controls appear when JavaScript is available.</p></div>
+
+<h2 id="checkpoint-decide-what-leaks">Checkpoint · Decide what leaks</h2>
+<ol>
+<li>Two crops from the same photograph go to different partitions. Is a filename-disjoint check enough?</li>
+<li>Four class rows from one image are randomly assigned separately. What has gone wrong?</li>
+<li>A combination occurs once. Can stratification guarantee its presence on both sides?</li>
+<li>You calculate a mean image intensity from training plus validation, then use it for standardisation. What should change?</li>
+</ol>
+<details>
+<summary>Hints and explanations</summary>
+<ol>
+<li>No. Their source photograph must remain on one side; different crop filenames do not establish independence.</li>
+<li>The unit of splitting was an annotation row rather than the source image. Rebuild the split at image level.</li>
+<li>No. Report the limitation and apply a declared policy without duplicating it across partitions.</li>
+<li>Estimate the mean using training images only, then reuse it unchanged. The validation set should not influence fitting.</li>
+</ol>
+</details>
+<h2 id="optional-extension-expected-support-is-not-guaranteed-support">Optional extension · Expected support is not guaranteed support</h2>
+<p>If <code>K</code> of <code>N</code> images contain a rare label and a uniform random holdout contains <code>n</code> images, its expected positive count is <code>nK/N</code>. For sampling without replacement, the count has hypergeometric variance:</p>
+<div class="arithmatex">\[
+\operatorname{Var}(X)=n p(1-p)\frac{N-n}{N-1},\qquad p=K/N.
+\]</div>
+<p>The simpler binomial variance <code>np(1-p)</code> ignores the finite-population correction and is an approximation in this setting. Neither formula proves that the realised holdout has adequate support. For the core route, inspect the actual support table. For a multi-label method beyond combination stratification, see the original <a href="https://doi.org/10.1007/978-3-642-23808-6_10">On the Stratification of Multi-label Data</a>.</p>
+<p><strong>Transfer question:</strong> identify the true independent source unit for another dataset: image, patient, manufactured item, video or acquisition batch. What evidence would you need before claiming there is no leakage?</p>
+<p><a href="05_metrics.html">Previous: metrics</a> · <a href="07_diagnostic_baseline.html">Next: diagnostic baseline</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="05_metrics.html">← 5 · Metrics &amp; error costs</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span></footer></div></main></div></body></html>
