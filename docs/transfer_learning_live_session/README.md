@@ -2,6 +2,9 @@
 
 **Live session · 26 October 2026 · Milestone 3: transfer learning**
 
+> **[Open the Session 3 presentation →](presentation/index.html)**<br>
+> Follow the interactive slides in class, then return to these guides for detailed explanations and code.
+
 You have already built a Dataset, batched samples, applied paired augmentations and trained a U-Net with BCE–Dice. Now ask a new question: **does starting from learned visual features help our segmentation model, and how can we test that fairly?**
 
 These notes develop the encoder/decoder mechanics, pretrained initialization, input adaptation, freezing and fine-tuning, loss formulation and controlled evaluation in detail. Read the explanations, work through the tensor/code examples and use the activities to test your reasoning.

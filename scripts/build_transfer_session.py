@@ -21,6 +21,7 @@ URLS = ['index.html', *[name + '.html' for name in MODULES[1:]]]
 
 def build(out):
     build_notebook()
+    build_presentation(out / 'presentation')
     render_session(out, source_dir=SOURCE, modules=MODULES, titles=TITLES, urls=URLS,
                    downloads=('classroom_walkthrough.ipynb', 'classroom_walkthrough.py',
                               'transfer_learning.ipynb', 'transfer_learning.py'),
@@ -44,7 +45,6 @@ def build(out):
                                  topline='26 October · Milestone 3 live session',
                                  kicker='Inspect. Reuse. Compare.', hero='From features<br>to evidence.',
                                  caption='Understand the mechanism. Test the idea.', download_label='Classroom notebook ↓'))
-    build_presentation(out / 'presentation')
     validate_site(out)
 
 
