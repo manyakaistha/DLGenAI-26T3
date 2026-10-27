@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -17,6 +17,9 @@
 <li><a href="#8-practise-on-clouds-then-transfer-the-reasoning">8 · Practise on clouds, then transfer the reasoning</a><ul>
 <li><a href="#core-access-and-verify-the-practice-files">Core · Access and verify the practice files</a></li>
 <li><a href="#core-understand-what-the-labels-mean">Core · Understand what the labels mean</a></li>
+<li><a href="#set-up-one-complete-run">Set up one complete run</a></li>
+<li><a href="#when-a-run-stops-read-the-first-useful-error">When a run stops, read the first useful error</a></li>
+<li><a href="#write-a-short-evidence-report">Write a short evidence report</a></li>
 <li><a href="#guided-practice-evidence-before-explanation">Guided practice · Evidence before explanation</a></li>
 <li><a href="#independent-exercises-after-the-teaching-session">Independent exercises · After the teaching session</a></li>
 <li><a href="#glossary-for-review">Glossary for review</a></li>
@@ -98,12 +101,70 @@
 </table>
 <p>The <a href="practice_dataset_lab.ipynb">practice notebook</a> validates dimensions, class records and RLE coordinate bounds. Point it to one variant's corresponding CSV and training-image folder. Keep downloads and generated results in your own local working area, outside committed teaching sources. Do not change an expected height or width merely to silence an assertion.</p>
 <p><strong>Dataset-variant trap:</strong> the supported mirror supplies <strong>re-encoded RLE</strong> at its resized geometry. A familiar filename and the same two column names do not prove compatibility. Never combine original labels with resized images, or the mirror CSV with original decoding dimensions. The mirror is not the official submission/scoring grid either. If neither authorised source is available, complete the <a href="foundations_walkthrough.ipynb">offline foundations notebook</a>, and record that the real-data audit remains pending. Synthetic practice is useful preparation, but it is not evidence about real cloud files.</p>
-<p>Preparation note: the original download required authenticated/rules-gated access, so these notes do not claim a complete local audit of that archive. The smaller mirror's CSV and a limited real-image smoke check were audited separately; a smoke check is not a full visual audit. Learners must verify their own files using the notebook's checks. No measured real-data totals or guaranteed cloud overlap findings are supplied as answers here.</p>
-<p>Read the source's usage terms before obtaining either variant. The mirror identifies its data as <strong>Data files © Original Authors</strong>; that is not an unrestricted licence or a replacement for upstream permissions. No terms have been accepted for you and no raw dataset is redistributed with the teaching materials.</p>
+<p>The original download is access-gated and was not locally audited for these notes. A small mirror smoke check verifies execution, not a full visual audit. Use your account under the source's terms; the mirror's “Data files © Original Authors” label is not an unrestricted licence. No raw data is redistributed here.</p>
 <h2 id="core-understand-what-the-labels-mean">Core · Understand what the labels mean</h2>
 <p>Fish, Flower, Gravel and Sugar name patterns of cloud organisation. They are not four colours, weather probabilities or industrial defect categories. The regional annotations are coarse and reflect human interpretation; a region can include spaces between visible clouds. Do not treat every annotated boundary as a precise physical cloud edge. The organisers' <a href="https://journals.ametsoc.org/view/journals/bams/101/11/bamsD190324.xml">scientific paper</a> describes the cloud-pattern labelling context and its limitations.</p>
 <p>An absent class is different from an image containing no labelled class. Calculate image cardinality and class-absent pair counts separately. Do not assume the real dataset includes fully label-empty images simply because the toy table does.</p>
 <p>The practice competition's metric and geometry also differ from the industrial task. A local small-canvas Dice diagnostic can validate code behaviour. It does not establish an official score or a transferable choice of model, threshold or noise filter.</p>
+<h2 id="set-up-one-complete-run">Set up one complete run</h2>
+<p>Keep the selected dataset's <code>train.csv</code> and <code>train_images/</code> <strong>together</strong>. The notebook's <code>CLOUD_DATA_ROOT</code> is their parent directory, not the CSV file itself and not a folder that contains another nested archive. The original Kaggle download may arrive as compressed image folders; extract them into <code>train_images/</code> before running the file check. The resized mirror uses its own CSV with coordinates for 576×384 masks. Pick the variant before opening the practice notebook and write it in the evidence log.</p>
+<p>For a local checkout, from the repository root, one explicit mirror run is:</p>
+<pre class="highlight"><code class="language-sh">export CLOUD_DATA_VARIANT=resized_384x576
+export CLOUD_DATA_ROOT=data/bootcamp/clouds_384x576
+export CLOUD_OUTPUT_ROOT=runs/bootcamp_session1_practice
+uv run --no-project --with numpy==2.2.6 --with pandas==2.3.3 --with matplotlib==3.10.9 --with pillow==12.3.0 python docs/bootcamp_session_1/practice_dataset_lab.py
+uv run --no-project --with numpy==2.2.6 --with pandas==2.3.3 --with matplotlib==3.10.9 --with pillow==12.3.0 python docs/bootcamp_session_1/starter_pixel_model.py</code></pre>
+<p>Use <code>CLOUD_DATA_VARIANT=original</code> and its corresponding root <strong>only</strong> for a complete original training CSV and original-size images. The starter command must follow the practice command because it reads the saved <code>session1_evidence.json</code> and reuses its exact <code>train_demo_ids</code> and <code>validation_demo_ids</code>. Do not edit those IDs by hand to improve a score. Both scripts write small JSON evidence records to <code>CLOUD_OUTPUT_ROOT</code>; the inputs remain untouched.</p>
+<p>In <strong>Kaggle Notebooks</strong>, attach your chosen dataset, inspect its directory in Files, set <code>CLOUD_DATA_ROOT</code> to the folder containing CSV and JPEG directory, and write <code>CLOUD_OUTPUT_ROOT</code> under <code>/kaggle/working/</code>. In <strong>Colab</strong>, mount your authorised data in a persistent location and set both paths in the first cell or with <code>os.environ</code>; copy evidence out before the temporary runtime ends. Choose a Python 3 CPU runtime.</p>
+<p>The notebooks import NumPy, pandas, Matplotlib and Pillow. <strong>Try imports first.</strong> If a package is missing in a hosted runtime, install the pinned version from the notebook setup with <code>%pip</code>, restart and Run All. Locally, use <code>uv</code> as above. The notebooks do not download data or accept Kaggle rules.</p>
+<h2 id="when-a-run-stops-read-the-first-useful-error">When a run stops, read the first useful error</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Check and repair</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Real cloud data missing</code> or <code>Missing ... train.csv</code></td>
+<td>Print the resolved <code>CLOUD_DATA_ROOT</code>; it must directly contain <code>train.csv</code> and <code>train_images/</code>. Check attachment/extraction and spelling.</td>
+</tr>
+<tr>
+<td>Thousands of referenced JPEGs missing</td>
+<td>The full CSV was paired with only part of the image folder. Finish the authorised download. The four-ID smoke option is for a labelled code check, not a shortcut to a full analysis.</td>
+</tr>
+<tr>
+<td>Expected 576×384 but image is 2100×1400, or RLE reaches beyond the canvas</td>
+<td>The variant, CSV and JPEGs disagree. Re-select the matching pair. Changing <code>EXPECTED_SIZE</code> alone would make the labels wrong.</td>
+</tr>
+<tr>
+<td><code>Missing one of the four labels</code>, unknown class, or duplicate row</td>
+<td>Inspect the exact CSV columns and <code>Image_Label</code> values. Confirm the selected file belongs to the named cloud source, then restore the unmodified source CSV.</td>
+</tr>
+<tr>
+<td>Overlay looks striped, rotated or shifted</td>
+<td>Stop before interpreting counts. Check 1-based starts, F-order traversal, <code>(height,width)</code> shape and image-mask alignment using a small known RLE. An encode–decode round trip alone is insufficient.</td>
+</tr>
+<tr>
+<td>Starter says the practice manifest is missing or incompatible</td>
+<td>Run practice first with the same <code>CLOUD_OUTPUT_ROOT</code> and <code>CLOUD_DATA_VARIANT</code>. Do not mix a prior manifest from another variant or runtime.</td>
+</tr>
+<tr>
+<td>A diagnostic is <code>NaN</code></td>
+<td>Print the positive/absent pair support. With no positive pair in a tiny sample, foreground Dice is unavailable; it is neither perfect nor failed.</td>
+</tr>
+<tr>
+<td>A curve changes after rerunning only one cell</td>
+<td>Restart and Run All in order. Note the selected IDs and fixed seeds; stale notebook variables can give a plausible but unreproducible result.</td>
+</tr>
+</tbody>
+</table>
+<p><code>CLOUD_SMOKE_IMAGE_IDS</code> explicitly checks only named real JPEGs. Leave it unset for the normal full-data lab; smoke outputs cannot estimate prevalence or model quality.</p>
+<h2 id="write-a-short-evidence-report">Write a short evidence report</h2>
+<p>Keep the two JSON manifests with a one-page explanation. A useful report records <strong>source variant and file layout</strong>, native and teaching-grid dimensions, the RLE convention and one hand-checked pixel, four-class label order, original-image split IDs or manifest path, positive and absent support counts, and one overlay chosen without looking for a flattering result. Follow with a small comparison table for all-empty, spatial prior and trainable RGB pixel model. State which rules read the validation image, which were fitted on training labels, and what each rule cannot know. Include the short training BCE trace and the complete threshold table, including weak rows.</p>
+<p>For every displayed number, write its denominator and image-ID population. Say “two positive image–class pairs among six sampled validation images” rather than “good Dice.” Distinguish a full-CSV <strong>presence count</strong> from a decoded-subset <strong>pixel-area estimate</strong>. Include one failure image and a plausible explanation you could test, such as a location prior repeating a mask on unrelated photographs. Do not select a different easiest image for each rule.</p>
+<p>A peer-review rubric asks four questions: <strong>correctness</strong> (RLE, geometry and overlay), <strong>independence</strong> (source-group separation), <strong>interpretation</strong> (foreground and absent-pair support), and <strong>reproducibility</strong> (saved variant, IDs and settings). A weak baseline with sound evidence is a successful diagnostic. Compare the class-global and spatial priors in <a href="07_diagnostic_baseline.html">Guide 7</a> before proposing a richer model.</p>
 <h2 id="guided-practice-evidence-before-explanation">Guided practice · Evidence before explanation</h2>
 <p>Work with a partner if possible: one person predicts the output; the other runs the cell; then switch. Preserve your own notebook and explanations.</p>
 <table>

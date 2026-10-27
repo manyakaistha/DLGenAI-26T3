@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -17,8 +17,14 @@
 <li><a href="#3-decode-the-mask-then-prove-where-it-belongs">3 · Decode the mask, then prove where it belongs</a><ul>
 <li><a href="#core-rle-stores-runs-of-foreground">Core · RLE stores runs of foreground</a></li>
 <li><a href="#core-convert-starts-once">Core · Convert starts once</a></li>
+<li><a href="#core-validate-before-slices-can-hide-an-error">Core · Validate before slices can hide an error</a></li>
+<li><a href="#core-encode-by-finding-foreground-transitions">Core · Encode by finding foreground transitions</a></li>
 <li><a href="#core-check-both-agreement-and-correctness">Core · Check both agreement and correctness</a></li>
 <li><a href="#core-preserve-geometry-through-every-operation">Core · Preserve geometry through every operation</a></li>
+<li><a href="#core-calculate-distortion-and-area-with-named-axes">Core · Calculate distortion and area, with named axes</a></li>
+<li><a href="#core-binary-values-do-not-guarantee-feature-retention">Core · Binary values do not guarantee feature retention</a></li>
+<li><a href="#optional-depth-aliasing-nyquist-and-the-sensor">Optional depth · Aliasing, Nyquist and the sensor</a></li>
+<li><a href="#core-compare-padding-tiling-and-resizing-by-their-costs">Core · Compare padding, tiling and resizing by their costs</a></li>
 <li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
 <li><a href="#edit-a-non-square-rle-mask">Edit a non-square RLE mask</a></li>
 <li><a href="#resize-and-inspect-a-thin-feature">Resize and inspect a thin feature</a></li>
@@ -76,12 +82,51 @@
 1 0 0 1
 1 0 0 0</code></pre>
 <p>The first run crosses a column boundary. Positions 3 and 4 are consecutive in the flattened sequence, although one is bottom-left and the other is near the top of the next column. An RLE run is therefore not necessarily one connected region in the two-dimensional image.</p>
+<p>Row-major traversal, called <code>C</code> order, would instead give positions <code>[1,2,3,4]</code> in the first row, <code>[5,6,7,8]</code> in the second and <code>[9,10,11,12]</code> in the third. Both traversals visit twelve positions, but their coordinate assignments differ. A shape or area assertion cannot distinguish them. Use a non-square example with asymmetric foreground locations.</p>
+<p>The following trace makes every boundary explicit:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Start</th>
+<th style="text-align: right;">Length</th>
+<th style="text-align: right;">Last one-based position</th>
+<th style="text-align: right;">Zero-based begin</th>
+<th style="text-align: right;">Exclusive stop</th>
+<th>Python slice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2 + 3 − 1 = 4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td><code>[1:4]</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">10 + 2 − 1 = 11</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">11</td>
+<td><code>[9:11]</code></td>
+</tr>
+</tbody>
+</table>
+<p>The flattened mask is <code>[0,1,1,1,0,0,0,0,0,1,1,0]</code>. Using the same sequence with <code>C</code> order makes a different grid while preserving its five marked pixels. Traversal describes which values are read or written in sequence; it need not describe the array's physical memory layout.</p>
 <h2 id="core-convert-starts-once">Core · Convert starts once</h2>
 <p>Python arrays use zero-based indices. The first start, 2, therefore becomes index 1. A length of 3 means the Python slice <code>[1:4]</code>, because the stopping index is excluded. Subtract one from the start; do not also subtract one from the length.</p>
 <pre class="highlight"><code class="language-python">import numpy as np
 
 def decode_toy_rle(text, height, width):
     """Strict toy decoder: 1-based starts, lengths, F-order canvas."""
+    if any(isinstance(v, (bool, np.bool_)) or
+           not isinstance(v, (int, np.integer)) or v &lt;= 0
+           for v in (height, width)):
+        raise ValueError("Height and width must be positive integers")
+    if not isinstance(text, str):
+        raise TypeError("Normalise documented CSV missing values first")
     flat = np.zeros(height * width, dtype=bool)
     text = text.strip()
     if not text:
@@ -104,6 +149,73 @@ assert mask.shape == (3, 4)
 assert mask.sum() == 5</code></pre>
 <p>The toy function accepts a string. A real CSV loader must separately interpret its documented missing-value convention before calling a decoder. <code>str(np.nan)</code> is the text <code>"nan"</code>, which is not an empty RLE and must not be parsed as an integer.</p>
 <p>Strict failure is useful for learning: it exposes a format mismatch rather than quietly changing labels. Do not silently clamp invalid runs, transpose a mask until it looks plausible, or copy another dataset's boundary workaround. First inspect the data specification and the offending record. Some formats use different conventions; document an explicit adaptation when required.</p>
+<h2 id="core-validate-before-slices-can-hide-an-error">Core · Validate before slices can hide an error</h2>
+<p>For every run, the final included one-based position is <code>start + length − 1</code>. On the twelve-position canvas, <code>12 2</code> asks for positions 12 and 13 and must fail. A plain NumPy slice such as <code>flat[11:13] = True</code> can silently truncate at the buffer boundary rather than raise an error. “It did not crash” is therefore insufficient evidence of a legal run.</p>
+<p>Our decoder also rejects zero or negative lengths, a start before one, an odd token count, unsorted runs and overlapping runs. <code>previous_stop</code> starts at zero, so a first negative Python index is rejected. A later begin smaller than the preceding exclusive stop repeats pixels or goes backwards. A begin equal to that stop is adjacent and legal under this policy. Other sources may define a different policy; document it rather than weakening validation until the file loads.</p>
+<table>
+<thead>
+<tr>
+<th>RLE text</th>
+<th>Result on H3/W4</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>1 1 12 1</code></td>
+<td>Valid</td>
+<td>First and final positions</td>
+</tr>
+<tr>
+<td><code>12 2</code></td>
+<td>Reject</td>
+<td>End position 13 exceeds 12</td>
+</tr>
+<tr>
+<td><code>0 2</code></td>
+<td>Reject</td>
+<td>Starts before the first position</td>
+</tr>
+<tr>
+<td><code>3 0</code></td>
+<td>Reject</td>
+<td>No positive-length foreground run</td>
+</tr>
+<tr>
+<td><code>2 3 4 1</code></td>
+<td>Reject</td>
+<td>Position 4 is requested twice</td>
+</tr>
+<tr>
+<td><code>2 3 10</code></td>
+<td>Reject</td>
+<td>Last start has no length</td>
+</tr>
+</tbody>
+</table>
+<h2 id="core-encode-by-finding-foreground-transitions">Core · Encode by finding foreground transitions</h2>
+<p>Encoding reverses the process. Flatten in the agreed order, add a zero at both ends, and locate changes. A zero-to-one change opens a run; its following one-to-zero change closes it. Padding handles foreground touching the first or final canvas position without separate special cases.</p>
+<p>For our flattened mask, the padded sequence changes at positions <code>[2,5,10,12]</code>. Starts are <code>[2,10]</code> and lengths are <code>[5−2,12−10] = [3,2]</code>, recovering <code>2 3 10 2</code>.</p>
+<pre class="highlight"><code class="language-python">def encode_toy_rle(mask):
+    a = np.asarray(mask)
+    if a.ndim != 2 or 0 in a.shape or not np.isin(a, [0, 1]).all():
+        raise ValueError("Use a nonempty 2D canvas with binary values")
+    flat = a.astype(np.uint8).ravel(order="F")
+    padded = np.concatenate(([0], flat, [0]))
+    changes = np.flatnonzero(padded[1:] != padded[:-1]) + 1
+    starts = changes[::2]
+    lengths = changes[1::2] - starts
+    pairs = np.column_stack((starts, lengths)).ravel()
+    return " ".join(str(int(value)) for value in pairs)
+
+assert encode_toy_rle(mask) == "2 3 10 2"
+assert encode_toy_rle(np.zeros((3, 4), dtype=bool)) == ""
+assert encode_toy_rle(np.ones((3, 4), dtype=bool)) == "1 12"
+assert np.array_equal(decode_toy_rle(encode_toy_rle(mask), 3, 4), mask)</code></pre>
+<p><code>flatnonzero</code> locates the transitions. Alternating entries are starts and exclusive ends; subtracting each start from its end produces its length. <code>column_stack</code> places each start beside its length, and the last <code>ravel</code> serialises pairs in row order. See the <a href="https://numpy.org/doc/stable/reference/generated/numpy.flatnonzero.html">NumPy flatnonzero reference</a> for the indexing operation.</p>
+<p>Two legal strings can describe the same mask. <code>2 1 3 2</code> and <code>2 3</code> both select positions 2–4. Our encoder returns the maximal merged run <code>2 3</code>. This is <strong>canonicalisation</strong>. Mask equality must survive the round trip; exact text equality requires an already canonical source. Our strict decoder accepts adjacent runs but rejects overlapping ones.</p>
+<p>RLE compression depends on the pattern. R runs need 2R integers, whereas a dense mask stores H×W values. A solid span compresses well; alternating foreground and background can require almost one run per marked pixel. Decimal digits and separators also cost bytes, so integer counts alone do not measure file size. A vertical line can be one F-order run and many C-order runs; the contract, rather than the shortest representation, determines which traversal to use.</p>
+<p>If two binary regions belong to the <strong>same class</strong>, decode both on the same canvas, combine them with <code>mask_a | mask_b</code>, then encode. Concatenating their RLE strings can create unsorted or overlapping runs. Keep different classes in separate channels to preserve memberships. “Mask RLE” refers to the target's representation, not an RGB photograph multiplied by a mask.</p>
 <h2 id="core-check-both-agreement-and-correctness">Core · Check both agreement and correctness</h2>
 <p>A round trip encodes a decoded mask and decodes it again, then checks equality. It proves that the two functions agree. It does <strong>not</strong> prove that both functions follow the external format: two functions with the same wrong traversal can round-trip perfectly.</p>
 <p>Use three checks together:</p>
@@ -123,6 +235,109 @@ Resized image and target at a shared geometry
 Check correspondence before measuring anything</code></pre>
 <p>Discrete binary masks need a resampling rule that preserves label identities, commonly nearest neighbour. Bilinear interpolation can create fractional target values at boundaries. Photographs can use an image interpolation rule suited to continuous intensities. Even nearest neighbour can remove a thin feature when downsampling: preserving binary values is not the same as preserving every foreground pixel.</p>
 <p>In <a href="https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize">Pillow's resize API</a>, the target size is width then height and the resampling filter is explicit. Set the mask filter explicitly; never rely on an image-oriented default. An intensity change applies to the image only; a crop or flip must be shared by image and mask.</p>
+<h2 id="core-calculate-distortion-and-area-with-named-axes">Core · Calculate distortion and area, with named axes</h2>
+<p>Let a source have width W₀ and height H₀, and its target have width W₁ and height H₁. Horizontal scale is sₓ = W₁/W₀; vertical scale is sᵧ = H₁/H₀. The ratio sᵧ/sₓ describes how much taller a feature becomes <strong>relative to its width</strong>. It equals one for uniform scaling, exceeds one for relative vertical stretch, and is below one for relative horizontal stretch. It does not always grow when distortion increases; <code>max(sₓ/sᵧ,sᵧ/sₓ)</code> is a symmetric factor if that is the intended summary.</p>
+<p>For our invented H60/W120 source:</p>
+<table>
+<thead>
+<tr>
+<th>Target, H × W</th>
+<th style="text-align: right;">sₓ</th>
+<th style="text-align: right;">sᵧ</th>
+<th style="text-align: right;">sᵧ/sₓ</th>
+<th style="text-align: right;">Approximate area scale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>30 × 60</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+<tr>
+<td>60 × 60</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.5</td>
+</tr>
+<tr>
+<td>30 × 120</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">0.5</td>
+</tr>
+</tbody>
+</table>
+<p>A source feature ten pixels wide and four high has continuous footprint five by two in the first target and five by four in the second. A circle becomes an ellipse under unequal scales. Area scales by the product sₓsᵧ in continuous geometry: a sufficiently large 40-pixel region might occupy about ten pixels after both dimensions halve. Integer sampling and boundaries prevent that approximation from being exact for every region. Component thresholds must name the grid on which their pixels are counted.</p>
+<p>Here is a complete image/mask resize with explicit interpolation:</p>
+<pre class="highlight"><code class="language-python">from PIL import Image
+
+target_wh = (60, 30)  # width first in Pillow
+toy_rgb = np.zeros((60, 120, 3), dtype=np.uint8)
+toy_mask = np.zeros((60, 120), dtype=np.uint8)
+toy_mask[20:24, 40:50] = 1
+small_rgb = np.asarray(Image.fromarray(toy_rgb).resize(
+    target_wh, Image.Resampling.BILINEAR))
+small_mask = np.asarray(Image.fromarray(toy_mask).resize(
+    target_wh, Image.Resampling.NEAREST))
+assert small_rgb.shape[:2] == small_mask.shape == (30, 60)
+assert set(np.unique(small_mask)).issubset({0, 1})</code></pre>
+<p>Image and mask share their target coordinates while using separate filters. Decode RLE on its <strong>encoded canvas before resizing</strong>. If annotations and photographs use different source grids by design, apply the documented coordinate mapping explicitly. Original cloud data, a mirror with re-encoded RLE, and the official scoring grid are separate contracts.</p>
+<h2 id="core-binary-values-do-not-guarantee-feature-retention">Core · Binary values do not guarantee feature retention</h2>
+<p>Use an explicit teaching sampler: output column j selects source column <code>floor((j+0.5)*W₀/W₁)</code>. Reducing width 12 to 4 samples zero-based source columns <code>[1,4,7,10]</code>. A one-column line at x=4 survives; an equally wide line at x=5 disappears. Both have a continuous target width of one third of a pixel, but alignment changes the sampled result.</p>
+<pre class="highlight"><code class="language-python">sampled = np.floor((np.arange(4) + 0.5) * 12 / 4).astype(int)
+assert sampled.tolist() == [1, 4, 7, 10]
+line_a = np.arange(12) == 4
+line_b = np.arange(12) == 5
+assert line_a[sampled].sum() == 1
+assert line_b[sampled].sum() == 0</code></pre>
+<p>Enlarging the vanished result back to width 12 cannot infer the erased source column. A surviving sample can also become a wider block. Restoring array size does not restore information. This formula is the declared teaching rule; actual libraries can use different coordinate conventions and filters.</p>
+<h2 id="optional-depth-aliasing-nyquist-and-the-sensor">Optional depth · Aliasing, Nyquist and the sensor</h2>
+<p><strong>Aliasing</strong> means fine-scale patterns become indistinguishable or misleading after sampling. Alternating dark/bright columns sampled every second column can become constant dark or constant bright, depending on phase. A low-pass filter before image downsampling can reduce this ambiguity but can soften thin features. It does not guarantee preservation of every labelled structure.</p>
+<p>The Nyquist condition concerns reconstructing a <strong>band-limited signal</strong>: the sampling rate must exceed twice its highest frequency to avoid ambiguity under the theorem's assumptions. A sharp binary edge is not band-limited. “Two pixels per defect” is therefore not a universal guarantee, and “subpixel means always gone” is also too strong. Alignment, filter and later thresholding matter.</p>
+<p>Industrial line-scan systems can assemble a frame from successive one-dimensional sensor readings as material moves past. Scan timing, motion and calibration affect physical geometry. A wide JPEG alone does not prove its acquisition mechanism or physical pixel spacing. Use metadata before interpreting pixel counts as millimetres or inferring a particular defect's identity. The same reasoning applies to photographs: inspect source geometry and the smallest relevant features before selecting a transform.</p>
+<h2 id="core-compare-padding-tiling-and-resizing-by-their-costs">Core · Compare padding, tiling and resizing by their costs</h2>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>Useful property</th>
+<th>Cost or check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Native rectangular input</td>
+<td>Retains the available source grid</td>
+<td>Memory; architecture's stride constraints</td>
+</tr>
+<tr>
+<td>Uniform resize</td>
+<td>Preserves proportions</td>
+<td>Fine detail can vanish; area and connectivity change</td>
+</tr>
+<tr>
+<td>Padding</td>
+<td>Adds border without stretching</td>
+<td>Extra computation; a padding target/loss policy</td>
+</tr>
+<tr>
+<td>Tiling</td>
+<td>Retains local detail at manageable size</td>
+<td>Less context; edge effects and a stitching rule</td>
+</tr>
+<tr>
+<td>Nonuniform resize</td>
+<td>Fits a specified shape</td>
+<td>Different distortion and sampling on each axis</td>
+</tr>
+</tbody>
+</table>
+<p>Many fully convolutional models accept rectangles subject to dimension constraints. Square pretraining images do not establish a universal square-input requirement. Read the actual implementation. Overlapping tiles can reduce seams, but need declared blending/cropping. Split independent sources <strong>before</strong> deriving tiles, as <a href="06_validation.html">Guide 6</a> explains.</p>
 <h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
 <p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
 <h3 id="edit-a-non-square-rle-mask">Edit a non-square RLE mask</h3>
@@ -137,6 +352,9 @@ Check correspondence before measuring anything</code></pre>
 <li>Why is <code>12 2</code> invalid for that canvas?</li>
 <li>A decoder returns <code>(3, 4)</code> but uses row-major order. Why will a shape assertion miss the error?</li>
 <li>A cloud CSV was re-encoded at a resized resolution. Can it be decoded with original-image dimensions merely because the JPEG filename matches?</li>
+<li>Encode <code>[[1,0,0],[1,1,0]]</code> in F order. Give the run lengths and foreground count.</li>
+<li>Resize an invented H40/W100 source to H20/W50 and then, separately, H40/W50. Find both scales, sᵧ/sₓ and approximate area scale.</li>
+<li>Under the width-12 to width-4 sampler, which one-column lines survive? Does this establish how every library behaves?</li>
 </ol>
 <details>
 <summary>Hints and explanations</summary>
@@ -145,6 +363,9 @@ Check correspondence before measuring anything</code></pre>
 <li>It requests positions 12 and 13, but only 12 positions exist. Do not hide the mismatch by clipping the run.</li>
 <li>Both grids contain 12 positions. The values occupy different coordinates; the known example and overlay detect this.</li>
 <li>No. RLE positions depend on the number of rows and the encoded canvas. Verify the image and CSV variant together. Decode at the annotation geometry, then perform an explicit, documented resize if needed.</li>
+<li>Flattened values are <code>[1,1,0,1,0,0]</code>, giving <code>1 2 4 1</code> and area three. A C-order decoder would preserve area while moving locations.</li>
+<li>First: sₓ=sᵧ=0.5, ratio one and area factor 0.25. Second: sₓ=0.5, sᵧ=1, ratio two and area factor 0.5. Only the first preserves proportions.</li>
+<li>Columns 1, 4, 7 and 10 under the explicit rule. Check the actual library's coordinates and filter before generalising the result.</li>
 </ol>
 </details>
 <h2 id="optional-extension-one-coordinate-formula">Optional extension · One coordinate formula</h2>

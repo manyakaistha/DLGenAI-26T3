@@ -18,11 +18,28 @@
     return a;
   };
   const counts=(p,y)=>p.reduce((o,x,i)=>{o[x?(y[i]?'tp':'fp'):(y[i]?'fn':'tn')]++;return o;},{tp:0,fp:0,fn:0,tn:0});
+  const components=(mask,h,w,connectivity=4)=>{
+    if(mask.length!==h*w||![4,8].includes(connectivity))throw Error('Check shape and connectivity.');
+    const labels=Array(h*w).fill(0),areas=[];
+    const moves=connectivity===4?[[-1,0],[1,0],[0,-1],[0,1]]:[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    for(let start=0;start<mask.length;start++){
+      if(!mask[start]||labels[start])continue;
+      const id=areas.length+1,queue=[start];labels[start]=id;let area=0;
+      for(let q=0;q<queue.length;q++){
+        const i=queue[q],r=Math.floor(i/w),c=i%w;area++;
+        for(const [dr,dc] of moves){const nr=r+dr,nc=c+dc,j=nr*w+nc;
+          if(nr>=0&&nr<h&&nc>=0&&nc<w&&mask[j]&&!labels[j]){labels[j]=id;queue.push(j);}}
+      }
+      areas.push(area);
+    }
+    return {labels,areas};
+  };
   const dice=(p,y)=>{const {tp,fp,fn}=counts(p,y);return 2*tp+fp+fn?2*tp/(2*tp+fp+fn):1;};
   const metric=(label,value)=>`<div class="bc-stat"><strong>${value}</strong><span>${label}</span></div>`;
   const control=(text,name,options)=>`<label>${text}<select data-control="${name}">${options.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></label>`;
   const range=(text,name,min,max,step,val)=>`<label>${text}<input data-control="${name}" type="range" min="${min}" max="${max}" step="${step}" value="${val}"><output>${val}</output></label>`;
   const definitions={
+    connectivity:{controls:control('Neighbour rule','connectivity',[['4','4-connected · shared edges'],['8','8-connected · edges + corners']])+range('Minimum kept area','minimum',1,4,1,2),state:()=>({}),render(s,root){const mask=[1,0,0,0,1,0,0,0,1],conn=+root.querySelector('select').value,limit=+root.querySelector('input').value,{labels,areas}=components(mask,3,3,conn),kept=labels.map(id=>id&&areas[id-1]>=limit?1:0);return `<div class="bc-pair"><div><h4>Component IDs · 0 = background</h4>${grid(labels,3,3)}</div><div><h4>After area ≥ ${limit}</h4>${grid(kept,3,3)}</div></div><div class="bc-stats">${metric('Components',areas.length)}${metric('Areas',areas.join(', '))}${metric('Kept pixels',kept.reduce((a,b)=>a+b,0))}</div><p class="bc-note">The same three diagonal pixels become three regions under 4-connectivity or one under 8-connectivity. At a minimum area of 2, that choice changes whether all three pixels are removed or kept.</p>`;}},
     learning:{controls:range('Input intensity x','x',0,1,.1,.8)+control('Training target','target',[['1','1 · foreground'],['0','0 · background']])+'<button type="button" data-update>Train one step</button>',state:()=>({w:0,b:0,steps:0}),click(s,b,root){if(!b.hasAttribute('data-update'))return;const x=+root.querySelector('input').value,y=+root.querySelector('select').value,p=1/(1+Math.exp(-(s.w*x+s.b))),error=p-y;s.w-=.5*error*x;s.b-=.5*error;s.steps++;},render(s,root){const x=+root.querySelector('input').value,y=+root.querySelector('select').value,z=s.w*x+s.b,p=1/(1+Math.exp(-z)),loss=Math.max(z,0)+Math.log1p(Math.exp(-Math.abs(z)))-y*z;return `<div class="bc-array-shape">z = wx + b <small class="bc-step-count">step ${s.steps}</small></div><div class="bc-learning-metrics">${metric('Weight w',s.w.toFixed(3))}${metric('Bias b',s.b.toFixed(3))}${metric('Probability',p.toFixed(3))}${metric('BCE loss',loss.toFixed(3))}</div><p class="bc-note">η = 0.5. w ← w − η(p−y)x; b ← b − η(p−y). Changing inputs keeps weights; Reset starts at zero.</p>`;}},
     arrays:{controls:control('View','view',[['rgb','HWC · RGB bytes'],['scaled','HWC · divide by 255'],['chw','CHW · axes rearranged']]),state:()=>({}),render(s,root){const mode=root.querySelector('select').value;const bytes=[0,128,255],values=mode==='scaled'?bytes.map(x=>(x/255).toFixed(3)):bytes;return `<div class="bc-array-shape">${mode==='chw'?'[3, 2, 4]':'[2, 4, 3]'}</div><p>One selected pixel: <code>[${values.join(', ')}]</code></p>${table([['Height','2','number of rows'],['Width','4','number of columns'],['Channels','3','red, green, blue']],['Axis','Size','Meaning'])}<p class="bc-note">${mode==='chw'?'transpose(2, 0, 1) moves the channel axis; reshape is not a substitute. Values stay the same.':mode==='scaled'?'Cast to floating point before arithmetic. These are scaled intensities, not predicted class probabilities.':'RGB is an input representation. The number of target classes is a separate decision.'}</p>`;}},
     overlap:{controls:control('Toy mask arrangement','mode',[['separate','Both labels present · disjoint pixels'],['overlap','Both labels present · shared pixels'],['absent','Only A present']]),state:()=>({}),render(s,root){const mode=root.querySelector('select').value,a=Array(24).fill(0),b=Array(24).fill(0);[7,8,13,14].forEach(i=>a[i]=1);(mode==='overlap'?[8,9,14,15]:mode==='separate'?[10,11,16,17]:[]).forEach(i=>b[i]=1);const shared=a.filter((x,i)=>x&&b[i]).length;return `<div class="bc-pair"><div><h4>Mask A</h4>${grid(a,4,6)}</div><div><h4>Mask B</h4>${grid(b,4,6)}</div></div><div class="bc-stats">${metric('Image cardinality',1+Number(b.some(Boolean)))}${metric('Shared pixels',shared)}</div><p class="bc-note">Image-level co-occurrence asks whether both masks are nonempty. Pixel overlap asks whether <code>A & B</code> has any 1s. They answer different questions.</p>`;}},
@@ -38,5 +55,5 @@
   let serial=0;
   function mount(root){const def=definitions[root.dataset.bc];if(!def)return;let state=def.state();const id=++serial;root.innerHTML=`<div class="bc-controls">${def.controls}<button type="button" data-reset>Reset</button></div><div class="bc-viz"></div><p class="bc-caption">Deterministic teaching example · not a dataset result</p>`;root.querySelectorAll('[data-control]').forEach((el,i)=>{el.id=`bc-${id}-${i}`;const label=el.closest('label');if(label)label.htmlFor=el.id;const output=el.nextElementSibling;if(output?.tagName==='OUTPUT')output.htmlFor=el.id;});const inputs=[...root.querySelectorAll('[data-control]')],defaults=inputs.map(x=>x.value);function render(){root.querySelector('.bc-viz').innerHTML=def.render(state,root);inputs.forEach(x=>{if(x.type==='range'){x.nextElementSibling.value=x.value;x.setAttribute('aria-valuetext',x.value);}});}root.addEventListener('input',render);root.addEventListener('change',render);root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-reset')){state=def.state();inputs.forEach((x,i)=>x.value=defaults[i]);render();return;}if(b.hasAttribute('data-pixel')){const index=b.dataset.pixel;def.click?.(state,b,root);render();root.querySelector(`[data-pixel="${index}"]`)?.focus({preventScroll:true});}else if(b.hasAttribute('data-update')){def.click?.(state,b,root);render();}});render();}
   document.querySelectorAll('[data-bc]').forEach(mount);
-  window.BootcampMath=Object.freeze({encode,decode,counts,dice});
+  window.BootcampMath=Object.freeze({encode,decode,counts,dice,components});
 })();

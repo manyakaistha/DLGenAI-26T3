@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -15,89 +15,189 @@
 <span class="section-label">4 · Intensity &amp; texture</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
 <li><a href="#4-brightness-is-one-clue-arrangement-is-another">4 · Brightness is one clue; arrangement is another</a><ul>
-<li><a href="#core-intensity-describes-values">Core · Intensity describes values</a></li>
-<li><a href="#core-compare-neighbourhoods">Core · Compare neighbourhoods</a></li>
-<li><a href="#core-what-brightness-thresholding-can-and-cannot-show">Core · What brightness thresholding can and cannot show</a></li>
-<li><a href="#core-make-an-observation-before-proposing-a-transform">Core · Make an observation before proposing a transform</a></li>
-<li><a href="#core-normalisation-is-not-evidence-of-separation">Core · Normalisation is not evidence of separation</a></li>
-<li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
+<li><a href="#core-begin-with-a-registered-image-and-mask">Core · Begin with a registered image and mask</a></li>
+<li><a href="#core-mean-variance-and-standard-deviation-answer-different-questions">Core · Mean, variance and standard deviation answer different questions</a></li>
+<li><a href="#core-a-histogram-keeps-counts-and-loses-coordinates">Core · A histogram keeps counts and loses coordinates</a></li>
+<li><a href="#core-compare-a-mean-gap-with-the-spread-cohens-d">Core · Compare a mean gap with the spread: Cohen's d</a></li>
+<li><a href="#core-interpret-a-contrast-measurement-without-overclaiming">Core · Interpret a contrast measurement without overclaiming</a></li>
+<li><a href="#core-scaling-values-is-different-from-adding-evidence">Core · Scaling values is different from adding evidence</a></li>
+<li><a href="#core-measure-arrangement-with-neighbouring-values">Core · Measure arrangement with neighbouring values</a></li>
+<li><a href="#explore-keep-the-histogram-fixed">Explore · Keep the histogram fixed</a><ul>
 <li><a href="#same-histogram-different-arrangement">Same histogram, different arrangement</a></li>
 </ul>
 </li>
-<li><a href="#checkpoint-explain-the-two-patterns">Checkpoint · Explain the two patterns</a></li>
-<li><a href="#optional-extension-effect-sizes-and-local-features">Optional extension · Effect sizes and local features</a></li>
+<li><a href="#optional-depth-from-neighbouring-pixels-to-a-receptive-field">Optional depth · From neighbouring pixels to a receptive field</a></li>
+<li><a href="#optional-depth-a-tiny-co-occurrence-matrix">Optional depth · A tiny co-occurrence matrix</a></li>
+<li><a href="#practice-check-a-measurement-and-challenge-a-claim">Practice · Check a measurement and challenge a claim</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </details><article><h1 id="4-brightness-is-one-clue-arrangement-is-another">4 · Brightness is one clue; arrangement is another</h1>
-<p><strong>Core question:</strong> could two regions have the same intensity statistics but look different?</p>
-<p>A bright region can be interesting, ordinary illumination or a display artefact. A texture can differ even when average brightness stays the same. Before selecting preprocessing or a model, inspect which cues are visible and which cues the annotation describes.</p>
-<h2 id="core-intensity-describes-values">Core · Intensity describes values</h2>
-<p>For one grayscale region, a histogram counts how often each intensity occurs. The mean gives an average level; the standard deviation describes spread around that mean. Neither records where the values occur.</p>
-<p>Take these two invented 4 × 4 patterns:</p>
+<p><strong>Core question:</strong> what can an intensity measurement establish, and what information does it leave out?</p>
+<p>A bright patch might be an annotated region, an ordinary reflection or a change in illumination. A region can also differ through the arrangement of its light and dark pixels while keeping the same average brightness. We need to separate these possibilities before proposing a transform or a model.</p>
+<p>This chapter is a standalone study guide. Follow the <strong>Core</strong> sections first; the optional sections explain statistics and spatial features more deeply. All numbers and patterns below are invented teaching examples. They do not identify any industrial defect class or give measured results for the practice dataset.</p>
+<h2 id="core-begin-with-a-registered-image-and-mask">Core · Begin with a registered image and mask</h2>
+<p>An intensity is a measured value at a location. A binary mask is a membership decision at that location. To compare foreground with background, their coordinates must agree. First display the image, the individual class mask and their overlay. A transposed or shifted mask produces convincing statistics about the wrong pixels.</p>
+<p>For RGB images, specify what quantity you measure. Red-channel intensity, three separate channel distributions and a declared grayscale conversion are different choices. Averaging RGB channels is a possible teaching feature; it is not a universal definition of luminance. Keep the choice fixed across examples.</p>
+<p>Also define <strong>background</strong>. For class A, <code>mask_A == 0</code> includes any locations belonging to other classes. Alternatively, “no annotation of any class” uses the complement of the union of all class masks. A nearby ring around a region measures local surroundings, whereas the entire image includes distant lighting conditions. None of these definitions should be silently substituted for another.</p>
+<p>A minimal single-channel extraction is:</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+# intensity and mask refer to the same image grid.
+intensity = np.array([[20, 30, 50], [40, 60, 80]], dtype=np.float32)
+mask = np.array([[0, 0, 1], [0, 1, 1]], dtype=bool)
+assert intensity.shape == mask.shape
+inside = intensity[mask]
+outside = intensity[~mask]
+print(inside)   # [50., 60., 80.]
+print(outside)  # [20., 30., 40.]</code></pre>
+<p>Boolean indexing selects values; it does not keep their two-dimensional arrangement. That is appropriate for a histogram, but it has already discarded spatial information. If either group is empty, report that the comparison is unavailable instead of calculating a mean from no observations.</p>
+<h2 id="core-mean-variance-and-standard-deviation-answer-different-questions">Core · Mean, variance and standard deviation answer different questions</h2>
+<p>For values <span class="arithmatex">\(x_1,\ldots,x_n\)</span>, the mean is</p>
+<div class="arithmatex">\[
+\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i.
+\]</div>
+<p>It gives the average intensity. Variance measures squared deviations from that average. For a complete toy population,</p>
+<div class="arithmatex">\[
+\sigma^2=\frac{1}{n}\sum_i(x_i-\bar{x})^2,
+\qquad \sigma=\sqrt{\sigma^2}.
+\]</div>
+<p>Take <code>[30, 40, 50]</code>. Their sum is 120 and mean is 40. Deviations are <code>[-10, 0, 10]</code>; squared deviations are <code>[100, 0, 100]</code>. Population variance is <code>200/3 ≈ 66.667</code>, and population SD is about <code>8.165</code>. Variance has squared intensity units; SD returns to intensity units.</p>
+<p>When describing a sample with the usual sample-variance convention, divide by <code>n−1</code> instead. For these same three numbers, sample variance is <code>200/2 = 100</code> and sample SD is 10. These are different quantities, not contradictory answers. State which one you used.</p>
+<pre class="highlight"><code class="language-python">values = np.array([30, 40, 50], dtype=np.float64)
+print(values.mean())            # 40
+print(values.var(ddof=0))       # population variance: 66.666...
+print(values.std(ddof=1))       # sample SD: 10</code></pre>
+<p><code>ddof</code> changes the divisor from <code>n</code> to <code>n−ddof</code>. A sample SD needs at least two values. NumPy's <a href="https://numpy.org/doc/stable/reference/generated/numpy.var.html">variance documentation</a> explains this convention. Converting to floating point before arithmetic also avoids unsigned-integer subtraction wrapping around instead of producing a negative deviation.</p>
+<h2 id="core-a-histogram-keeps-counts-and-loses-coordinates">Core · A histogram keeps counts and loses coordinates</h2>
+<p>A histogram counts how many values lie in each intensity interval, called a <strong>bin</strong>. If one group contains 100 pixels and another contains 1,000, raw bin counts mostly reveal that size difference. For distribution comparison, divide each group's bin counts by its own total and state that you are showing proportions.</p>
+<p>Use the same bin edges and intensity range for both groups. Otherwise a bar in one plot may describe a different interval from a bar in the other. Very wide bins hide structure; very narrow bins can make a small sample look irregular. Show sample sizes alongside the plot.</p>
+<p>Equal means do not imply equal histograms. <code>[20,40,60]</code> and <code>[0,40,80]</code> both average to 40, but the second has more spread. <code>[0,0,60,60]</code> and <code>[30,30,30,30]</code> both average to 30, yet one is split between extremes and the other is constant. A mean difference of zero alone cannot establish that two groups are visually indistinguishable.</p>
+<p>Now consider a stronger equality: <strong>the entire histogram is identical</strong>.</p>
 <pre class="highlight"><code class="language-text">Pattern A                 Pattern B
 0   0   255 255            0   255 0   255
 0   0   255 255            255 0   255 0
 0   0   255 255            0   255 0   255
 0   0   255 255            255 0   255 0</code></pre>
-<p>Both contain eight zeros and eight values of 255. They have identical histograms, mean 127.5 and population standard deviation 127.5. One is divided into two blocks; the other alternates like a checkerboard. A function of only the pixel-value histogram cannot tell them apart. A spatial comparison can.</p>
-<p>This is the elementary meaning of <strong>texture</strong> here: the arrangement, variation and relationships of values over a neighbourhood. Texture depends on scale. A checkerboard shrunk far enough can become a nearly uniform patch, so resolution choices affect the evidence available to a model.</p>
-<h2 id="core-compare-neighbourhoods">Core · Compare neighbourhoods</h2>
-<pre class="highlight"><code class="language-python">import numpy as np
+<p>Both contain eight zeros and eight values of 255. Therefore both have mean <code>127.5</code>, population variance <code>16256.25</code> and population SD <code>127.5</code>. Every histogram bin count is the same. Yet A has two solid blocks while B alternates. A function using only the histogram cannot distinguish them. Their arrangement contains the missing information.</p>
+<h2 id="core-compare-a-mean-gap-with-the-spread-cohens-d">Core · Compare a mean gap with the spread: Cohen's d</h2>
+<p>A raw foreground–background gap needs context. A difference of 12 intensity units is substantial relative to an SD of 3, but small relative to an SD of 60. A <strong>standardised mean difference</strong> expresses that gap in spread units.</p>
+<p>For the pooled-SD version of Cohen's <span class="arithmatex">\(d\)</span>, define foreground sample size <span class="arithmatex">\(n_f\)</span>, mean <span class="arithmatex">\(\bar{x}_f\)</span>, sample SD <span class="arithmatex">\(s_f\)</span>, and corresponding background quantities <span class="arithmatex">\(n_b,\bar{x}_b,s_b\)</span>. Then</p>
+<div class="arithmatex">\[
+s_p^2=\frac{(n_f-1)s_f^2+(n_b-1)s_b^2}{n_f+n_b-2},
+\qquad d=\frac{\bar{x}_f-\bar{x}_b}{s_p}.
+\]</div>
+<p>The denominator combines <strong>variances</strong>, weighted by their degrees of freedom, before taking a square root. It is not the ordinary average of the two SDs. This pooled description uses a common within-group spread; if spreads differ greatly, show both distributions instead of allowing one pooled number to hide that difference.</p>
+<p>Work through these invented summaries:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th style="text-align: right;">n</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">Sample SD</th>
+<th style="text-align: right;">Sample variance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inside mask</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">36</td>
+</tr>
+<tr>
+<td>Chosen background</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">144</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Foreground contributes <code>(4−1) × 36 = 108</code> squared-deviation units.</li>
+<li>Background contributes <code>(7−1) × 144 = 864</code>.</li>
+<li>Total degrees of freedom are <code>4+7−2 = 9</code>.</li>
+<li>Pooled variance is <code>(108+864)/9 = 108</code>.</li>
+<li>Pooled SD is <code>sqrt(108) ≈ 10.392</code>.</li>
+<li>The mean gap is <code>96−78 = 18</code>, so <code>d = 18/10.392 ≈ 1.732</code>.</li>
+</ol>
+<p>The sign is positive because the inside is brighter on average. Reversing the groups reverses the sign. Magnitude is the gap in pooled-SD units; it is neither a probability nor a predicted segmentation score. Conventional small/medium/large labels, when used, are descriptive heuristics rather than thresholds proving a detector will work.</p>
+<pre class="highlight"><code class="language-python">def pooled_d(mean_f, sd_f, n_f, mean_b, sd_b, n_b):
+    if n_f &lt; 2 or n_b &lt; 2 or sd_f &lt; 0 or sd_b &lt; 0:
+        raise ValueError("Need two samples per group and nonnegative SDs")
+    pooled_var = ((n_f - 1) * sd_f**2 + (n_b - 1) * sd_b**2) / (n_f + n_b - 2)
+    if pooled_var == 0:
+        return np.nan  # undefined standardised difference
+    return (mean_f - mean_b) / np.sqrt(pooled_var)
 
-a = np.array([[0, 0, 255, 255]] * 4, dtype=np.float32)
+assert np.isclose(pooled_d(96, 6, 4, 78, 12, 7), np.sqrt(3))</code></pre>
+<p>If both groups have zero within-group spread, this particular standardisation is undefined. Two different constant intensities could be perfectly distinguishable, but still have an undefined pooled d. Adding an arbitrary epsilon would hide that issue by manufacturing a very large finite number.</p>
+<h2 id="core-interpret-a-contrast-measurement-without-overclaiming">Core · Interpret a contrast measurement without overclaiming</h2>
+<p>Small <span class="arithmatex">\(|d|\)</span> means small <strong>mean separation relative to the chosen pooled spread</strong>. It does not prove that full histograms overlap almost completely, that colour is useless or that texture is the only possible cue. The equal-mean examples above already disprove those stronger conclusions.</p>
+<p>Large <span class="arithmatex">\(|d|\)</span> also does not prove a global threshold works on new images. One camera exposure might make everything brighter. A foreground distribution can have a shifted mean but a long tail overlapping background. Rectangular regional annotations can include uninformative interior gaps. Inspect distributions and held-out predictions before selecting a decision rule.</p>
+<p>For the cloud practice data, organisation regions are not exact silhouettes of bright clouds. A labelled area can include darker spaces between clouds. Therefore brightness statistics describe the supplied region and background definition; they do not turn brightness into ground truth.</p>
+<p>Choose and record an aggregation rule. Pooling all foreground pixels across images gives large regions more influence. Calculating a d per image and averaging gives each eligible image equal weight, but can exclude images without both groups and can be unstable for tiny groups. Neither is automatically preferable. Report the eligible-image count, group definition, intensity conversion and aggregation together.</p>
+<p>Neighbouring pixels are correlated: a million adjacent locations are not a million independent manufactured items or scenes. A descriptive pixel statistic can still be useful, but uncertainty based on independent-pixel assumptions can be far too optimistic. For repeated-image evidence, preserve the independent source groups discussed in <a href="06_validation.html">Guide 6</a>. Do not turn pixel count into a claim of enormous experimental support.</p>
+<h2 id="core-scaling-values-is-different-from-adding-evidence">Core · Scaling values is different from adding evidence</h2>
+<p>Suppose the same transformation <span class="arithmatex">\(x'=ax+b\)</span>, with <span class="arithmatex">\(a&gt;0\)</span>, is applied to every value in both groups. The mean difference becomes <span class="arithmatex">\(a(\bar{x}_f-\bar{x}_b)\)</span>; each SD and the pooled SD become <span class="arithmatex">\(a\)</span> times their originals. Consequently,</p>
+<div class="arithmatex">\[
+d'=\frac{a(\bar{x}_f-\bar{x}_b)}{a s_p}=d.
+\]</div>
+<p>Adding 20 to both means above changes them to 116 and 98; their gap stays 18 and d stays 1.732. Multiplying every value by 0.5 halves both gap and pooled SD, again preserving d. Dividing a confirmed 8-bit image by 255 is another such uniform scaling.</p>
+<p>These statements assume no clipping or rounding loss and the <strong>same</strong> transform in both groups. With negative a, the sign reverses; with a zero, all values collapse and the SD is zero. Saturating transformed values into 0–255 can destroy the invariance. Independently normalising each region is a different operation and may remove the very mean difference you intended to measure.</p>
+<p>Contrast enhancement can help a person see existing structure or help a limited model use it. It cannot guarantee better prediction. CLAHE, contrast-limited adaptive histogram equalisation, uses local histograms with a clipping control rather than one global affine rule. Its mapping depends on neighbourhoods, so the d-invariance proof does not apply. It can change distributions and strengthen noise as well as useful structure. The <a href="https://docs.opencv.org/4.x/d5/daf/tutorial_py_histogram_equalization.html">OpenCV CLAHE explanation</a> describes this local procedure.</p>
+<p>For an enhancement experiment, preserve the masks, split and evaluation grid; state settings and compare held-out errors under the same budget. Display original and transformed views with declared plotting limits. A sharper-looking overlay is a viewing result until prediction evidence supports a stronger claim.</p>
+<h2 id="core-measure-arrangement-with-neighbouring-values">Core · Measure arrangement with neighbouring values</h2>
+<p>Texture describes relationships among values over a neighbourhood: alternation, direction, repeated spacing or local roughness. One simple descriptor is mean absolute horizontal change:</p>
+<pre class="highlight"><code class="language-python">a = np.array([[0, 0, 255, 255]] * 4, dtype=np.float32)
 b = np.array([[0, 255, 0, 255], [255, 0, 255, 0]] * 2,
              dtype=np.float32)
 
-def neighbour_change(x):
+def horizontal_change(x):
     return np.abs(np.diff(x, axis=1)).mean()
 
-print(a.mean(), b.mean())
-print(neighbour_change(a), neighbour_change(b))</code></pre>
-<p>The horizontal-neighbour differences average to 85 for A and 255 for B. This deliberately simple feature exposes arrangement that the mean misses. It does not establish a general-purpose texture classifier. Rotating the patterns changes a horizontal-only feature; real images also contain noise, different scales and unrelated edges.</p>
-<p>Cast integer images to a signed or floating type before subtraction. Unsigned 8-bit arithmetic cannot represent a negative difference in the intended way. A numerical result from the wrong dtype can look precise while describing the wrong computation.</p>
-<h2 id="core-what-brightness-thresholding-can-and-cannot-show">Core · What brightness thresholding can and cannot show</h2>
-<p>A rule such as <code>image &gt;= t</code> selects bright locations. On a toy image with a bright square against a dark uniform background, it may isolate that square. It will also select an equally bright background object. If the two patterns above are assigned different semantic labels, their shared brightness values cannot determine those labels independently of location or context.</p>
-<p>Cloud organisation annotations are especially useful for this discussion. A bright cloud pixel and a labelled cloud-pattern region are different concepts. A mask can encompass spaces between clouds because its target is organisation. A brightness threshold should therefore be described as a diagnostic rule, not a valid ground-truth generator.</p>
-<h2 id="core-make-an-observation-before-proposing-a-transform">Core · Make an observation before proposing a transform</h2>
-<p>For one selected class, display the original image, its mask and an overlay. Then ask:</p>
-<ul>
-<li>Is the annotated region brighter, darker or mixed relative to nearby background?</li>
-<li>Is the boundary a sharp intensity edge or a region-level interpretation?</li>
-<li>Does the pattern involve spacing, repeated structures or local roughness?</li>
-<li>Is the same apparent cue visible across several examples and illumination conditions?</li>
-<li>Could a resize remove the cue I am discussing?</li>
-</ul>
-<p>Foreground versus background intensity summaries require a registered mask. A shifted mask produces misleading statistics even when the code is otherwise correct. Start with the overlay. Compare several individual examples before pooling every pixel into one distribution; large images or large masks can dominate a pooled result.</p>
-<h2 id="core-normalisation-is-not-evidence-of-separation">Core · Normalisation is not evidence of separation</h2>
-<p>Dividing an image by 255 changes units. It does not make an ambiguous label separable. Contrast enhancement changes how local brightness differences appear; it may strengthen useful structure, unrelated texture or noise. A more dramatic picture is not automatically a better input.</p>
-<p>Use fixed display ranges when comparing before and after views. State whether a transform changes the image data or only the plotting scale. In the core route we inspect the original data and one simple statistic; preprocessing experiments belong after a trustworthy split and a reproducible baseline.</p>
-<h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
-<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
+assert np.isclose(horizontal_change(a), 85)
+assert np.isclose(horizontal_change(b), 255)</code></pre>
+<p>A row of A has differences <code>[0,255,0]</code>, averaging to 85. Every adjacent pair in a row of B differs by 255. <code>axis=1</code> means “compare columns”; <code>abs</code> removes the direction of the change. Casting before subtraction is essential. With unsigned bytes, <code>0−255</code> can wrap to a small positive value rather than become −255.</p>
+<p>A directional difference is a simple <strong>gradient feature</strong>. Rotate A by 90 degrees and its horizontal differences become zero, even though its horizontal boundary is still visible through vertical differences. This feature is direction-sensitive. B remains alternating after a quarter-turn. Combining directions supplies additional information, but does not create a complete semantic classifier.</p>
+<p><strong>Local variance</strong> is another descriptor. In a three-value window <code>[0,0,0]</code>, variance is zero; <code>[0,255,0]</code> has mean 85 and population variance 14450. A sliding variance map can highlight mixed neighbourhoods. Edges, sensor noise and meaningful texture can all raise it. Window size changes its meaning: a tiny window sees detail; a large one can mix several different regions. Keep border handling explicit, because padding also changes the neighbourhood.</p>
+<h2 id="explore-keep-the-histogram-fixed">Explore · Keep the histogram fixed</h2>
+<p>These controls use deterministic toy patterns. Predict which values change before switching the arrangement. The diagrams and arithmetic above provide the same lesson without JavaScript.</p>
 <h3 id="same-histogram-different-arrangement">Same histogram, different arrangement</h3>
 <div class="bc-lab" data-bc="texture"><p>Use the worked examples in this guide to reason about same histogram, different arrangement. The interactive controls appear when JavaScript is available.</p></div>
 
-<h2 id="checkpoint-explain-the-two-patterns">Checkpoint · Explain the two patterns</h2>
+<h2 id="optional-depth-from-neighbouring-pixels-to-a-receptive-field">Optional depth · From neighbouring pixels to a receptive field</h2>
+<p>The starter RGB model in <a href="07_diagnostic_baseline.html">Guide 7</a> sees one pixel's colour. A 1×1 convolution also combines channels at one location, without directly seeing surrounding locations. Identical RGB values therefore receive identical outputs in that starter model.</p>
+<p>A 3×3 spatial convolution can respond to an arrangement of nearby pixels. Stacking three stride-1, undilated 3×3 layers gives a theoretical receptive-field width <code>1 → 3 → 5 → 7</code>. Each output can depend on a 7×7 region of the input away from boundary complications. For a layer with kernel width k, dilation d, stride s and previous input jump j, the recurrence is <code>r_new = r_old + (k−1)*d*j</code>, <code>j_new = j*s</code>.</p>
+<p>This describes possible dependence, not a guarantee that training uses all that context well. Downsampling expands context but can erase thin detail. A larger receptive field can help distinguish a repeated background pattern from an isolated disturbance, while still requiring correct labels and held-out evidence.</p>
+<h2 id="optional-depth-a-tiny-co-occurrence-matrix">Optional depth · A tiny co-occurrence matrix</h2>
+<p>A grey-level co-occurrence matrix, or GLCM, counts pairs of intensity levels at a declared offset. Reduce A and B to levels 0 and 1 and count rightward neighbours. A has four <code>0→0</code>, four <code>0→1</code> and four <code>1→1</code> pairs. B has six <code>0→1</code> and six <code>1→0</code> pairs. Both have 12 pairs, but different pair distributions.</p>
+<p>After dividing by 12, the descriptor <code>sum(P[i,j]*(i−j)**2)</code> is 1/3 for A and 1 for B. This distinguishes them even though their single-pixel histograms match. Offset, direction, grey-level quantisation and whether counts are symmetrised must be stated. The <a href="https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.graycomatrix">scikit-image GLCM documentation</a> gives the formal API. This is an optional descriptor exercise, not a required preprocessing pipeline.</p>
+<h2 id="practice-check-a-measurement-and-challenge-a-claim">Practice · Check a measurement and challenge a claim</h2>
 <ol>
-<li>Can A and B have different means? Calculate rather than judge by eye.</li>
-<li>Would a histogram plot distinguish them?</li>
-<li>Why can a convolutional feature use information that a single-pixel threshold cannot?</li>
-<li>A transformation makes a mask overlay look sharper. What evidence would establish that it helps prediction?</li>
+<li>For <code>[8,10,12]</code>, calculate mean, population variance and sample variance. Explain why the two variances differ.</li>
+<li>Inside mean 84 and background mean 72 share pooled SD8. Find d, its sign and its units. Does that number alone establish a useful threshold?</li>
+<li>Apply <code>x'=2x+5</code> to both groups in question 2 without clipping. Predict the new mean gap, pooled SD and d.</li>
+<li>A student reports d=0 from pooled pixels and concludes that their regions have identical appearance. Give two alternative explanations and one further check.</li>
+<li>Shuffle the entries of A. Which of mean, histogram and horizontal change must remain fixed? Which might change?</li>
+<li>A contrast transform raises validation recall but also raises false alarms. What else must be inspected before calling it useful?</li>
 </ol>
 <details>
-<summary>Hints and explanations</summary>
+<summary>Hints and worked explanations</summary>
 <ol>
-<li>Their means are equal: <code>(8 × 0 + 8 × 255) / 16 = 127.5</code>.</li>
-<li>No. Their counts at each intensity are identical.</li>
-<li>A neighbourhood operation can respond to arrangements such as alternation and edges. This does not guarantee it learns the right semantic rule; it makes that information available.</li>
-<li>Compare held-out predictions under a fixed split and matching budget, change only the transform, and inspect both scores and errors. Display attractiveness is not a validation result.</li>
+<li>Mean 10; squared deviations 4,0,4. Population variance 8/3; sample variance 8/2=4. Their divisors encode different conventions.</li>
+<li>d=(84−72)/8=+1.5, a dimensionless positive mean difference. Show distributions and held-out errors before claiming separability.</li>
+<li>Mean gap 24, pooled SD16, so d remains 1.5. The shared positive affine scale cancels.</li>
+<li>The groups might differ in spread/tails, or in spatial arrangement; image-specific brightness shifts could also cancel when pooled. Compare overlays, per-image histograms and neighbourhood features.</li>
+<li>Mean and histogram remain fixed because the values are unchanged. Horizontal change may vary because neighbours changed.</li>
+<li>Inspect precision/empty-pair behaviour, class support and the declared objective under the fixed split. Improved recall alone does not establish a better operating point.</li>
 </ol>
 </details>
-<h2 id="optional-extension-effect-sizes-and-local-features">Optional extension · Effect sizes and local features</h2>
-<p>You can compare foreground and background means relative to their spread, or examine local variance and co-occurrence-based features. A small difference of means does not prove the absence of predictive information: spatial arrangement, colour and context may matter. A large difference does not prove a stable cue: illumination or annotation sampling may explain it. Do not interpret thousands of neighbouring pixels as thousands of independent examples.</p>
-<p>For a concrete next step, rotate pattern B and recompute the horizontal statistic. Then add a vertical-neighbour statistic and explain how that changes the description. <a href="https://numpy.org/doc/stable/reference/generated/numpy.diff.html">NumPy's <code>diff</code> documentation</a> defines the axis-wise difference operation used above.</p>
-<p><strong>Transfer question:</strong> what observation would support testing an intensity-based diagnostic on another dataset? What observation would make you inspect texture or context instead? Phrase both as hypotheses to check.</p>
+<p><strong>Transfer question:</strong> specify an intensity quantity, a background definition, an aggregation rule and a spatial feature you would inspect on a new dataset. State what each could support and what it could not establish. Leave actual class conclusions to your own checked measurements.</p>
 <p><a href="03_rle_and_geometry.html">Previous: RLE and geometry</a> · <a href="05_metrics.html">Next: metrics</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="03_rle_and_geometry.html">← 3 · RLE &amp; geometry</a><a href="05_metrics.html">5 · Metrics &amp; error costs →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>

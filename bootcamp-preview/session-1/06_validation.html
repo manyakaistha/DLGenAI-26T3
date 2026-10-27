@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -18,6 +18,10 @@
 <li><a href="#core-split-images-before-their-derivatives">Core · Split images before their derivatives</a></li>
 <li><a href="#core-stratification-tries-to-preserve-representation">Core · Stratification tries to preserve representation</a></li>
 <li><a href="#core-rounding-and-rare-combinations-are-real-constraints">Core · Rounding and rare combinations are real constraints</a></li>
+<li><a href="#work-through-an-integer-allocation-not-just-a-percentage">Work through an integer allocation, not just a percentage</a></li>
+<li><a href="#what-combination-and-per-class-balancing-preserve">What combination and per-class balancing preserve</a></li>
+<li><a href="#quantify-split-luck-without-promising-exact-support">Quantify split luck without promising exact support</a></li>
+<li><a href="#draw-the-boundary-around-fitting-selection-and-final-assessment">Draw the boundary around fitting, selection and final assessment</a></li>
 <li><a href="#core-audit-a-split-then-keep-it-fixed">Core · Audit a split, then keep it fixed</a></li>
 <li><a href="#core-fit-transform-and-choose-have-different-boundaries">Core · Fit, transform and choose have different boundaries</a></li>
 <li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
@@ -26,7 +30,7 @@
 </ul>
 </li>
 <li><a href="#checkpoint-decide-what-leaks">Checkpoint · Decide what leaks</a></li>
-<li><a href="#optional-extension-expected-support-is-not-guaranteed-support">Optional extension · Expected support is not guaranteed support</a></li>
+<li><a href="#optional-extension-check-the-assumption-behind-the-formula">Optional extension · Check the assumption behind the formula</a></li>
 </ul>
 </li>
 </ul>
@@ -62,6 +66,92 @@ and derived examples                 and measure predictions</code></pre>
 </ol>
 <p>Grouping rare combinations into a broader splitting stratum changes only how the split is allocated; it must not erase or relabel their original targets. No method can manufacture independent examples of a class that appears only once. If a class lacks validation positives, say that its positive-case performance cannot be established on this split.</p>
 <p>The <a href="practice_dataset_lab.ipynb">practice notebook</a> records its actual policy. Read that cell's printed support table rather than assuming the word “stratified” guarantees exact proportions. <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html">Scikit-learn's <code>train_test_split</code> reference</a> describes its <code>stratify</code> and <code>random_state</code> arguments; it is not a general guarantee of multi-label or grouped independence.</p>
+<h2 id="work-through-an-integer-allocation-not-just-a-percentage">Work through an integer allocation, not just a percentage</h2>
+<p>“Use 25% for validation” is a target, not a way to divide an individual image. Consider a <strong>fictional</strong> set of 16 independent source images. Their four presence patterns occur 7, 5, 3 and 1 times. A four-image holdout would ideally receive <code>7/4 = 1.75</code>, <code>5/4 = 1.25</code>, <code>3/4 = 0.75</code> and <code>1/4 = 0.25</code> images from those patterns. None of those fractions is a possible selected count. If we simply round each one to the nearest integer, we get <code>2+1+1+0=4</code> here, but independent rounding is not guaranteed to sum to the desired total in another table.</p>
+<p>A transparent <strong>largest-remainder</strong> exercise starts with floors <code>[1,1,0,0]</code>, then gives the two remaining validation places to the largest fractional remainders: 0.75 from the seven-image stratum and 0.75 from the three-image stratum. With a declared tie rule, the allocation is <code>[2,1,1,0]</code>. The singleton stays in training. That is a policy choice, not a proof that the validation set can assess the singleton's combination. Even a class present in several combinations may have poor support if their allocations all round down. Audit the <em>class</em> totals after allocating <em>combinations</em>.</p>
+<p>The following small code spells out the policy. It operates on invented IDs and assumes those IDs are independent. It keeps at least one member of each non-singleton stratum in training; a singleton is training-only. It deliberately raises an error if that policy cannot meet the requested validation size. In a real project, that failure calls for a documented decision about holdout size or grouping, not a hidden duplicate.</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+
+members = {
+    "0000": [f"clean_{i}" for i in range(7)],
+    "1000": [f"fish_{i}" for i in range(5)],
+    "0100": [f"flower_{i}" for i in range(3)],
+    "1010": ["rare_0"],
+}
+seed, wanted = 30, 4
+rng = np.random.default_rng(seed)
+counts = {key: len(ids) for key, ids in members.items()}
+raw = {key: wanted * count / sum(counts.values())
+       for key, count in counts.items()}
+assigned = {key: int(np.floor(value)) for key, value in raw.items()}
+capacity = {key: max(0, count - 1) for key, count in counts.items()}
+while sum(assigned.values()) &lt; wanted:
+    choices = [key for key in sorted(members)
+               if assigned[key] &lt; capacity[key]]
+    if not choices:
+        raise ValueError("Declared training-support policy cannot fill holdout")
+    chosen = max(choices, key=lambda key: raw[key] - assigned[key])
+    assigned[chosen] += 1
+validation_ids, training_ids = [], []
+for key, ids in members.items():
+    shuffled = rng.permutation(ids).tolist()
+    validation_ids += shuffled[:assigned[key]]
+    training_ids += shuffled[assigned[key]:]
+assert len(validation_ids) == wanted
+assert not (set(validation_ids) &amp; set(training_ids))
+assert set(validation_ids) | set(training_ids) == {
+    image_id for ids in members.values() for image_id in ids
+}
+print(assigned)  # {'0000': 2, '1000': 1, '0100': 1, '1010': 0}</code></pre>
+<p>This toy method explains allocation; it is not a general grouped multi-label splitter. A code path that first divides photographs into tiles and then “stratifies” the tiles still leaks source images. If two images are from one acquisition group, replace the image IDs with group IDs <em>before</em> this reasoning. A group can have several labels and several images, so group counts and image counts will differ. Check both, and keep the group intact even when doing so makes the label balance untidy.</p>
+<h2 id="what-combination-and-per-class-balancing-preserve">What combination and per-class balancing preserve</h2>
+<p>A four-bit vector records which of four labels occur <strong>somewhere in an image</strong>. Combination stratification treats <code>1001</code> as its own stratum, so it can preserve the frequency of that co-occurrence when the stratum is sufficiently populated. It does not preserve mask size, severity, location, acquisition source or pixel overlap. Two <code>1001</code> images might have very different marked areas. The vector also says nothing about whether their two masks intersect at any pixel.</p>
+<p>An iterative multi-label allocator instead tries to balance each class's positive count across partitions, often paying special attention to rare labels first. That can retain marginal class support when many whole combinations are singletons. It may nevertheless change the frequency of specific combinations. Neither method guarantees exact balance with whole images, and neither repairs duplicate-source leakage. A grouped split can satisfy independence while some classes have zero validation support. This is a limitation to state and investigate, not permission to split one source across both sets.</p>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Preserves most directly</th>
+<th>Must still be checked</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Uniform random image split</td>
+<td>Image-ID disjointness if implemented correctly</td>
+<td>Rare labels, combinations, shared source groups</td>
+</tr>
+<tr>
+<td>Combination stratification</td>
+<td>Common presence-vector proportions</td>
+<td>Singleton combinations, marginal support after rounding, source groups</td>
+</tr>
+<tr>
+<td>Iterative multi-label allocation</td>
+<td>Marginal label support where feasible</td>
+<td>Specific co-occurrences, source groups, integer constraints</td>
+</tr>
+<tr>
+<td>Group-aware allocation</td>
+<td>Separation of known related sources</td>
+<td>Rare labels and combination support, group definition</td>
+</tr>
+</tbody>
+</table>
+<p>A practical priority order is <strong>independent source group → complete image and its four rows → label support → finer combination proportions</strong>. If group metadata is absent, say what you used as a proxy and inspect near duplicates. A filename convention can be useful evidence for grouping, but a different filename alone does not prove independence.</p>
+<h2 id="quantify-split-luck-without-promising-exact-support">Quantify split luck without promising exact support</h2>
+<p>For a uniform random holdout drawn <strong>without replacement</strong>, let the dataset contain <code>N</code> independent images, <code>K</code> positives for a label, and <code>n</code> held-out images. If <code>X</code> is the number of held-out positives, then</p>
+<div class="arithmatex">\[E[X]=nK/N,\qquad
+\operatorname{Var}(X)=n\frac K N\left(1-\frac K N\right)\frac{N-n}{N-1}.\]</div>
+<p>The last factor is the finite-population correction. It matters because drawing a positive image leaves one fewer positive for later draws. A binomial calculation uses <code>np(1−p)</code> and behaves as if every draw were independent <em>with replacement</em>. It is an approximation, generally with a larger variance when the holdout is a sizable fraction of the dataset. This calculation describes <strong>uniform random splitting</strong>, not the distribution produced by a stratification rule.</p>
+<p>Use another invented example: <code>N=40</code>, <code>K=10</code>, <code>n=8</code>. The expected support is <code>8×10/40=2</code>. The exact without-replacement variance is <code>8×0.25×0.75×(32/39)=1.2308</code>, so the standard deviation is about <code>1.1094</code>. The binomial approximation gives variance <code>1.5</code> and standard deviation <code>1.2247</code>. Both centre at 2; neither guarantees a realised count of 2. The exact probability of <strong>zero</strong> positives is</p>
+<div class="arithmatex">\[P(X=0)=\frac{\binom{30}{8}}{\binom{40}{8}}\approx 0.0761.\]</div>
+<p>That is about a 7.6% chance in this toy setting. A 20% target does not itself prevent an empty rare-class validation group. If zero positives are observed, a foreground-only Dice for that class has no positive pairs to average. Report it as unavailable with support zero; do not silently assign a perfect or failed foreground score. An all-pair metric could still be defined through empty-pair conventions, but it answers a different question.</p>
+<p>For each real split, print <strong>realised</strong> counts, not just <code>E[X]</code>. Repeat a split under several seeds only as a <em>stability audit</em>: note how support and conclusions vary. Do not try seeds until one produces the best model score and then claim it was a single prespecified evaluation. If a few sources dominate the dataset, repeated image-level splits can keep leaking across source groups; repairing the unit of independence comes first.</p>
+<h2 id="draw-the-boundary-around-fitting-selection-and-final-assessment">Draw the boundary around fitting, selection and final assessment</h2>
+<p>Training can read the training inputs and targets to update weights. It can also estimate a normalisation mean, sample weights or a spatial-prior map, but those fitted quantities must use training data alone. The validation input is transformed using the already fixed rule; its target is read for measurement and choice. Even without gradients, copying validation masks into a prior map or using their intensity statistics to standardise training is fitted-data leakage.</p>
+<p>Development decisions use validation information. A threshold chosen because it wins among five candidates, an epoch chosen because its validation loss is lowest, or a component-size rule chosen after viewing validation masks all use validation. This is legitimate <strong>selection</strong> if declared, but the same validation score is optimistically selected. Repeating many unrecorded sweeps can overfit that holdout. A final independent test, if available, evaluates the completed rule once under its stated protocol. Hidden test labels or leaderboard feedback should not become a substitute training or threshold-tuning set.</p>
+<p>Write a small decision ledger before running an experiment: fixed split ID, candidate choices, metric and tie rule. Afterwards record <em>every</em> attempted candidate and the selected one. If the validation set has just one positive for a class, a single example can reverse candidate rankings; prefer a cautious conclusion to false precision. If no final independent evaluation is available, label the result a validation estimate with its support and selection history.</p>
 <h2 id="core-audit-a-split-then-keep-it-fixed">Core · Audit a split, then keep it fixed</h2>
 <pre class="highlight"><code class="language-python">train_ids = set(train_table["image_id"])
 valid_ids = set(valid_table["image_id"])
@@ -103,12 +193,11 @@ assert train_ids | valid_ids == set(all_table["image_id"])</code></pre>
 <li>Estimate the mean using training images only, then reuse it unchanged. The validation set should not influence fitting.</li>
 </ol>
 </details>
-<h2 id="optional-extension-expected-support-is-not-guaranteed-support">Optional extension · Expected support is not guaranteed support</h2>
-<p>If <code>K</code> of <code>N</code> images contain a rare label and a uniform random holdout contains <code>n</code> images, its expected positive count is <code>nK/N</code>. For sampling without replacement, the count has hypergeometric variance:</p>
-<div class="arithmatex">\[
-\operatorname{Var}(X)=n p(1-p)\frac{N-n}{N-1},\qquad p=K/N.
-\]</div>
-<p>The simpler binomial variance <code>np(1-p)</code> ignores the finite-population correction and is an approximation in this setting. Neither formula proves that the realised holdout has adequate support. For the core route, inspect the actual support table. For a multi-label method beyond combination stratification, see the original <a href="https://doi.org/10.1007/978-3-642-23808-6_10">On the Stratification of Multi-label Data</a>.</p>
+<h2 id="optional-extension-check-the-assumption-behind-the-formula">Optional extension · Check the assumption behind the formula</h2>
+<p>The hypergeometric formula above supposes <code>N</code> distinct, equally eligible images and a simple uniform sample of <code>n</code> of them. If a camera captures twenty near-identical frames from one scene, they may be twenty filenames but not twenty independent observations. A random image holdout can then contain nearly the same scene in training and validation. The formula still describes how many <strong>filenames</strong> with a label land in the holdout, but it does not quantify uncertainty over unseen scenes. Redefine the draw at the scene or acquisition-group level where that relationship matters.</p>
+<p>A useful audit starts before modelling: compare metadata such as source identifiers and acquisition times; inspect a small set of nearest-looking images from opposite partitions; and check whether crop coordinates or processing suffixes reveal common parents. Perceptual image similarity can flag candidates for human inspection, but a similar-looking cloud need not be a duplicate, and unrelated filenames can still derive from the same source. Document the evidence and the resulting group rule. Never claim that a disjoint-ID assertion alone proves generalisation to new sources.</p>
+<p>For deeper study, the original <a href="https://doi.org/10.1007/978-3-642-23808-6_10">multi-label stratification paper</a> discusses balancing label evidence; it does not override source-group independence. The <a href="practice_dataset_lab.ipynb">practice notebook</a> uses a fixed random image split for a short CPU exercise, prints the class-support table and saves the actual IDs. Its fixed seed enables repetition, but the small diagnostic sample does not establish robust rare-class performance. Apply the grouped and stratified reasoning here when designing a full study, and explain any missing metadata.</p>
+<p><strong>Decision exercise.</strong> Suppose eight images are four before/after pairs from four acquisition sessions. Two sessions contain the rare label, and the validation budget is two images. An image-level split could put the “before” frame in training and the “after” frame in validation, producing two apparently distinct filenames. A session-level split allocates both frames together, so a two-image validation set contains one complete session. If both rare sessions are placed in training, validation cannot measure rare-positive performance; if one rare session is held out, support is one independent source, even though it contains two images. State that support in both units. Which constraint should decide the split? Independence comes first. Then examine whether the chosen independent allocation supplies enough label support for the question you want to answer. A metric printed over two related frames does not create two independent rare-label cases.</p>
 <p><strong>Transfer question:</strong> identify the true independent source unit for another dataset: image, patient, manufactured item, video or acquisition batch. What evidence would you need before claiming there is no leakage?</p>
 <p><a href="05_metrics.html">Previous: metrics</a> · <a href="07_diagnostic_baseline.html">Next: diagnostic baseline</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="05_metrics.html">← 5 · Metrics &amp; error costs</a><a href="07_diagnostic_baseline.html">7 · Diagnostic baseline &amp; thresholds →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>

@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -18,7 +18,13 @@
 <li><a href="#core-begin-with-predictions-whose-meaning-is-obvious">Core · Begin with predictions whose meaning is obvious</a></li>
 <li><a href="#core-understand-a-spatial-prior">Core · Understand a spatial prior</a></li>
 <li><a href="#core-train-a-small-image-dependent-model">Core · Train a small image-dependent model</a></li>
+<li><a href="#three-baselines-that-answer-different-questions">Three baselines that answer different questions</a></li>
+<li><a href="#trace-the-actual-notebook-arrays">Trace the actual notebook arrays</a></li>
+<li><a href="#work-one-gradient-update-by-hand">Work one gradient update by hand</a></li>
+<li><a href="#follow-a-full-training-pass-and-a-fixed-validation-pass">Follow a full training pass and a fixed validation pass</a></li>
+<li><a href="#separate-learning-decision-and-generalisation">Separate learning, decision and generalisation</a></li>
 <li><a href="#core-a-score-becomes-a-mask-through-a-decision-rule">Core · A score becomes a mask through a decision rule</a></li>
+<li><a href="#read-a-threshold-table-from-its-counts">Read a threshold table from its counts</a></li>
 <li><a href="#core-a-small-declared-threshold-comparison">Core · A small, declared threshold comparison</a></li>
 <li><a href="#core-diagnose-surprising-results">Core · Diagnose surprising results</a></li>
 <li><a href="#practice-write-a-baseline-record">Practice · Write a baseline record</a></li>
@@ -92,6 +98,119 @@ z = w_R R + w_G G + w_B B + b,
 
 <p>Keep <strong>training loss</strong> separate from <strong>validation Dice</strong>. BCE uses continuous scores while hard Dice uses thresholded masks. A decreasing loss on training pixels does not guarantee better localisation on new images. Inspect the held-out errors and compare against the same empty/prior diagnostics. No weights, results or threshold from this cloud exercise should be transferred to the assessed project.</p>
 <p>This deliberately weak starter model covers the first milestone's baseline-training idea. The later pipeline session develops spatial context, U-Net, batches, augmentation and a fuller training workflow. Finishing the small model independently can take longer than its in-class introduction.</p>
+<h2 id="three-baselines-that-answer-different-questions">Three baselines that answer different questions</h2>
+<p>A <strong>class-global pixel prior</strong> is a useful bridge between the all-empty rule and the spatial prior. For class <code>k</code>, count its marked pixels in the <em>training</em> images and divide by all training canvas pixels: <code>q_k = marked pixels/(N_train × H × W)</code>. Repeat that one value at every location of every validation image. Do not confuse it with the fraction of <strong>images</strong> containing the class; a rare large region and many tiny regions can reverse those rankings. If <code>q_k=0.08</code>, a threshold of 0.5 predicts that class empty everywhere. That result diagnoses the combination of class imbalance and decision threshold; it does not show that an image has no cloud pattern.</p>
+<p>The spatial prior replaces one class-wide value with an <code>H×W</code> map for each class. A training image contributes either zero or one at each location. The map can learn a repeated annotation location, but it still sends the <strong>same</strong> map to two completely different validation photographs. The trainable RGB pixel model is the first rule here whose output changes with a new image's colours. It cannot use nearby pixels, though, and so cannot tell a white pixel inside a thin structure from an equally white pixel in a different texture. These three rules should be compared on the same held-out IDs and grid, with their information sources named. It would be misleading to claim that any one is a full segmentation system.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Fitted from training labels?</th>
+<th>Reads each new image?</th>
+<th>Retains location?</th>
+<th>Can read neighbours?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Class-global prior</td>
+<td>Yes, one value per class</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Spatial prior</td>
+<td>Yes, one map per class</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Four-head RGB logistic model</td>
+<td>Yes, four feature weights per head</td>
+<td>Yes</td>
+<td>No, except through the pixel value</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<p>In all three, a <strong>score</strong> still needs a threshold to become a binary mask. A low or high numerical score need not be a calibrated probability. The spatial prior's observed frequency at a coordinate is estimated from a small sampled training set; it is not a trustworthy conditional probability for a new image. A logistic output lies between zero and one by construction, but that shape alone does not certify calibration either.</p>
+<h2 id="trace-the-actual-notebook-arrays">Trace the actual notebook arrays</h2>
+<p>The <a href="foundations_walkthrough.ipynb">offline foundations notebook</a> uses tiny synthetic arrays to teach HWC, CHW, RLE, masks and Dice. Its examples are not cloud measurements. The <a href="practice_dataset_lab.ipynb">real-data practice notebook</a> reads <code>Image_Label</code>/<code>EncodedPixels</code>, groups four rows per image, verifies the chosen Kaggle variant's geometry, checks a real overlay and splits <strong>image IDs</strong> once with a fixed seed. Its spatial prior averages up to 12 training masks at a <code>70×105</code> grid and evaluates up to 6 validation images. The saved <code>session1_evidence.json</code> includes the actual IDs, variant, split seed, grid and diagnostic cutoffs. On a limited smoke run these numbers may be smaller; the output explicitly says so.</p>
+<p>The <a href="starter_pixel_model.ipynb">starter pixel-model notebook</a> reads that manifest rather than drawing a new split. For each selected image, it resizes RGB input by bilinear interpolation, scales bytes to <code>[0,1]</code>, and decodes each class's RLE at the <strong>selected source variant's</strong> native canvas. It then resizes binary masks by nearest neighbour to the same <code>70×105</code> grid. One image yields an RGB array <code>(70,105,3)</code> and binary targets <code>(70,105,4)</code>. Flattening gives 7,350 pixel rows. The feature vector is <code>[1,R,G,B]</code>, so a selected set of <code>N</code> images gives <code>X</code> shape <code>(7350N,4)</code> and <code>Y</code> shape <code>(7350N,4)</code>. The leading 1 is the bias feature; it is not a fourth colour channel.</p>
+<p>The weight matrix <code>W</code> has shape <code>(4,4)</code>: four input features by four independent class heads. <code>XW</code> has shape <code>(7350N,4)</code>. Each column receives its own sigmoid; the four outputs need not sum to one. That matters when two cloud categories mark the same pixel. A softmax would force a single winner and change the problem represented by the supplied labels. The starter code avoids a large framework to keep this relationship visible; its four-feature contraction is mathematically the same <code>X @ W</code> operation. There is no convolutional neighbourhood, decoder, pretrained encoder or GPU training in these Session 1 notebooks.</p>
+<p>The local notebook requires the real practice manifest first. If it reports missing <code>session1_evidence.json</code>, run the practice notebook on the same selected variant and <code>CLOUD_OUTPUT_ROOT</code>; do not fabricate a split file. If it reports an incompatible variant, fix the dataset root or selection rather than changing expected dimensions to bypass the check. The starter saves a separate <code>starter_pixel_model_evidence.json</code> containing its exact selected IDs, shapes, learning settings, loss trace and diagnostic table, without copying image pixels or masks.</p>
+<h2 id="work-one-gradient-update-by-hand">Work one gradient update by hand</h2>
+<p>For one pixel, let <code>x=[1,0.2,0.4,0.6]</code> and its four targets be <code>y=[1,0,0,0]</code>. Start with every weight at zero. Each logit is <code>z_k=x·W[:,k]=0</code>, and each sigmoid score is <code>p_k=0.5</code>. For one example and four classes, the notebook's <strong>mean</strong> BCE is</p>
+<div class="arithmatex">\[L=\frac14\sum_{k=1}^4[\log(1+e^{z_k})-y_k z_k]=\log 2\approx0.6931.\]</div>
+<p>The derivative of this mean loss for weight <code>W[f,k]</code> is <code>x_f(p_k−y_k)/4</code>. The first class has error <code>−0.5</code>; each absent class has error <code>+0.5</code>. With teaching learning rate 2, the first head's bias update is <code>−2×(−0.5/4)=+0.25</code>. Each absent head's bias becomes <code>−0.25</code>. The first head's red weight becomes <code>+0.05</code>, green <code>+0.10</code> and blue <code>+0.15</code>; the absent heads get the corresponding negative values. Recompute the first logit:</p>
+<div class="arithmatex">\[z_1=0.25+0.05(0.2)+0.10(0.4)+0.15(0.6)=0.39,\]</div>
+<p>so its new sigmoid score is about <code>0.596</code>. The other three logits are <code>−0.39</code> and their scores about <code>0.404</code>. The update moved this <strong>training pixel's</strong> scores toward its target. It did not show that the rule works on another photograph. The real notebook averages over a minibatch of many pixels and all four heads, so its gradient is <code>Xᵀ(sigmoid(XW)−Y)/(4M)</code> for <code>M</code> minibatch pixels. It uses a fixed shuffle seed and training IDs only for updates.</p>
+<p><code>logaddexp(0,z)−yz</code> is a stable way to calculate BCE from a logit, avoiding an explicit <code>log(sigmoid(z))</code> that can fail at extreme values. Sigmoid is used for the gradient and later thresholding; targets remain 0 or 1. Resizing targets by bilinear interpolation would create fractional edge labels and change this binary exercise. Scaling RGB bytes to <code>[0,1]</code> is a fixed arithmetic transform, not a mean and standard deviation estimated from validation images.</p>
+<p>An <strong>epoch</strong> is one pass through the selected training images. A <strong>minibatch</strong> is the subset used for one update. The notebook uses a fixed small image cap, two images per update and 12 epochs so the exercise runs on a CPU. These counts are classroom settings, not recommendations for another dataset or a proof of convergence. It evaluates validation BCE after each epoch but does not use validation masks in the weight gradient. An optimizer that selected the best epoch would use validation for selection and must record that additional choice; this notebook simply shows the short trace.</p>
+<h2 id="follow-a-full-training-pass-and-a-fixed-validation-pass">Follow a full training pass and a fixed validation pass</h2>
+<p>The starter's NumPy loop has no hidden training mode: only an explicit assignment to W changes its parameters. In a larger PyTorch model, dropout and batch normalisation also behave differently during fitting and evaluation. <code>model.eval()</code> changes those behaviours; <code>torch.no_grad()</code> disables gradient tracking. Neither replaces the other, and neither chooses a threshold or computes a metric automatically.</p>
+<p>This framework sketch shows the boundaries. It assumes a four-logit model, a training and validation loader, and a mean-reduced <code>BCEWithLogitsLoss</code>; it is a reading example rather than another downloadable training notebook.</p>
+<pre class="highlight"><code class="language-python">for epoch in range(number_of_epochs):
+    model.train()
+    for images, targets in training_loader:
+        optimizer.zero_grad()       # remove the previous step's gradients
+        logits = model(images)      # [B,4,H,W], targets have the same shape
+        loss = loss_function(logits, targets.float())
+        loss.backward()             # calculate parameter gradients
+        optimizer.step()            # only training targets drive this update
+
+    model.eval()
+    with torch.no_grad():
+        for images, targets in validation_loader:
+            logits = model(images)
+            scores = logits.sigmoid()
+            predictions = scores &gt;= declared_threshold
+            # Accumulate per-pair counts/metrics with the stated empty rule.
+            # No optimizer.step(), backward(), or fitting from these targets.</code></pre>
+<p>Gradients accumulate by default in PyTorch; resetting them prevents an unintended sum across unrelated steps. Evaluation targets are still needed to calculate errors, but they do not drive parameter updates. Dropout is disabled in evaluation and batch normalisation normally uses its stored training statistics. Forgetting to restore <code>model.train()</code> for the next pass can change subsequent training. The <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch optimisation tutorial</a> walks through these operations in a larger example.</p>
+<p>For loss summaries, account for batch sizes. If two batches contain 2 and 1 images and their mean losses are 0.2 and 0.8, the unweighted mean of batch means is 0.5, while the image-weighted mean is <code>(2×0.2+1×0.8)/3=0.4</code>. With equal grids/channels, image weighting also weights the elementwise mean correctly. Unequal valid-pixel counts require those counts instead. Hard Dice needs its own declared pair/class reduction; do not apply the loss averaging rule by reflex.</p>
+<h2 id="separate-learning-decision-and-generalisation">Separate learning, decision and generalisation</h2>
+<p>Loss and hard-mask Dice answer different questions. BCE uses every continuous score, so moving a true pixel from 0.30 to 0.45 improves its loss even if both are below a 0.5 hard-mask cutoff. A threshold can make the binary mask unchanged across several epochs while BCE steadily falls. Conversely, one score crossing 0.5 can change many pixels at once on a coarse annotation. Class imbalance gives the abundant absent pixels many contributions to mean BCE; a model can reduce average loss while missing a rare class. That is why the starter prints training and validation positive-pixel fractions and reports foreground-pair Dice beside absent-pair accuracy.</p>
+<p>Consider invented epoch summaries below. They are <strong>not measured notebook results</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Epoch</th>
+<th style="text-align: right;">Training BCE</th>
+<th style="text-align: right;">Held-out BCE</th>
+<th>Interpretation to test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.69</td>
+<td style="text-align: right;">0.70</td>
+<td>Starting point; masks and support still need inspection.</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">0.62</td>
+<td>Both improve; evidence of learning, not yet of useful localisation.</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.55</td>
+<td>Held-out BCE improves more slowly.</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.42</td>
+<td style="text-align: right;">0.60</td>
+<td>Possible overfit or unstable small holdout; inspect fixed examples and IDs.</td>
+</tr>
+</tbody>
+</table>
+<p>Do not diagnose “overfitting” from the table alone: a few validation images, an absent rare class or a shifted source can make a curve noisy. Check whether the same source leaked across partitions, whether masks align, how many positive pairs support each number and whether examples were chosen in advance. Holding the split and images fixed makes a model comparison interpretable. Trying many seeds until one curve looks good turns the seed into another validation-selected choice.</p>
 <h2 id="core-a-score-becomes-a-mask-through-a-decision-rule">Core · A score becomes a mask through a decision rule</h2>
 <pre class="highlight"><code class="language-python">prediction = score_map &gt;= threshold</code></pre>
 <p>A score map and a binary prediction are different objects. Record the comparison operator: values equal to the threshold are selected by <code>&gt;=</code>. A threshold is an operating choice, not the qualifying cutoff mentioned in project rules.</p>
@@ -138,6 +257,11 @@ Score:          .9    .4    .6    .1</code></pre>
 </table>
 <p>Raising the threshold removes selected locations. It cannot increase the selected set when scores are fixed. TP and FP cannot increase, while FN cannot decrease. Recall therefore cannot increase for a nonempty fixed target. Dice can move either way, and precision is not guaranteed to rise at every step: it depends on which locations were removed.</p>
 <p>There is no theorem that 0.5 is best for Dice, even for well-calibrated probabilities. The best threshold depends on the objective, score behaviour and evaluated population. With an uncalibrated spatial prior, treating 0.5 as inherently special is even less justified.</p>
+<h2 id="read-a-threshold-table-from-its-counts">Read a threshold table from its counts</h2>
+<p>For the positive target in the four-location example above, at 0.3 the selected locations are 1, 2 and 3. Locations 1 and 2 are true positives, location 3 is a false positive, and there is no missed positive: <code>Dice = 2×2/(2×2+1+0)=4/5</code>. At 0.5, location 2 drops out, so <code>TP=1, FP=1, FN=1</code>, giving <code>2/(2+1+1)=1/2</code>. At 0.8, location 3 also drops out: <code>TP=1, FP=0, FN=1</code>, giving <code>2/3</code>. Dice improved between 0.5 and 0.8 because the removed false positive outweighed the unchanged missed positive. It did <strong>not</strong> recover the positive at location 2.</p>
+<p>Now keep the exact same four scores but make the target all zero. At thresholds 0.3, 0.5 and 0.8 there is at least one false alarm, so that image/class pair gets Dice 0 under our explicit one-empty convention. At 0.95 every score is below the cutoff, prediction and target are both empty, and the pair gets 1. If we averaged this empty pair and the positive pair equally, the resulting toy all-pair means would be <code>0.4</code>, <code>0.25</code>, about <code>0.333</code> and <code>0.5</code> for cutoffs 0.3, 0.5, 0.8 and 0.95. The highest mean in this two-pair toy would belong to 0.95, despite <strong>zero foreground Dice</strong> at that cutoff. This is why the denominator and support population must accompany a reported score.</p>
+<p>A cutoff comparison should use a small fixed list, the same validation images and the same underlying scores. Record a deterministic tie rule before looking at results; for example, prefer the less aggressive cutoff among tied diagnostic values, while showing both positive and absent-pair behaviour. One can inspect precision and recall too: precision is <code>TP/(TP+FP)</code> when there is a predicted positive, and recall is <code>TP/(TP+FN)</code> when there is a true positive. State how undefined denominators are handled. A higher threshold removes predictions, but it is not guaranteed to raise precision on every image. These are <strong>local teaching diagnostics</strong>, not a fitted threshold to carry into another competition.</p>
+<p>Calibration asks whether a score such as 0.7 corresponds to about seven positives in ten comparable cases. That requires many independent held-out cases and careful grouping; the tiny Session 1 sample cannot establish it. A sigmoid maps a logit into <code>[0,1]</code> but does not make that empirical statement true automatically. Treat a calibration plot, if attempted later, as another validation analysis with its own data needs. For now, describe the score range, the chosen cutoff, target support and actual errors.</p>
 <h2 id="core-a-small-declared-threshold-comparison">Core · A small, declared threshold comparison</h2>
 <p>For the teaching lab, compare a few thresholds already listed in the notebook. Fit the prior once on training masks. Apply each threshold to its validation score maps, without refitting from validation targets. For each candidate, record:</p>
 <ul>

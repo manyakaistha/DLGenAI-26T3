@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -15,31 +15,43 @@
 <span class="section-label">2 · Labels &amp; counts</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
 <li><a href="#2-count-images-labels-and-pixels-separately">2 · Count images, labels and pixels separately</a><ul>
-<li><a href="#core-classification-detection-and-segmentation">Core · Classification, detection and segmentation</a></li>
-<li><a href="#core-read-a-long-annotation-table">Core · Read a long annotation table</a></li>
-<li><a href="#core-three-kinds-of-imbalance">Core · Three kinds of imbalance</a></li>
-<li><a href="#core-co-occurrence-and-overlap-are-different-audits">Core · Co-occurrence and overlap are different audits</a></li>
-<li><a href="#core-why-output-semantics-matter-later">Core · Why output semantics matter later</a></li>
-<li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
-<li><a href="#co-occurrence-versus-shared-pixels">Co-occurrence versus shared pixels</a></li>
+<li><a href="#21-what-kind-of-prediction-is-required">2.1 · What kind of prediction is required?</a></li>
+<li><a href="#22-read-the-annotation-contract-before-counting">2.2 · Read the annotation contract before counting</a></li>
+<li><a href="#23-from-long-rows-to-a-presence-matrix">2.3 · From long rows to a presence matrix</a></li>
+<li><a href="#24-prevalence-cardinality-and-label-density">2.4 · Prevalence, cardinality and label density</a></li>
+<li><a href="#25-three-imbalances-and-their-practical-consequences">2.5 · Three imbalances and their practical consequences</a></li>
+<li><a href="#26-image-co-occurrence-as-a-full-matrix">2.6 · Image co-occurrence as a full matrix</a></li>
+<li><a href="#27-pixel-intersections-union-and-occupancy">2.7 · Pixel intersections, union and occupancy</a></li>
+<li><a href="#28-sigmoid-one-yesno-score-per-class">2.8 · Sigmoid: one yes/no score per class</a></li>
+<li><a href="#29-softmax-categories-share-a-probability-budget">2.9 · Softmax: categories share a probability budget</a></li>
+<li><a href="#210-match-the-head-target-and-loss">2.10 · Match the head, target and loss</a></li>
+<li><a href="#explore-co-occurrence-versus-shared-pixels">Explore · Co-occurrence versus shared pixels</a></li>
+<li><a href="#practice-count-audit-then-choose-a-representation">Practice · Count, audit, then choose a representation</a><ul>
+<li><a href="#exercise-1-preserve-the-absent-image">Exercise 1 · Preserve the absent image</a></li>
+<li><a href="#exercise-2-detect-a-structural-error">Exercise 2 · Detect a structural error</a></li>
+<li><a href="#exercise-3-triple-overlap">Exercise 3 · Triple overlap</a></li>
+<li><a href="#exercise-4-one-pixel-incompatible-targets">Exercise 4 · One pixel, incompatible targets</a></li>
 </ul>
 </li>
-<li><a href="#checkpoint-a-small-audit-on-paper">Checkpoint · A small audit on paper</a></li>
-<li><a href="#practice-build-a-count-sheet">Practice · Build a count sheet</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </details><article><h1 id="2-count-images-labels-and-pixels-separately">2 · Count images, labels and pixels separately</h1>
 <p><strong>Core question:</strong> what is the denominator of this claim?</p>
-<p>“There are many examples of this class” can refer to many annotation rows, many photographs or many pixels. Those statements have different implications. Before calculating a percentage, write its numerator and denominator in words.</p>
-<h2 id="core-classification-detection-and-segmentation">Core · Classification, detection and segmentation</h2>
-<p>Classification answers which labels occur in an image. Detection adds approximate locations, commonly boxes. Semantic segmentation assigns a category or categories to locations in the image. A mask does not necessarily distinguish separate instances of the same category: two disconnected Fish regions can be stored in one Fish mask.</p>
-<p><strong>Multiclass classification</strong> chooses one class from mutually exclusive choices for a single decision. <strong>Multi-label classification</strong> permits several independent labels for the same example. An image can contain Fish and Sugar, so its image-level label can be <code>[1, 0, 0, 1]</code> in the fixed Fish/Flower/Gravel/Sugar order. That vector does not tell us whether Fish and Sugar occupy the same pixel.</p>
-<h2 id="core-read-a-long-annotation-table">Core · Read a long annotation table</h2>
-<p>The cloud practice CSV uses <code>Image_Label</code> to combine the image filename with a class label, and <code>EncodedPixels</code> for that class's mask. The notebook separates the final underscore-delimited label, checks the label vocabulary, and verifies that each image–class key is unique. Never split a filename at every underscore and assume the first piece is its complete name.</p>
-<p>An empty annotation means “this class has no marked region here” under this dataset's convention. Preserve it as an empty mask. A missing image file, an invalid RLE and an empty target are three different conditions. An image is fully label-empty only if <strong>all</strong> its class masks are empty; one absent class does not make the whole image clean.</p>
-<p>Use this invented presence matrix, not a measured cloud distribution:</p>
+<p>“There are many examples of this class” could mean many photographs, many annotation rows or many marked pixels. These statements are not interchangeable. A class can occur in half the photographs yet occupy only a tiny part of each one. A correct analysis starts by naming the thing being counted.</p>
+<p>This chapter builds the count sheet and then connects the annotations to model outputs. All numerical tables and masks below are invented. Use the <a href="practice_dataset_lab.ipynb">practice notebook</a> to make your own cloud-data observations; do not treat the toy distribution as a claim about real clouds.</p>
+<h2 id="21-what-kind-of-prediction-is-required">2.1 · What kind of prediction is required?</h2>
+<p>Image classification asks which labels occur somewhere in a picture. Object detection also localises objects, commonly with boxes. Semantic segmentation assigns a category or categories to image locations. Instance segmentation additionally separates individual objects of the same category. Our four class masks need not identify separate instances: two disconnected Fish regions can belong to one Fish mask.</p>
+<p><strong>Multiclass</strong> means one choice among mutually exclusive categories for the decision under discussion. <strong>Multi-label</strong> means several labels can be present for that decision. Specify its level. At image level, Fish and Sugar may both occur. At pixel level, their masks might occupy different places or overlap. Multi-label images alone do not establish multi-label pixels.</p>
+<p>Represent one image's presence using a fixed class order: Fish, Flower, Gravel, Sugar. The vector <code>[1, 0, 0, 1]</code> says Fish and Sugar each have at least one annotated pixel. It gives no area, location or component count. It also says nothing about the RGB input's three colour channels.</p>
+<h2 id="22-read-the-annotation-contract-before-counting">2.2 · Read the annotation contract before counting</h2>
+<p>The practice cloud CSV has <code>Image_Label</code> and <code>EncodedPixels</code>. The first field combines the image filename with its final underscore-delimited class name. The second stores that image–class mask as RLE. An example key <code>toy_scene_01.jpg_Fish</code> must become filename <code>toy_scene_01.jpg</code> and class <code>Fish</code>, rather than filename <code>toy</code>.</p>
+<p>Under the practice convention, an empty/missing <code>EncodedPixels</code> means an absent class. Whitespace should be normalised deliberately. A missing class <strong>row</strong>, however, is not necessarily an absent class: it might indicate an incomplete download, a failed join or a different annotation schema. A missing image file is another error. Do not turn every failure into “clean”.</p>
+<p>For a full-pair table with <code>N</code> images and <code>C</code> classes, we expect one row for every image–class pair. Therefore it should contain <code>N × C</code> rows. That equality alone does not validate it. A duplicate Fish row and missing Sugar row could cancel numerically. We must also check uniqueness, class vocabulary and complete pair coverage against the expected image IDs.</p>
+<p>Use an independent image manifest when possible: a list of source images from the selected dataset variant. Deriving the expected IDs only from the CSV cannot reveal an image omitted entirely from that CSV. Conversely, a directory containing only a declared demonstration subset cannot be used to certify completeness of the full archive. State the scope of each check.</p>
+<h2 id="23-from-long-rows-to-a-presence-matrix">2.3 · From long rows to a presence matrix</h2>
+<p>A long table repeats each image once per class. A wide presence matrix places images in rows and classes in columns. This invented matrix will be our running example:</p>
 <table>
 <thead>
 <tr>
@@ -94,54 +106,209 @@
 </tr>
 </tbody>
 </table>
-<p>Cardinality is the number of present labels in one image: sum across a row. It is not foreground area or the count of connected regions.</p>
-<p>There are 5 images, 20 image–class pairs and 6 positive pairs. Four images have at least one label. Thus the label-positive image fraction is <code>4/5</code>, while the positive-pair fraction is <code>6/20</code>. Neither tells us foreground pixel coverage. Even when every real cloud image has some cloud label, individual image–class pairs may still be empty. Measure both quantities rather than transferring assumptions from another dataset.</p>
-<h2 id="core-three-kinds-of-imbalance">Core · Three kinds of imbalance</h2>
-<ol>
-<li><strong>Image-label imbalance:</strong> one class occurs in few images. A model has fewer distinct positive examples from which to learn that class.</li>
-<li><strong>Pair imbalance:</strong> many image–class questions have an empty answer. A model may learn that predicting absence is often rewarded.</li>
-<li><strong>Pixel imbalance:</strong> a positive image can contain a small labelled area surrounded by background. Most pixel decisions can be negative even when image-level class counts seem balanced.</li>
-</ol>
-<p>Suppose a toy mask covers 5 of 100 pixels. Predicting background everywhere has 95% pixel accuracy but detects none of its foreground. This is why an impressive accuracy figure needs a foreground-focused diagnostic. <a href="05_metrics.html">Guide 5</a> calculates one.</p>
-<p>When reporting pixel coverage, specify whether it is <code>sum(mask_k)/(N*H*W)</code> for one class across all images or coverage only among positive images. They answer different questions. For overlapping labels, summing all class areas can exceed the union area; use a union when asking “what fraction of image locations has any label?”</p>
-<h2 id="core-co-occurrence-and-overlap-are-different-audits">Core · Co-occurrence and overlap are different audits</h2>
-<p>Draw a 3 × 4 grid. Mark Fish in the leftmost column and Sugar in the rightmost column. They co-occur in the image but share no pixels. Now move one Sugar pixel into the Fish column. The presence vector stays the same, while pixel overlap changes.</p>
-<pre class="highlight"><code class="language-python"># masks is a stack of registered Boolean targets: (classes, height, width)
-present = masks.reshape(masks.shape[0], -1).any(axis=1)
-cardinality = present.sum()
+<p>There are five images, twenty image–class pairs and six present pairs. Image p must remain in the analysis even though it contributes no positive row. If we first filter to present annotations and then group by image, p disappears. Its absence would make the label-empty image count and cardinality distribution wrong.</p>
+<p>The following complete toy example makes a long table, validates it, and reconstructs the matrix. <code>"1 1"</code> stands for a one-pixel toy mask wherever a class is present. It is only a presence demonstration, not a realistic cloud annotation.</p>
+<pre class="highlight"><code class="language-python">import numpy as np
+import pandas as pd
+
+CLASSES = ("Fish", "Flower", "Gravel", "Sugar")
+image_ids = ["p", "q", "r", "s", "t"]
+toy_presence = np.array([
+    [0, 0, 0, 0],
+    [1, 0, 0, 0],
+    [1, 0, 0, 1],
+    [0, 1, 0, 1],
+    [0, 0, 1, 0],
+], dtype=bool)
+records = []
+for filename, labels in zip(image_ids, toy_presence):
+    for name, present in zip(CLASSES, labels):
+        records.append({"Image_Label": f"{filename}_{name}",
+                        "EncodedPixels": "1 1" if present else ""})
+df = pd.DataFrame(records)
+
+def presence_from_full_pairs(frame, expected_ids):
+    required = {"Image_Label", "EncodedPixels"}
+    if not required.issubset(frame.columns):
+        raise ValueError("Required annotation columns are missing")
+    ids = list(expected_ids)
+    if (not ids or any(not isinstance(v, str) or not v.strip() for v in ids)
+            or len(ids) != len(set(ids))):
+        raise ValueError("Expected image IDs must be nonempty and unique")
+    work = frame.copy()
+    if (work["Image_Label"].isna().any()
+            or not work["Image_Label"].map(lambda v: isinstance(v, str)).all()):
+        raise ValueError("Image_Label must contain strings")
+    parts = work["Image_Label"].str.rsplit("_", n=1, expand=True)
+    if parts.shape[1] != 2:
+        raise ValueError("Each key needs a filename and final class suffix")
+    work["image_id"], work["class_name"] = parts[0], parts[1]
+    if work[["image_id", "class_name"]].isna().any().any():
+        raise ValueError("A key has no valid class suffix")
+    if not work["class_name"].isin(CLASSES).all():
+        raise ValueError("Unexpected class label")
+    if work.duplicated(["image_id", "class_name"]).any():
+        raise ValueError("Duplicate image-class pair")
+    actual = set(zip(work["image_id"], work["class_name"]))
+    expected = {(filename, name) for filename in ids for name in CLASSES}
+    if actual != expected:
+        raise ValueError(f"Pair coverage mismatch: {len(expected-actual)} missing, "
+                         f"{len(actual-expected)} unexpected")
+    nonmissing = work["EncodedPixels"].dropna()
+    if not nonmissing.map(lambda v: isinstance(v, str)).all():
+        raise ValueError("Masks must be RLE strings or documented missing values")
+    text = work["EncodedPixels"].fillna("").str.strip()
+    work["present"] = text.ne("")
+    wide = work.pivot(index="image_id", columns="class_name", values="present")
+    wide = wide.reindex(index=ids, columns=CLASSES)
+    if wide.isna().any().any():
+        raise ValueError("A pair disappeared during pivot")
+    return wide.astype(bool)
+
+presence = presence_from_full_pairs(df, image_ids)
+assert np.array_equal(presence.to_numpy(), toy_presence)</code></pre>
+<p>Read the validation in order. We first check that the required columns and independent IDs exist. <code>rsplit(..., n=1)</code> separates only the final underscore. We then reject unknown labels and duplicate keys. Comparing actual pairs with the Cartesian product of expected images and classes detects missing rows as well as extra ones. Only after these checks do blank annotations become false presence values.</p>
+<p><code>pivot</code> chooses an image index, class columns and the Boolean value to place in each cell. Explicit reindexing fixes the class order and preserves every expected image. We do not use an aggregation such as “take the first duplicate”, because that could hide contradictory annotations. The <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.pivot.html">pandas pivot documentation</a> explains its duplicate-key restriction.</p>
+<p>This function validates the <strong>table and presence contract</strong>, not the contents of every nonempty RLE. The text <code>"not a mask"</code> is nonempty but invalid. <a href="03_rle_and_geometry.html">Guide 3</a> supplies strict run validation. A complete audit combines both layers and verifies image dimensions and IDs.</p>
+<h2 id="24-prevalence-cardinality-and-label-density">2.4 · Prevalence, cardinality and label density</h2>
+<p>Let <code>Y[i,k]</code> be the binary presence value for image <code>i</code>, class <code>k</code>. <code>i</code> selects an image; <code>k</code> selects one of <code>C</code> labels. Summation means adding across the indicated index.</p>
+<p>The <strong>class prevalence</strong> is the fraction of images with that class:</p>
+<div class="arithmatex">\[
+\operatorname{prevalence}_k=\frac{1}{N}\sum_{i=1}^{N}Y_{i,k}.
+\]</div>
+<p>Fish occurs in q and r, so its prevalence is <code>2/5 = 0.4</code>. Flower and Gravel each have prevalence <code>1/5</code>; Sugar has <code>2/5</code>. The sum of prevalences can exceed one in a multi-label task because an image can contribute to several classes.</p>
+<p>The <strong>cardinality</strong> of image <code>i</code> is <code>c_i = Σ_k Y[i,k]</code>, the number of checked labels in that row. The five cardinalities are <code>[0,1,2,2,1]</code>. Their distribution is 0 labels: one image; 1 label: two; 2 labels: two; 3 and 4 labels: zero. The mean cardinality is <code>6/5 = 1.2</code> labels per image. This average may be fractional even though each image's cardinality is an integer.</p>
+<p><strong>Label density</strong> divides mean cardinality by the number of possible labels: <code>1.2/4 = 0.3</code>. It is also <code>6/20</code>, the fraction of present image–class pairs. Density here concerns <strong>label presence</strong>, not foreground pixel density. Use the full name to avoid confusion.</p>
+<pre class="highlight"><code class="language-python">class_counts = presence.sum(axis=0)
+cardinality = presence.sum(axis=1)
+cardinality_histogram = cardinality.value_counts().reindex(range(5), fill_value=0)
+label_empty_images = int((cardinality == 0).sum())
+positive_pairs = int(class_counts.sum())
+assert positive_pairs == int(cardinality.sum()) == 6
+assert label_empty_images == 1
+assert np.isclose(cardinality.mean(), 1.2)
+assert np.isclose(positive_pairs / presence.size, 0.3)</code></pre>
+<p>Column sums and row sums must agree when summed again: both count all present pairs. This identity is a useful error check. <code>reindex(range(5), fill_value=0)</code> retains zero-frequency cardinalities, so the graph does not silently omit impossible-looking or absent bins.</p>
+<p>For cloud-pattern annotations, “label-empty” means no supplied class is marked. It is safer than claiming a physically cloudless scene. In another dataset, absent annotation may mean unknown rather than negative. Counting cannot repair an ambiguous labelling policy.</p>
+<h2 id="25-three-imbalances-and-their-practical-consequences">2.5 · Three imbalances and their practical consequences</h2>
+<p>Image-label imbalance concerns how many distinct images contain each class. Pair imbalance concerns how many class questions have an absent answer. Pixel imbalance concerns how much area is foreground within those masks. They affect learning and interpretation differently.</p>
+<p>Suppose an invented class occurs in 50 of 100 equal-sized images and covers 2% of each positive image. Its image prevalence is 50%, but its foreground fraction across all class-mask locations is <code>0.5 × 0.02 = 0.01</code>, or 1%. Predicting background everywhere would obtain 99% pixel accuracy while missing every positive location.</p>
+<p>A common class can therefore still supply relatively few foreground decisions. Conversely, a rare class may cover large regions when it appears. Report class-image support, positive-mask area distributions and empty-pair counts rather than substituting one for another. For unequal image sizes, a pooled pixel fraction weights larger images more; a mean of per-image fractions gives each image equal weight. State which calculation you used.</p>
+<p>Reweighting losses or sampling more positive images are possible later interventions. Neither is automatically required nor guaranteed to improve performance. Oversampling can repeat a few rare examples without adding new diversity, and extra foreground weight may increase false alarms. Preserve a natural held-out evaluation distribution and test an explicit hypothesis. The first response to an imbalance chart should be a better diagnostic, not an unexamined bag of training changes.</p>
+<h2 id="26-image-co-occurrence-as-a-full-matrix">2.6 · Image co-occurrence as a full matrix</h2>
+<p>A co-occurrence matrix counts how many images contain both classes. If <code>Y</code> is our integer presence matrix, its <code>(a,b)</code> entry is <code>Σ_i Y[i,a]Y[i,b]</code>. Multiplication contributes one only when both labels occur in that image.</p>
+<pre class="highlight"><code class="language-python">Y = presence.to_numpy(dtype=np.int64)
+cooccurrence = Y.T @ Y
+print(cooccurrence)</code></pre>
+<p>In Fish/Flower/Gravel/Sugar order, the result is:</p>
+<pre class="highlight"><code class="language-text">2 0 0 1
+0 1 0 1
+0 0 1 0
+1 1 0 2</code></pre>
+<p>The diagonal repeats per-class image counts. Fish–Sugar is 1 because image r contains both. Flower–Sugar is 1 because s contains both. The matrix is symmetric: “Fish and Sugar” counts the same images as “Sugar and Fish”. Use integer arithmetic; a Boolean matrix multiplication does not express the intended count accumulation.</p>
+<p>A zero co-occurrence count means there was no image in this inspected population containing both labels, so there can be no cross-class pixel overlap for that pair here. A positive co-occurrence count says only that overlap is possible. It does not say that it happened.</p>
+<h2 id="27-pixel-intersections-union-and-occupancy">2.7 · Pixel intersections, union and occupancy</h2>
+<p>Now inspect four registered binary masks on <strong>one different toy image</strong>. Fish marks <code>(0,0)</code> and <code>(0,1)</code>. Flower marks <code>(0,1)</code> and <code>(1,1)</code>. Gravel marks <code>(2,3)</code>. Sugar is empty. Coordinates are <code>(row,column)</code>.</p>
+<pre class="highlight"><code class="language-python">masks = np.zeros((4, 3, 4), dtype=bool)
+masks[0, 0, 0:2] = True
+masks[1, 0:2, 1] = True
+masks[2, 2, 3] = True
+
+overlap = np.zeros((4, 4), dtype=np.int64)
+for a in range(4):
+    for b in range(4):
+        overlap[a, b] = np.logical_and(masks[a], masks[b]).sum()
 occupancy = masks.astype(np.int16).sum(axis=0)
-overlap_locations = (occupancy &gt; 1).sum()
-union_area = (occupancy &gt; 0).sum()</code></pre>
-<p><code>present</code> asks whether each class marks <strong>anywhere</strong>. <code>occupancy</code> asks how many classes mark <strong>each location</strong>. Report the number of images inspected as well as overlapping pixels. Finding no overlap in a handful of overlays is not proof that the full annotation set is disjoint. Check at native mask geometry; resizing can erase small overlaps or create artefacts.</p>
-<h2 id="core-why-output-semantics-matter-later">Core · Why output semantics matter later</h2>
-<p>At a pixel, four independent sigmoid outputs answer four yes/no questions. They can all be low, or several can be high. A softmax distributes a total of one across mutually exclusive categories; a background-inclusive argmax selects one category. If a dataset permits overlapping targets, converting them to one class ID discards information.</p>
-<p>For this session, keep four separate binary masks. You do not need to choose or implement a neural-network head. First establish what the annotations can represent. “Four labels” by itself does not imply a four-category softmax; it also says nothing about the input image's three colour channels.</p>
-<h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
-<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
-<h3 id="co-occurrence-versus-shared-pixels">Co-occurrence versus shared pixels</h3>
+union_area = int((occupancy &gt; 0).sum())
+overlap_locations = int((occupancy &gt; 1).sum())
+assert union_area == 4
+assert overlap_locations == 1
+assert np.array_equal(overlap, overlap.T)
+print(overlap)</code></pre>
+<p>The full pixel-intersection matrix is:</p>
+<pre class="highlight"><code class="language-text">2 1 0 0
+1 2 0 0
+0 0 1 0
+0 0 0 0</code></pre>
+<p>Its diagonal counts each class's foreground pixels, because intersecting a set with itself preserves it. Off-diagonal entries count shared locations. Only <code>(0,1)</code> belongs to both Fish and Flower. The diagonal sum is five class memberships, but the union contains four distinct image locations. These are different denominators.</p>
+<p><code>occupancy</code> adds memberships at each pixel. Values 0, 1 and 2 mean background, one label and two labels, respectively. It provides the direct count of locations with any cross-class overlap. Summing off-diagonal matrix entries would double-count class pairs. Even summing only the upper triangle does not generally count unique overlap locations: a pixel marked by three classes contributes three distinct class pairs but is still one location.</p>
+<p>For a dataset audit, accumulate each pair's intersection over images, and separately count images containing any overlap and locations with occupancy above one. Report the number of images examined and whether this was a subset or exhaustive annotation audit. Check at the source annotation geometry; resizing can erase tiny intersections. An observed disjoint annotation set describes that set and its labelling policy, not an immutable law of physics.</p>
+<h2 id="28-sigmoid-one-yesno-score-per-class">2.8 · Sigmoid: one yes/no score per class</h2>
+<p>A model head is its final output mapping. Suppose it emits a raw score, or logit, <code>z_k</code> for class <code>k</code> at one pixel. Sigmoid converts each separately:</p>
+<div class="arithmatex">\[
+p_k=\sigma(z_k)=\frac{1}{1+e^{-z_k}}.
+\]</div>
+<p><code>e</code> is the exponential constant. For <code>z=0</code>, the denominator is two and the result is 0.5. Positive logits give scores above 0.5; negative ones give scores below it. For the four logits <code>[2,1,-1,-2]</code>, sigmoid gives approximately <code>[0.881,0.731,0.269,0.119]</code>. At a demonstration threshold of 0.5, Fish and Flower are both selected. All four can also be below threshold, representing background without a separate background output.</p>
+<p>Each conversion reads only its own logit, so changing Flower's logit while holding others fixed changes only Flower's sigmoid value. The four values do not have to sum to one; here they sum to two. This describes independent <strong>output decisions</strong>, not proof that cloud classes are statistically independent or that the model's features are separate.</p>
+<h2 id="29-softmax-categories-share-a-probability-budget">2.9 · Softmax: categories share a probability budget</h2>
+<p>For an exclusive pixel target, consider background plus four classes. Softmax reads all five logits together:</p>
+<div class="arithmatex">\[
+p_k=\frac{e^{z_k}}{\sum_{j=0}^{4}e^{z_j}},\qquad \sum_{k=0}^{4}p_k=1.
+\]</div>
+<p>The index <code>j</code> runs across every category in the denominator; <code>k</code> chooses the category whose probability is being calculated. With logits <code>[0,2,1,-1,-2]</code> in background/Fish/Flower/Gravel/Sugar order, the exponentials sum to approximately 11.6106. Dividing by that shared total gives <code>[0.0861,0.6364,0.2341,0.0317,0.0117]</code>.</p>
+<p><strong>Argmax</strong> chooses the category with the largest score, so Fish wins. Raising Flower's logit, with the others held fixed, increases its share and reduces the others through the denominator. Adding the same constant to every logit changes no softmax share; implementations can subtract the maximum before exponentiating for numerical stability.</p>
+<p>A standard background-inclusive argmax produces one category per location. A four-class softmax with no background would force even an unmarked pixel into one of the four classes under that decision rule. A one-channel softmax is always one and cannot express a foreground/background choice.</p>
+<p>Neither sigmoid nor softmax automatically gives calibrated confidence. A probability-shaped output is a model estimate to assess, not a guarantee. Also, 0.5 is a convenient demonstration boundary, not a universal Dice-optimal threshold. <a href="07_diagnostic_baseline.html">Guide 7</a> examines decision thresholds on fixed scores.</p>
+<h2 id="210-match-the-head-target-and-loss">2.10 · Match the head, target and loss</h2>
+<p>For <code>B</code> examples and four binary masks, an independent-output design commonly uses raw logits shaped <code>[B,4,H,W]</code> and floating binary targets of the same shape. <code>BCEWithLogitsLoss</code> combines the sigmoid calculation with binary cross-entropy in a stable implementation. Give it raw logits rather than applying sigmoid first.</p>
+<p>Binary cross-entropy for a probability <code>p</code> and target <code>y</code> is <code>−[y log(p) + (1−y)log(1−p)]</code>. When <code>y=1</code>, it penalises a small <code>p</code>; when <code>y=0</code>, it penalises a large <code>p</code>. At <code>p=0.8</code>, the two losses are about 0.223 and 1.609, respectively. These are training penalties, not Dice values. The exact aggregate also depends on its declared reduction and weighting.</p>
+<p>For an exclusive design with background, raw logits commonly have shape <code>[B,5,H,W]</code>. The basic class-index target has shape <code>[B,H,W]</code> and integer IDs 0–4. <code>CrossEntropyLoss</code> uses the correct category's log-probability through a stable log-softmax calculation. It also expects raw logits. PyTorch supports other target modes, including soft distributions; those have different contracts from the class-index example here and do not turn overlapping binary memberships into exclusive truth without changing their meaning.</p>
+<table>
+<thead>
+<tr>
+<th>Design</th>
+<th>Target at one pixel</th>
+<th>Conventional loss input</th>
+<th>Hard decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Four independent outputs</td>
+<td>Four binary values, e.g. <code>[1,1,0,0]</code></td>
+<td>Four raw logits, same shape as floating targets</td>
+<td>Class-wise thresholds</td>
+</tr>
+<tr>
+<td>Five exclusive outputs</td>
+<td>One integer, e.g. <code>1 = Fish</code></td>
+<td>Five raw logits; integer target omits channel axis</td>
+<td>Background-inclusive argmax</td>
+</tr>
+</tbody>
+</table>
+<p>If annotations overlap, reducing <code>[1,1,0,0]</code> to one integer silently discards a membership. If the masks are disjoint, both an independent-output model and a background-inclusive exclusive model can represent them. The latter constrains the hard output; the former may need validated conflict handling if exclusivity is required. Annotation compatibility does not establish which model will perform better. That requires a fair held-out comparison later, with matching targets and losses.</p>
+<p>See the official <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html">BCEWithLogitsLoss</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html">CrossEntropyLoss</a> contracts before implementing either. For this session, being able to explain the objects and identify a mismatch is the core checkpoint.</p>
+<h2 id="explore-co-occurrence-versus-shared-pixels">Explore · Co-occurrence versus shared pixels</h2>
+<p>Select both arrangements in the workbench. Predict which count stays fixed and which changes before switching the control. Then relate its two-mask result to the four-class matrix above.</p>
 <div class="bc-lab" data-bc="overlap"><p>Use the worked examples in this guide to reason about co-occurrence versus shared pixels. The interactive controls appear when JavaScript is available.</p></div>
 
-<h2 id="checkpoint-a-small-audit-on-paper">Checkpoint · A small audit on paper</h2>
-<p>For the five-image toy table above:</p>
-<ol>
-<li>Count Fish-positive images, label-empty images and cardinality-two images.</li>
-<li>Add a second disconnected Fish region to image q. Which table entries change?</li>
-<li>Can the table establish whether image r contains overlapping masks?</li>
-<li>A class appears in 50 of 100 images, but covers 2% of each positive image. What fraction of all class-mask pixel decisions are positive, assuming equal image sizes?</li>
-</ol>
+<h2 id="practice-count-audit-then-choose-a-representation">Practice · Count, audit, then choose a representation</h2>
+<h3 id="exercise-1-preserve-the-absent-image">Exercise 1 · Preserve the absent image</h3>
+<p>Using the five-image presence table, calculate label-positive images, positive pairs, mean cardinality and density. What goes wrong if image p is removed before calculating the averages?</p>
 <details>
-<summary>Hints and explanations</summary>
-<ol>
-<li>Fish-positive = 2; fully label-empty = 1; cardinality-two = 2. State that the denominator for each image count is five.</li>
-<li>Presence and cardinality do not change; mask area and possibly component count change.</li>
-<li>No. It records presence only. Decode the registered masks and test their intersection.</li>
-<li><code>0.50 × 0.02 = 0.01</code>, or 1% across all images for that class. This illustrates the difference between image prevalence and pixel prevalence.</li>
-</ol>
+<summary>Worked answer</summary>
+<p>There are four label-positive images, six present pairs, mean cardinality <code>6/5=1.2</code> and density <code>6/20=0.3</code>. Removing p changes the population to four images: mean cardinality becomes <code>6/4=1.5</code> and density <code>6/16=0.375</code>. Those values answer a conditional question about label-positive images rather than the original full table. The omitted label-empty case must be disclosed.</p>
 </details>
-<h2 id="practice-build-a-count-sheet">Practice · Build a count sheet</h2>
-<p>In the <a href="practice_dataset_lab.ipynb">practice notebook</a>, label each output as <strong>image</strong>, <strong>pair</strong>, <strong>class</strong> or <strong>pixel</strong>. Record the full table size separately from a small decoded subset. Use filenames to join image and annotation records; an image reader's file order is not a reliable match to CSV row order. Keep zeros when making count plots so absent combinations do not disappear silently.</p>
-<p><strong>Optional extension:</strong> draw a class co-occurrence matrix whose entry <code>(i, j)</code> counts images containing both classes. Compare it with a pixel-intersection matrix. Explain why the two matrices need not have similar relative values.</p>
-<p><strong>Transfer question:</strong> in a new dataset, what evidence would justify saying “most examples are clean”? How would you distinguish unannotated material from explicitly labelled absence?</p>
+<h3 id="exercise-2-detect-a-structural-error">Exercise 2 · Detect a structural error</h3>
+<p>A twenty-row table has five images and four classes. One image has Fish twice and no Sugar row. Does the total-row check pass? Which validation above rejects it? Should the missing Sugar row be filled with false automatically?</p>
+<details>
+<summary>Worked answer</summary>
+<p>The total remains <code>5×4=20</code>, so that check passes. Duplicate-key validation rejects the repeated Fish pair, and expected-pair coverage would expose missing Sugar. A missing record is not established absence. Investigate the source contract rather than fabricating a negative annotation.</p>
+</details>
+<h3 id="exercise-3-triple-overlap">Exercise 3 · Triple overlap</h3>
+<p>One pixel is marked by Fish, Flower and Gravel. All other pixels are background. What are union area, overlap-location count, diagonal areas, upper-triangle cross-class sum and full off-diagonal sum?</p>
+<details>
+<summary>Worked answer</summary>
+<p>Union area and overlap-location count are both one. The three nonempty classes each have diagonal area one. There are three unordered pairs, so the upper triangle sums to three; symmetry makes the full off-diagonal sum six. Pair-intersection totals and distinct overlapping locations cannot be interchanged.</p>
+</details>
+<h3 id="exercise-4-one-pixel-incompatible-targets">Exercise 4 · One pixel, incompatible targets</h3>
+<p>A target says Fish and Flower both apply. Their logits are 2 and 1. What does sigmoid with threshold 0.5 select? What does the five-category softmax example select? Can its one integer preserve both labels?</p>
+<details>
+<summary>Worked answer</summary>
+<p>Sigmoid gives about 0.881 and 0.731, selecting both. The stated softmax vector assigns the largest share to Fish, so argmax selects Fish alone. Its one category ID cannot retain two simultaneous memberships. This is a representational limitation, independent of how well a model is trained.</p>
+</details>
+<p><strong>Transfer question:</strong> describe the table checks, image support counts and pixel audit you need before interpreting a new dataset's label structure. Which claims would remain unsupported if you inspected only ten convenient overlays?</p>
 <p><a href="01_foundations.html">Previous: foundations</a> · <a href="03_rle_and_geometry.html">Next: RLE and geometry</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="01_foundations.html">← 1 · Arrays, images &amp; notebooks</a><a href="03_rle_and_geometry.html">3 · RLE &amp; geometry →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>

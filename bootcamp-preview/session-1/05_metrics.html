@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8228c9025b1c"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=8b85dd5e88eca2c1"></script><script defer src="styles/generative/live_session_interactions.js?v=8b85dd5e88eca2c1"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -15,36 +15,46 @@
 <span class="section-label">5 · Metrics &amp; error costs</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
 <li><a href="#5-calculate-a-score-you-can-explain">5 · Calculate a score you can explain</a><ul>
-<li><a href="#core-count-four-outcomes">Core · Count four outcomes</a></li>
-<li><a href="#core-dice-measures-overlap">Core · Dice measures overlap</a></li>
-<li><a href="#core-empty-masks-are-a-policy-decision">Core · Empty masks are a policy decision</a></li>
-<li><a href="#core-averaging-changes-the-question">Core · Averaging changes the question</a></li>
-<li><a href="#core-a-projects-official-metric-is-a-separate-contract">Core · A project's official metric is a separate contract</a></li>
-<li><a href="#core-thresholds-and-area-filters-change-predictions">Core · Thresholds and area filters change predictions</a></li>
+<li><a href="#core-one-imageclass-pair-produces-four-pixel-counts">Core · One image–class pair produces four pixel counts</a></li>
+<li><a href="#core-why-a-high-accuracy-can-miss-the-task">Core · Why a high accuracy can miss the task</a></li>
+<li><a href="#core-derive-dice-from-the-overlap">Core · Derive Dice from the overlap</a></li>
+<li><a href="#core-implement-the-comparison-with-explicit-inputs">Core · Implement the comparison with explicit inputs</a></li>
+<li><a href="#core-an-empty-target-creates-a-sharp-scoring-boundary">Core · An empty target creates a sharp scoring boundary</a></li>
+<li><a href="#core-epsilon-is-a-scoring-decision-not-a-repair-with-no-consequences">Core · Epsilon is a scoring decision, not a repair with no consequences</a></li>
+<li><a href="#core-an-average-needs-a-population">Core · An average needs a population</a></li>
+<li><a href="#core-mean-pair-dice-and-pooled-dice-can-disagree">Core · Mean pair Dice and pooled Dice can disagree</a></li>
+<li><a href="#core-read-a-weighted-metric-before-calculating-it">Core · Read a weighted metric before calculating it</a></li>
+<li><a href="#core-thresholds-choose-an-operating-point">Core · Thresholds choose an operating point</a></li>
+<li><a href="#core-a-component-needs-a-connectivity-rule">Core · A component needs a connectivity rule</a></li>
+<li><a href="#core-remove-whole-small-components-not-arbitrary-pixels">Core · Remove whole small components, not arbitrary pixels</a></li>
+<li><a href="#optional-depth-a-perfect-mask-retention-calculation-and-dice-bound">Optional depth · A perfect-mask retention calculation and Dice bound</a></li>
+<li><a href="#core-area-has-units-and-depends-on-geometry">Core · Area has units and depends on geometry</a></li>
 <li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a><ul>
 <li><a href="#threshold-errors-and-dice">Threshold, errors and Dice</a></li>
 <li><a href="#small-regions-and-filtering">Small regions and filtering</a></li>
 <li><a href="#optional-pair-mean-versus-pooled-dice">Optional · pair mean versus pooled Dice</a></li>
 </ul>
 </li>
-<li><a href="#checkpoint-score-and-interpret">Checkpoint · Score and interpret</a></li>
-<li><a href="#optional-extension-iou-and-dice">Optional extension · IoU and Dice</a></li>
+<li><a href="#optional-depth-derive-the-diceiou-relationship">Optional depth · Derive the Dice–IoU relationship</a></li>
+<li><a href="#practice-calculate-then-explain-what-the-result-establishes">Practice · Calculate, then explain what the result establishes</a></li>
+<li><a href="#a-reporting-checklist-you-can-use-independently">A reporting checklist you can use independently</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </details><article><h1 id="5-calculate-a-score-you-can-explain">5 · Calculate a score you can explain</h1>
-<p><strong>Core question:</strong> which errors does this number notice, and over which examples is it averaged?</p>
-<p>A correct metric implementation can still answer the wrong question. “Dice” without an empty convention, averaging population and evaluation geometry is incomplete. A useful score report names those choices and includes simple predictions whose behaviour we already understand.</p>
-<h2 id="core-count-four-outcomes">Core · Count four outcomes</h2>
-<p>Compare one binary prediction <code>P</code> with one binary ground-truth mask <code>G</code> at the same geometry:</p>
+<p><strong>Core question:</strong> which errors does a score notice, and over which examples is it averaged?</p>
+<p>A metric turns predictions and targets into a number. That number can be correct while answering the wrong question. Pixel accuracy, positive-pair Dice and correctly empty predictions describe different behaviour. “Dice” without an empty convention, averaging population and evaluation geometry is an incomplete specification.</p>
+<p>This chapter develops one binary comparison, then a collection of image–class pairs, then thresholding and connected components. Work through the <strong>Core</strong> examples first. Optional sections explain relationships and bounds that are useful for deeper study. Every numerical example is fictional; none supplies industrial dataset measurements, a tuned project setting or an assessment answer. The chapter is longer than its in-class demonstration because it also supports independent study.</p>
+<h2 id="core-one-imageclass-pair-produces-four-pixel-counts">Core · One image–class pair produces four pixel counts</h2>
+<p>For one class, let <code>G</code> be the supplied ground-truth mask and <code>P</code> the hard binary prediction. Both must refer to the same locations at the same geometry. A location is foreground when its value is 1 and background when its value is 0.</p>
 <table>
 <thead>
 <tr>
 <th>Ground truth</th>
 <th>Prediction</th>
-<th>Name</th>
-<th>Meaning</th>
+<th>Outcome</th>
+<th>Interpretation</th>
 </tr>
 </thead>
 <tbody>
@@ -52,58 +62,96 @@
 <td>1</td>
 <td>1</td>
 <td>True positive, TP</td>
-<td>A marked location was found.</td>
+<td>Annotated foreground found.</td>
 </tr>
 <tr>
 <td>0</td>
 <td>1</td>
 <td>False positive, FP</td>
-<td>An unmarked location was predicted.</td>
+<td>Unannotated foreground proposed.</td>
 </tr>
 <tr>
 <td>1</td>
 <td>0</td>
 <td>False negative, FN</td>
-<td>A marked location was missed.</td>
+<td>Annotated foreground missed.</td>
 </tr>
 <tr>
 <td>0</td>
 <td>0</td>
 <td>True negative, TN</td>
-<td>A background location stayed background.</td>
+<td>Background kept as background.</td>
 </tr>
 </tbody>
 </table>
-<p>Imagine a toy mask with five foreground locations. A prediction marks six locations, three of them correct. Then TP = 3, FP = 3 and FN = 2. Foreground recall is <code>TP/(TP+FN) = 3/5</code>. Foreground precision is <code>TP/(TP+FP) = 3/6</code>. Recall asks how much target was found; precision asks how much predicted foreground was correct. Empty denominators require their own stated convention.</p>
-<h2 id="core-dice-measures-overlap">Core · Dice measures overlap</h2>
-<p>For one pair of masks,</p>
+<p>“Positive” here means membership of this class, not whether the image is bright. “False” means disagreement with the supplied annotation; a visually debatable region still needs to be interpreted against that target contract.</p>
+<p>Trace this 3×6 toy grid by hand:</p>
+<pre class="highlight"><code class="language-text">Ground truth G             Prediction P
+1 1 1 0 0 0                1 1 0 1 0 0
+1 1 0 0 0 0                1 0 0 1 0 0
+1 0 0 0 0 0                1 0 0 0 1 0</code></pre>
+<p>There are 6 target pixels and 7 predicted pixels. Four positions belong to both masks, so TP=4. Three prediction positions lie outside the target, so FP=3. Two target positions were missed, so FN=2. The remaining 9 positions are TN. Check the accounting: <code>4+3+2+9=18</code>, the canvas size.</p>
+<p>These counts give three familiar ratios:</p>
 <div class="arithmatex">\[
-\operatorname{Dice}(P,G)=\frac{2|P\cap G|}{|P|+|G|}
+\text{precision}=\frac{TP}{TP+FP},\qquad
+\text{recall}=\frac{TP}{TP+FN},\qquad
+\text{accuracy}=\frac{TP+TN}{TP+FP+FN+TN}.
+\]</div>
+<p>Precision asks what fraction of <strong>proposed foreground</strong> was correct:4/7≈0.5714. Recall asks what fraction of <strong>target foreground</strong> was found:4/6≈0.6667. Accuracy asks what fraction of <strong>all locations</strong> was correct:13/18≈0.7222. Name the denominator before calculating.</p>
+<p>Precision has no denominator when no foreground is predicted. Recall has no denominator when the target is empty. Different tools choose different return values in these cases. An unavailable foreground recall on an empty target is not evidence of perfect localisation. Use a declared empty-target diagnostic instead.</p>
+<h2 id="core-why-a-high-accuracy-can-miss-the-task">Core · Why a high accuracy can miss the task</h2>
+<p>Imagine a separate 1000-pixel canvas with 8 target pixels. An all-background prediction has TP=0, FP=0, FN=8 and TN=992. Accuracy is 99.2%, even though every target pixel was missed.</p>
+<p>Background locations dominate that denominator. Foreground metrics focus attention elsewhere, but no metric automatically resolves every issue. A pixel score can still underweight tiny regions, ignore their connectivity or hide poor performance for one class inside an average. Start with counts and overlays, then choose complementary summaries.</p>
+<p>In multi-label segmentation, make the comparison separately for each class channel. A pixel belonging to two target masks contributes a foreground decision to each channel. Converting those masks to one argmax class discards annotations before scoring. Likewise, an empty class mask does not make the entire image empty; another class can be present.</p>
+<h2 id="core-derive-dice-from-the-overlap">Core · Derive Dice from the overlap</h2>
+<p>For sets of foreground locations,</p>
+<div class="arithmatex">\[
+D(P,G)=\frac{2|P\cap G|}{|P|+|G|}.
+\]</div>
+<p>Vertical bars mean “number of foreground locations”. In our grid, the intersection has 4 pixels, prediction 7 and target 6. Therefore Dice is <code>2×4/(7+6)=8/13≈0.6154</code>.</p>
+<p>Substitute <code>|P|=TP+FP</code>, <code>|G|=TP+FN</code> and <code>|P∩G|=TP</code>:</p>
+<div class="arithmatex">\[
+D=\frac{2TP}{2TP+FP+FN}.
+\]</div>
+<p>A true-positive pixel appears in both foreground set sizes, which explains the factor 2. Perfect agreement on a nonempty mask gives 1. Disjoint masks with at least one nonempty member give 0. Dice is symmetric: swapping target and prediction exchanges FP with FN and leaves the value unchanged. The practical costs of a miss and a false alarm can still differ; symmetry is a property of this formula.</p>
+<p>True negatives do not appear. Adding a border that is background in both masks leaves TP/FP/FN and Dice unchanged, though it can raise accuracy. This makes Dice useful for sparse foreground. It also means Dice does not tell you how much background material was inspected or whether a disconnected result is operationally acceptable.</p>
+<p>When precision and recall are both defined, their harmonic mean is</p>
+<div class="arithmatex">\[
+F_1=\frac{2\,\text{precision}\,\text{recall}}
+{\text{precision}+\text{recall}}
 =\frac{2TP}{2TP+FP+FN}.
 \]</div>
-<p>Vertical bars count foreground pixels. In the toy example, <code>|P| = 6</code>, <code>|G| = 5</code> and <code>|P ∩ G| = 3</code>, so Dice is <code>6/11</code>, approximately 0.545. The factor of two accounts for the common foreground appearing in both set sizes in the denominator. Perfectly matching nonempty masks have Dice 1. Disjoint masks with at least one nonempty mask have Dice 0.</p>
-<p>True negatives do not appear in this formula. Adding a large blank border can raise pixel accuracy while leaving Dice unchanged, if TP/FP/FN remain unchanged. This makes Dice useful for inspecting sparse foreground, though it cannot describe every error that matters.</p>
+<p>For this binary comparison it equals foreground Dice. This identity does not make library defaults interchangeable: their empty handling, averaging axes and ignored labels may differ.</p>
+<h2 id="core-implement-the-comparison-with-explicit-inputs">Core · Implement the comparison with explicit inputs</h2>
 <pre class="highlight"><code class="language-python">import numpy as np
 
+def binary_counts(prediction, target):
+    p, g = np.asarray(prediction), np.asarray(target)
+    if p.shape != g.shape:
+        raise ValueError("Prediction and target need the same shape")
+    if not np.isin(p, [0, 1]).all() or not np.isin(g, [0, 1]).all():
+        raise ValueError("Pass binary masks, not continuous scores")
+    p, g = p.astype(bool), g.astype(bool)
+    return {
+        "tp": int((p &amp; g).sum()), "fp": int((p &amp; ~g).sum()),
+        "fn": int((~p &amp; g).sum()), "tn": int((~p &amp; ~g).sum()),
+    }
+
 def dice_pair(prediction, target):
-    prediction = np.asarray(prediction, dtype=bool)
-    target = np.asarray(target, dtype=bool)
-    if prediction.shape != target.shape:
-        raise ValueError("Masks must have the same shape")
-    denominator = prediction.sum() + target.sum()
-    if denominator == 0:
-        return 1.0   # explicit convention for this teaching exercise
-    intersection = np.logical_and(prediction, target).sum()
-    return float(2 * intersection / denominator)</code></pre>
-<p>This function measures one pair only. Averaging it is a separate decision. It also deliberately uses hard binary masks; a differentiable soft Dice training loss is a later topic.</p>
-<h2 id="core-empty-masks-are-a-policy-decision">Core · Empty masks are a policy decision</h2>
+    c = binary_counts(prediction, target)
+    denominator = 2*c["tp"] + c["fp"] + c["fn"]
+    return 1.0 if denominator == 0 else 2*c["tp"] / denominator</code></pre>
+<p><code>&amp;</code> combines Boolean conditions and <code>~</code> reverses them. Summing a Boolean array counts true entries. Converting those sums to ordinary integers makes the reported counts unambiguous. The second function handles <strong>one pair</strong>; a later loop decides what collection to average.</p>
+<p>Do not pass a floating probability map and rely on <code>astype(bool)</code> to threshold it. Every nonzero value, including 0.001, would become true. Apply the intended comparison, such as <code>scores &gt;= threshold</code>, first. Also avoid silently flattening a whole batch into one pair: that changes the metric's weighting even if all shapes are otherwise valid.</p>
+<h2 id="core-an-empty-target-creates-a-sharp-scoring-boundary">Core · An empty target creates a sharp scoring boundary</h2>
+<p>If both masks are empty, the raw ratio is 0/0. It supplies no value. For our teaching exercises and the cloud competition, we adopt empty–empty Dice=1. This is a convention, not a theorem shared by every segmentation tool.</p>
 <table>
 <thead>
 <tr>
 <th>Target</th>
 <th>Prediction</th>
-<th style="text-align: right;">Our exercise value</th>
-<th>Reason</th>
+<th style="text-align: right;">Dice under our convention</th>
+<th>What happened?</th>
 </tr>
 </thead>
 <tbody>
@@ -111,44 +159,245 @@ def dice_pair(prediction, target):
 <td>Nonempty</td>
 <td>Exact match</td>
 <td style="text-align: right;">1</td>
-<td>Full agreement.</td>
+<td>Foreground agrees.</td>
 </tr>
 <tr>
 <td>Nonempty</td>
 <td>Empty</td>
 <td style="text-align: right;">0</td>
-<td>All foreground missed.</td>
+<td>Complete miss.</td>
 </tr>
 <tr>
 <td>Empty</td>
-<td>Nonempty</td>
+<td>Any nonempty mask</td>
 <td style="text-align: right;">0</td>
-<td>No foreground overlap.</td>
+<td>False alarm, no possible intersection.</td>
 </tr>
 <tr>
 <td>Empty</td>
 <td>Empty</td>
-<td style="text-align: right;">1 by convention</td>
-<td>The raw ratio is <code>0/0</code>.</td>
+<td style="text-align: right;">1</td>
+<td>Correct absence, by explicit policy.</td>
 </tr>
 </tbody>
 </table>
-<p>Empty–empty Dice is not universally 1. Different tools omit empty pairs, return a chosen value or apply smoothing. Read the task specification and test your implementation. Adding a small epsilon does not remove the need to decide what should happen: adding it to numerator and denominator versus denominator only gives different empty–empty values.</p>
-<p>For the cloud practice competition, the published metric uses mean image–label Dice with empty–empty agreement rewarded. A local Dice mean at the notebook's small teaching resolution is a <strong>local diagnostic</strong>; it is not a reproduced leaderboard result at the official evaluation geometry. See the <a href="https://www.kaggle.com/c/understanding_cloud_organization/">cloud competition overview</a> and its evaluation section for its format and scoring rules.</p>
-<h2 id="core-averaging-changes-the-question">Core · Averaging changes the question</h2>
-<p>An invented batch has four image–class pairs: one target is positive and three are empty. An all-empty prediction has per-pair Dice <code>[0, 1, 1, 1]</code> under our convention, so its all-pair mean is 0.75. Its mean over target-positive pairs is 0. It has detected nothing. Both numbers are mathematically correct; they describe different populations.</p>
-<p>Also distinguish <strong>mean of pair Dice values</strong> from <strong>pooled-pixel Dice</strong>. If one pair is tiny and another is large, averaging their scores weights each pair equally. Pooling TP/FP/FN first gives larger masks more influence. Neither operation can be inferred merely from the name Dice.</p>
-<p>Report at least the number of positive and empty pairs alongside their separate diagnostics. A class with no positive validation examples has no positive-pair localisation evidence. Mark that case unavailable rather than silently calling it perfect. If a small sample has no empty pairs, empty-pair behaviour is likewise unmeasured.</p>
-<h2 id="core-a-projects-official-metric-is-a-separate-contract">Core · A project's official metric is a separate contract</h2>
-<p>The industrial project's evaluation description, archived by the instructor on 7 October 2026 from its <a href="https://www.kaggle.com/competitions/industrial-surface-defect-detection/overview/evaluation">competition evaluation page</a>, describes a weighted score with 70% foreground Dice, 20% false-positive score and 10% empty-prediction accuracy. Verify current organiser rules if that page is unavailable or has changed. This is different from the cloud competition's Dice mean. The archived description alone does not specify every detail of foreground averaging, false-positive normalisation or empty-subset handling. Do not invent a precise local formula and label it the official scorer.</p>
-<p>When an exact scorer is unavailable, identify what is confirmed, ask the organiser for missing definitions, and clearly label any local approximation. We use ordinary binary diagnostics for the practice notebook. They teach arithmetic and error analysis; they do not supply an official industrial score, all-empty score or assessment calculation.</p>
-<p>For practice, consider a <strong>fictional</strong> metric <code>0.6 × positive_pair_Dice + 0.4 × empty_pair_accuracy</code>. It gives different importance to errors than an all-pair Dice average. Before calculating it, write which subset supplies each term. This fictional rule is only an exercise in reading metric definitions.</p>
-<h2 id="core-thresholds-and-area-filters-change-predictions">Core · Thresholds and area filters change predictions</h2>
-<p>A threshold selects score locations with <code>score &gt;= threshold</code>. A component-area filter removes selected connected regions below a specified size. One changes pixel decisions using scores; the other uses the geometry of the resulting mask. Neither operation improves a score by definition.</p>
-<p>For a toy target with two components of 3 and 12 pixels, a perfect prediction initially has Dice 1. A rule removing components smaller than 5 pixels deletes the real 3-pixel component. Recall falls to <code>12/15 = 0.8</code>, and Dice becomes <code>24/27</code>, approximately 0.889. The same filter might remove a false alarm elsewhere. Inspect the trade-off on held-out data and report the area unit and connectivity. Pixel area changes with resolution, so a cutoff in one geometry is not directly portable to another.</p>
-<p>We introduce filtering to recognise its effect. Selecting a project filter and building a post-processing pipeline belong in later sessions. Keep the initial baseline unfiltered so its behaviour remains easy to inspect.</p>
+<p>Let <code>m</code> be the predicted foreground area when the target is empty. Then</p>
+<div class="arithmatex">\[
+D(P,\varnothing)=
+\begin{cases}1,&amp;m=0,\\0,&amp;m\ge1.\end{cases}
+\]</div>
+<p>The one-pixel transition is the important feature. One false pixel and 200 false pixels both give 0 for that pair. This diagnostic notices <strong>whether</strong> an alarm occurred, not its volume. Describing a seven-pixel false alarm as seven times worse than a one-pixel alarm is incorrect under this exact Dice convention.</p>
+<p>Compare an initially perfect 240-pixel target with one extra false pixel. Its Dice becomes <code>480/481≈0.9979</code>. On an empty target, that same single false pixel changes 1 to 0. The difference follows from the target and denominator, not from a changing definition of “false pixel”. This is why the count of empty pairs matters when interpreting a mean.</p>
+<p>The <a href="https://www.kaggle.com/c/understanding_cloud_organization/">official cloud evaluation</a> specifies its pairwise mean and empty convention. Our small working-grid notebook reports local diagnostics; it does not reproduce the competition's official evaluation grid or a leaderboard score.</p>
+<h2 id="core-epsilon-is-a-scoring-decision-not-a-repair-with-no-consequences">Core · Epsilon is a scoring decision, not a repair with no consequences</h2>
+<p>Consider two possible smoothed expressions, with <span class="arithmatex">\(\epsilon&gt;0\)</span>:</p>
+<div class="arithmatex">\[
+D_A=\frac{2|P\cap G|+\epsilon}{|P|+|G|+\epsilon},
+\qquad
+D_B=\frac{2|P\cap G|}{|P|+|G|+\epsilon}.
+\]</div>
+<p>For two empty masks, A returns 1 and B returns 0. Adding epsilon did not decide the correct policy; the placement encoded two different policies.</p>
+<p>For an empty target and a one-pixel prediction, take epsilon=1 purely to expose the arithmetic. A gives <code>1/(1+1)=0.5</code>, whereas B gives 0. Neither is our hard Dice result with explicit empty–empty handling for every case. With epsilon=0.001, A gives <code>0.001/1.001≈0.000999</code>, still nonzero. Its size is a modelling/scoring choice.</p>
+<p>Units matter too. Adding 1 to pixel <strong>counts</strong> differs from adding 1 to normalised area <strong>fractions</strong>. A smoothing choice that is minor on a large count can dominate a tiny mask. Do not mix a differentiable soft Dice loss, its numerical stabilisation and a hard evaluation metric under one undocumented name. Training loss guides updates; evaluation must follow its separate contract.</p>
+<h2 id="core-an-average-needs-a-population">Core · An average needs a population</h2>
+<p>Let <span class="arithmatex">\(\mathcal{F}\)</span> contain image–class pairs whose target has foreground, and <span class="arithmatex">\(\mathcal{E}\)</span> contain target-empty pairs. A <strong>positive pair</strong> belongs to <span class="arithmatex">\(\mathcal{F}\)</span>, regardless of whether its prediction is empty. A <strong>predicted-positive pair</strong> is a different population. Confusing them can conveniently exclude complete misses from a report.</p>
+<p>Positive-pair Dice averages over <span class="arithmatex">\(\mathcal{F}\)</span>, including zeros for missed positive targets. Empty-pair accuracy averages the indicator “prediction is empty” over <span class="arithmatex">\(\mathcal{E}\)</span>. Report both subset sizes. If <span class="arithmatex">\(\mathcal{F}\)</span> is empty, foreground performance is unmeasured; if <span class="arithmatex">\(\mathcal{E}\)</span> is empty, absence performance is unmeasured. Do not silently replace an unavailable term by 1 or change weights unless the scoring specification explicitly does so.</p>
+<p>An invented five-pair pool has two positive targets and three empty targets. Predicting nothing gives pair Dice <code>[0,0,1,1,1]</code>, all-pair mean 0.6, positive-pair mean 0 and empty-pair accuracy 1. The three values are consistent. They ask different questions.</p>
+<p>More generally, with <span class="arithmatex">\(N_f\)</span> positive and <span class="arithmatex">\(N_e\)</span> empty pairs, an all-empty prediction has</p>
+<div class="arithmatex">\[
+\bar D_{\mathrm{all}}=
+\frac{N_f\cdot0+N_e\cdot1}{N_f+N_e}
+=\frac{N_e}{N_f+N_e}.
+\]</div>
+<p>This is the <strong>empty-pair fraction</strong>, not necessarily the fully empty-image fraction. The derivation needs no trained model. It also does not determine a different competition's composite score. Keep class-wise support visible: an attractive average can conceal a rare class that is never found.</p>
+<h2 id="core-mean-pair-dice-and-pooled-dice-can-disagree">Core · Mean pair Dice and pooled Dice can disagree</h2>
+<p>Use two nonempty pairs with intentionally unequal target sizes:</p>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th style="text-align: right;">TP</th>
+<th style="text-align: right;">FP</th>
+<th style="text-align: right;">FN</th>
+<th style="text-align: right;">Target area</th>
+<th style="text-align: right;">Prediction area</th>
+<th style="text-align: right;">Pair Dice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Small</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>Large</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">36/78≈0.4615</td>
+</tr>
+</tbody>
+</table>
+<p>The mean of their Dice values is <code>(1+36/78)/2=19/26≈0.7308</code>. Each pair has equal influence.</p>
+<p>Pooling first gives TP=20, FP=12 and FN=30, hence <code>D_pool=40/(40+12+30)=20/41≈0.4878</code>. The larger comparison contributes much more to the pooled counts.</p>
+<p>Why? Let each pair's denominator be <span class="arithmatex">\(q_i=2TP_i+FP_i+FN_i\)</span>, when nonzero. Then</p>
+<div class="arithmatex">\[
+D_{\mathrm{pool}}=\frac{\sum_i q_iD_i}{\sum_i q_i}.
+\]</div>
+<p>It is a denominator-weighted mean, rather than an equal-pair mean. Here those weights are 4 and 78. Calling the difference a rounding error would miss a change in the question. Empty–empty pairs have denominator 0 and contribute no pixel counts to pooling, while an equal-pair mean may reward them by 1 under its convention.</p>
+<p>Other reductions are possible: average within each class first, then average classes; average per image; or pool selected classes. A class macro-average gives rare and common classes equal class weight, which differs from averaging all pairs with available positive targets. Write the axes and population in the report instead of relying on an ambiguous “macro” label alone.</p>
+<h2 id="core-read-a-weighted-metric-before-calculating-it">Core · Read a weighted metric before calculating it</h2>
+<p>The industrial project's description archived by the instructor on 7 October 2026 from its <a href="https://www.kaggle.com/competitions/industrial-surface-defect-detection/overview/evaluation">evaluation page</a> lists 70% foreground Dice,20% false-positive score and 10% empty-prediction accuracy. Verify current organiser rules if the page is unavailable or changed. The archived description does <strong>not</strong> specify every reduction, false-positive normalisation or absent-subset rule. These notes do not supply a fabricated exact implementation or compute its all-empty assessment answer.</p>
+<p>We can still practise the reasoning with a completely defined <strong>fictional</strong> score. Assume every pair has a200-pixel canvas and both target subsets are nonempty. Define</p>
+<div class="arithmatex">\[
+F=\frac{1}{N_f}\sum_{i\in\mathcal F}D_i,\quad
+V=1-\frac{1}{N_e}\sum_{i\in\mathcal E}\frac{|P_i|}{200},\quad
+A=\frac{1}{N_e}\sum_{i\in\mathcal E}\mathbf1[|P_i|=0].
+\]</div>
+<p>Let the fictional score be <code>S=0.55F+0.30V+0.15A</code>. These weights and definitions belong <strong>only to this exercise</strong>. F measures overlap on target-positive pairs. V penalises the fraction of area falsely selected on target-empty pairs. A rewards exactly empty predictions on those same target-empty pairs. V and A share a subset; the three terms do not use three disjoint populations.</p>
+<p>Work this seven-pair example step by step:</p>
+<ul>
+<li>Three positive-target Dice values are 0.8,0.5 and 0.2, giving <code>F=1.5/3=0.5</code>.</li>
+<li>Four empty targets have predicted areas 0,0,10 and 30. Their fractions are 0,0,0.05 and 0.15. Average false area is 0.20/4=0.05, so <code>V=0.95</code>.</li>
+<li>Two of the four empty targets receive exactly empty predictions, so <code>A=2/4=0.5</code>.</li>
+<li>Combine the terms only now: <code>S=0.55×0.5+0.30×0.95+0.15×0.5=0.635</code>.</li>
+</ul>
+<p>Dividing each component by all seven pairs would produce a different metric. Also, the 10-pixel and 30-pixel alarms differ in V but both fail the exact-empty test in A. Each term makes a different error distinction explicit.</p>
+<p>For an all-empty predictor <strong>under this fictional definition</strong>, F=0, V=1, A=1, so <code>S=0.30+0.15=0.45</code>. Its all-pair empty-aware Dice is instead 4/7≈0.5714. In general, with fixed weights <span class="arithmatex">\(\alpha,\beta,\gamma\)</span> and these definitions, the fictional all-empty score is <span class="arithmatex">\(\beta+\gamma\)</span>, provided both target subsets exist. Its all-pair Dice remains the observed empty-pair fraction. If a subset is absent, return to the specification; the derivation cannot silently divide by zero.</p>
+<h2 id="core-thresholds-choose-an-operating-point">Core · Thresholds choose an operating point</h2>
+<p>A score map is continuous; a binary prediction needs a decision rule. Write both threshold and comparison operator. With <code>score &gt;= threshold</code>, a score exactly equal to the threshold is selected. Raising the threshold on a <strong>fixed</strong> map can only remove foreground positions. TP and FP cannot increase, FN cannot decrease, and recall cannot increase for a nonempty fixed target.</p>
+<p>Precision can move either way. Suppose two selected locations comprise one true pixel with score 0.6 and one false pixel with score 0.9. At threshold 0.5, precision is 1/2. At0.8, only the false pixel remains, so precision is 0. Raising the threshold did not make the remaining predictions more trustworthy in this example.</p>
+<p>For a fuller toy comparison:</p>
+<pre class="highlight"><code class="language-text">Target:   1    1    0    0    0
+Score:   .9   .4   .7   .2   .1</code></pre>
+<table>
+<thead>
+<tr>
+<th>Threshold</th>
+<th style="text-align: right;">TP</th>
+<th style="text-align: right;">FP</th>
+<th style="text-align: right;">FN</th>
+<th style="text-align: right;">Precision</th>
+<th style="text-align: right;">Recall</th>
+<th style="text-align: right;">Dice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2/3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4/5</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1/2</td>
+<td style="text-align: right;">1/2</td>
+<td style="text-align: right;">1/2</td>
+</tr>
+<tr>
+<td>0.8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1/2</td>
+<td style="text-align: right;">2/3</td>
+</tr>
+</tbody>
+</table>
+<p>Dice falls and then rises. A default 0.5 is not guaranteed to maximise Dice, even when probabilities are calibrated. For an elementary cost illustration, let one FP cost 1 and one FN cost 4. The three rows then cost 1,5 and 4. Those costs favour the first row, while another application might value false alarms differently. This is a declared fictional operating objective, not a replacement project metric.</p>
+<p>Compare a small predeclared threshold set using validation predictions, with model, split and geometry fixed. Choosing from that table makes validation a selection set; its best observed value is not a fresh independent test. Keep an untouched final evaluation where available. Reusing cloud thresholds in a different domain skips the evidence this exercise is meant to teach.</p>
+<h2 id="core-a-component-needs-a-connectivity-rule">Core · A component needs a connectivity rule</h2>
+<p>Thresholding decides pixel membership. <strong>Connected-component labelling</strong> groups selected pixels by whether a path of neighbouring foreground pixels joins them. It does not know whether an island is a real object. Semantic masks can also join several objects into one region or split one object into several pieces.</p>
+<p>Under 4-connectivity, neighbours share an edge: up, down, left and right. Under 8-connectivity, diagonal corner neighbours count too. Consider</p>
+<pre class="highlight"><code class="language-text">1 0 0
+0 1 0
+0 0 1</code></pre>
+<p>Four-connectivity gives three components of area 1. Eight-connectivity gives one component of area 3. If a minimum-area rule keeps area≥2, the first choice removes everything and the second keeps everything. The rule must therefore state both area threshold and connectivity.</p>
+<p>Eight-connectivity can preserve a thin diagonal chain; it can also join two otherwise distinct regions that touch only at a corner. Four-connectivity makes the opposite choice. Neither is universally essential or correct for every defect dataset. Select a convention that matches the task, report it and inspect its consequences.</p>
+<p>Here is a deliberately small breadth-first search for one 2D binary mask:</p>
+<div class="bc-lab" data-bc="connectivity"><p>The diagonal above forms three area-one regions under 4-connectivity and one area-three region under 8-connectivity. Keeping area at least two removes all pixels in the first case and retains all in the second.</p></div>
+
+<pre class="highlight"><code class="language-python">from collections import deque
+
+def components(mask, connectivity=4):
+    a = np.asarray(mask, dtype=bool)
+    if a.ndim != 2 or connectivity not in (4, 8):
+        raise ValueError("Use a 2D mask and connectivity 4 or 8")
+    offsets = [(-1,0), (1,0), (0,-1), (0,1)]
+    if connectivity == 8:
+        offsets += [(-1,-1), (-1,1), (1,-1), (1,1)]
+    seen = np.zeros_like(a)
+    groups = []
+    h, w = a.shape
+    for row in range(h):
+        for col in range(w):
+            if not a[row, col] or seen[row, col]:
+                continue
+            queue = deque([(row, col)])
+            seen[row, col] = True
+            group = []
+            while queue:
+                r, c = queue.popleft()
+                group.append((r, c))
+                for dr, dc in offsets:
+                    rr, cc = r + dr, c + dc
+                    if 0 &lt;= rr &lt; h and 0 &lt;= cc &lt; w:
+                        if a[rr, cc] and not seen[rr, cc]:
+                            seen[rr, cc] = True
+                            queue.append((rr, cc))
+            groups.append(group)
+    return groups</code></pre>
+<p>The outer scan finds an unvisited foreground seed. The queue explores its neighbours until no reachable pixel remains. Marking a pixel when it enters the queue prevents repeated insertion. <code>len(group)</code> is its pixel area. Bounds checks prevent negative Python indices from wrapping to the opposite image edge. The result is coordinate lists for teaching, not an efficient large-image implementation. Libraries return a label image and measurements more conveniently; see <a href="https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.label">scikit-image's labelling documentation</a>. Check each library's connectivity parameter convention rather than assuming it uses literal 4 and 8.</p>
+<h2 id="core-remove-whole-small-components-not-arbitrary-pixels">Core · Remove whole small components, not arbitrary pixels</h2>
+<p>A minimum-area filter keeps a predicted connected component if its pixel count is at least a chosen minimum. With minimum 4, a component of area 3 is removed and a component of area 4 remains. State <code>&lt; minimum</code> versus <code>&lt;= minimum</code>; the equality case changes results.</p>
+<pre class="highlight"><code class="language-python">def keep_components(mask, minimum, connectivity=4):
+    if minimum &lt; 1:
+        raise ValueError("Minimum area must be at least one pixel")
+    kept = np.zeros(np.asarray(mask).shape, dtype=bool)
+    for group in components(mask, connectivity):
+        if len(group) &gt;= minimum:
+            for row, col in group:
+                kept[row, col] = True
+    return kept</code></pre>
+<p>Each surviving component is retained with its original boundary. The operation cannot know which removed components were false. Removing a true tiny region can reduce recall; deleting false pixels can improve precision. Evaluate both outcomes on held-out predictions, retaining the unfiltered reference.</p>
+<p><strong>Morphological opening is a different operation.</strong> Binary erosion followed by dilation with a structuring element removes structures according to shape and thickness. A long one-pixel-wide line can have area 100 but contain no 3×3 solid neighbourhood; a3×3 opening can erase it. A component-area filter with minimum 10 would retain that connected line. Opening can alter boundaries of surviving objects, while whole-component size filtering leaves a retained component's pixels unchanged. The <a href="https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html">OpenCV morphology tutorial</a> defines erosion, dilation and opening.</p>
+<p>Do not describe either method as guaranteed cleanup. A small component might be genuine, and a large connected false region might survive. Filtering each class independently also preserves the possibility of multi-label overlap; filtering an argmax map is a different task.</p>
+<h2 id="optional-depth-a-perfect-mask-retention-calculation-and-dice-bound">Optional depth · A perfect-mask retention calculation and Dice bound</h2>
+<p>A ground-truth component-size audit can reveal a filter's potential cost. Let ground-truth component areas be <span class="arithmatex">\(a_1,\ldots,a_m\)</span>, under a stated connectivity, and minimum area be T. Start with the special assumption <strong>prediction equals ground truth exactly</strong>. The fraction of target pixels retained after removing components smaller than T is</p>
+<div class="arithmatex">\[
+r(T)=\frac{\sum_{a_j\ge T}a_j}{\sum_j a_j}
+=1-\frac{\sum_{a_j&lt;T}a_j}{\sum_j a_j}.
+\]</div>
+<p>This is pixel-weighted recall of the filtered perfect mask. It is not the fraction of components retained. If the target is empty, its denominator is zero and this foreground-retention calculation is unavailable.</p>
+<p>Use toy areas <code>[3,7,20]</code>. Total target area is 30. With T=5, only the area 3 component disappears: retained area 27, recall r=0.9. One third of the components were deleted, but only one tenth of the pixels. An object-counting objective could regard that loss very differently from a pooled pixel objective.</p>
+<p>For this filtered perfect prediction, FP=0, TP=rG and FN=(1−r)G, where G denotes total target area. Substitute into Dice:</p>
+<div class="arithmatex">\[
+D=\frac{2rG}{2rG+(1-r)G}=\frac{2r}{1+r}.
+\]</div>
+<p>At r=0.9, Dice is 1.8/1.9=18/19≈0.9474. If some independent assumption guarantees recall≤r for a set of allowed predictions, this is also their Dice upper bound: false positives only enlarge the denominator, and <code>2r/(1+r)</code> increases with r. Equality requires no false positives and attainment of the recall limit.</p>
+<p>The <strong>assumption matters</strong>. A real area filter acts on predicted components. A model could predict a small true component together with enough adjacent false pixels to exceed T; it then survives. A false bridge could join two small true components. Conversely, an imperfect model could fragment a large true region into subthreshold pieces and lose more than the perfect-mask calculation suggests. Therefore GT component areas alone do not establish an unconditional recall ceiling for every possible filtered prediction.</p>
+<p>Call the quantity a perfect-prediction retention diagnostic, or state the additional assumption that predicted true components remain separated and cannot gain area through false additions. Do not mistake that conditional bound for a universal property of the post-processing pipeline. Check actual predicted-component distributions and before/after validation errors.</p>
+<h2 id="core-area-has-units-and-depends-on-geometry">Core · Area has units and depends on geometry</h2>
+<p>A minimum of 20 <strong>pixels</strong> refers to the grid where the filter is applied. If width and height are each halved, area scales approximately by 0.25: a sufficiently large 80-pixel region might occupy about 20 new pixels. Integer sampling, connectivity changes and lost thin features prevent exact proportionality for every object.</p>
+<p>A relative-area rule divides by the canvas area, for example 20/2000=1%. That can make comparisons more interpretable, but does not make the rule invariant to changed image content, cropping or lost detail. If calibrated physical pixel spacing is available, physical area uses pixel count times horizontal and vertical spacing; do not invent physical units for ordinary JPEGs without that metadata.</p>
+<p>Record threshold, comparison operator, connectivity, area cutoff, filtering grid and operation order. “Resize probabilities, threshold, filter” can differ from “threshold, filter, resize”. Cloud original, resized mirror and official submission grids are distinct. A cutoff selected on one is not automatically suitable on another or on the industrial task.</p>
 <h2 id="explore-predict-before-changing-a-control">Explore · Predict before changing a control</h2>
-<p>These small interactive examples use fixed toy values. Explain a result before changing one setting, then use Reset to check it again. The worked examples above remain available without JavaScript.</p>
+<p>These examples use fixed toy values. Explain the relevant numerator, denominator and target subset before changing a setting. Reset lets you check the same comparison again; the worked examples above remain usable without JavaScript.</p>
 <h3 id="threshold-errors-and-dice">Threshold, errors and Dice</h3>
 <div class="bc-lab" data-bc="dice"><p>Use the worked examples in this guide to reason about threshold, errors and dice. The interactive controls appear when JavaScript is available.</p></div>
 
@@ -158,26 +407,39 @@ def dice_pair(prediction, target):
 <h3 id="optional-pair-mean-versus-pooled-dice">Optional · pair mean versus pooled Dice</h3>
 <div class="bc-lab" data-bc="averaging"><p>Use the worked examples in this guide to reason about optional · pair mean versus pooled dice. The interactive controls appear when JavaScript is available.</p></div>
 
-<h2 id="checkpoint-score-and-interpret">Checkpoint · Score and interpret</h2>
+<h2 id="optional-depth-derive-the-diceiou-relationship">Optional depth · Derive the Dice–IoU relationship</h2>
+<p>Intersection over union uses <span class="arithmatex">\(J=TP/(TP+FP+FN)\)</span>. Write intersection t and union u, with u&gt;0. The sum of foreground set sizes is u+t, so</p>
+<div class="arithmatex">\[
+D=\frac{2t}{u+t}=\frac{2(t/u)}{1+t/u}=\frac{2J}{1+J},
+\qquad J=\frac{D}{2-D}.
+\]</div>
+<p>For our first grid, J=4/9 and D=<code>2×(4/9)/(1+4/9)=8/13</code>. Dice is at least IoU on the same defined comparison, with equality at zero overlap and perfect overlap. They are not interchangeable numerical scales. This relation holds per comparison; applying the nonlinear conversion to a <strong>mean</strong> IoU does not generally reproduce mean Dice. Handle the both-empty case according to each metric's stated policy.</p>
+<h2 id="practice-calculate-then-explain-what-the-result-establishes">Practice · Calculate, then explain what the result establishes</h2>
 <ol>
-<li><code>G = {1,2,3,4}</code> and <code>P = {3,4,5}</code>. Find TP/FP/FN and Dice.</li>
-<li>A 100-pixel canvas has two positive pixels. What is all-background accuracy? What is its foreground Dice?</li>
-<li>Why can “mean Dice = 0.9” be insufficient evidence that small foreground regions are found?</li>
-<li>Can a tiny false-positive region on an empty pair receive full empty-prediction accuracy?</li>
+<li>A target has 9 pixels, a prediction 8, and intersection 6. Find TP/FP/FN, precision, recall, Dice and IoU. What extra count is needed for accuracy?</li>
+<li>On an empty target, predictions have areas 0,1 and 40. Give hard Dice under our convention. Then compare the first two using numerator-and-denominator smoothing with epsilon 2.</li>
+<li>A six-pair pool has two positive targets and four empty targets. Predicting nothing gives what all-pair Dice? Is its positive-pair score defined, and what is it?</li>
+<li>In the fictional score, let F=0.6, V=0.9 and A=0.25. Calculate <code>0.55F+0.30V+0.15A</code>. Which term's denominator would require the target-empty count?</li>
+<li>Apply the provided component code to <code>np.eye(3, dtype=bool)</code> with minimum 2 under both connectivity choices. Predict the retained area before running.</li>
+<li>For perfect-prediction component areas <code>[2,8,30]</code> and minimum 9, calculate retained component fraction, pixel recall and Dice. Explain why this is not a universal bound for all predicted masks.</li>
+<li>A threshold raises empty-pair accuracy but lowers positive-pair Dice. What additional specification determines whether the trade-off is preferable?</li>
 </ol>
 <details>
-<summary>Hints and explanations</summary>
+<summary>Hints and worked solutions</summary>
 <ol>
-<li>TP = 2, FP = 1, FN = 2; Dice = <code>4/7</code>, approximately 0.571.</li>
-<li>Accuracy is <code>98/100 = 98%</code>; Dice is zero because both target pixels were missed.</li>
-<li>The empty convention, pair composition, class weighting and size distribution may hide poor foreground behaviour. Ask for positive-pair and class-wise evidence plus overlays.</li>
-<li>Under an exact-empty criterion it receives zero: some foreground was predicted. A pixel-fraction penalty can treat it differently. This is why the precise metric definition matters.</li>
+<li>TP=6, FP=2, FN=3; precision 6/8=0.75, recall 6/9=2/3, Dice 12/17≈0.7059, IoU6/11≈0.5455. Accuracy also needs TN, or canvas size to infer TN.</li>
+<li>Hard Dice 1,0,0. Smoothed empty–empty is 2/2=1; one false pixel gives 2/3. That changes the hard metric rather than merely protecting its division.</li>
+<li>Four of six pairs get 1, so mean 2/3. Positive-pair Dice is defined because two target-positive pairs exist; both are complete misses and their mean is 0.</li>
+<li><code>0.33+0.27+0.0375=0.6375</code>. Both V and A use the target-empty count; F uses target-positive support.</li>
+<li>Four-connectivity creates three area 1 components and retains 0 pixels. Eight-connectivity creates one area 3 component and retains 3.</li>
+<li>One of three components survives, carrying 30/40=0.75 of target pixels. With no FP, Dice=1.5/1.75=6/7≈0.8571. Real predicted additions/bridges can change which components survive; fragmentation can increase loss.</li>
+<li>The declared objective and any operating costs, plus adequate class/subset support on a fixed holdout. One improved component alone cannot determine the full decision.</li>
 </ol>
 </details>
-<h2 id="optional-extension-iou-and-dice">Optional extension · IoU and Dice</h2>
-<p>Intersection over union is <code>TP/(TP+FP+FN)</code>. For a defined nonempty comparison, <code>Dice = 2 × IoU/(1+IoU)</code>. Dice is at least IoU; they are equal at zero overlap and perfect overlap. Their numeric scales differ, so a Dice of 0.6 cannot be compared directly with an IoU of 0.6 as if the values meant the same quality.</p>
-<p>For a research discussion of validation choices, see the original <a href="https://doi.org/10.1038/s41592-023-02151-z">Metrics Reloaded paper</a>. Read it after the hand examples, not as a prerequisite.</p>
-<p><strong>Transfer question:</strong> before implementing another task's metric, what examples would you hand-check? Include an empty pair, a missed nonempty target, a false positive and two unequal-size masks.</p>
+<h2 id="a-reporting-checklist-you-can-use-independently">A reporting checklist you can use independently</h2>
+<p>State the dataset variant, label channel and evaluation grid; the hard threshold and any filter; the empty convention; the target subsets and their support; and the reduction across pairs/classes. Include the all-empty reference under the <strong>same local definition</strong>, class-wise results and selected success/failure overlays. Preserve the unfiltered comparison before crediting a cleanup step.</p>
+<p>For deeper reading, <a href="https://www.nature.com/articles/s41592-023-02151-z">Metrics Reloaded</a> explains why metric selection and aggregation depend on the actual task. It complements these calculations rather than replacing the dataset's scoring contract.</p>
+<p><strong>Transfer question:</strong> design a hand-check suite for another evaluator: perfect and missed nonempty targets, both-empty agreement, a false alarm, unequal-size pairs, absent subsets and a diagonal component. Say which convention each example would expose. Obtain any missing official definitions before labelling a local calculation the official score.</p>
 <p><a href="04_intensity_and_texture.html">Previous: intensity and texture</a> · <a href="06_validation.html">Next: validation</a> · <a href="index.html">Overview</a></p></article><nav class="pagination"><a href="04_intensity_and_texture.html">← 4 · Intensity &amp; texture</a><a href="06_validation.html">6 · Validation &amp; rare labels →</a></nav><footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
