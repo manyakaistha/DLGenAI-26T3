@@ -184,4 +184,7 @@
   const decoration=document.createElement('script');decoration.src=assetURL('ask-ai-botanical.js');
   decoration.onload=()=>{const script=document.createElement('script');script.src=assetURL('ask-ai.js');document.head.append(script);};
   document.head.append(css,decoration);
+  // A shared disclosure works across guides, directories and unlisted previews.
+  const sidebar=document.createElement('script');sidebar.src=assetURL('sidebar.js');
+  document.head.append(sidebar);
 })();

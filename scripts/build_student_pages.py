@@ -290,14 +290,15 @@ def build(output: Path):
     review_source = ROOT / "guide2701"
     if review_source.is_dir():
         shutil.copytree(review_source, output / "guide2701", dirs_exist_ok=True)
-        # Keep shared behavior current in the unlisted rendered snapshot too.
-        for theme in (output / "guide2701").rglob("styles/generative/theme.js"):
-            for name in ("theme.js", "ask-ai.js", "ask-ai.css", "ask-ai-botanical.js"):
-                shutil.copy2(ROOT / "styles/generative" / name, theme.parent / name)
     # Unlisted review snapshot: no links from the public resource menus.
     preview_source = ROOT / "bootcamp-preview"
     if preview_source.is_dir():
         shutil.copytree(preview_source, output / "bootcamp-preview", dirs_exist_ok=True)
+    # Rendered snapshots also use the current shared controls. Refresh these
+    # after copying every source tree so previews cannot retain stale behavior.
+    for theme in output.rglob("styles/generative/theme.js"):
+        for name in ("theme.js", "sidebar.js", "sidebar.css", "ask-ai.js", "ask-ai.css", "ask-ai-botanical.js"):
+            shutil.copy2(ROOT / "styles/generative" / name, theme.parent / name)
     version_theme_assets(output)
     validate_site(output)
 

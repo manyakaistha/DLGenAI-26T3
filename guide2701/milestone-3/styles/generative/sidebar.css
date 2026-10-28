@@ -1,0 +1,30 @@
+/* Shared reading navigation; classroom decks retain their own slide indexes. */
+.sidebar-toggle[hidden]{display:none}
+.sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:12px/1.4 'DM Sans',system-ui,sans-serif;cursor:pointer}
+.sidebar-toggle:hover{border-color:var(--accent)}
+.sidebar-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.sidebar-toggle svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.guide-sidebar-ready .sidebar-controls{position:sticky;top:0;z-index:2;background:var(--nav-bg);padding-bottom:18px}
+.guide-sidebar-ready .sidebar-body[hidden]{display:none}
+.guide-sidebar-ready .skip:focus{z-index:20}
+.guide-sidebar-ready[data-sidebar="collapsed"] .layout{grid-template-columns:60px minmax(0,1fr)}
+.guide-sidebar-ready[data-sidebar="collapsed"] .sidebar{padding:18px 8px;overflow:visible}
+.guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-controls{padding-bottom:0}
+.guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-toggle{width:44px;padding:10px}
+.guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-toggle-label{display:none}
+.guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-toggle-chevron{transform:rotate(180deg);transform-origin:12px 12px}
+@media(max-width:850px){
+  html.guide-sidebar-ready{scroll-padding-top:80px}
+  .guide-sidebar-ready .layout{display:block}
+  .guide-sidebar-ready .sidebar{position:sticky;top:0;z-index:6;max-height:75vh;overflow:auto;overscroll-behavior:contain;padding:10px 22px}
+  .guide-sidebar-ready .sidebar-controls{padding:0;background:var(--nav-bg)}
+  .guide-sidebar-ready .sidebar-body{padding:8px 0 12px}
+  .guide-sidebar-ready .sidebar-toggle{justify-content:flex-start}
+  .guide-sidebar-ready[data-sidebar="collapsed"] .sidebar{padding:8px 22px}
+  .guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-toggle{width:auto;padding:9px 12px}
+  .guide-sidebar-ready[data-sidebar="collapsed"] .sidebar-toggle-label{display:inline}
+}
+@media print{
+  .guide-sidebar-ready .sidebar,.sidebar-controls{display:none!important}
+  .guide-sidebar-ready .layout{display:block!important}
+}
