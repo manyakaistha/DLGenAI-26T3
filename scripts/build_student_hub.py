@@ -28,6 +28,8 @@ SESSIONS = [
      'Follow a sample from CSV row to training batch. Explore the split, paired transformations, interactive labs and notebook.'),
     ('session-3/index.html', '26 October 2026 · Session 3', 'From a Baseline U-Net to a Pretrained Encoder',
      'Detailed encoder-decoder, transfer-learning, fine-tuning and evaluation notes, with optional MRI applications placed alongside the relevant concepts.'),
+    ('session-4/index.html', '29 October 2026 · Session 4 · 60 minutes', 'Train Efficiently, Keep the Evidence',
+     'AMP, FP16 versus BF16, accumulation, scheduling, checkpoint resume and validation on Clouds, with exact notebook handoffs and optional in-depth DDP.'),
 ]
 
 
@@ -45,7 +47,9 @@ def cards(items, current, action):
         '<div>' + f'<a class="resource-card" href="{relative(url, current)}"><span class="resource-meta">{html.escape(meta)}</span>'
         f'<h2>{html.escape(title)}</h2><p>{html.escape(description)}</p><span class="resource-action">{action} →</span></a>'
         + (f'<p><a href="{relative("session-3/presentation/index.html", current)}">Present the 26 October session · interactive slides →</a></p>'
-           if url == 'session-3/index.html' else '') + '</div>'
+           if url == 'session-3/index.html' else '')
+        + (f'<p><a href="{relative("session-4/presentation/index.html", current)}">Present the 29 October session · interactive slides →</a></p>'
+           if url == 'session-4/index.html' else '') + '</div>'
         for url, meta, title, description in items) + '</div>'
 
 
