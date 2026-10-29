@@ -40,28 +40,24 @@ The source defaults are small: B=2, accumulation=2, three epochs, training cap 3
 
 ## AMP demo
 
-<a id="amp-demo"></a>
 [Open section 01 · Precision](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_training.ipynb#scrollTo=precision-demo) · [Open section 02 · AMP](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_training.ipynb#scrollTo=amp-demo)
 
 **Slide handoff 1 · minutes 22–28.** Setup must already be complete. Run the number-cast cell under **01**, then the source inspection/benchmark cell under **02**. Predict the FP16 overflow and the CPU skip before executing. Read the actual device, finite-loss flag, measured steps and peak-memory definition. CPU results demonstrate execution; they do not establish CUDA speedup. Return to the slide immediately after the benchmark discussion.
 
 ## Accumulation demo
 
-<a id="accumulation-demo"></a>
 [Open section 03 · Accumulation](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_training.ipynb#scrollTo=accumulation-demo)
 
 **Slide handoff 2 · minutes 34–39.** Run its one code cell. It compares gradients before clipping/update for the same real examples in a physical batch and in microbatches. Expected: allclose assertion passes with a small floating-point difference. Read the actual microbatch sizes; a tiny explicit smoke run can use 2+1 instead of 2+2+1. Find the B_i/N weighting in `train_epoch`. The no-BatchNorm/no-dropout model and per-image loss are essential to interpreting the comparison.
 
 ## Resume demo
 
-<a id="resume-demo"></a>
 [Open section 04 · Resume](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_training.ipynb#scrollTo=resume-demo) · [Open section 05 · Validation](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_training.ipynb#scrollTo=validation-demo)
 
 **Slide handoff 3 · minutes 45–51.** Run the interrupt/resume cell, then the schedule/validation cell. It trains the tiny selected real dataset for one epoch, resumes to the fixed three-epoch plan, and runs an uninterrupted reference. Expected on the CPU route: final weights are close within the stated tolerance. Inspect checkpoint keys and next epoch, then contrast last.pt with best.pt. Pre-run this before class to estimate duration on your machine. If time is tight, discuss the saved local result from your rehearsal with its scope stated; do not present illustrative output as freshly measured.
 
 ## DDP demo
 
-<a id="ddp-demo"></a>
 [Download cloud_ddp.ipynb](cloud_ddp.ipynb) · [Open D0 · Setup](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_ddp.ipynb#scrollTo=ddp-setup) · [Open D1 · Shards](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_ddp.ipynb#scrollTo=ddp-shards) · [Open D2 · Launch](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_ddp.ipynb#scrollTo=ddp-launch) · [Open D3 · Resume](https://colab.research.google.com/github/manyakaistha/DLGenAI-26T3/blob/main/docs/efficient_training_session/cloud_ddp.ipynb#scrollTo=ddp-resume)
 
 **Optional, outside the hour.** Read the [DDP guide](07_ddp_optional.md). Run D0 first; it writes both Python files and configures the same real cloud data. Default is two CPU/Gloo processes, B=1, accumulation=2, FP32. D1 prints actual sampler shards. D2 launches one epoch through an external script. D3 resumes and verifies replica agreement and unique validation counts. Change `DDP_DEMO_DEVICE` to `cuda` only with at least two visible compatible GPUs; the worker chooses NCCL then. Single-GPU Colab cannot supply a second GPU by changing this variable.
