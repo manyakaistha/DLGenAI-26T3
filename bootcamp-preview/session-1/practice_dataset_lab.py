@@ -324,4 +324,4 @@ print('Saved split and diagnostic manifest:', manifest_path.resolve())
 # 
 # **Hint after attempting:** Small samples may contain no positive pair for a category or even across the chosen images; `NaN` then says there is no denominator for that diagnostic, not that the method succeeded. The prior ignores actual image content. Keep the split fixed before trying any idea; the hidden test set is not a place to choose settings.
 # 
-# For further study, use the Milestone 1 guides on image geometry, RLE, Dice and split design. The next bootcamp meeting turns these observations into a checked data notebook; it does not require a trained model today.
+# For further study, use the bootcamp guides on image geometry, RLE, Dice and split design. The next bootcamp meeting turns these observations into a checked data notebook; it does not require a trained model today.
