@@ -16,14 +16,13 @@
 <ul>
 <li><a href="#1-a-notebook-an-image-and-a-tensor">1 · A notebook, an image and a tensor</a><ul>
 <li><a href="#11-inputs-targets-predictions-and-learning">1.1 · Inputs, targets, predictions and learning</a></li>
-<li><a href="#12-what-a-notebook-remembers">1.2 · What a notebook remembers</a></li>
-<li><a href="#13-from-one-number-to-a-grid">1.3 · From one number to a grid</a></li>
-<li><a href="#14-read-coordinates-and-slices">1.4 · Read coordinates and slices</a></li>
-<li><a href="#15-dtype-changes-what-arithmetic-can-represent">1.5 · Dtype changes what arithmetic can represent</a></li>
-<li><a href="#16-colour-classes-and-batches-occupy-different-axes">1.6 · Colour, classes and batches occupy different axes</a></li>
-<li><a href="#17-a-mask-records-membership">1.7 · A mask records membership</a></li>
-<li><a href="#18-scaling-and-standardisation-are-different-operations">1.8 · Scaling and standardisation are different operations</a></li>
-<li><a href="#19-intensity-logit-probability-and-target">1.9 · Intensity, logit, probability and target</a></li>
+<li><a href="#12-from-one-number-to-a-grid">1.2 · From one number to a grid</a></li>
+<li><a href="#13-read-coordinates-and-slices">1.3 · Read coordinates and slices</a></li>
+<li><a href="#14-dtype-changes-what-arithmetic-can-represent">1.4 · Dtype changes what arithmetic can represent</a></li>
+<li><a href="#15-colour-classes-and-batches-occupy-different-axes">1.5 · Colour, classes and batches occupy different axes</a></li>
+<li><a href="#16-a-mask-records-membership">1.6 · A mask records membership</a></li>
+<li><a href="#17-scaling-and-standardisation-are-different-operations">1.7 · Scaling and standardisation are different operations</a></li>
+<li><a href="#18-intensity-logit-probability-and-target">1.8 · Intensity, logit, probability and target</a></li>
 <li><a href="#explore-predict-before-changing-a-control">Explore · Predict before changing a control</a></li>
 <li><a href="#practice-read-calculate-diagnose">Practice · Read, calculate, diagnose</a><ul>
 <li><a href="#exercise-1-coordinates-and-shape">Exercise 1 · Coordinates and shape</a></li>
@@ -45,12 +44,7 @@
 <p>In supervised learning, an example pairs an input with a target. For image segmentation, the input contains measured intensities and the target identifies annotated locations. We can write this as <code>prediction = model(input)</code>. The model uses its current parameters, which are adjustable numbers, to calculate a prediction. A loss compares that prediction with the training target. Training updates the parameters to reduce that loss across training examples.</p>
 <p>The target is not calculated from the current prediction. If the prediction is wrong, we do not move the annotation to agree with it. We inspect the error and, during training, adjust the model. Validation uses examples held out from fitting to examine whether the learned rule works beyond the examples it learned from. A metric summarises those examined predictions. Loss, prediction and metric are separate objects, even when they all appear as numbers in a notebook.</p>
 <p>Today we first learn the model's inputs and answers. A mistake in their shape or meaning can remain hidden through a long training run. A fast, hand-checkable example is therefore useful preparation for a larger model.</p>
-<h2 id="12-what-a-notebook-remembers">1.2 · What a notebook remembers</h2>
-<p>A notebook has Markdown cells for explanations and code cells for execution. Its <strong>kernel</strong> is the running Python process. A variable assigned in one code cell remains available to later cells until the kernel restarts. The page's visual order and the kernel's execution history can disagree.</p>
-<p>Suppose one cell assigns <code>threshold = 128</code> and another calculates <code>mask = image &gt;= threshold</code>. If you change the first cell to 180 but run only the second, the kernel may still use 128. The saved output is not proof that the visible code produced it. Restarting the kernel and running every cell in order exposes these hidden dependencies.</p>
-<p>In a code cell, <code>=</code> assigns a value to a name; <code>==</code> tests equality; <code>&gt;=</code> tests whether values meet a boundary. An import such as <code>import numpy as np</code> makes a library available under the short name <code>np</code>. It does not load images or install the library. Installation belongs in the notebook's setup instructions; local work in this repository uses <code>uv</code>.</p>
-<p>Use <strong>read → predict → run → inspect → explain</strong>. When an error occurs, read its last line, find the failing operation, and inspect the object just before it. <code>NameError</code> often indicates an unexecuted definition. <code>FileNotFoundError</code> indicates an unavailable path, not an empty dataset. An assertion failure means an assumption was false; removing the assertion does not repair the assumption.</p>
-<h2 id="13-from-one-number-to-a-grid">1.3 · From one number to a grid</h2>
+<h2 id="12-from-one-number-to-a-grid">1.2 · From one number to a grid</h2>
 <p>A <strong>scalar</strong> is one number, such as 140. A <strong>vector</strong> is a sequence, such as <code>[10, 70, 140, 240]</code>. A two-dimensional array arranges values along two axes. For an image grid, axis 0 usually counts rows and axis 1 counts columns. More axes allow colour channels, batches and other information. A tensor is a general term for such a multi-axis numerical object; it is not automatically a GPU object.</p>
 <pre class="highlight"><code class="language-python">import numpy as np
 
@@ -66,7 +60,7 @@ print(image.size)        # 12 stored values
 print(image.dtype)       # uint8</code></pre>
 <p>The outer list contains three row lists. Each row contains four values. Thus <code>shape</code> is <code>(3, 4)</code>, and multiplying the axis lengths gives <code>size = 3 × 4 = 12</code>. <code>ndim</code> counts axes, not rows. A two-dimensional array can have a million rows and still have two axes.</p>
 <p>The same 3 × 4 shape could represent an image, a table of exam marks or part of a matrix calculation. Shape records organisation; the data contract supplies meaning. Write axis names beside an unfamiliar shape before manipulating it.</p>
-<h2 id="14-read-coordinates-and-slices">1.4 · Read coordinates and slices</h2>
+<h2 id="13-read-coordinates-and-slices">1.3 · Read coordinates and slices</h2>
 <p>Python starts counting at zero. <code>image[1, 2]</code> selects the second row and third column, whose value is 140. NumPy image indexing is commonly <code>[y, x]</code>: row first, column second. A drawing may describe a point as <code>(x, y)</code>, so copying coordinates without naming their order is dangerous.</p>
 <pre class="highlight"><code class="language-python">print(image[0, 3])          # 255: top-right value
 print(image[:, 2])          # [128, 140, 150]: all rows, column 2
@@ -74,14 +68,14 @@ print(image[1, :])          # [10, 70, 140, 240]: row 1, all columns
 print(image[0:2, 1:3])      # [[64, 128], [70, 140]]</code></pre>
 <p>A colon alone takes everything on an axis. The slice <code>0:2</code> includes indices 0 and 1 and excludes 2. The final selection therefore takes two rows and two columns. Its shape is <code>(2, 2)</code>. This stop-before rule also matters when a later guide converts RLE lengths into Python slices.</p>
 <p>Selecting one integer index removes that axis from the result: <code>image[1, :]</code> has shape <code>(4,)</code>. A slice retains it: <code>image[1:2, :]</code> has shape <code>(1, 4)</code>. These objects contain the same four values but have different shapes. Adding an axis does not add a new measurement; it changes the organisation expected by the next operation.</p>
-<h2 id="15-dtype-changes-what-arithmetic-can-represent">1.5 · Dtype changes what arithmetic can represent</h2>
+<h2 id="14-dtype-changes-what-arithmetic-can-represent">1.4 · Dtype changes what arithmetic can represent</h2>
 <p><code>dtype</code> describes number storage. <code>uint8</code> means unsigned 8-bit integer, with values from 0 through 255. <code>float32</code> represents floating-point values, including fractions and negative values. <code>bool</code> represents false or true. The correct dtype depends on the object's role.</p>
 <p>A stored 8-bit photograph may reasonably use <code>uint8</code>, but intermediate calculations often need floating point. For example, subtracting a brighter value from a darker one should give a negative difference. Unsigned arithmetic cannot represent that intended result. Convert before subtracting; do not assume that an integer array behaves like unrestricted mathematical integers.</p>
 <pre class="highlight"><code class="language-python">a = np.array([10, 250], dtype=np.uint8)
 change = a.astype(np.float32) - 100.0
 assert np.allclose(change, [-90.0, 150.0])</code></pre>
 <p><code>astype</code> creates a representation with the selected dtype. It does not decide whether the values represent brightness, labels or probabilities. Converting a binary mask to floating point leaves its values at 0.0 and 1.0; dividing it by 255 changes those values and therefore changes its target meaning.</p>
-<h2 id="16-colour-classes-and-batches-occupy-different-axes">1.6 · Colour, classes and batches occupy different axes</h2>
+<h2 id="15-colour-classes-and-batches-occupy-different-axes">1.5 · Colour, classes and batches occupy different axes</h2>
 <p>An RGB pixel contains three colour measurements, for example <code>[0, 128, 255]</code>. An RGB image reader commonly returns height × width × channels, abbreviated <strong>HWC</strong>. PyTorch image models commonly use channels × height × width, abbreviated <strong>CHW</strong>. A batch adds an example axis in front.</p>
 <table>
 <thead>
@@ -128,7 +122,7 @@ assert np.array_equal(chw[:, 1, 2], rgb[1, 2, :])
 batch = np.stack([chw, chw], axis=0)
 assert batch.shape == (2, 3, 3, 4)</code></pre>
 <p>The assignment paints one known pixel. <code>moveaxis</code> relocates the last axis to the front while preserving that pixel's three measurements. <code>stack</code> adds an example axis. In contrast, reshaping HWC directly into CHW merely requests a different arrangement of the same sequence; it does not identify and move the colour axis. A compatible total element count does not prove a correct conversion. The <a href="https://numpy.org/doc/stable/reference/generated/numpy.reshape.html">NumPy reshape reference</a> distinguishes shape changes from indexing order.</p>
-<h2 id="17-a-mask-records-membership">1.7 · A mask records membership</h2>
+<h2 id="16-a-mask-records-membership">1.6 · A mask records membership</h2>
 <p>A binary mask has one value at every location: 1 means marked, 0 means unmarked. It can mark bright regions, dark regions or a texture whose mean brightness is ordinary. For a small invented example, use brightness to construct a mask:</p>
 <pre class="highlight"><code class="language-python">mask = image &gt;= 128
 assert mask.shape == image.shape
@@ -139,7 +133,7 @@ print(foreground_values)    # [128, 255, 140, 240, 150, 230]</code></pre>
 <p>The comparison operates separately at every location. The resulting Boolean array contains true where the condition holds. Summing Booleans counts true entries. Boolean indexing <code>image[mask]</code> gathers those selected intensities into a vector; it does not retain their original grid arrangement.</p>
 <p>An <strong>empty mask</strong> still has the full spatial shape, but every value is zero. It says that this class has no annotated location. It is different from a missing image file or an annotation record that was never supplied. In the cloud practice dataset, one absent class does not make the whole image label-empty.</p>
 <p>Keep display operations separate from data operations. A translucent overlay is a picture for inspection, not a replacement target. Fix binary-mask display limits at 0 and 1 so plotting software does not exaggerate a small numerical range. Inspect the source image and each class mask separately before combining colours.</p>
-<h2 id="18-scaling-and-standardisation-are-different-operations">1.8 · Scaling and standardisation are different operations</h2>
+<h2 id="17-scaling-and-standardisation-are-different-operations">1.7 · Scaling and standardisation are different operations</h2>
 <p>For a confirmed 8-bit image, dividing by 255 converts the available intensity range to 0–1:</p>
 <pre class="highlight"><code class="language-python">x = image.astype(np.float32) / 255.0
 assert x.shape == image.shape
@@ -161,7 +155,7 @@ valid_values = np.array([0.75], dtype=np.float32)
 standardised_valid = (valid_values - train_mean) / train_std
 assert np.allclose(standardised_valid, [0.5])</code></pre>
 <p>Estimating mean/std from training plus validation lets held-out inputs influence a fitted transformation. Estimate them on training only and reuse them. RGB standardisation often has one statistic per colour channel; state which axes were averaged. A per-image transformation is another policy and changes what brightness information remains. The fixed conversion <code>/255</code> uses a declared sensor range rather than fitting a statistic from held-out data. <a href="06_validation.html">Guide 6</a> develops the leakage boundary.</p>
-<h2 id="19-intensity-logit-probability-and-target">1.9 · Intensity, logit, probability and target</h2>
+<h2 id="18-intensity-logit-probability-and-target">1.8 · Intensity, logit, probability and target</h2>
 <p>At one pixel, these four numbers could coexist:</p>
 <table>
 <thead>
@@ -222,7 +216,7 @@ assert np.allclose(standardised_valid, [0.5])</code></pre>
 <p>A colleague replaces <code>moveaxis</code> with <code>reshape</code>, finds the expected shape and starts training. Which check would expose a possible mistake? Why is an expected shape insufficient?</p>
 <details>
 <summary>Worked answer</summary>
-<p>Paint a known RGB pixel, reorder, and compare its three channel values at the same row/column, as in Section 1.6. Also display the reconstructed image. Reshape preserves element count but can mix colour and spatial positions. Training cannot establish that those positions were correct.</p>
+<p>Paint a known RGB pixel, reorder, and compare its three channel values at the same row/column, as in Section 1.5. Also display the reconstructed image. Reshape preserves element count but can mix colour and spatial positions. Training cannot establish that those positions were correct.</p>
 </details>
 <h2 id="optional-extension-numpy-arrays-and-pytorch-tensors">Optional extension · NumPy arrays and PyTorch tensors</h2>
 <p>A compatible NumPy array can become a PyTorch tensor through <code>torch.from_numpy(x)</code>. Such conversion can share underlying storage: modifying one object may affect the other. A tensor also records a device and may participate in automatic differentiation. Those properties do not change what its axes mean.</p>
