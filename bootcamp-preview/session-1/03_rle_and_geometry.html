@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=d62eacf5b225"><script defer src="activities.js?v=0c8caf800962"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -78,9 +78,10 @@
 </tbody>
 </table>
 <p>Decode <code>2 3 10 2</code>: mark positions 2, 3, 4, 10 and 11.</p>
-<pre class="highlight"><code class="language-text">0 1 0 1
+<div class="highlight"><pre><span></span><code>0 1 0 1
 1 0 0 1
-1 0 0 0</code></pre>
+1 0 0 0
+</code></pre></div>
 <p>The first run crosses a column boundary. Positions 3 and 4 are consecutive in the flattened sequence, although one is bottom-left and the other is near the top of the next column. An RLE run is therefore not necessarily one connected region in the two-dimensional image.</p>
 <p>Row-major traversal, called <code>C</code> order, would instead give positions <code>[1,2,3,4]</code> in the first row, <code>[5,6,7,8]</code> in the second and <code>[9,10,11,12]</code> in the third. Both traversals visit twelve positions, but their coordinate assignments differ. A shape or area assertion cannot distinguish them. Use a non-square example with asymmetric foreground locations.</p>
 <p>The following trace makes every boundary explicit:</p>
@@ -117,36 +118,37 @@
 <p>The flattened mask is <code>[0,1,1,1,0,0,0,0,0,1,1,0]</code>. Using the same sequence with <code>C</code> order makes a different grid while preserving its five marked pixels. Traversal describes which values are read or written in sequence; it need not describe the array's physical memory layout.</p>
 <h2 id="core-convert-starts-once">Core · Convert starts once</h2>
 <p>Python arrays use zero-based indices. The first start, 2, therefore becomes index 1. A length of 3 means the Python slice <code>[1:4]</code>, because the stopping index is excluded. Subtract one from the start; do not also subtract one from the length.</p>
-<pre class="highlight"><code class="language-python">import numpy as np
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-def decode_toy_rle(text, height, width):
-    """Strict toy decoder: 1-based starts, lengths, F-order canvas."""
-    if any(isinstance(v, (bool, np.bool_)) or
-           not isinstance(v, (int, np.integer)) or v &lt;= 0
-           for v in (height, width)):
-        raise ValueError("Height and width must be positive integers")
-    if not isinstance(text, str):
-        raise TypeError("Normalise documented CSV missing values first")
-    flat = np.zeros(height * width, dtype=bool)
-    text = text.strip()
-    if not text:
-        return flat.reshape((height, width), order="F")
-    values = [int(token) for token in text.split()]
-    if len(values) % 2:
-        raise ValueError("Expected start-length pairs")
-    previous_stop = 0
-    for start, length in zip(values[::2], values[1::2]):
-        begin = start - 1
-        stop = begin + length
-        if length &lt;= 0 or begin &lt; previous_stop or stop &gt; flat.size:
-            raise ValueError("Invalid, unsorted, overlapping or out-of-bounds run")
-        flat[begin:stop] = True
-        previous_stop = stop
-    return flat.reshape((height, width), order="F")
+<span class="k">def</span><span class="w"> </span><span class="nf">decode_toy_rle</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Strict toy decoder: 1-based starts, lengths, F-order canvas."""</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span> <span class="ow">or</span>
+           <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+           <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Height and width must be positive integers"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Normalise documented CSV missing values first"</span><span class="p">)</span>
+    <span class="n">flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">width</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected start-length pairs"</span><span class="p">)</span>
+    <span class="n">previous_stop</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]):</span>
+        <span class="n">begin</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">begin</span> <span class="o">+</span> <span class="n">length</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">begin</span> <span class="o">&lt;</span> <span class="n">previous_stop</span> <span class="ow">or</span> <span class="n">stop</span> <span class="o">&gt;</span> <span class="n">flat</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid, unsorted, overlapping or out-of-bounds run"</span><span class="p">)</span>
+        <span class="n">flat</span><span class="p">[</span><span class="n">begin</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">previous_stop</span> <span class="o">=</span> <span class="n">stop</span>
+    <span class="k">return</span> <span class="n">flat</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span>
 
-mask = decode_toy_rle("2 3 10 2", 3, 4)
-assert mask.shape == (3, 4)
-assert mask.sum() == 5</code></pre>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">decode_toy_rle</span><span class="p">(</span><span class="s2">"2 3 10 2"</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span>
+</code></pre></div>
 <p>The toy function accepts a string. A real CSV loader must separately interpret its documented missing-value convention before calling a decoder. <code>str(np.nan)</code> is the text <code>"nan"</code>, which is not an empty RLE and must not be parsed as an integer.</p>
 <p>Strict failure is useful for learning: it exposes a format mismatch rather than quietly changing labels. Do not silently clamp invalid runs, transpose a mask until it looks plausible, or copy another dataset's boundary workaround. First inspect the data specification and the offending record. Some formats use different conventions; document an explicit adaptation when required.</p>
 <h2 id="core-validate-before-slices-can-hide-an-error">Core · Validate before slices can hide an error</h2>
@@ -196,22 +198,23 @@ assert mask.sum() == 5</code></pre>
 <h2 id="core-encode-by-finding-foreground-transitions">Core · Encode by finding foreground transitions</h2>
 <p>Encoding reverses the process. Flatten in the agreed order, add a zero at both ends, and locate changes. A zero-to-one change opens a run; its following one-to-zero change closes it. Padding handles foreground touching the first or final canvas position without separate special cases.</p>
 <p>For our flattened mask, the padded sequence changes at positions <code>[2,5,10,12]</code>. Starts are <code>[2,10]</code> and lengths are <code>[5−2,12−10] = [3,2]</code>, recovering <code>2 3 10 2</code>.</p>
-<pre class="highlight"><code class="language-python">def encode_toy_rle(mask):
-    a = np.asarray(mask)
-    if a.ndim != 2 or 0 in a.shape or not np.isin(a, [0, 1]).all():
-        raise ValueError("Use a nonempty 2D canvas with binary values")
-    flat = a.astype(np.uint8).ravel(order="F")
-    padded = np.concatenate(([0], flat, [0]))
-    changes = np.flatnonzero(padded[1:] != padded[:-1]) + 1
-    starts = changes[::2]
-    lengths = changes[1::2] - starts
-    pairs = np.column_stack((starts, lengths)).ravel()
-    return " ".join(str(int(value)) for value in pairs)
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">encode_toy_rle</span><span class="p">(</span><span class="n">mask</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Use a nonempty 2D canvas with binary values"</span><span class="p">)</span>
+    <span class="n">flat</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s2">"F"</span><span class="p">)</span>
+    <span class="n">padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(([</span><span class="mi">0</span><span class="p">],</span> <span class="n">flat</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">changes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">padded</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="n">padded</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">changes</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">changes</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">starts</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">starts</span><span class="p">,</span> <span class="n">lengths</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s2">" "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">)</span>
 
-assert encode_toy_rle(mask) == "2 3 10 2"
-assert encode_toy_rle(np.zeros((3, 4), dtype=bool)) == ""
-assert encode_toy_rle(np.ones((3, 4), dtype=bool)) == "1 12"
-assert np.array_equal(decode_toy_rle(encode_toy_rle(mask), 3, 4), mask)</code></pre>
+<span class="k">assert</span> <span class="n">encode_toy_rle</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"2 3 10 2"</span>
+<span class="k">assert</span> <span class="n">encode_toy_rle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span> <span class="o">==</span> <span class="s2">""</span>
+<span class="k">assert</span> <span class="n">encode_toy_rle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span> <span class="o">==</span> <span class="s2">"1 12"</span>
+<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">decode_toy_rle</span><span class="p">(</span><span class="n">encode_toy_rle</span><span class="p">(</span><span class="n">mask</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">mask</span><span class="p">)</span>
+</code></pre></div>
 <p><code>flatnonzero</code> locates the transitions. Alternating entries are starts and exclusive ends; subtracting each start from its end produces its length. <code>column_stack</code> places each start beside its length, and the last <code>ravel</code> serialises pairs in row order. See the <a href="https://numpy.org/doc/stable/reference/generated/numpy.flatnonzero.html">NumPy flatnonzero reference</a> for the indexing operation.</p>
 <p>Two legal strings can describe the same mask. <code>2 1 3 2</code> and <code>2 3</code> both select positions 2–4. Our encoder returns the maximal merged run <code>2 3</code>. This is <strong>canonicalisation</strong>. Mask equality must survive the round trip; exact text equality requires an already canonical source. Our strict decoder accepts adjacent runs but rejects overlapping ones.</p>
 <p>RLE compression depends on the pattern. R runs need 2R integers, whereas a dense mask stores H×W values. A solid span compresses well; alternating foreground and background can require almost one run per marked pixel. Decimal digits and separators also cost bytes, so integer counts alone do not measure file size. A vertical line can be one F-order run and many C-order runs; the contract, rather than the shortest representation, determines which traversal to use.</p>
@@ -228,11 +231,12 @@ assert np.array_equal(decode_toy_rle(encode_toy_rle(mask), 3, 4), mask)</code></
 <h2 id="core-preserve-geometry-through-every-operation">Core · Preserve geometry through every operation</h2>
 <p>Images are indexed <code>[row, column]</code>, usually <code>[y, x]</code>; image libraries often request resize arguments <code>(width, height)</code>. Read the function's documentation instead of guessing from a tuple.</p>
 <p>For a fictional image of height 60 and width 120, resizing to 30 × 60 scales both axes by 0.5 and preserves its aspect ratio. Resizing to 60 × 60 uses width scale 0.5 and height scale 1.0: a square feature becomes taller relative to its width.</p>
-<pre class="highlight"><code class="language-text">Image and target at original geometry
+<div class="highlight"><pre><span></span><code>Image and target at original geometry
               ↓ same crop / flip / spatial scale
 Resized image and target at a shared geometry
               ↓ overlay at that geometry
-Check correspondence before measuring anything</code></pre>
+Check correspondence before measuring anything
+</code></pre></div>
 <p>Discrete binary masks need a resampling rule that preserves label identities, commonly nearest neighbour. Bilinear interpolation can create fractional target values at boundaries. Photographs can use an image interpolation rule suited to continuous intensities. Even nearest neighbour can remove a thin feature when downsampling: preserving binary values is not the same as preserving every foreground pixel.</p>
 <p>In <a href="https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.resize">Pillow's resize API</a>, the target size is width then height and the resampling filter is explicit. Set the mask filter explicitly; never rely on an image-oriented default. An intensity change applies to the image only; a crop or flip must be shared by image and mask.</p>
 <h2 id="core-calculate-distortion-and-area-with-named-axes">Core · Calculate distortion and area, with named axes</h2>
@@ -274,27 +278,29 @@ Check correspondence before measuring anything</code></pre>
 </table>
 <p>A source feature ten pixels wide and four high has continuous footprint five by two in the first target and five by four in the second. A circle becomes an ellipse under unequal scales. Area scales by the product sₓsᵧ in continuous geometry: a sufficiently large 40-pixel region might occupy about ten pixels after both dimensions halve. Integer sampling and boundaries prevent that approximation from being exact for every region. Component thresholds must name the grid on which their pixels are counted.</p>
 <p>Here is a complete image/mask resize with explicit interpolation:</p>
-<pre class="highlight"><code class="language-python">from PIL import Image
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
-target_wh = (60, 30)  # width first in Pillow
-toy_rgb = np.zeros((60, 120, 3), dtype=np.uint8)
-toy_mask = np.zeros((60, 120), dtype=np.uint8)
-toy_mask[20:24, 40:50] = 1
-small_rgb = np.asarray(Image.fromarray(toy_rgb).resize(
-    target_wh, Image.Resampling.BILINEAR))
-small_mask = np.asarray(Image.fromarray(toy_mask).resize(
-    target_wh, Image.Resampling.NEAREST))
-assert small_rgb.shape[:2] == small_mask.shape == (30, 60)
-assert set(np.unique(small_mask)).issubset({0, 1})</code></pre>
+<span class="n">target_wh</span> <span class="o">=</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>  <span class="c1"># width first in Pillow</span>
+<span class="n">toy_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">toy_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">toy_mask</span><span class="p">[</span><span class="mi">20</span><span class="p">:</span><span class="mi">24</span><span class="p">,</span> <span class="mi">40</span><span class="p">:</span><span class="mi">50</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">small_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">toy_rgb</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+    <span class="n">target_wh</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Resampling</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">))</span>
+<span class="n">small_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">toy_mask</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+    <span class="n">target_wh</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Resampling</span><span class="o">.</span><span class="n">NEAREST</span><span class="p">))</span>
+<span class="k">assert</span> <span class="n">small_rgb</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">small_mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">small_mask</span><span class="p">))</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span>
+</code></pre></div>
 <p>Image and mask share their target coordinates while using separate filters. Decode RLE on its <strong>encoded canvas before resizing</strong>. If annotations and photographs use different source grids by design, apply the documented coordinate mapping explicitly. Original cloud data, a mirror with re-encoded RLE, and the official scoring grid are separate contracts.</p>
 <h2 id="core-binary-values-do-not-guarantee-feature-retention">Core · Binary values do not guarantee feature retention</h2>
 <p>Use an explicit teaching sampler: output column j selects source column <code>floor((j+0.5)*W₀/W₁)</code>. Reducing width 12 to 4 samples zero-based source columns <code>[1,4,7,10]</code>. A one-column line at x=4 survives; an equally wide line at x=5 disappears. Both have a continuous target width of one third of a pixel, but alignment changes the sampled result.</p>
-<pre class="highlight"><code class="language-python">sampled = np.floor((np.arange(4) + 0.5) * 12 / 4).astype(int)
-assert sampled.tolist() == [1, 4, 7, 10]
-line_a = np.arange(12) == 4
-line_b = np.arange(12) == 5
-assert line_a[sampled].sum() == 1
-assert line_b[sampled].sum() == 0</code></pre>
+<div class="highlight"><pre><span></span><code><span class="n">sampled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">sampled</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="n">line_a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+<span class="n">line_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span>
+<span class="k">assert</span> <span class="n">line_a</span><span class="p">[</span><span class="n">sampled</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="n">line_b</span><span class="p">[</span><span class="n">sampled</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
+</code></pre></div>
 <p>Enlarging the vanished result back to width 12 cannot infer the erased source column. A surviving sample can also become a wider block. Restoring array size does not restore information. This formula is the declared teaching rule; actual libraries can use different coordinate conventions and filters.</p>
 <h2 id="optional-depth-aliasing-nyquist-and-the-sensor">Optional depth · Aliasing, Nyquist and the sensor</h2>
 <p><strong>Aliasing</strong> means fine-scale patterns become indistinguishable or misleading after sampling. Alternating dark/bright columns sampled every second column can become constant dark or constant bright, depending on phase. A low-pass filter before image downsampling can reduce this ambiguity but can soften thin features. It does not guarantee preservation of every labelled structure.</p>

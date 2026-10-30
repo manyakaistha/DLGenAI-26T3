@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=d62eacf5b225"><script defer src="activities.js?v=0c8caf800962"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -86,10 +86,11 @@
 </table>
 <p>“Positive” here means membership of this class, not whether the image is bright. “False” means disagreement with the supplied annotation; a visually debatable region still needs to be interpreted against that target contract.</p>
 <p>Trace this 3×6 toy grid by hand:</p>
-<pre class="highlight"><code class="language-text">Ground truth G             Prediction P
+<div class="highlight"><pre><span></span><code>Ground truth G             Prediction P
 1 1 1 0 0 0                1 1 0 1 0 0
 1 1 0 0 0 0                1 0 0 1 0 0
-1 0 0 0 0 0                1 0 0 0 1 0</code></pre>
+1 0 0 0 0 0                1 0 0 0 1 0
+</code></pre></div>
 <p>There are 6 target pixels and 7 predicted pixels. Four positions belong to both masks, so TP=4. Three prediction positions lie outside the target, so FP=3. Two target positions were missed, so FN=2. The remaining 9 positions are TN. Check the accounting: <code>4+3+2+9=18</code>, the canvas size.</p>
 <p>These counts give three familiar ratios:</p>
 <div class="arithmatex">\[
@@ -123,24 +124,25 @@ F_1=\frac{2\,\text{precision}\,\text{recall}}
 \]</div>
 <p>For this binary comparison it equals foreground Dice. This identity does not make library defaults interchangeable: their empty handling, averaging axes and ignored labels may differ.</p>
 <h2 id="core-implement-the-comparison-with-explicit-inputs">Core · Implement the comparison with explicit inputs</h2>
-<pre class="highlight"><code class="language-python">import numpy as np
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-def binary_counts(prediction, target):
-    p, g = np.asarray(prediction), np.asarray(target)
-    if p.shape != g.shape:
-        raise ValueError("Prediction and target need the same shape")
-    if not np.isin(p, [0, 1]).all() or not np.isin(g, [0, 1]).all():
-        raise ValueError("Pass binary masks, not continuous scores")
-    p, g = p.astype(bool), g.astype(bool)
-    return {
-        "tp": int((p &amp; g).sum()), "fp": int((p &amp; ~g).sum()),
-        "fn": int((~p &amp; g).sum()), "tn": int((~p &amp; ~g).sum()),
-    }
+<span class="k">def</span><span class="w"> </span><span class="nf">binary_counts</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="n">p</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">prediction</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">g</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Prediction and target need the same shape"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Pass binary masks, not continuous scores"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span> <span class="n">g</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"tp"</span><span class="p">:</span> <span class="nb">int</span><span class="p">((</span><span class="n">p</span> <span class="o">&amp;</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"fp"</span><span class="p">:</span> <span class="nb">int</span><span class="p">((</span><span class="n">p</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+        <span class="s2">"fn"</span><span class="p">:</span> <span class="nb">int</span><span class="p">((</span><span class="o">~</span><span class="n">p</span> <span class="o">&amp;</span> <span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span> <span class="s2">"tn"</span><span class="p">:</span> <span class="nb">int</span><span class="p">((</span><span class="o">~</span><span class="n">p</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">g</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()),</span>
+    <span class="p">}</span>
 
-def dice_pair(prediction, target):
-    c = binary_counts(prediction, target)
-    denominator = 2*c["tp"] + c["fp"] + c["fn"]
-    return 1.0 if denominator == 0 else 2*c["tp"] / denominator</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">dice_pair</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">binary_counts</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s2">"fp"</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s2">"fn"</span><span class="p">]</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="n">denominator</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">2</span><span class="o">*</span><span class="n">c</span><span class="p">[</span><span class="s2">"tp"</span><span class="p">]</span> <span class="o">/</span> <span class="n">denominator</span>
+</code></pre></div>
 <p><code>&amp;</code> combines Boolean conditions and <code>~</code> reverses them. Summing a Boolean array counts true entries. Converting those sums to ordinary integers makes the reported counts unambiguous. The second function handles <strong>one pair</strong>; a later loop decides what collection to average.</p>
 <p>Do not pass a floating probability map and rely on <code>astype(bool)</code> to threshold it. Every nonzero value, including 0.001, would become true. Apply the intended comparison, such as <code>scores &gt;= threshold</code>, first. Also avoid silently flattening a whole batch into one pair: that changes the metric's weighting even if all shapes are otherwise valid.</p>
 <h2 id="core-an-empty-target-creates-a-sharp-scoring-boundary">Core · An empty target creates a sharp scoring boundary</h2>
@@ -275,8 +277,9 @@ A=\frac{1}{N_e}\sum_{i\in\mathcal E}\mathbf1[|P_i|=0].
 <p>A score map is continuous; a binary prediction needs a decision rule. Write both threshold and comparison operator. With <code>score &gt;= threshold</code>, a score exactly equal to the threshold is selected. Raising the threshold on a <strong>fixed</strong> map can only remove foreground positions. TP and FP cannot increase, FN cannot decrease, and recall cannot increase for a nonempty fixed target.</p>
 <p>Precision can move either way. Suppose two selected locations comprise one true pixel with score 0.6 and one false pixel with score 0.9. At threshold 0.5, precision is 1/2. At0.8, only the false pixel remains, so precision is 0. Raising the threshold did not make the remaining predictions more trustworthy in this example.</p>
 <p>For a fuller toy comparison:</p>
-<pre class="highlight"><code class="language-text">Target:   1    1    0    0    0
-Score:   .9   .4   .7   .2   .1</code></pre>
+<div class="highlight"><pre><span></span><code>Target:   1    1    0    0    0
+Score:   .9   .4   .7   .2   .1
+</code></pre></div>
 <table>
 <thead>
 <tr>
@@ -324,56 +327,59 @@ Score:   .9   .4   .7   .2   .1</code></pre>
 <h2 id="core-a-component-needs-a-connectivity-rule">Core · A component needs a connectivity rule</h2>
 <p>Thresholding decides pixel membership. <strong>Connected-component labelling</strong> groups selected pixels by whether a path of neighbouring foreground pixels joins them. It does not know whether an island is a real object. Semantic masks can also join several objects into one region or split one object into several pieces.</p>
 <p>Under 4-connectivity, neighbours share an edge: up, down, left and right. Under 8-connectivity, diagonal corner neighbours count too. Consider</p>
-<pre class="highlight"><code class="language-text">1 0 0
+<div class="highlight"><pre><span></span><code>1 0 0
 0 1 0
-0 0 1</code></pre>
+0 0 1
+</code></pre></div>
 <p>Four-connectivity gives three components of area 1. Eight-connectivity gives one component of area 3. If a minimum-area rule keeps area≥2, the first choice removes everything and the second keeps everything. The rule must therefore state both area threshold and connectivity.</p>
 <p>Eight-connectivity can preserve a thin diagonal chain; it can also join two otherwise distinct regions that touch only at a corner. Four-connectivity makes the opposite choice. Neither is universally essential or correct for every defect dataset. Select a convention that matches the task, report it and inspect its consequences.</p>
 <p>Here is a deliberately small breadth-first search for one 2D binary mask:</p>
 <div class="bc-lab" data-bc="connectivity"><p>The diagonal above forms three area-one regions under 4-connectivity and one area-three region under 8-connectivity. Keeping area at least two removes all pixels in the first case and retains all in the second.</p></div>
 
-<pre class="highlight"><code class="language-python">from collections import deque
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
 
-def components(mask, connectivity=4):
-    a = np.asarray(mask, dtype=bool)
-    if a.ndim != 2 or connectivity not in (4, 8):
-        raise ValueError("Use a 2D mask and connectivity 4 or 8")
-    offsets = [(-1,0), (1,0), (0,-1), (0,1)]
-    if connectivity == 8:
-        offsets += [(-1,-1), (-1,1), (1,-1), (1,1)]
-    seen = np.zeros_like(a)
-    groups = []
-    h, w = a.shape
-    for row in range(h):
-        for col in range(w):
-            if not a[row, col] or seen[row, col]:
-                continue
-            queue = deque([(row, col)])
-            seen[row, col] = True
-            group = []
-            while queue:
-                r, c = queue.popleft()
-                group.append((r, c))
-                for dr, dc in offsets:
-                    rr, cc = r + dr, c + dc
-                    if 0 &lt;= rr &lt; h and 0 &lt;= cc &lt; w:
-                        if a[rr, cc] and not seen[rr, cc]:
-                            seen[rr, cc] = True
-                            queue.append((rr, cc))
-            groups.append(group)
-    return groups</code></pre>
+<span class="k">def</span><span class="w"> </span><span class="nf">components</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">connectivity</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Use a 2D mask and connectivity 4 or 8"</span><span class="p">)</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">connectivity</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="n">offsets</span> <span class="o">+=</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">a</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="ow">or</span> <span class="n">seen</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)])</span>
+            <span class="n">seen</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="n">queue</span><span class="p">:</span>
+                <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+                <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">dr</span><span class="p">,</span> <span class="n">dc</span> <span class="ow">in</span> <span class="n">offsets</span><span class="p">:</span>
+                    <span class="n">rr</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">dr</span><span class="p">,</span> <span class="n">c</span> <span class="o">+</span> <span class="n">dc</span>
+                    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">rr</span> <span class="o">&lt;</span> <span class="n">h</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">cc</span> <span class="o">&lt;</span> <span class="n">w</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">seen</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">]:</span>
+                            <span class="n">seen</span><span class="p">[</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rr</span><span class="p">,</span> <span class="n">cc</span><span class="p">))</span>
+            <span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">groups</span>
+</code></pre></div>
 <p>The outer scan finds an unvisited foreground seed. The queue explores its neighbours until no reachable pixel remains. Marking a pixel when it enters the queue prevents repeated insertion. <code>len(group)</code> is its pixel area. Bounds checks prevent negative Python indices from wrapping to the opposite image edge. The result is coordinate lists for teaching, not an efficient large-image implementation. Libraries return a label image and measurements more conveniently; see <a href="https://scikit-image.org/docs/stable/api/skimage.measure.html#skimage.measure.label">scikit-image's labelling documentation</a>. Check each library's connectivity parameter convention rather than assuming it uses literal 4 and 8.</p>
 <h2 id="core-remove-whole-small-components-not-arbitrary-pixels">Core · Remove whole small components, not arbitrary pixels</h2>
 <p>A minimum-area filter keeps a predicted connected component if its pixel count is at least a chosen minimum. With minimum 4, a component of area 3 is removed and a component of area 4 remains. State <code>&lt; minimum</code> versus <code>&lt;= minimum</code>; the equality case changes results.</p>
-<pre class="highlight"><code class="language-python">def keep_components(mask, minimum, connectivity=4):
-    if minimum &lt; 1:
-        raise ValueError("Minimum area must be at least one pixel")
-    kept = np.zeros(np.asarray(mask).shape, dtype=bool)
-    for group in components(mask, connectivity):
-        if len(group) &gt;= minimum:
-            for row, col in group:
-                kept[row, col] = True
-    return kept</code></pre>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">keep_components</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">minimum</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">minimum</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Minimum area must be at least one pixel"</span><span class="p">)</span>
+    <span class="n">kept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">components</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">connectivity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">minimum</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="n">kept</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">kept</span>
+</code></pre></div>
 <p>Each surviving component is retained with its original boundary. The operation cannot know which removed components were false. Removing a true tiny region can reduce recall; deleting false pixels can improve precision. Evaluate both outcomes on held-out predictions, retaining the unfiltered reference.</p>
 <p><strong>Morphological opening is a different operation.</strong> Binary erosion followed by dilation with a structuring element removes structures according to shape and thickness. A long one-pixel-wide line can have area 100 but contain no 3×3 solid neighbourhood; a3×3 opening can erase it. A component-area filter with minimum 10 would retain that connected line. Opening can alter boundaries of surviving objects, while whole-component size filtering leaves a retained component's pixels unchanged. The <a href="https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html">OpenCV morphology tutorial</a> defines erosion, dilation and opening.</p>
 <p>Do not describe either method as guaranteed cleanup. A small component might be genuine, and a large connected false region might survive. Filtering each class independently also preserves the possibility of multi-label overlap; filtering an argmax map is a different task.</p>

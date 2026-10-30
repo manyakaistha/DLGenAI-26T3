@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=d62eacf5b225"><script defer src="activities.js?v=0c8caf800962"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -41,17 +41,19 @@
 <h2 id="core-split-images-before-their-derivatives">Core · Split images before their derivatives</h2>
 <p>One cloud photograph contributes four class rows. If those rows are shuffled separately, some labels from the same photograph can enter training and others validation. The model has already seen the image it is being examined on. Similar leakage occurs if crops, flipped copies or resized variants of the same original land on both sides.</p>
 <p>Create one image-level table first, assign each image to one partition, and join its class rows back afterwards. If several photographs come from the same source scene or acquisition group, consider that group as the indivisible unit. An image-ID check prevents identical-ID leakage; it does not prove independence from near-duplicate scenes. <a href="https://scikit-learn.org/stable/common_pitfalls.html">Scikit-learn's leakage guidance</a> explains why preprocessing fitted on held-out data also creates leakage.</p>
-<pre class="highlight"><code class="language-text">Original source / image IDs
+<div class="highlight"><pre><span></span><code>Original source / image IDs
             ↓ assign each source once
 Training IDs                         Validation IDs
      ↓                                      ↓
 Training-only fitting                Apply fixed transformations
-and derived examples                 and measure predictions</code></pre>
+and derived examples                 and measure predictions
+</code></pre></div>
 <h2 id="core-stratification-tries-to-preserve-representation">Core · Stratification tries to preserve representation</h2>
 <p>A random split does not guarantee that rare labels appear on both sides. Stratification tries to represent selected label information in each partition. For multi-label data, one simple approach treats the entire presence vector as a combination label:</p>
-<pre class="highlight"><code class="language-text">[0,0,0,0] → 0000
+<div class="highlight"><pre><span></span><code>[0,0,0,0] → 0000
 [1,0,0,0] → 1000
-[1,0,0,1] → 1001</code></pre>
+[1,0,0,1] → 1001
+</code></pre></div>
 <p>This preserves combinations approximately when there are enough examples. It is different from pretending that every image has one of four mutually exclusive labels. A class can belong to several combinations.</p>
 <p>For an invented 20-image table with combination counts <code>[8, 4, 4, 4]</code>, a 25% validation target can allocate <code>[2, 1, 1, 1]</code>: five validation images, with every combination represented. This convenient arithmetic does not generalise to all datasets.</p>
 <h2 id="core-rounding-and-rare-combinations-are-real-constraints">Core · Rounding and rare combinations are real constraints</h2>
@@ -70,39 +72,40 @@ and derived examples                 and measure predictions</code></pre>
 <p>“Use 25% for validation” is a target, not a way to divide an individual image. Consider a <strong>fictional</strong> set of 16 independent source images. Their four presence patterns occur 7, 5, 3 and 1 times. A four-image holdout would ideally receive <code>7/4 = 1.75</code>, <code>5/4 = 1.25</code>, <code>3/4 = 0.75</code> and <code>1/4 = 0.25</code> images from those patterns. None of those fractions is a possible selected count. If we simply round each one to the nearest integer, we get <code>2+1+1+0=4</code> here, but independent rounding is not guaranteed to sum to the desired total in another table.</p>
 <p>A transparent <strong>largest-remainder</strong> exercise starts with floors <code>[1,1,0,0]</code>, then gives the two remaining validation places to the largest fractional remainders: 0.75 from the seven-image stratum and 0.75 from the three-image stratum. With a declared tie rule, the allocation is <code>[2,1,1,0]</code>. The singleton stays in training. That is a policy choice, not a proof that the validation set can assess the singleton's combination. Even a class present in several combinations may have poor support if their allocations all round down. Audit the <em>class</em> totals after allocating <em>combinations</em>.</p>
 <p>The following small code spells out the policy. It operates on invented IDs and assumes those IDs are independent. It keeps at least one member of each non-singleton stratum in training; a singleton is training-only. It deliberately raises an error if that policy cannot meet the requested validation size. In a real project, that failure calls for a documented decision about holdout size or grouping, not a hidden duplicate.</p>
-<pre class="highlight"><code class="language-python">import numpy as np
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-members = {
-    "0000": [f"clean_{i}" for i in range(7)],
-    "1000": [f"fish_{i}" for i in range(5)],
-    "0100": [f"flower_{i}" for i in range(3)],
-    "1010": ["rare_0"],
-}
-seed, wanted = 30, 4
-rng = np.random.default_rng(seed)
-counts = {key: len(ids) for key, ids in members.items()}
-raw = {key: wanted * count / sum(counts.values())
-       for key, count in counts.items()}
-assigned = {key: int(np.floor(value)) for key, value in raw.items()}
-capacity = {key: max(0, count - 1) for key, count in counts.items()}
-while sum(assigned.values()) &lt; wanted:
-    choices = [key for key in sorted(members)
-               if assigned[key] &lt; capacity[key]]
-    if not choices:
-        raise ValueError("Declared training-support policy cannot fill holdout")
-    chosen = max(choices, key=lambda key: raw[key] - assigned[key])
-    assigned[chosen] += 1
-validation_ids, training_ids = [], []
-for key, ids in members.items():
-    shuffled = rng.permutation(ids).tolist()
-    validation_ids += shuffled[:assigned[key]]
-    training_ids += shuffled[assigned[key]:]
-assert len(validation_ids) == wanted
-assert not (set(validation_ids) &amp; set(training_ids))
-assert set(validation_ids) | set(training_ids) == {
-    image_id for ids in members.values() for image_id in ids
-}
-print(assigned)  # {'0000': 2, '1000': 1, '0100': 1, '1010': 0}</code></pre>
+<span class="n">members</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"0000"</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"clean_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)],</span>
+    <span class="s2">"1000"</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"fish_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span>
+    <span class="s2">"0100"</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"flower_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)],</span>
+    <span class="s2">"1010"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"rare_0"</span><span class="p">],</span>
+<span class="p">}</span>
+<span class="n">seed</span><span class="p">,</span> <span class="n">wanted</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">4</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">members</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">raw</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">wanted</span> <span class="o">*</span> <span class="n">count</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+       <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">assigned</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">raw</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">capacity</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="k">while</span> <span class="nb">sum</span><span class="p">(</span><span class="n">assigned</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">wanted</span><span class="p">:</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">members</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">assigned</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">capacity</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">choices</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Declared training-support policy cannot fill holdout"</span><span class="p">)</span>
+    <span class="n">chosen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">key</span><span class="p">:</span> <span class="n">raw</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">-</span> <span class="n">assigned</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="n">assigned</span><span class="p">[</span><span class="n">chosen</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">validation_ids</span><span class="p">,</span> <span class="n">training_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">members</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">shuffled</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">validation_ids</span> <span class="o">+=</span> <span class="n">shuffled</span><span class="p">[:</span><span class="n">assigned</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+    <span class="n">training_ids</span> <span class="o">+=</span> <span class="n">shuffled</span><span class="p">[</span><span class="n">assigned</span><span class="p">[</span><span class="n">key</span><span class="p">]:]</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">validation_ids</span><span class="p">)</span> <span class="o">==</span> <span class="n">wanted</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">validation_ids</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">training_ids</span><span class="p">))</span>
+<span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">validation_ids</span><span class="p">)</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">training_ids</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span>
+    <span class="n">image_id</span> <span class="k">for</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">members</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">image_id</span> <span class="ow">in</span> <span class="n">ids</span>
+<span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">assigned</span><span class="p">)</span>  <span class="c1"># {'0000': 2, '1000': 1, '0100': 1, '1010': 0}</span>
+</code></pre></div>
 <p>This toy method explains allocation; it is not a general grouped multi-label splitter. A code path that first divides photographs into tiles and then “stratifies” the tiles still leaks source images. If two images are from one acquisition group, replace the image IDs with group IDs <em>before</em> this reasoning. A group can have several labels and several images, so group counts and image counts will differ. Check both, and keep the group intact even when doing so makes the label balance untidy.</p>
 <h2 id="what-combination-and-per-class-balancing-preserve">What combination and per-class balancing preserve</h2>
 <p>A four-bit vector records which of four labels occur <strong>somewhere in an image</strong>. Combination stratification treats <code>1001</code> as its own stratum, so it can preserve the frequency of that co-occurrence when the stratum is sufficiently populated. It does not preserve mask size, severity, location, acquisition source or pixel overlap. Two <code>1001</code> images might have very different marked areas. The vector also says nothing about whether their two masks intersect at any pixel.</p>
@@ -153,10 +156,11 @@ print(assigned)  # {'0000': 2, '1000': 1, '0100': 1, '1010': 0}</code></pre>
 <p>Development decisions use validation information. A threshold chosen because it wins among five candidates, an epoch chosen because its validation loss is lowest, or a component-size rule chosen after viewing validation masks all use validation. This is legitimate <strong>selection</strong> if declared, but the same validation score is optimistically selected. Repeating many unrecorded sweeps can overfit that holdout. A final independent test, if available, evaluates the completed rule once under its stated protocol. Hidden test labels or leaderboard feedback should not become a substitute training or threshold-tuning set.</p>
 <p>Write a small decision ledger before running an experiment: fixed split ID, candidate choices, metric and tie rule. Afterwards record <em>every</em> attempted candidate and the selected one. If the validation set has just one positive for a class, a single example can reverse candidate rankings; prefer a cautious conclusion to false precision. If no final independent evaluation is available, label the result a validation estimate with its support and selection history.</p>
 <h2 id="core-audit-a-split-then-keep-it-fixed">Core · Audit a split, then keep it fixed</h2>
-<pre class="highlight"><code class="language-python">train_ids = set(train_table["image_id"])
-valid_ids = set(valid_table["image_id"])
-assert not (train_ids &amp; valid_ids)
-assert train_ids | valid_ids == set(all_table["image_id"])</code></pre>
+<div class="highlight"><pre><span></span><code><span class="n">train_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">train_table</span><span class="p">[</span><span class="s2">"image_id"</span><span class="p">])</span>
+<span class="n">valid_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">valid_table</span><span class="p">[</span><span class="s2">"image_id"</span><span class="p">])</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="n">train_ids</span> <span class="o">&amp;</span> <span class="n">valid_ids</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">train_ids</span> <span class="o">|</span> <span class="n">valid_ids</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_table</span><span class="p">[</span><span class="s2">"image_id"</span><span class="p">])</span>
+</code></pre></div>
 <p>Set equality checks coverage and disjointness, but duplicate rows still need their own check. Also record:</p>
 <ul>
 <li>Number of source images and, where known, acquisition groups per partition.</li>

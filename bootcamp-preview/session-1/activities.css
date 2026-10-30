@@ -5,3 +5,14 @@
 .bc-learning-metrics{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;margin:18px 0}.bc-learning-metrics .bc-stat{border-top:1px solid var(--bc-line);padding-top:10px}
 
 .bc-step-count{font:12px Arial,sans-serif;color:var(--muted,#657366);padding-left:15px;white-space:nowrap}
+
+.bc-texture-compare{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:start;margin:10px 0}
+.bc-texture-panel h4{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted,#657366);margin:0 0 10px}
+.bc-hist-display{display:flex;flex-direction:column;gap:10px;margin:8px 0}
+.bc-hist-row{display:grid;grid-template-columns:65px 1fr 85px;align-items:center;gap:10px;font-size:13px}
+.bc-hist-label{font-weight:600;color:var(--bc-ink)}
+.bc-hist-track{background:var(--paper,#eee);height:18px;border-radius:4px;border:1px solid var(--bc-line);overflow:hidden}
+.bc-hist-bar{height:100%;background:var(--bc-accent);border-radius:3px}
+.bc-hist-val{font-variant-numeric:tabular-nums;color:var(--muted,#657366);font-size:12px}
+.bc-hist-callout{background:var(--paper,#f0eadf);border-left:3px solid var(--bc-accent);padding:8px 12px;font-size:13px;border-radius:4px;margin-top:12px;line-height:1.4}
+@media(max-width:700px){.bc-texture-compare{grid-template-columns:1fr}}

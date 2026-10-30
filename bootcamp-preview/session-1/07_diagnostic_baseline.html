@@ -5,7 +5,7 @@
 <script>try{let t=localStorage.getItem('guide-garden-theme');if(['paper','midnight','moss','butter','blush','mono'].includes(t))document.documentElement.dataset.theme=t}catch{}</script>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
-<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=98c35f905863"><script defer src="activities.js?v=8d2c4f4fd044"></script><meta name="robots" content="noindex, nofollow, nosnippet">
+<script defer src="site.js?v=a78b3a6c1ae5"></script><script defer src="styles/generative/theme.js?v=25436f7f84852330"></script><script defer src="styles/generative/live_session_interactions.js?v=25436f7f84852330"></script><link rel="stylesheet" href="activities.css?v=d62eacf5b225"><script defer src="activities.js?v=0c8caf800962"></script><meta name="robots" content="noindex, nofollow, nosnippet">
 </head>
 <body data-overview="false"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · bootcamp</span><a class="brand" href="index.html">Bootcamp 01<br>Read the Data</a><p>30 October 2026 · First teaching session. Learn each concept, check an example, then explain the evidence.</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options"><button class="theme-option" data-palette="paper" aria-pressed="true">Paper</button><button class="theme-option" data-palette="midnight" aria-pressed="false">Midnight</button><button class="theme-option" data-palette="moss" aria-pressed="false">Moss</button><button class="theme-option" data-palette="butter" aria-pressed="false">Butter</button><button class="theme-option" data-palette="blush" aria-pressed="false">Blush</button><button class="theme-option" data-palette="mono" aria-pressed="false">Mono</button></div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
@@ -152,23 +152,24 @@ z = w_R R + w_G G + w_B B + b,
 <h2 id="follow-a-full-training-pass-and-a-fixed-validation-pass">Follow a full training pass and a fixed validation pass</h2>
 <p>The starter's NumPy loop has no hidden training mode: only an explicit assignment to W changes its parameters. In a larger PyTorch model, dropout and batch normalisation also behave differently during fitting and evaluation. <code>model.eval()</code> changes those behaviours; <code>torch.no_grad()</code> disables gradient tracking. Neither replaces the other, and neither chooses a threshold or computes a metric automatically.</p>
 <p>This framework sketch shows the boundaries. It assumes a four-logit model, a training and validation loader, and a mean-reduced <code>BCEWithLogitsLoss</code>; it is a reading example rather than another downloadable training notebook.</p>
-<pre class="highlight"><code class="language-python">for epoch in range(number_of_epochs):
-    model.train()
-    for images, targets in training_loader:
-        optimizer.zero_grad()       # remove the previous step's gradients
-        logits = model(images)      # [B,4,H,W], targets have the same shape
-        loss = loss_function(logits, targets.float())
-        loss.backward()             # calculate parameter gradients
-        optimizer.step()            # only training targets drive this update
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_epochs</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">training_loader</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>       <span class="c1"># remove the previous step's gradients</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>      <span class="c1"># [B,4,H,W], targets have the same shape</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>             <span class="c1"># calculate parameter gradients</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>            <span class="c1"># only training targets drive this update</span>
 
-    model.eval()
-    with torch.no_grad():
-        for images, targets in validation_loader:
-            logits = model(images)
-            scores = logits.sigmoid()
-            predictions = scores &gt;= declared_threshold
-            # Accumulate per-pair counts/metrics with the stated empty rule.
-            # No optimizer.step(), backward(), or fitting from these targets.</code></pre>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">validation_loader</span><span class="p">:</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">()</span>
+            <span class="n">predictions</span> <span class="o">=</span> <span class="n">scores</span> <span class="o">&gt;=</span> <span class="n">declared_threshold</span>
+            <span class="c1"># Accumulate per-pair counts/metrics with the stated empty rule.</span>
+            <span class="c1"># No optimizer.step(), backward(), or fitting from these targets.</span>
+</code></pre></div>
 <p>Gradients accumulate by default in PyTorch; resetting them prevents an unintended sum across unrelated steps. Evaluation targets are still needed to calculate errors, but they do not drive parameter updates. Dropout is disabled in evaluation and batch normalisation normally uses its stored training statistics. Forgetting to restore <code>model.train()</code> for the next pass can change subsequent training. The <a href="https://docs.pytorch.org/tutorials/beginner/basics/optimization_tutorial.html">PyTorch optimisation tutorial</a> walks through these operations in a larger example.</p>
 <p>For loss summaries, account for batch sizes. If two batches contain 2 and 1 images and their mean losses are 0.2 and 0.8, the unweighted mean of batch means is 0.5, while the image-weighted mean is <code>(2×0.2+1×0.8)/3=0.4</code>. With equal grids/channels, image weighting also weights the elementwise mean correctly. Unequal valid-pixel counts require those counts instead. Hard Dice needs its own declared pair/class reduction; do not apply the loss averaging rule by reflex.</p>
 <h2 id="separate-learning-decision-and-generalisation">Separate learning, decision and generalisation</h2>
@@ -212,11 +213,13 @@ z = w_R R + w_G G + w_B B + b,
 </table>
 <p>Do not diagnose “overfitting” from the table alone: a few validation images, an absent rare class or a shifted source can make a curve noisy. Check whether the same source leaked across partitions, whether masks align, how many positive pairs support each number and whether examples were chosen in advance. Holding the split and images fixed makes a model comparison interpretable. Trying many seeds until one curve looks good turns the seed into another validation-selected choice.</p>
 <h2 id="core-a-score-becomes-a-mask-through-a-decision-rule">Core · A score becomes a mask through a decision rule</h2>
-<pre class="highlight"><code class="language-python">prediction = score_map &gt;= threshold</code></pre>
+<div class="highlight"><pre><span></span><code><span class="n">prediction</span> <span class="o">=</span> <span class="n">score_map</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
+</code></pre></div>
 <p>A score map and a binary prediction are different objects. Record the comparison operator: values equal to the threshold are selected by <code>&gt;=</code>. A threshold is an operating choice, not the qualifying cutoff mentioned in project rules.</p>
 <p>Consider one invented four-location example:</p>
-<pre class="highlight"><code class="language-text">Target:          1     1     0     0
-Score:          .9    .4    .6    .1</code></pre>
+<div class="highlight"><pre><span></span><code>Target:          1     1     0     0
+Score:          .9    .4    .6    .1
+</code></pre></div>
 <table>
 <thead>
 <tr>
