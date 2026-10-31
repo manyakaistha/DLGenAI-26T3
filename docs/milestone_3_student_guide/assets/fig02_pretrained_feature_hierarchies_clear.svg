@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-label="What a pretrained encoder passes to the decoder">
+<rect width="1200" height="600" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">What a pretrained encoder passes to the decoder</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">Feature taps carry different spatial detail; the classifier head is discarded.</text>
+<rect x="50" y="130" width="480" height="70" rx="12" fill="#e8f2ef" stroke="#91bcb6" stroke-width="2"/>
+<text x="72" y="159" fill="#087e83" font-size="20" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Stem</text>
+<text x="72" y="185" fill="#202522" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">64 × 64 × 400</text>
+<path d="M545 165 L697 165" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M688.2 171.6 L697 165 L688.2 158.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="715" y="136" width="430" height="59" rx="10" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<text x="738" y="173" fill="#202522" font-size="19" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">edges and local contrast</text>
+<path d="M346 200 L376 212" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M365.4 214.8 L376 212 L370.3 202.6" fill="none" stroke="#255a9b" stroke-width="3"/>
+<rect x="85" y="218" width="445" height="70" rx="12" fill="#e8f2ef" stroke="#91bcb6" stroke-width="2"/>
+<text x="107" y="247" fill="#087e83" font-size="20" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Stage 1</text>
+<text x="107" y="273" fill="#202522" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">64 × 32 × 200</text>
+<path d="M545 253 L697 253" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M688.2 259.6 L697 253 L688.2 246.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="715" y="224" width="430" height="59" rx="10" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<text x="738" y="261" fill="#202522" font-size="19" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">small texture patterns</text>
+<path d="M346 288 L376 300" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M365.4 302.8 L376 300 L370.3 290.6" fill="none" stroke="#255a9b" stroke-width="3"/>
+<rect x="120" y="306" width="410" height="70" rx="12" fill="#e8f2ef" stroke="#91bcb6" stroke-width="2"/>
+<text x="142" y="335" fill="#087e83" font-size="20" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Stage 2</text>
+<text x="142" y="361" fill="#202522" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">128 × 16 × 100</text>
+<path d="M545 341 L697 341" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M688.2 347.6 L697 341 L688.2 334.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="715" y="312" width="430" height="59" rx="10" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<text x="738" y="349" fill="#202522" font-size="19" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">larger structures</text>
+<path d="M346 376 L376 388" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M365.4 390.8 L376 388 L370.3 378.6" fill="none" stroke="#255a9b" stroke-width="3"/>
+<rect x="155" y="394" width="375" height="70" rx="12" fill="#e8f2ef" stroke="#91bcb6" stroke-width="2"/>
+<text x="177" y="423" fill="#087e83" font-size="20" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Stage 3</text>
+<text x="177" y="449" fill="#202522" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">256 × 8 × 50</text>
+<path d="M545 429 L697 429" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M688.2 435.6 L697 429 L688.2 422.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="715" y="400" width="430" height="59" rx="10" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<text x="738" y="437" fill="#202522" font-size="19" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">wider context</text>
+<path d="M346 464 L376 476" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M365.4 478.8 L376 476 L370.3 466.6" fill="none" stroke="#255a9b" stroke-width="3"/>
+<rect x="190" y="482" width="340" height="70" rx="12" fill="#e8f2ef" stroke="#91bcb6" stroke-width="2"/>
+<text x="212" y="511" fill="#087e83" font-size="20" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Stage 4</text>
+<text x="212" y="537" fill="#202522" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">512 × 4 × 25</text>
+<path d="M545 517 L697 517" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M688.2 523.6 L697 517 L688.2 510.4" fill="none" stroke="#087e83" stroke-width="3"/>
+<rect x="715" y="488" width="430" height="59" rx="10" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<text x="738" y="525" fill="#202522" font-size="19" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">coarse semantics</text>
+<text x="51" y="586" fill="#52635d" font-size="16" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Illustrative ResNet-34 shape trace; verify actual feature shapes for the chosen implementation.</text>
+</svg>

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Milestone 3 questions · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning, pretrained vision backbones, grayscale adaptation, ASPP, and compound loss.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="off">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Milestone 3<br>Study Guides</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html" aria-current="page"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 3</summary><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html" aria-current="page"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Assessment questions</span><a href="milestone-3.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Milestone 3 Assessment</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Understand. Adapt. Evaluate.</p></div></div>
+<span class="section-label">Assessment · 9 questions</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#official-starter-code-default-parameters-reference">🛠️ Official Starter Code &amp; Default Parameters Reference</a></li>
+<li><a href="#question-1-feature-map-spatial-geometry-downsampling-arithmetic">Question 1: Feature Map Spatial Geometry &amp; Downsampling Arithmetic</a></li>
+<li><a href="#question-2-pretrained-backbone-architecture-parameter-audit">Question 2: Pretrained Backbone Architecture &amp; Parameter Audit</a></li>
+<li><a href="#question-3-grayscale-input-adaptation-the-single-channel-dilemma">Question 3: Grayscale Input Adaptation (The Single-Channel Dilemma)</a></li>
+<li><a href="#question-4-multi-scale-receptive-fields-atrous-convolutions-deeplabv3-vs-u-net">Question 4: Multi-Scale Receptive Fields &amp; Atrous Convolutions (DeepLabV3+ vs. U-Net)</a></li>
+<li><a href="#question-5-differentiable-soft-dice-loss-numerical-smoothing">Question 5: Differentiable Soft Dice Loss &amp; Numerical Smoothing</a></li>
+<li><a href="#question-6-output-head-semantics-mutually-exclusive-loss-formulations">Question 6: Output Head Semantics &amp; Mutually Exclusive Loss Formulations</a></li>
+<li><a href="#question-7-compound-loss-behavior-on-defect-vs-clean-images">Question 7: Compound Loss Behavior on Defect vs. Clean Images</a></li>
+<li><a href="#question-8-scratch-baseline-vs-pretrained-transfer-learning-empirical-training-convergence">Question 8: Scratch Baseline vs. Pretrained Transfer Learning (Empirical Training &amp; Convergence)</a></li>
+<li><a href="#question-9-pretrained-backbone-architecture-trade-off-resnet-34-vs-efficientnet-b0">Question 9: Pretrained Backbone Architecture Trade-off (ResNet-34 vs. EfficientNet-B0)</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="milestone-3-transfer-learning-stronger-segmentation-models">Milestone 3: Transfer Learning &amp; Stronger Segmentation Models</h1>
+<p>Industrial Surface Anomaly Segmentation · Milestone 3 Assessment</p>
+<p>Read the <a href="index.html">student study guides</a> before attempting the questions. Use the competition data in <code>data/public/</code> and compute your own results. This document contains questions and response formats only.</p>
+<p>For Questions 8 and 9, train your models using the official starter code and standard training protocol provided below.</p>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>In Milestone 2, you built the data foundation: a custom PyTorch <code>Dataset</code> and <code>DataLoader</code> pipeline and trained a basic from-scratch U-Net baseline. However, training semantic segmentation models from scratch on highly imbalanced surface anomaly datasets often plateaus early—the network lacks generic edge/texture visual priors and struggles with extreme background dominance (&gt;97% clean pixels).</p>
+<p><strong>Milestone 3 introduces production-grade deep learning vision techniques:</strong></p>
+<ol>
+<li><strong>Encoder–Decoder Spatial Mechanics:</strong> Feature map downsampling, bottleneck compression, skip-connection concatenation, and receptive field expansion on anisotropic (<span class="arithmatex">\(128 \times 800\)</span>) sensor ribbons.</li>
+<li><strong>Transfer Learning with Pretrained Backbones:</strong> Leveraging ImageNet feature hierarchies (ResNet, EfficientNet) via <code>segmentation_models_pytorch</code> (SMP), parameter audits, and fine-tuning dynamics (freeze vs. unfreeze).</li>
+<li><strong>Single-Channel Grayscale Adaptation:</strong> Mathematically adapting 3-channel RGB pretrained weights to single-channel industrial line-scan sensors (3-channel duplication vs. first-layer weight collapse).</li>
+<li><strong>Multi-Scale Context &amp; Atrous Convolutions:</strong> Analyzing DeepLabV3+ with Atrous Spatial Pyramid Pooling (ASPP) to detect both fine cracks and large diffuse stains without spatial resolution collapse.</li>
+<li><strong>Compound Loss Formulations:</strong> Replacing plain BCE with differentiable <strong>Soft Dice Loss</strong> and <strong>Compound Loss (<span class="arithmatex">\(\alpha \text{BCE} + \beta \text{Dice}\)</span>)</strong> to handle extreme foreground sparsity.</li>
+<li><strong>Output Head Semantics:</strong> Comparing 4-channel independent Sigmoid multi-label detection with 5-channel mutually-exclusive Softmax partitions.</li>
+<li><strong>Comparative Benchmarking:</strong> Evaluating performance gains, convergence speed, and parameter trade-offs between scratch U-Net, ResNet-34, and EfficientNet-B0.</li>
+</ol>
+<hr />
+<h2 id="official-starter-code-default-parameters-reference">🛠️ Official Starter Code &amp; Default Parameters Reference</h2>
+<p>To eliminate parameter guesswork and ensure complete consistency across implementations, use the standard definitions below.</p>
+<h3 id="1-model-instantiation-freezing-for-questions-2-8-9">1. Model Instantiation &amp; Freezing (for Questions 2, 8, 9)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">segmentation_models_pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smp</span>
+
+<span class="c1"># ResNet-34 U-Net (Model A)</span>
+<span class="n">model_resnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
+    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>        <span class="c1"># Pretrained backbone</span>
+    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span>     <span class="c1"># Load ImageNet feature hierarchy</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>                  <span class="c1"># Grayscale industrial strip</span>
+    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>                       <span class="c1"># 4 independent defect channels</span>
+<span class="p">)</span>
+
+<span class="c1"># EfficientNet-B0 U-Net (Model B)</span>
+<span class="n">model_effnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
+    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"efficientnet-b0"</span><span class="p">,</span>
+    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
+<span class="p">)</span>
+
+<span class="c1"># Freezing Encoder (for Q2):</span>
+<span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model_resnet</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+    <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+<h3 id="2-differentiable-soft-dice-compound-loss-for-questions-5-7-8-9">2. Differentiable Soft Dice &amp; Compound Loss (for Questions 5, 7, 8, 9)</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SoftDiceLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Differentiable Soft Dice Loss with Laplace smoothing."""</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span> <span class="o">=</span> <span class="n">smooth</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">probs_flat</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">targets_flat</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="p">(</span><span class="n">probs_flat</span> <span class="o">*</span> <span class="n">targets_flat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">dice</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">intersection</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">probs_flat</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">targets_flat</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">dice</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CompoundLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compound Loss: alpha * BCE + beta * SoftDice."""</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bce</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dice</span> <span class="o">=</span> <span class="n">SoftDiceLoss</span><span class="p">(</span><span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bce</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="3-common-training-protocol-for-questions-8-9">3. Common Training Protocol (for Questions 8 &amp; 9)</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Standard hyperparameters for benchmarking</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">3e-4</span>
+<span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">ALPHA</span> <span class="o">=</span> <span class="mf">0.5</span>   <span class="c1"># BCE weight</span>
+<span class="n">BETA</span> <span class="o">=</span> <span class="mf">0.5</span>    <span class="c1"># Soft Dice weight</span>
+<span class="n">SMOOTH</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Laplace smoothing parameter</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">CompoundLoss</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">ALPHA</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">BETA</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="n">SMOOTH</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">LEARNING_RATE</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="n">WEIGHT_DECAY</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="question-1-feature-map-spatial-geometry-downsampling-arithmetic">Question 1: Feature Map Spatial Geometry &amp; Downsampling Arithmetic</h2>
+<p>In semantic segmentation, the encoder compresses input features through a series of pooling or strided convolution operations. In standard natural image segmentation (e.g. <span class="arithmatex">\(256 \times 256\)</span>), dimensions downsample symmetrically. However, industrial line-scan strips have an extreme anisotropic aspect ratio: <span class="arithmatex">\(128 \times 800\)</span> (<span class="arithmatex">\(1:6.25\)</span>).</p>
+<p>A semantic segmentation network processes an industrial line-scan steel strip of native shape <span class="arithmatex">\((1, 128, 800)\)</span> across 4 progressive stride-2 downsampling stages:</p>
+<div class="arithmatex">\[\text{Input: } (128, 800) \xrightarrow{/2} \text{Stage 1: } (64, 400) \xrightarrow{/2} \text{Stage 2: } (32, 200) \xrightarrow{/2} \text{Stage 3: } (16, 100) \xrightarrow{/2} \text{Stage 4 (Bottleneck): } (H_{\text{bottle}}, W_{\text{bottle}})\]</div>
+<p><strong>Question:</strong></p>
+<ol>
+<li>What is the spatial shape <span class="arithmatex">\((H_{\text{bottle}}, W_{\text{bottle}})\)</span> of the feature representation at the Stage 4 bottleneck?</li>
+<li>If an unpadded image strip with an odd width of <span class="arithmatex">\(128 \times 799\)</span> is passed through this 4-stage encoder with standard integer floor pooling (<code>kernel_size=2, stride=2</code>), what is the spatial dimension mismatch (in pixels along width) that occurs when attempting the final skip-connection concatenation at the decoder?</li>
+<li>What is the total spatial downsampling factor (ratio of input canvas area to bottleneck spatial area)?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>H_bottle, W_bottle; mismatch_px; downsample_factor</code><br />
+<em>(Example format: <code>16, 100; 0; 64</code>)</em></p>
+<hr />
+<h2 id="question-2-pretrained-backbone-architecture-parameter-audit">Question 2: Pretrained Backbone Architecture &amp; Parameter Audit</h2>
+<p>Training a deep segmentation model from scratch on small domain datasets often struggles because early layers must learn basic visual primitives (edges, gradients, Gabor textures) from scratch. Transfer learning addresses this by using backbones pretrained on ImageNet (<span class="arithmatex">\(1.2\text{M}\)</span> natural images).</p>
+<p>Consider SMP U-Net with ResNet-34 (<code>encoder_name="resnet34"</code>) versus EfficientNet-B0 (<code>encoder_name="efficientnet-b0"</code>), both instantiated with <code>in_channels=1</code> and <code>classes=4</code> using default SMP configurations (see Starter Code snippet 1):</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Compute the total parameter count (weights + biases across encoder, decoder, and segmentation head) of both models. Which architecture is more parameter-efficient, and what is the exact difference in parameter count between them?</li>
+<li>In feature-extractor transfer learning, the backbone encoder is often frozen (<code>for p in model.encoder.parameters(): p.requires_grad = False</code>) while keeping the decoder and segmentation head trainable. For the ResNet-34 U-Net, what exact percentage of Model A's total parameters remain trainable? Round to 1 decimal place.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>more_efficient_model, param_diff; trainable_pct</code><br />
+<em>(Example format: <code>resnet18, 5000000; 25.0%</code>)</em></p>
+<hr />
+<h2 id="question-3-grayscale-input-adaptation-the-single-channel-dilemma">Question 3: Grayscale Input Adaptation (The Single-Channel Dilemma)</h2>
+<p>Pretrained ImageNet backbones expect 3-channel RGB inputs (<span class="arithmatex">\(C_{\text{in}} = 3\)</span>). Industrial steel line-scan cameras produce 1-channel grayscale images (<span class="arithmatex">\(C_{\text{in}} = 1\)</span>).</p>
+<ul>
+<li><strong>Strategy A (Channel Duplication):</strong> Duplicate the grayscale image across 3 channels in the DataLoader (<span class="arithmatex">\(X_{\text{rep}} = [I, I, I]\)</span>) so the 3-channel first layer (<code>conv1</code>) can run untouched.</li>
+<li><strong>Strategy B (First-Layer Weight Collapse):</strong> Modify the first convolutional layer (<code>conv1</code>) to accept <span class="arithmatex">\(C_{\text{in}} = 1\)</span> by mathematically combining the 3-channel pretrained RGB weights: <span class="arithmatex">\(W_{\text{gray}} = f(W_{\text{rgb}})\)</span>.</li>
+</ul>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Mathematically, what exact operation <span class="arithmatex">\(f(W_{\text{rgb}})\)</span> across the channel dimension—<strong>sum</strong> or <strong>mean</strong>—must be applied so that the first-layer output activations of Strategy B are strictly identical to Strategy A for any input image <span class="arithmatex">\(I\)</span>?</li>
+<li>In terms of GPU memory bandwidth and PCIe bus transfer from host to device, by what factor does Strategy B reduce the memory transfer size of the input image batch compared to Strategy A?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>sum_or_mean, memory_factor</code><br />
+<em>(Example format: <code>mean, 2x</code>)</em></p>
+<hr />
+<h2 id="question-4-multi-scale-receptive-fields-atrous-convolutions-deeplabv3-vs-u-net">Question 4: Multi-Scale Receptive Fields &amp; Atrous Convolutions (DeepLabV3+ vs. U-Net)</h2>
+<p>In surface defect inspection, anomalies span radically different scales: <code>defect_a</code> consists of hairline cracks (only 1–3 pixels wide), whereas <code>defect_c</code> consists of massive diffuse patches spanning hundreds of pixels. Traditional U-Nets expand their receptive field solely by aggressive downsampling (pooling), which destroys fine spatial boundary details.</p>
+<p>DeepLabV3+ solves this trade-off using Atrous (Dilated) Convolutions in an Atrous Spatial Pyramid Pooling (ASPP) module, expanding the effective receptive field without downsampling or increasing parameter count.
+For a <span class="arithmatex">\(k \times k\)</span> convolutional kernel with dilation rate <span class="arithmatex">\(r\)</span>, the effective spatial footprint <span class="arithmatex">\(k'\)</span> is given by:</p>
+<div class="arithmatex">\[k' = k + (k - 1)(r - 1)\]</div>
+<p><strong>Question:</strong></p>
+<ol>
+<li>For a standard <span class="arithmatex">\(3 \times 3\)</span> kernel (<span class="arithmatex">\(k=3\)</span>), what is the effective spatial footprint <span class="arithmatex">\(k'\)</span> when the dilation rate is <span class="arithmatex">\(r = 6\)</span>, and when <span class="arithmatex">\(r = 12\)</span>?</li>
+<li>In 1–2 concise sentences: what is the fundamental architectural advantage of ASPP's multi-scale dilated convolutions over a traditional pooling bottleneck when segmenting both thin scratches (<code>defect_a</code>) and large diffuse patches (<code>defect_c</code>) on <span class="arithmatex">\(128 \times 800\)</span> steel sheets?</li>
+</ol>
+<p><strong>Answer format:</strong> <code>k_eff_r6, k_eff_r12; brief_advantage</code><br />
+<em>(Example format: <code>7x7, 15x15; Dilated convolutions expand receptive field without resolution loss</code>)</em></p>
+<hr />
+<h2 id="question-5-differentiable-soft-dice-loss-numerical-smoothing">Question 5: Differentiable Soft Dice Loss &amp; Numerical Smoothing</h2>
+<p>In surface anomaly detection, over 97% of canvas pixels are clean background. Standard Binary Cross-Entropy (BCE) computes pixel-wise loss independently, allowing the massive volume of background pixels to overwhelm gradients and biasing models toward predicting zero everywhere.</p>
+<p>Consider a synthetic patch of <span class="arithmatex">\(10{,}000\)</span> pixels containing exactly <strong>100 defect pixels</strong> (<span class="arithmatex">\(y_i = 1\)</span>) and <strong>9,900 clean background pixels</strong> (<span class="arithmatex">\(y_i = 0\)</span>).
+Use the differentiable Soft Dice Loss formula with Laplace additive smoothing (<span class="arithmatex">\(\epsilon = 1.0\)</span>) as defined in Starter Code snippet 2:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Dice}}(P, Y) = 1 - \frac{2 \sum_{i=1}^N p_i y_i + \epsilon}{\sum_{i=1}^N p_i + \sum_{i=1}^N y_i + \epsilon}\]</div>
+<p><strong>Question:</strong></p>
+<ol>
+<li><strong>Lazy Model 1:</strong> Predicts <span class="arithmatex">\(p_i = 0.01\)</span> uniformly across all <span class="arithmatex">\(10{,}000\)</span> pixels. What is its exact Soft Dice Loss?</li>
+<li><strong>Accurate Model 2:</strong> Predicts <span class="arithmatex">\(p_i = 0.90\)</span> on all 100 defect pixels, and <span class="arithmatex">\(p_i = 0.00\)</span> on all 9,900 background pixels. What is its exact Soft Dice Loss?
+Round both answers to 4 decimal places.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>loss_model1, loss_model2</code><br />
+<em>(Example format: <code>0.8521, 0.1245</code>)</em></p>
+<hr />
+<h2 id="question-6-output-head-semantics-mutually-exclusive-loss-formulations">Question 6: Output Head Semantics &amp; Mutually Exclusive Loss Formulations</h2>
+<p>In Milestone 1 (Q3), empirical data auditing verified that different defect classes are strictly spatially mutually exclusive at the pixel level (0 overlapping pixels across the entire dataset).</p>
+<ul>
+<li><strong>Formulation A (Multi-Label Sigmoid):</strong> 4 independent output channels with Sigmoid activations, trained with <code>BCEWithLogitsLoss</code>. Each defect channel is predicted independently.</li>
+<li><strong>Formulation B (Multi-Class Softmax):</strong> 5 output channels (Background + 4 defect classes) with Softmax activation, trained with <code>CrossEntropyLoss</code>. The network partitions each pixel into exactly one category.</li>
+</ul>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Under Formulation B (5-channel Softmax), if a steel strip contains <code>defect_a</code> on the left half of the strip and <code>defect_c</code> on the right half, can the model correctly segment both defect instances on the same image without mutual interference? (Yes/No)</li>
+<li>What is the fundamental disadvantage or operational failure mode of Formulation B if test data or future production batches ever contain overlapping defect annotations? (1 sentence).</li>
+</ol>
+<p><strong>Answer format:</strong> <code>Yes/No; brief_disadvantage</code><br />
+<em>(Example format: <code>Yes; Softmax prevents multiple classes from occupying the same pixel</code>)</em></p>
+<hr />
+<h2 id="question-7-compound-loss-behavior-on-defect-vs-clean-images">Question 7: Compound Loss Behavior on Defect vs. Clean Images</h2>
+<p>Modern segmentation pipelines combine BCE and Soft Dice into a Compound Loss:</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{Compound}} = 0.5 \times \mathcal{L}_{\text{BCE}} + 0.5 \times \mathcal{L}_{\text{Dice}}\]</div>
+<p>Consider a completely clean image (<span class="arithmatex">\(|Y| = 0\)</span>, no defect pixels):</p>
+<ul>
+<li>If predictions are completely empty (<span class="arithmatex">\(\sum p_i = 0\)</span>), smoothed Dice is <span class="arithmatex">\(1.0 \implies \mathcal{L}_{\text{Dice}} = 0.0\)</span>.</li>
+<li>If the model predicts even 50 stray false-positive noise pixels (<span class="arithmatex">\(\sum p_i = 50\)</span>), smoothed Dice is <span class="arithmatex">\(\frac{0 + 1}{50 + 0 + 1} = \frac{1}{51} \approx 0.0196 \implies \mathcal{L}_{\text{Dice}} \approx 0.9804\)</span>.</li>
+</ul>
+<p><strong>Question:</strong></p>
+<ol>
+<li>For a clean image (<span class="arithmatex">\(|Y| = 0\)</span>), describe the gradient behavior that <span class="arithmatex">\(\mathcal{L}_{\text{Dice}}\)</span> produces when stray noise pixels appear versus when predictions are clean.</li>
+<li>Why is combining BCE with Soft Dice strictly superior to training with Soft Dice alone on highly imbalanced surface anomaly datasets where many images are clean? (1–2 sentences).</li>
+</ol>
+<p><strong>Answer format:</strong> <code>brief_gradient_explanation; brief_compound_justification</code></p>
+<hr />
+<h2 id="question-8-scratch-baseline-vs-pretrained-transfer-learning-empirical-training-convergence">Question 8: Scratch Baseline vs. Pretrained Transfer Learning (Empirical Training &amp; Convergence)</h2>
+<p>Train both a from-scratch U-Net and an ImageNet-pretrained ResNet-34 U-Net for 5 epochs under identical settings using the standard training protocol defined in Starter Code snippet 3: AdamW optimizer (learning rate = <span class="arithmatex">\(3 \times 10^{-4}\)</span>), batch size = 16, and Compound Loss (<span class="arithmatex">\(0.5 \times \text{BCE} + 0.5 \times \text{SoftDice}\)</span>).</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>By Epoch 5, which model achieves a lower validation loss and higher official competition score? (<code>pretrained</code> / <code>scratch</code>)</li>
+<li>Convergence Speed: In the very first epoch (Epoch 1), which model demonstrates faster foreground feature acquisition and substantially higher foreground Dice? (<code>pretrained</code> / <code>scratch</code>)</li>
+<li>Generalization: Does the pretrained model exhibit smaller overfitting / a tighter generalization gap (<span class="arithmatex">\(|L_{\text{val}} - L_{\text{train}}|\)</span>) compared to training from scratch? (<code>Yes</code> / <code>No</code>)</li>
+<li>What is the approximate range of competition score improvement gained by using the pretrained ResNet-34 backbone over the scratch baseline on the validation split? Choose one: <code>[&lt; +0.02, +0.02 to +0.08, &gt; +0.10]</code>.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>winning_model; faster_epoch1_model; tighter_gap_yes_no; score_improvement_range</code><br />
+<em>(Example format: <code>scratch; scratch; No; &lt; +0.02</code>)</em></p>
+<hr />
+<h2 id="question-9-pretrained-backbone-architecture-trade-off-resnet-34-vs-efficientnet-b0">Question 9: Pretrained Backbone Architecture Trade-off (ResNet-34 vs. EfficientNet-B0)</h2>
+<p>Compare ResNet-34 U-Net (<span class="arithmatex">\(24.4\text{M}\)</span> parameters) and EfficientNet-B0 U-Net (<span class="arithmatex">\(6.25\text{M}\)</span> parameters) trained for 5 epochs using the same protocol as Question 8.</p>
+<p><strong>Question:</strong></p>
+<ol>
+<li>Parameter Ratio: Approximately how many times more parameters does ResNet-34 have compared to EfficientNet-B0? (Round to nearest integer).</li>
+<li>Resource Footprint: Which architecture consumes significantly less peak GPU VRAM and is better suited for edge deployment with strict memory budgets? (<code>resnet34</code> / <code>efficientnet-b0</code>)</li>
+<li>Performance: Can the lightweight EfficientNet-B0 achieve a competitive or higher official competition score than ResNet-34 despite having <span class="arithmatex">\(\sim 74\%\)</span> fewer parameters? (<code>Yes</code> / <code>No</code>)</li>
+<li>Architectural Mechanism: Name the specific convolution technique used in EfficientNet that drastically reduces parameter count compared to standard convolutions in ResNet.</li>
+</ol>
+<p><strong>Answer format:</strong> <code>param_ratio; edge_backbone; competitive_yes_no; convolution_technique</code><br />
+<em>(Example format: <code>2x; resnet34; No; standard residual convolutions</code>)</em></p></article><nav class="pagination" aria-label="Previous and next page"><a href="index.html">← Milestone 3 Overview</a><a href="guide_01_feature_map_geometry_and_downsampling.html">Q1 · Feature Map Geometry &amp; Downsampling →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

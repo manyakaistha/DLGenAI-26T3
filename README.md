@@ -9,6 +9,8 @@ Public milestone guides and live session resources for DLGenAI 26T3.
 - [Milestone 1 study guide and nine learning modules](docs/milestone_1_student_guide_v2/README.md)
 - [Milestone 2 questions](MILESTONE_2.md)
 - [Milestone 2 study guides and eight concept modules](https://manyakaistha.github.io/DLGenAI-26T3/milestones/milestone-2/)
+- [Milestone 3 questions](MILESTONE_3.md)
+- [Milestone 3 study guides and nine concept modules](docs/milestone_3_student_guide/README.md)
 - [Q11–Q12 starter notebook in Google Colab](https://colab.research.google.com/drive/1Jf4f7jKddRSMpiZ1D8oVqmR8LDK-t86Q?usp=sharing)
 - [Colab setup instructions and notebook/Python downloads](docs/starter_code_q11_q12/README.md)
 
@@ -49,19 +51,21 @@ A beginner-friendly continuation with an 80/20 split lesson, explained PyTorch c
 The notebook creates original synthetic cloud-like data locally and runs on CPU.
 
 
-## Live session: From a Baseline U-Net to a Pretrained Encoder · 26 October 2026
+## Live session: From a Baseline U-Net to a Pretrained Encoder
 
-Detailed study notes explain encoder–decoder mechanics, pretrained initialization, freezing and fine-tuning, BCE–Dice, and controlled evaluation. Full MRI application pages appear between the relevant concept pages and are clearly optional, with skip/continue links back to the theory.
+Notes on encoder-decoder architectures, ImageNet transfer learning, fine-tuning, Batch Normalization drift, and the 4-Sigmoid vs 5-Softmax comparison, with optional MRI examples.
 
 - [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-3/)
-- [Concept walkthrough notebook](docs/transfer_learning_live_session/classroom_walkthrough.ipynb)
-- [Optional complete MRI experiment](docs/transfer_learning_live_session/notebook.md)
+- [Notebook](docs/transfer_learning_live_session/transfer_learning.ipynb)
 
-Original technical depth, code examples and interactive controls are preserved. Dataset preparation and full training remain optional; dataset attribution and license are documented in the application notes.
+The notebook trains a toy encoder-decoder on synthetic textures.
 
 
-## Interactive live presentation · 26 October
+## Live session: Train Efficiently, Keep the Evidence
 
-[Open the 16:9 presentation](https://manyakaistha.github.io/DLGenAI-26T3/session-3/presentation/) alongside the unchanged detailed study guides. It contains 21 core slides, three optional MRI stops, step-through diagrams and numerical activities. Use arrows, the slide index and fullscreen; download the standalone HTML from the index to present offline.
+Notes, activities, and an end-to-end cloud training walkthrough on automatic mixed precision (AMP), gradient accumulation, cosine schedules, and checkpoint governance.
 
-Sources and controls: [presentation README](docs/transfer_learning_presentation/README.md). Build independently with `uv run --no-project python scripts/build_transfer_presentation.py`, or use the website build above.
+- [Student session notes](https://manyakaistha.github.io/DLGenAI-26T3/session-4/)
+- [Notebook](docs/efficient_training_session/cloud_training.ipynb)
+
+The notebook demonstrates mixed-precision training and checkpoint validation on GPU.

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q8 · Scratch vs. Pretrained Convergence · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning, pretrained vision backbones, grayscale adaptation, ASPP, and compound loss.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Milestone 3<br>Study Guides</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html" aria-current="page"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 3</summary><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html" aria-current="page"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Student learning resources</span><a href="milestone-3.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 8 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 08 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-concept-controlled-empirical-benchmarking">1. The Core Concept: Controlled Empirical Benchmarking</a></li>
+<li><a href="#2-theoretical-principles-convergence-dynamics-generalization">2. Theoretical Principles: Convergence Dynamics &amp; Generalization</a></li>
+<li><a href="#3-implementation-workflow-in-pytorch">3. Implementation Workflow in PyTorch</a></li>
+<li><a href="#4-guiding-hints-for-question-8">4. Guiding Hints for Question 8</a></li>
+<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="scratch-baseline-vs-pretrained-transfer-learning">Scratch Baseline vs. Pretrained Transfer Learning</h1>
+<p><em>(Milestone 3 · Question 8 Study Guide)</em></p>
+<hr />
+<h2 id="1-the-core-concept-controlled-empirical-benchmarking">1. The Core Concept: Controlled Empirical Benchmarking</h2>
+<p>In Milestone 2, you trained a basic convolutional U-Net from scratch. In Milestone 3, you introduce transfer learning by integrating an ImageNet-pretrained <strong>ResNet-34</strong> backbone into your segmentation model.</p>
+<p>To establish the empirical value of transfer learning scientifically, you must conduct a <strong>controlled comparison</strong>: keeping all dataset splits, augmentations, optimizers, learning rates, loss functions, and batch sizes strictly identical, altering <strong>only the weight initialization (from-scratch vs. ImageNet-pretrained)</strong>.</p>
+<div class="highlight"><pre><span></span><code>Fair Benchmarking Protocol:
+- Architecture:          U-Net
+- Backbones Compared:    From-Scratch (Random Init) vs. Pretrained ResNet-34 (ImageNet)
+- Input Adaptation:      Grayscale in_channels=1
+- Loss Function:         Compound Loss (0.5 * BCE + 0.5 * SoftDice, smooth=1.0)
+- Optimizer:             AdamW (lr=3e-4, weight_decay=1e-2)
+- Batch Size:            16
+- Training Horizon:      5 Epochs
+</code></pre></div>
+<hr />
+<h2 id="2-theoretical-principles-convergence-dynamics-generalization">2. Theoretical Principles: Convergence Dynamics &amp; Generalization</h2>
+<p>When evaluating learning curves across epochs, machine learning engineers track three primary diagnostic phenomena:</p>
+<h3 id="1-feature-acquisition-speed-epoch-1-dynamics">1. Feature Acquisition Speed (Epoch 1 Dynamics)</h3>
+<ul>
+<li><strong>From-Scratch Model:</strong> Starts from Gaussian or uniform random noise (e.g., Kaiming/He normal initialization). During Epoch 1, gradients must first organize basic orientation filters, edge detectors, and localized texture responses. Loss starts high, predictions are near zero or noisy, and foreground Dice on rare defects is close to 0.0.</li>
+<li><strong>Pretrained ResNet-34:</strong> Enters training with over 21 million parameters already tuned to detect universal visual boundaries, ridges, and contrast gradients. Within the very first epoch, the decoder learns to tap into these pre-existing representations, achieving immediate foreground feature activation and substantially higher Epoch 1 Dice scores.</li>
+</ul>
+<h3 id="2-generalization-gap-l_textval-l_texttrain">2. Generalization Gap (<span class="arithmatex">\(|L_{\text{val}} - L_{\text{train}}|\)</span>)</h3>
+<p>The <strong>generalization gap</strong> measures the difference between training loss and validation loss:</p>
+<div class="arithmatex">\[\Delta_{\text{gen}} = |L_{\text{val}} - L_{\text{train}}|\]</div>
+<ul>
+<li>In from-scratch training on small, sparse defect datasets, models are susceptible to memorizing idiosyncratic background noise or specific training sheet artifacts, leading to divergence between training and validation trajectories (overfitting).</li>
+<li>Pretrained weights act as a powerful form of <strong>implicit inductive regularization</strong>: because the feature representations were shaped on over 1.2 million natural images, the network is constrained to robust visual primitives that generalize more reliably to unseen validation splits, yielding a <strong>tighter generalization gap</strong>.</li>
+</ul>
+<h3 id="3-asymptotic-performance-competition-score-gains">3. Asymptotic Performance &amp; Competition Score Gains</h3>
+<p>By Epoch 5:</p>
+<ul>
+<li>The scratch model is still struggling to optimize both low-level filters and high-level segmentation heads simultaneously.</li>
+<li>The pretrained model converges to a substantially lower validation loss and a markedly higher official competition score (mean Dice over classes with empty-mask evaluation). On typical industrial defect benchmarks, transfer learning delivers an immediate jump of <strong><span class="arithmatex">\(+0.02\text{ to }+0.08\)</span></strong> in competition score over a scratch baseline.</li>
+</ul>
+<hr />
+<h2 id="3-implementation-workflow-in-pytorch">3. Implementation Workflow in PyTorch</h2>
+<p>To train and evaluate both models consistently:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">segmentation_models_pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smp</span>
+
+<span class="c1"># Scratch U-Net (random initialization):</span>
+<span class="n">model_scratch</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
+    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>
+    <span class="n">encoder_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># None = Train from scratch!</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Pretrained U-Net (ImageNet initialization):</span>
+<span class="n">model_pretrained</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
+    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>
+    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span> <span class="c1"># ImageNet weights!</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</code></pre></div>
+<p>Run both models through the standard 5-epoch training loop using the official <code>CompoundLoss</code> and <code>AdamW</code> settings from <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>. At the end of each epoch, record:</p>
+<ol>
+<li>Training Loss (<span class="arithmatex">\(L_{\text{train}}\)</span>)</li>
+<li>Validation Loss (<span class="arithmatex">\(L_{\text{val}}\)</span>)</li>
+<li>Validation Foreground Dice</li>
+<li>Competition Metric Score</li>
+</ol>
+<hr />
+<h2 id="4-guiding-hints-for-question-8">4. Guiding Hints for Question 8</h2>
+<p>To solve Question 8 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
+<ul>
+<li><strong>Hint 1 (Identify Winning Model at Epoch 5):</strong> Review your recorded validation curves at Epoch 5. Compare the validation loss and competition score between <code>model_pretrained</code> and <code>model_scratch</code>. Choose between <code>pretrained</code> and <code>scratch</code>.</li>
+<li><strong>Hint 2 (Epoch 1 Acquisition):</strong> Inspect your Epoch 1 logs. Which model achieved a substantially higher foreground Dice and lower loss in the first epoch? Choose between <code>pretrained</code> and <code>scratch</code>.</li>
+<li><strong>Hint 3 (Generalization Gap):</strong> Compute <span class="arithmatex">\(|L_{\text{val}} - L_{\text{train}}|\)</span> at Epoch 5 for both models. Does the pretrained model achieve a smaller difference (tighter gap) between training and validation loss compared to the scratch model? Choose <code>Yes</code> or <code>No</code>.</li>
+<li>
+<p><strong>Hint 4 (Score Improvement Range):</strong> Calculate the difference in competition score:</p>
+<div class="arithmatex">\[\Delta_{\text{score}} = \text{Score}_{\text{pretrained}} - \text{Score}_{\text{scratch}}\]</div>
+<p>Select the matching range from the provided options: <code>[&lt; +0.02, +0.02 to +0.08, &gt; +0.10]</code>.</p>
+</li>
+</ul>
+<hr />
+<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-3.html#question-8-scratch-baseline-vs-pretrained-transfer-learning-empirical-training-convergence">Milestone 3 Assessment: Question 8</a>.</li>
+<li>Train both models for 5 epochs under identical hyperparameters.</li>
+<li>Compare Epoch 5 winning performance, Epoch 1 convergence speed, generalization gaps, and competition score improvements.</li>
+<li>Enter your response in the specified format: <code>winning_model; faster_epoch1_model; tighter_gap_yes_no; score_improvement_range</code>.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_compound_loss_and_clean_image_dynamics.html">← Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_09_backbone_architecture_tradeoffs.html">Q9 · Backbone Architecture Trade-offs →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q6 · Output Heads &amp; Target Semantics · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning, pretrained vision backbones, grayscale adaptation, ASPP, and compound loss.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Milestone 3<br>Study Guides</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html" aria-current="page"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 3</summary><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html" aria-current="page"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Student learning resources</span><a href="milestone-3.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 6 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 06 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-architectural-choice-sigmoid-vs-softmax">1. The Core Architectural Choice: Sigmoid vs. Softmax</a></li>
+<li><a href="#2-mathematical-principles-activation-target-semantics">2. Mathematical Principles: Activation &amp; Target Semantics</a></li>
+<li><a href="#3-spatial-disjointness-vs-pixel-level-overlap">3. Spatial Disjointness vs. Pixel-Level Overlap</a></li>
+<li><a href="#4-comparative-decision-matrix">4. Comparative Decision Matrix</a></li>
+<li><a href="#5-guiding-hints-for-question-6">5. Guiding Hints for Question 6</a></li>
+<li><a href="#6-your-assignment-task">6. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="output-head-semantics-loss-formulations">Output Head Semantics &amp; Loss Formulations</h1>
+<p><em>(Milestone 3 · Question 6 Study Guide)</em></p>
+<hr />
+<h2 id="1-the-core-architectural-choice-sigmoid-vs-softmax">1. The Core Architectural Choice: Sigmoid vs. Softmax</h2>
+<p>When configuring the final output layer of a semantic segmentation model, deep learning practitioners face a foundational design choice:</p>
+<div class="highlight"><pre><span></span><code>               ┌──► Formulation A: 4-Channel Independent Sigmoid (Multi-Label)
+Decoder Logits │    Shape: [B, 4, H, W]  │  Trained with BCEWithLogitsLoss
+               │
+               └──► Formulation B: 5-Channel Mutually Exclusive Softmax (Multi-Class)
+                    Shape: [B, 5, H, W]  │  Trained with CrossEntropyLoss
+</code></pre></div>
+<p>This choice governs not only the loss function and activation mathematics, but also the fundamental representational capacity of your inspection system.</p>
+<hr />
+<h2 id="2-mathematical-principles-activation-target-semantics">2. Mathematical Principles: Activation &amp; Target Semantics</h2>
+<h3 id="formulation-a-4-channel-independent-sigmoid">Formulation A: 4-Channel Independent Sigmoid</h3>
+<p>In Formulation A, the network outputs 4 continuous logit feature maps matching the 4 defect classes (<code>defect_a</code>, <code>defect_b</code>, <code>defect_c</code>, <code>defect_d</code>):</p>
+<div class="arithmatex">\[\mathbf{Z} \in \mathbb{R}^{B \times 4 \times H \times W}\]</div>
+<p>Each channel is passed through an independent Sigmoid function:</p>
+<div class="arithmatex">\[P_c(y, x) = \sigma\big(z_c(y, x)\big) = \frac{1}{1 + e^{-z_c(y, x)}} \in [0, 1]\]</div>
+<ul>
+<li><strong>Target Representation:</strong> Dense binary floating-point tensor of shape <code>[B, 4, H, W]</code>.</li>
+<li><strong>Loss Function:</strong> <code>nn.BCEWithLogitsLoss()</code> computed independently across all 4 channels and all pixels.</li>
+<li><strong>Semantic Freedom:</strong> Channel <span class="arithmatex">\(c_1\)</span> exerts zero mathematical suppression on channel <span class="arithmatex">\(c_2\)</span>. A pixel <span class="arithmatex">\((y, x)\)</span> can simultaneously have high probabilities for multiple defect categories (e.g., <span class="arithmatex">\(P_a(y, x) = 0.92\)</span> and <span class="arithmatex">\(P_c(y, x) = 0.88\)</span>). If all channels are zero (<span class="arithmatex">\(P_c &lt; \tau\)</span>), the pixel is implicitly classified as background.</li>
+</ul>
+<h3 id="formulation-b-5-channel-mutually-exclusive-softmax">Formulation B: 5-Channel Mutually Exclusive Softmax</h3>
+<p>In Formulation B, an explicit <strong>Background Class (Channel 0)</strong> is added, creating 5 total output channels:</p>
+<div class="arithmatex">\[\mathbf{Z} \in \mathbb{R}^{B \times 5 \times H \times W} \quad (\text{0: Background, 1: Defect A, 2: Defect B, 3: Defect C, 4: Defect D})\]</div>
+<p>Probabilities are computed via the Softmax operator across the channel dimension at every spatial coordinate <span class="arithmatex">\((y, x)\)</span>:</p>
+<div class="arithmatex">\[P_c(y, x) = \frac{e^{z_c(y, x)}}{\sum_{k=0}^4 e^{z_k(y, x)}}\]</div>
+<ul>
+<li><strong>Target Representation:</strong> 2D integer class index map of shape <code>[B, H, W]</code> where each pixel holds an integer class label <span class="arithmatex">\(Y(y, x) \in \{0, 1, 2, 3, 4\}\)</span>.</li>
+<li><strong>Loss Function:</strong> <code>nn.CrossEntropyLoss()</code>.</li>
+<li>
+<p><strong>Probability Simplex Constraint:</strong> At every single pixel coordinate <span class="arithmatex">\((y, x)\)</span>, the channel probabilities strictly sum to 1:</p>
+<div class="arithmatex">\[\sum_{c=0}^4 P_c(y, x) = 1.0\]</div>
+<p>By definition, an increase in the probability of one defect class <em>strictly forces</em> a mathematical decrease in all other classes.</p>
+</li>
+</ul>
+<hr />
+<h2 id="3-spatial-disjointness-vs-pixel-level-overlap">3. Spatial Disjointness vs. Pixel-Level Overlap</h2>
+<p>In Milestone 1 (Question 3), your data audit verified an empirical property of the training dataset:</p>
+<div class="arithmatex">\[\text{Overlapping Defect Pixels in Training Set} = 0\]</div>
+<p>Across all 11,393 training images, whenever multiple defect classes appeared on the same steel sheet, they occurred at <strong>distinct, non-overlapping spatial locations</strong> (e.g., a scratch on the left edge and an oxide patch on the right edge).</p>
+<h3 id="can-softmax-segment-multiple-defects-on-the-same-sheet">Can Softmax Segment Multiple Defects on the Same Sheet?</h3>
+<p>A frequent misconception is that Softmax restricts a model to predicting only one defect class per image. <strong>This is false.</strong></p>
+<ul>
+<li>Softmax is applied <strong>independently at each spatial pixel <span class="arithmatex">\((y, x)\)</span></strong>.</li>
+<li>
+<p>At pixel <span class="arithmatex">\((y, x) = (50, 100)\)</span> on the left side of the sheet, the model can predict:</p>
+<div class="arithmatex">\[P_{\text{defect\_a}}(50, 100) = 0.95, \quad P_{\text{bg}} = 0.04, \quad P_{\text{others}} \approx 0.01\]</div>
+</li>
+<li>
+<p>At pixel <span class="arithmatex">\((y, x) = (50, 700)\)</span> on the right side of the sheet, the model can independently predict:</p>
+<div class="arithmatex">\[P_{\text{defect\_c}}(50, 700) = 0.94, \quad P_{\text{bg}} = 0.05, \quad P_{\text{others}} \approx 0.01\]</div>
+</li>
+</ul>
+<p>Because spatial coordinates are decoupled, Formulation B can cleanly segment multiple defect instances across disjoint regions of the same steel sheet without mutual interference.</p>
+<h3 id="the-operational-failure-mode-of-formulation-b">The Operational Failure Mode of Formulation B</h3>
+<p>However, Formulation B has a critical operational vulnerability: <strong>it fundamentally cannot represent overlapping annotations at the same spatial pixel</strong>.</p>
+<div class="highlight"><pre><span></span><code>The Overlap Breakdown:
+Suppose a hairline scratch (Defect A) cuts across a large oxide inclusion (Defect C) at pixel (y, x):
+- True physical reality: Both Defect A and Defect C are present simultaneously.
+- Integer Class Target: Target tensor must choose ONE integer: y(y, x) = 1 OR y(y, x) = 3.
+                        Whichever defect is omitted is treated as FALSE (loss penalizes it!).
+- Softmax Probabilities: sum(P_c) = 1.0. If P_A = 0.8, P_C CANNOT exceed 0.2!
+</code></pre></div>
+<p>If test data, re-annotated batches, or real-world production runs contain even a single pixel where two defects overlap, Formulation B experiences <strong>catastrophic mutual suppression</strong>: the model is forced into a winner-take-all competition, guaranteeing missed detections (false negatives) for whichever defect loses the competition at that pixel.</p>
+<hr />
+<h2 id="4-comparative-decision-matrix">4. Comparative Decision Matrix</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">Formulation A (4-Ch Sigmoid)</th>
+<th style="text-align: left;">Formulation B (5-Ch Softmax)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Output Activation</strong></td>
+<td style="text-align: left;">Channel-wise Sigmoid <span class="arithmatex">\(\sigma(z_c) \in [0, 1]\)</span></td>
+<td style="text-align: left;">Cross-channel Softmax <span class="arithmatex">\(\sum P_c = 1.0\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Loss Function</strong></td>
+<td style="text-align: left;"><code>BCEWithLogitsLoss</code> / Compound Loss</td>
+<td style="text-align: left;"><code>CrossEntropyLoss</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Target Tensor Format</strong></td>
+<td style="text-align: left;">Float <code>[B, 4, 128, 800]</code></td>
+<td style="text-align: left;">Long <code>[B, 128, 800]</code> (integers 0..4)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Spatially Disjoint Defects</strong></td>
+<td style="text-align: left;">Fully supported</td>
+<td style="text-align: left;">Fully supported</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Overlapping Pixel Annotations</strong></td>
+<td style="text-align: left;">Fully supported (each channel independent)</td>
+<td style="text-align: left;"><strong>Catastrophic failure</strong> (winner-take-all suppression)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Background Representation</strong></td>
+<td style="text-align: left;">Implicit (all 4 channels <span class="arithmatex">\(&lt; \tau\)</span>)</td>
+<td style="text-align: left;">Explicit (dedicated Channel 0)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-guiding-hints-for-question-6">5. Guiding Hints for Question 6</h2>
+<p>To solve Question 6 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
+<ul>
+<li><strong>Hint 1 (Spatially Separated Defects):</strong> Consider whether Softmax normalization is computed across spatial coordinates or across the channel depth at each individual coordinate <span class="arithmatex">\((y, x)\)</span>. Since Softmax operates per-pixel, can the left half of an image predict class A while the right half predicts class C? Choose <code>Yes</code> or <code>No</code>.</li>
+<li><strong>Hint 2 (Failure Mode Under Overlap):</strong> In 1 concise sentence, identify why Formulation B fails if defects overlap at the exact same pixel <span class="arithmatex">\((y, x)\)</span>. Note that integer target representation and the Softmax probability simplex (<span class="arithmatex">\(\sum P_c = 1\)</span>) force mutual exclusivity at the pixel level, preventing a single pixel from being classified into multiple categories simultaneously.</li>
+</ul>
+<hr />
+<h2 id="6-your-assignment-task">6. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-3.html#question-6-output-head-semantics-mutually-exclusive-loss-formulations">Milestone 3 Assessment: Question 6</a>.</li>
+<li>Answer whether Formulation B can segment spatially disjoint defects on the same sheet without mutual interference (<code>Yes</code> / <code>No</code>).</li>
+<li>Formulate a 1-sentence statement describing the operational failure mode of Formulation B when defect annotations overlap.</li>
+<li>Enter your response in the specified format: <code>Yes/No; brief_disadvantage</code>.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html">← Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html">Q7 · Compound Loss &amp; Clean Image Dynamics →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

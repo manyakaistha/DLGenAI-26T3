@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-label="Three ways to adapt a pretrained RGB encoder">
+<rect width="1200" height="500" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">Three ways to adapt a pretrained RGB encoder</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">Choose an input strategy, then compare it on the same held-out split.</text>
+<rect x="40" y="150" width="345" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="56" y="167" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="73" y="191" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="102" y="192" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Repeat gray 3×</text>
+<text x="60" y="232" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Input: [3,H,W]</text>
+<text x="60" y="260" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Keep pretrained stem unchanged.</text>
+<text x="60" y="288" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">No new color information.</text>
+<path d="M388 260 L423 260" fill="none" stroke="#52635d" stroke-width="3"/>
+<path d="M414.2 266.6 L423 260 L414.2 253.4" fill="none" stroke="#52635d" stroke-width="3"/>
+<rect x="430" y="150" width="345" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="446" y="167" width="34" height="34" rx="9" fill="#255a9b" stroke="#255a9b" stroke-width="2"/>
+<text x="463" y="191" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="492" y="192" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Replace first conv</text>
+<text x="450" y="232" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Input: [1,H,W]</text>
+<text x="450" y="260" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Average RGB kernel weights.</text>
+<text x="450" y="288" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Fine-tune the adapted stem.</text>
+<path d="M778 260 L813 260" fill="none" stroke="#52635d" stroke-width="3"/>
+<path d="M804.2 266.6 L813 260 L804.2 253.4" fill="none" stroke="#52635d" stroke-width="3"/>
+<rect x="820" y="150" width="345" height="220" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="836" y="167" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="853" y="191" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">3</text>
+<text x="882" y="192" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Learn a 1→3 adapter</text>
+<text x="840" y="232" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Input: [1,H,W]</text>
+<text x="840" y="260" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Train a small projection.</text>
+<text x="840" y="288" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Extra parameters and compute.</text>
+<rect x="40" y="408" width="1110" height="55" rx="8" fill="#eaf2ef" stroke="#c8dbd3" stroke-width="2"/>
+<text x="58" y="442" fill="#087e83" font-size="18" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Check normalization and tensor shape before loading pretrained weights.</text>
+</svg>
