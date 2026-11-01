@@ -5,6 +5,15 @@
 <script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
 <link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script>
 </head><body data-overview="false" data-ai-help="off">
 <a class="skip" href="#main">Skip to content</a><div class="layout">

@@ -33,7 +33,19 @@ def check() -> None:
         for url in builder.LEGACY_GUIDES:
             assert "previously shared URL belongs to the earlier" in (output / url).read_text(encoding="utf-8")
 
+        # The metric reference must work on both the public and unlisted routes.
+        guide = output / "guide_08_scratch_vs_pretrained_convergence.html"
+        metric_anchor = "#question-8-official-competition-weighted-metric-toy-batch-calculation"
+        assert f'href="../milestone-1/milestone-1.html{metric_anchor}"' in guide.read_text(encoding="utf-8")
+        snapshot = Path(temporary) / "snapshot"
+        builder.build_milestone_three(snapshot,
+            milestone_one_url="../../milestones/milestone-1/milestone-1.html")
+        assert f'href="../../milestones/milestone-1/milestone-1.html{metric_anchor}"' in (
+            snapshot / guide.name).read_text(encoding="utf-8")
+
         # An incremental build must remove stale resources and preserve all URLs.
+        for directory in ("assets", "downloads", "examples", "styles"):
+            (output / directory / "stale-review-file.txt").write_text("stale", encoding="utf-8")
         builder.build_milestone_three(output)
         assert manifest(output) == first, "Clean and repeated builds differ"
 

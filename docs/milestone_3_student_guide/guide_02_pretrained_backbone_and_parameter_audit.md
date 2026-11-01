@@ -5,9 +5,9 @@
 
 ## 1. The Core Concept: The Transfer Learning Advantage
 
-Training deep semantic segmentation networks from scratch requires tens of thousands of diverse, annotated samples. On specialized industrial datasets like surface anomaly inspection, annotations are scarce, expensive to produce, and heavily skewed toward clean background material.
+Training deep semantic segmentation networks from scratch can require substantial labeled data, depending on the task and architecture. On specialized industrial datasets like surface anomaly inspection, annotations are scarce, expensive to produce, and heavily skewed toward clean background material.
 
-When a convolutional network is initialized randomly (e.g., via Kaiming/He normal initialization), the earliest convolutional filters possess no prior concept of visual reality. The network must spend dozens of epochs learning basic image processing primitives:
+When a convolutional network is initialized randomly (e.g., via Kaiming/He normal initialization), the earliest convolutional filters possess no prior concept of visual reality. The network must learn useful image processing primitives during training:
 - Directional edge filters (horizontal, vertical, diagonal)
 - Color and intensity gradients
 - Local frequency and Gabor textures
@@ -26,12 +26,12 @@ By adopting a pretrained encoder backbone, your model starts training with matur
 
 In modern semantic segmentation toolkits like `segmentation_models_pytorch` (SMP), a standard segmentation model decomposes into three distinct structural modules:
 
-$$\text{Model} = \underbrace{\text{Encoder (Backbone)}}_{\text{Pretrained ImageNet Features}} + \underbrace{\text{Decoder}}_{\text{Feature Upsampling \& Skip Fusion}} + \underbrace{\text{Segmentation Head}}_{1 \times 1 \text{ Conv to } K \text{ Defect Classes}}$$
+$$\text{Model} = \underbrace{\text{Encoder (Backbone)}}_{\text{Pretrained ImageNet Features}} + \underbrace{\text{Decoder}}_{\text{Feature Upsampling \& Skip Fusion}} + \underbrace{\text{Segmentation Head}}_{\text{Conv to } K \text{ Defect Classes}}$$
 
 ### Backbone Architecture 1: ResNet-34 (Residual Networks)
 ResNet-34 employs standard $3 \times 3$ convolutional layers organized into residual blocks with additive identity shortcut connections:
 $$\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + \mathbf{x}$$
-The identity shortcut eliminates vanishing gradients across deep stacks, allowing stable optimization. However, standard 2D convolutions apply dense spatial-channel matrix multiplications:
+The identity shortcut helps gradients propagate across deep stacks. However, standard 2D convolutions apply dense spatial-channel matrix multiplications:
 $$\text{Parameters} = K_h \times K_w \times C_{\text{in}} \times C_{\text{out}}$$
 For $3 \times 3$ kernels across hundreds of channels, parameter counts scale quadratic with channel depth.
 
@@ -42,7 +42,7 @@ EfficientNet-B0 was engineered using Neural Architecture Search (NAS) and compou
 3. **Squeeze-and-Excitation (SE) Attention:** Adaptively recalibrates channel-wise feature responses.
 4. **$1 \times 1$ Pointwise Projection:** Compresses channels back down to match linear bottlenecks.
 
-This factorization separates spatial filtering from channel mixing, slashing parameter count and FLOPs by **over $70\%$** while preserving representational capacity.
+This factorization separates spatial filtering from channel mixing. Count parameters for the complete model: decoder width, expansion layers and SE blocks also contribute, and parameter savings do not guarantee equal accuracy or lower peak activation memory.
 
 ---
 
@@ -66,9 +66,22 @@ By setting `requires_grad = False` on the encoder:
 for param in model.encoder.parameters():
     param.requires_grad = False
 ```
-- The encoder acts as a fixed, frozen feature extractor.
+- The encoder parameters no longer receive newly computed gradients. This alone does not freeze its running buffers or stochastic behavior.
 - Only the randomly initialized decoder blocks and the segmentation head receive gradient updates.
 - GPU VRAM consumption during training decreases because intermediate encoder activation gradients do not need to be retained in memory.
+
+If a fixed feature extractor is intended, call `model.encoder.eval()` **after each `model.train()`**. BatchNorm running mean/variance otherwise update in training mode even when its affine parameters have `requires_grad=False`. `eval()` also changes dropout behavior; it does not disable gradients. Q2 asks only for parameter accounting; Q8/Q9 train all parameters with normal training-mode BatchNorm.
+
+```python
+model.train()             # sets all submodules to training mode
+model.encoder.eval()     # only for a deliberately fixed feature extractor
+```
+
+See [PyTorch BatchNorm2d](https://docs.pytorch.org/docs/2.8/generated/torch.nn.BatchNorm2d.html) for the running-statistics contract and [SMP 0.5.0 model settings](https://smp.readthedocs.io/en/v0.5.0/models.html) for encoder/decoder options. The assessment pins SMP 0.5.0 and explicitly fixes decoder settings so parameter counts are reproducible.
+
+![Illustrative ResNet encoder stages and increasingly broad features](assets/fig02_pretrained_feature_hierarchies_clear.svg)
+
+*This is a five-stage ResNet feature trace, separate from Q1's four-pooling toy network. Feature meanings are illustrative, not measured activations.*
 
 ### Trainable Parameter Ratio Formula
 When the encoder is frozen, the percentage of remaining trainable parameters is:

@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -30,116 +39,81 @@
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 1 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">Concept guide 01 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
-<li><a href="#1-the-engineering-context-anisotropic-sensor-ribbons">1. The Engineering Context: Anisotropic Sensor Ribbons</a></li>
-<li><a href="#2-theoretical-principles-progressive-downsampling-bottleneck-compression">2. Theoretical Principles: Progressive Downsampling &amp; Bottleneck Compression</a></li>
-<li><a href="#3-the-odd-dimension-parity-trap-skip-connection-tensor-mismatches">3. The Odd-Dimension Parity Trap: Skip-Connection Tensor Mismatches</a></li>
-<li><a href="#4-guiding-hints-for-question-1">4. Guiding Hints for Question 1</a></li>
-<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+<li><a href="#1-why-keep-the-strip-geometry">1. Why Keep the Strip Geometry?</a></li>
+<li><a href="#2-compute-shapes-from-the-actual-operator">2. Compute Shapes from the Actual Operator</a></li>
+<li><a href="#3-skip-mismatch-and-full-canvas-deficit-are-different">3. Skip Mismatch and Full-Canvas Deficit Are Different</a></li>
+<li><a href="#4-practice-check">4. Practice Check</a></li>
+<li><a href="#5-guiding-hints-and-assignment-task">5. Guiding Hints and Assignment Task</a></li>
 </ul>
 </div>
 </details>
 <article><h1 id="feature-map-spatial-geometry-downsampling-arithmetic">Feature Map Spatial Geometry &amp; Downsampling Arithmetic</h1>
 <p><em>(Milestone 3 · Question 1 Study Guide)</em></p>
-<hr />
-<h2 id="1-the-engineering-context-anisotropic-sensor-ribbons">1. The Engineering Context: Anisotropic Sensor Ribbons</h2>
-<p>In standard computer vision benchmarks (e.g., ImageNet, COCO, Cityscapes), images are typically square or near-square (e.g., <span class="arithmatex">\(224 \times 224\)</span>, <span class="arithmatex">\(512 \times 512\)</span>). In industrial quality control, however, steel strips pass under continuous line-scan cameras at speeds exceeding 15 m/s. The resulting digital inspection canvases are wide, elongated ribbons with an anisotropic aspect ratio:</p>
-<div class="arithmatex">\[(H, W) = (128, 800) \quad \implies \quad \text{Aspect Ratio} = \frac{W}{H} = \frac{800}{128} = 6.25 : 1\]</div>
-<p>In Milestone 2, you learned that naively resizing these images to square dimensions (<span class="arithmatex">\(256 \times 256\)</span>) stretches vertical features by <span class="arithmatex">\(2\times\)</span> while squishing horizontal features by over <span class="arithmatex">\(3.1\times\)</span>, severely distorting thin scratches and longitudinal cracks. Therefore, industrial segmentation networks must process strips at their <strong>native anisotropic dimensions</strong>.</p>
-<p>To design an effective encoder–decoder architecture, you must understand how spatial dimensions transform through progressive downsampling stages, how bottleneck representations compress spatial information, and how odd-dimension rounding introduces fatal skip-connection tensor alignment bugs.</p>
-<hr />
-<h2 id="2-theoretical-principles-progressive-downsampling-bottleneck-compression">2. Theoretical Principles: Progressive Downsampling &amp; Bottleneck Compression</h2>
-<p>A semantic segmentation encoder progressively compresses 2D spatial dimensions while expanding channel capacity to capture hierarchical visual abstractions:</p>
+<h2 id="1-why-keep-the-strip-geometry">1. Why Keep the Strip Geometry?</h2>
+<p>The competition images are height × width <span class="arithmatex">\(128 \times 800\)</span>. Resizing them to a square changes horizontal and vertical distances by different factors, which distorts defect shapes. Keep the native dimensions for this assessment. Downsampling inside a model is a separate operation: it reduces feature resolution while increasing channels and context.</p>
+<p><img alt="Encoder and decoder with matching-resolution skip connections" src="assets/fig01_encoder_decoder_mechanics_clear.svg" /></p>
+<p><em>This conceptual diagram illustrates skip fusion. Q1 defines its own four pooling stages; the SMP models used in Q2 use five encoder stages by default. Do not infer Q1's bottleneck from another model's diagram.</em></p>
+<h2 id="2-compute-shapes-from-the-actual-operator">2. Compute Shapes from the Actual Operator</h2>
+<p>For dilation 1, a pooling or convolution output dimension is:</p>
+<div class="arithmatex">\[D_{out}=\left\lfloor\frac{D_{in}+2p-k}{s}\right\rfloor+1.\]</div>
+<p>With <code>MaxPool2d(kernel_size=2, stride=2, padding=0, ceil_mode=False)</code>, this becomes <span class="arithmatex">\(\lfloor D_{in}/2\rfloor\)</span>. A <code>Conv2d(kernel_size=3, stride=2, padding=1)</code> instead gives <span class="arithmatex">\(\lceil D_{in}/2\rceil\)</span>. They agree on even inputs but differ on odd inputs. Q1 explicitly uses the floor-pooling rule.</p>
+<p>For dimensions divisible by <span class="arithmatex">\(2^n\)</span>, <span class="arithmatex">\(n\)</span> such pooling stages reduce each axis by <span class="arithmatex">\(2^n\)</span> and area by <span class="arithmatex">\(4^n\)</span>. This is a sampling-area ratio, <strong>not the receptive field</strong>: stacked convolutions can make a feature depend on a much larger input region.</p>
+<h3 id="practice-with-different-dimensions">Practice with Different Dimensions</h3>
+<p>Consider a fictional <span class="arithmatex">\(96 \times 640\)</span> tensor and three pooling stages:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Stage</th>
+<th style="text-align: right;">Height</th>
+<th style="text-align: right;">Width</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Input</td>
+<td style="text-align: right;">96</td>
+<td style="text-align: right;">640</td>
+</tr>
+<tr>
+<td style="text-align: left;">Pool 1</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">320</td>
+</tr>
+<tr>
+<td style="text-align: left;">Pool 2</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">160</td>
+</tr>
+<tr>
+<td style="text-align: left;">Pool 3</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">80</td>
+</tr>
+</tbody>
+</table>
+<p>The area ratio is <span class="arithmatex">\((96\cdot640)/(12\cdot80)=64\)</span>. Repeat this procedure with the assessment's dimensions and stage count yourself.</p>
+<h2 id="3-skip-mismatch-and-full-canvas-deficit-are-different">3. Skip Mismatch and Full-Canvas Deficit Are Different</h2>
+<p>A U-Net decoder concatenates a decoder tensor with an encoder skip at the same spatial resolution. <code>torch.cat(..., dim=1)</code> allows channel counts to differ, but batch, height and width must agree.</p>
+<p>Use a <strong>different toy width of 643 and three pooling stages</strong>:</p>
+<div class="arithmatex">\[643\to321\to160\to80.\]</div>
+<p>Doubling the bottleneck gives 160, which matches the first skip. Doubling again gives 320, which disagrees with the next skip of width 321. A decoder with no alignment stops at that concatenation. Blindly multiplying the bottleneck by <span class="arithmatex">\(2^3\)</span> gives 640, a full-canvas deficit of 3; that is not the mismatch at a particular skip.</p>
+<p>Common alignment choices include padding the input, cropping a skip, or interpolating to the skip's explicit size:</p>
+<pre class="highlight"><code class="language-python">import torch.nn.functional as F
+# In a decoder that intentionally aligns to the skip:
+upsampled = F.interpolate(decoder, size=skip.shape[-2:], mode="bilinear", align_corners=False)</code></pre>
+<p>This fixes tensor shape, not lost image detail. Q1 instead asks about the <strong>first decoder skip</strong>, immediately after the bottleneck is doubled, before any cropping, padding or interpolation-to-size.</p>
+<h2 id="4-practice-check">4. Practice Check</h2>
+<details>
+<summary>Why do the two stride-2 operators disagree at an odd width?</summary>
+<p>For a toy width of 101, floor pooling produces 50 while a padded 3-tap stride-2 convolution produces 51. Substituting the padding and kernel values in the general formula explains the difference. Always trace the operator used by your model.</p>
+</details>
+<h2 id="5-guiding-hints-and-assignment-task">5. Guiding Hints and Assignment Task</h2>
 <ol>
-<li><strong>Early layers</strong> operate at high spatial resolution and small receptive fields, capturing high-frequency primitives (microscopic edges, pixel gradients, localized textures).</li>
-<li><strong>Deep layers (Bottleneck)</strong> operate at low spatial resolution and massive receptive fields, capturing semantic context (global sheet morphology, large diffuse stains).</li>
-</ol>
-<div class="highlight"><pre><span></span><code>Progressive 4-Stage Downsampling Pipeline:
-Input:    (B, C_in,  128, 800)
-             │  stride=2
-             ▼
-Stage 1:  (B, C_1,    64, 400)
-             │  stride=2
-             ▼
-Stage 2:  (B, C_2,    32, 200)
-             │  stride=2
-             ▼
-Stage 3:  (B, C_3,    16, 100)
-             │  stride=2
-             ▼
-Stage 4:  (B, C_4,    H_bottle, W_bottle)   &lt;--- Bottleneck Representation
-</code></pre></div>
-<h3 id="stride-2-downsampling-arithmetic">Stride-2 Downsampling Arithmetic</h3>
-<p>At each stage <span class="arithmatex">\(s \in \{1, 2, 3, 4\}\)</span>, spatial dimensions are halved using either:</p>
-<ul>
-<li>Strided convolutions (<code>Conv2d(stride=2, padding=1, kernel_size=3)</code>)</li>
-<li>Max pooling (<code>MaxPool2d(kernel_size=2, stride=2)</code>)</li>
-</ul>
-<p>For an input dimension <span class="arithmatex">\(D_{\text{in}}\)</span>, standard PyTorch pooling applies integer floor division:</p>
-<div class="arithmatex">\[D_{\text{out}} = \left\lfloor \frac{D_{\text{in}} + 2 \times p - k}{s} \right\rfloor + 1\]</div>
-<p>For standard non-overlapping <span class="arithmatex">\(2 \times 2\)</span> pooling (<span class="arithmatex">\(k=2, s=2, p=0\)</span>):</p>
-<div class="arithmatex">\[D_{\text{out}} = \left\lfloor \frac{D_{\text{in}}}{2} \right\rfloor\]</div>
-<h3 id="spatial-area-downsampling-factor">Spatial Area Downsampling Factor</h3>
-<p>The spatial area of a 2D feature map is given by <span class="arithmatex">\(A = H \times W\)</span>. When an image undergoes <span class="arithmatex">\(N\)</span> successive stride-2 downsampling operations:</p>
-<ul>
-<li>The height is reduced by <span class="arithmatex">\(2^N\)</span>.</li>
-<li>The width is reduced by <span class="arithmatex">\(2^N\)</span>.</li>
-<li>The total spatial footprint area is reduced by:</li>
-</ul>
-<div class="arithmatex">\[\text{Area Downsampling Factor} = \frac{A_{\text{input}}}{A_{\text{bottleneck}}} = \frac{H_{\text{input}} \times W_{\text{input}}}{H_{\text{bottle}} \times W_{\text{bottle}}} = (2^N) \times (2^N) = 2^{2N} = 4^N\]</div>
-<p>For a 4-stage encoder (<span class="arithmatex">\(N = 4\)</span>):</p>
-<div class="arithmatex">\[\text{Area Factor} = 2^4 \times 2^4 = 16 \times 16 = 256\]</div>
-<p>This means that at the Stage 4 bottleneck, each spatial location in the feature tensor summarizes an area equivalent to <strong>256 native canvas pixels</strong>.</p>
-<hr />
-<h2 id="3-the-odd-dimension-parity-trap-skip-connection-tensor-mismatches">3. The Odd-Dimension Parity Trap: Skip-Connection Tensor Mismatches</h2>
-<p>In U-Net architectures, the decoder reconstructs fine spatial boundaries by concatenating high-resolution encoder feature maps with upsampled decoder feature maps via <strong>lateral skip connections</strong>:</p>
-<div class="arithmatex">\[\mathbf{X}_{\text{fused}} = \text{Concat}\big(\mathbf{X}_{\text{skip}}, \, \text{Upsample}(\mathbf{X}_{\text{decoder}})\big)\]</div>
-<p>In PyTorch, <code>torch.cat([tensor_a, tensor_b], dim=1)</code> requires that all non-concatenated dimensions match <strong>exactly</strong>:</p>
-<div class="arithmatex">\[H_a == H_b \quad \text{and} \quad W_a == W_b\]</div>
-<p>If there is even a single-pixel mismatch, PyTorch raises a runtime exception:
-<code>RuntimeError: Sizes of tensors must match except in dimension 1. Expected size 100 but got size 99 for dimension 3.</code></p>
-<h3 id="why-odd-dimensions-cause-phase-errors">Why Odd Dimensions Cause Phase Errors</h3>
-<p>Consider what happens when an input dimension is <strong>odd</strong> (e.g., <span class="arithmatex">\(W = 799\)</span>):</p>
-<ul>
-<li>Stage 0 (Input): <span class="arithmatex">\(W_0 = 799\)</span></li>
-<li>Stage 1: <span class="arithmatex">\(W_1 = \lfloor 799 / 2 \rfloor = 399\)</span> (1 pixel dropped by floor division)</li>
-<li>Stage 2: <span class="arithmatex">\(W_2 = \lfloor 399 / 2 \rfloor = 199\)</span></li>
-<li>Stage 3: <span class="arithmatex">\(W_3 = \lfloor 199 / 2 \rfloor = 99\)</span></li>
-<li>Stage 4 (Bottleneck): <span class="arithmatex">\(W_4 = \lfloor 99 / 2 \rfloor = 49\)</span></li>
-</ul>
-<p>Now trace what happens during decoder upsampling using standard <span class="arithmatex">\(2\times\)</span> bilinear interpolation or transposed convolution (<code>ConvTranspose2d(stride=2)</code>):</p>
-<ul>
-<li>From Stage 4 to Stage 3: <span class="arithmatex">\(49 \times 2 = 98\)</span>. But Stage 3 encoder skip feature map has width <span class="arithmatex">\(W_3 = 99\)</span>!</li>
-<li><strong>Mismatch at Stage 3 skip connection:</strong> <span class="arithmatex">\(99 - 98 = 1\text{ pixel}\)</span>!</li>
-<li>Propagating all the way back up to the canvas: <span class="arithmatex">\(49 \times 2^4 = 49 \times 16 = 784 \neq 799\)</span>.</li>
-</ul>
-<p>This fundamental parity mismatch occurs whenever an image dimension is not divisible by <span class="arithmatex">\(2^N\)</span> (where <span class="arithmatex">\(N\)</span> is the number of downsampling stages). For <span class="arithmatex">\(N=4\)</span>, input dimensions must be exact multiples of <span class="arithmatex">\(2^4 = 16\)</span>. Because <span class="arithmatex">\(800\)</span> is cleanly divisible by 16 (<span class="arithmatex">\(800 / 16 = 50\)</span>), native ribbons process without mismatch. But an unpadded <span class="arithmatex">\(799\)</span>-pixel strip causes immediate tensor misalignment.</p>
-<hr />
-<h2 id="4-guiding-hints-for-question-1">4. Guiding Hints for Question 1</h2>
-<p>To solve Question 1 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
-<ul>
-<li>
-<p><strong>Hint 1 (Trace Bottleneck Shape):</strong> Take the native canvas dimensions <span class="arithmatex">\((H, W) = (128, 800)\)</span>. Apply integer division by 2 successively across the 4 stages:</p>
-<div class="arithmatex">\[\text{Stage 1: } (128/2, 800/2) \to \text{Stage 2: } (\dots) \to \text{Stage 3: } (\dots) \to \text{Stage 4: } (H_{\text{bottle}}, W_{\text{bottle}})\]</div>
-<p>Verify that both <span class="arithmatex">\(H_{\text{bottle}}\)</span> and <span class="arithmatex">\(W_{\text{bottle}}\)</span> are clean integers.</p>
-</li>
-<li>
-<p><strong>Hint 2 (Calculate Odd-Width Truncation):</strong> For an odd width of <span class="arithmatex">\(W = 799\)</span>, trace the width through the 4 stages using integer floor division <span class="arithmatex">\(\lfloor W / 2 \rfloor\)</span>. At Stage 4, multiply the bottleneck width by <span class="arithmatex">\(2^4 = 16\)</span> to find the reconstructed width <span class="arithmatex">\(\hat{W}_{\text{recon}}\)</span>. The dimension mismatch along width is:</p>
-<div class="arithmatex">\[\Delta W = W_{\text{native}} - \hat{W}_{\text{recon}} = 799 - (W_{\text{bottle}} \times 16)\]</div>
-</li>
-<li>
-<p><strong>Hint 3 (Compute Downsampling Factor):</strong> Compute the ratio of total input pixels to total bottleneck feature locations:</p>
-<div class="arithmatex">\[\text{Factor} = \frac{128 \times 800}{H_{\text{bottle}} \times W_{\text{bottle}}}\]</div>
-<p>Confirm that this matches the mathematical identity <span class="arithmatex">\((2^4)^2 = 16 \times 16\)</span>.</p>
-</li>
-</ul>
-<hr />
-<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
-<ol>
-<li>Open <a href="milestone-3.html#question-1-feature-map-spatial-geometry-downsampling-arithmetic">Milestone 3 Assessment: Question 1</a>.</li>
-<li>Trace the exact Stage 4 bottleneck shape <span class="arithmatex">\((H_{\text{bottle}}, W_{\text{bottle}})\)</span>.</li>
-<li>Compute the spatial mismatch (in pixels along width) for an odd-width strip of <span class="arithmatex">\(128 \times 799\)</span>.</li>
-<li>Calculate the total spatial downsampling factor.</li>
-<li>Enter your response in the specified format: <code>H_bottle, W_bottle; mismatch_px; downsample_factor</code>.</li>
+<li>Read <a href="milestone-3.html#question-1-feature-map-spatial-geometry-downsampling-arithmetic">Question 1</a>.</li>
+<li>Trace both axes through the four specified pooling operations.</li>
+<li>For the odd-width input, keep every intermediate width. Compare the Stage 3 skip width with twice the Stage 4 bottleneck width. Stop before alignment; do not substitute a full-canvas deficit.</li>
+<li>Divide input area by bottleneck area for the native even-sized strip.</li>
+<li>Report <code>H_bottle, W_bottle; first_skip_mismatch_px; downsample_factor</code>.</li>
 </ol></article><nav class="pagination" aria-label="Previous and next page"><a href="milestone-3.html">← Milestone 3 questions</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html">Q2 · Pretrained Backbones &amp; Parameter Audit →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>

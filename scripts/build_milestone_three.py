@@ -34,6 +34,18 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs/milestone_3_student_guide"
 QUESTION = ROOT / "MILESTONE_3.md"
 
+# Let wrapped hero copy define height; the shared fixed-height hero clips this
+# milestone's longer title at narrow widths. Keep the change local to M3 pages.
+MILESTONE_CSS = """
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+"""
+
 URLS = [
     "index.html",
     "milestone-3.html",
@@ -137,6 +149,7 @@ def build_legacy_pages(output: Path) -> None:
 <script>try {{ const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; }} catch {{}}</script>
 <link rel="stylesheet" href="site.css"><link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>{MILESTONE_CSS}</style>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script>
 </head><body data-overview="false" data-ai-help="off">
 <a class="skip" href="#main">Skip to content</a><div class="layout">
@@ -150,7 +163,7 @@ def build_legacy_pages(output: Path) -> None:
         (output / url).write_text(page, encoding="utf-8")
 
 
-def build_milestone_three(output: Path):
+def build_milestone_three(output: Path, *, milestone_one_url: str = "../milestone-1/milestone-1.html"):
     """Build all Milestone 3 question-wise pages from Markdown sources into output directory."""
     output.mkdir(parents=True, exist_ok=True)
 
@@ -170,6 +183,7 @@ def build_milestone_three(output: Path):
 
     titles = [item[1] for item in LABELS]
     mapping = {p.resolve(): url for p, url in zip(sources, URLS)}
+    mapping[(ROOT / "MILESTONE_1.md").resolve()] = milestone_one_url
 
     for directory in ("assets", "downloads", "examples"):
         destination = output / directory
@@ -264,6 +278,7 @@ def build_milestone_three(output: Path):
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>{MILESTONE_CSS}</style>
 <script>window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]}},options:{{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}}}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="{str(i == 0).lower()}" data-ai-help="{'off' if source == QUESTION else 'study'}">
@@ -305,4 +320,8 @@ def build_milestone_three(output: Path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "guide2701/milestone-3")
-    build_milestone_three(parser.parse_args().output.resolve())
+    output = parser.parse_args().output.resolve()
+    milestone_one_url = ("../../milestones/milestone-1/milestone-1.html"
+                         if output.parent == ROOT / "guide2701"
+                         else "../milestone-1/milestone-1.html")
+    build_milestone_three(output, milestone_one_url=milestone_one_url)

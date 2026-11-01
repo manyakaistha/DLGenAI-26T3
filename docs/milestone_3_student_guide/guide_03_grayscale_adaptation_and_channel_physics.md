@@ -58,8 +58,8 @@ $$W_{\text{gray}} = \sum_{c \in \{R, G, B\}} W_c = \text{sum}\big(W_{\text{rgb}}
 A common beginner trap is computing the channel-wise average:
 $$W_{\text{mean}} = \frac{1}{3} \big(W_R + W_G + W_B\big)$$
 If you use the mean, the output activation is:
-$$\mathbf{Y}_{\text{mean}} = \frac{1}{3} \mathbf{Y}_A$$
-Every pre-activation value in the first layer is attenuated by a factor of 3. When this attenuated signal passes into the downstream Batch Normalization layer (`BatchNorm2d`), the activation magnitude does not match the running mean and variance statistics learned during ImageNet pretraining, degrading early feature representations.
+$$\mathbf{Y}_{\text{mean}} = \frac{\mathbf{Y}_A-\mathbf{b}}{3}+\mathbf{b}.$$
+The convolution contribution is scaled by one third; the copied bias is unchanged. Only with zero bias does the entire output equal $\mathbf{Y}_A/3$. A changed scale can affect a downstream BatchNorm using pretrained running statistics; its effect after fine-tuning must be measured. The equivalence proof assumes identical channel inputs, padding and copied biases. Separate RGB mean/std normalization after duplication generally makes the channels unequal and breaks that assumption.
 
 In PyTorch `segmentation_models_pytorch`, passing `in_channels=1` automatically implements Strategy B using **channel summation**:
 ```python
@@ -69,6 +69,10 @@ model.encoder.conv1.weight.data = new_weight
 ```
 
 ---
+
+![Repeat channels, replace the stem, or learn an input adapter](assets/fig03_grayscale_adaptation_clear.svg)
+
+*These are alternative input strategies. The weight-combination rule and normalization assumptions must be stated explicitly; an average and a sum are not activation-equivalent.*
 
 ## 3. Hardware & Memory Bandwidth: Host-to-Device (PCIe) Transfer
 
@@ -94,7 +98,7 @@ Let $B$ be the batch size, and $(H, W) = (128, 800)$. For 32-bit floating-point 
 
 $$\text{Transfer Reduction Factor} = \frac{\text{Bytes}_A}{\text{Bytes}_B} = \frac{3}{1} = 3\times$$
 
-Strategy B reduces the volume of image data transferred across the PCIe bus by an exact factor of **$3\times$** (a $66.7\%$ reduction). On multi-GPU distributed clusters or bandwidth-constrained systems, this eliminates host-to-device I/O bottlenecks and reduces peak GPU memory allocation.
+Strategy B reduces the volume of image data transferred across the PCIe bus by an exact factor of **$3\times$** (a $66.7\%$ reduction). On multi-GPU distributed clusters or bandwidth-constrained systems, this reduces input-transfer bytes, but does not guarantee that I/O is the bottleneck or that total peak VRAM falls by the same factor. Downstream activations, optimizer state and device-side repetition also matter.
 
 ---
 
@@ -117,7 +121,8 @@ To solve Question 3 in [`MILESTONE_3.md`](../../MILESTONE_3.md):
   x_rgb = x_gray.repeat(1, 3, 1, 1)
 
   diff = (conv_rgb(x_rgb) - conv_gray(x_gray)).abs().max().item()
-  print("Max absolute difference:", diff)  # < 1e-6 (machine precision!)
+  print("Max absolute difference:", diff)  # small floating-point rounding differences are expected
+  torch.testing.assert_close(conv_rgb(x_rgb), conv_gray(x_gray), rtol=1e-5, atol=1e-6)
   ```
 - **Hint 3 (Compute Memory Factor):** Determine the ratio of input tensor elements between a 3-channel batch `[B, 3, 128, 800]` and a 1-channel batch `[B, 1, 128, 800]`. Express the reduction factor in the standard multiplier format (e.g., `2x` or `3x`).
 

@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -30,100 +39,56 @@
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 7 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">Concept guide 07 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
-<li><a href="#1-the-engineering-context-the-compound-loss-formulation">1. The Engineering Context: The Compound Loss Formulation</a></li>
-<li><a href="#2-mathematical-principles-clean-image-dynamics-y-0">2. Mathematical Principles: Clean Image Dynamics (\(|Y| = 0\))</a></li>
-<li><a href="#3-gradient-behavior-analysis">3. Gradient Behavior Analysis</a></li>
-<li><a href="#4-why-compound-loss-is-strictly-superior-to-dice-alone">4. Why Compound Loss is Strictly Superior to Dice Alone</a></li>
-<li><a href="#5-guiding-hints-for-question-7">5. Guiding Hints for Question 7</a></li>
-<li><a href="#6-your-assignment-task">6. Your Assignment Task</a></li>
+<li><a href="#1-why-compare-bce-and-dice">1. Why Compare BCE and Dice?</a></li>
+<li><a href="#2-define-the-reduction-before-discussing-a-clean-image">2. Define the Reduction Before Discussing a Clean Image</a></li>
+<li><a href="#3-follow-the-derivative-through-sigmoid">3. Follow the Derivative through Sigmoid</a></li>
+<li><a href="#4-how-bce-contributes">4. How BCE Contributes</a></li>
+<li><a href="#5-a-small-autograd-check">5. A Small Autograd Check</a></li>
+<li><a href="#6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</a></li>
 </ul>
 </div>
 </details>
 <article><h1 id="compound-loss-behavior-on-defect-vs-clean-images">Compound Loss Behavior on Defect vs. Clean Images</h1>
 <p><em>(Milestone 3 · Question 7 Study Guide)</em></p>
-<hr />
-<h2 id="1-the-engineering-context-the-compound-loss-formulation">1. The Engineering Context: The Compound Loss Formulation</h2>
-<p>In industrial surface anomaly detection, neither Binary Cross-Entropy (BCE) nor Soft Dice loss is sufficient on its own:</p>
-<ul>
-<li><strong>BCE alone:</strong> Slashes loss gradients on sparse defects, tempting models to predict zero everywhere.</li>
-<li><strong>Soft Dice alone:</strong> Normalizes by global set sums, causing erratic, non-convex gradient dynamics when processing completely empty, defect-free material.</li>
-</ul>
-<p>To combine the localized gradient stability of BCE with the overlap sensitivity of Dice, modern production segmentation pipelines employ a <strong>Compound Loss</strong>:</p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Compound}} = \alpha \, \mathcal{L}_{\text{BCE}} + \beta \, \mathcal{L}_{\text{Dice}}\]</div>
-<p>In standard benchmark protocols, equal weighting is applied: <span class="arithmatex">\(\alpha = 0.5, \beta = 0.5\)</span>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">CompoundLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bce</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dice</span> <span class="o">=</span> <span class="n">SoftDiceLoss</span><span class="p">(</span><span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bce</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-</code></pre></div>
-<hr />
-<h2 id="2-mathematical-principles-clean-image-dynamics-y-0">2. Mathematical Principles: Clean Image Dynamics (<span class="arithmatex">\(|Y| = 0\)</span>)</h2>
-<p>In industrial inspection, the vast majority of camera frames depict pristine, defect-free metal where the true annotation mask is completely empty:</p>
-<div class="arithmatex">\[|Y| = \sum_{i=1}^N y_i = 0\]</div>
-<p>Let us analyze what happens to the smoothed Soft Dice Loss (<span class="arithmatex">\(\epsilon = 1.0\)</span>) on such images:</p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1.0 - \frac{2 \sum p_i y_i + 1.0}{\sum p_i + \sum y_i + 1.0} = 1.0 - \frac{1.0}{\sum_{i=1}^N p_i + 1.0}\]</div>
-<h3 id="scenario-a-completely-clean-predictions-sum-p_i-0">Scenario A: Completely Clean Predictions (<span class="arithmatex">\(\sum p_i = 0\)</span>)</h3>
-<p>If the model correctly predicts zero probability across all canvas pixels:</p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1.0 - \frac{1.0}{0 + 1.0} = 1.0 - 1.0 = 0.0\]</div>
-<p>The loss reaches its optimal global minimum of 0.</p>
-<h3 id="scenario-b-stray-false-positive-noise-pixels">Scenario B: Stray False-Positive Noise Pixels</h3>
-<p>Now suppose the model predicts even a tiny amount of stray false-positive noise—for example, predicting weak activations that sum to just <strong>50 probability units</strong> (<span class="arithmatex">\(\sum p_i = 50\)</span>) out of a canvas of <span class="arithmatex">\(102{,}400\)</span> pixels:</p>
-<div class="arithmatex">\[\text{Smoothed Dice} = \frac{1.0}{50 + 1.0} = \frac{1}{51} \approx 0.0196\]</div>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1.0 - 0.0196 = 0.9804\]</div>
-<p><strong>Key Observation:</strong> A mere 50 stray probability units causes the Soft Dice loss to explode from <strong><span class="arithmatex">\(0.0\)</span> to <span class="arithmatex">\(0.9804\)</span></strong>—a violent jump spanning <span class="arithmatex">\(98\%\)</span> of its dynamic range!</p>
-<hr />
-<h2 id="3-gradient-behavior-analysis">3. Gradient Behavior Analysis</h2>
-<p>To understand why this sudden jump occurs, examine the partial derivative of <span class="arithmatex">\(\mathcal{L}_{\text{Dice}}\)</span> with respect to the predicted probability <span class="arithmatex">\(p_j\)</span> on a clean sheet (<span class="arithmatex">\(y_i = 0 \ \forall \ i\)</span>):</p>
-<div class="arithmatex">\[\frac{\partial \mathcal{L}_{\text{Dice}}}{\partial p_j} = \frac{\partial}{\partial p_j}\left(1 - \frac{1}{\sum p_i + 1}\right) = \frac{1}{\left(\sum_{i=1}^N p_i + 1\right)^2}\]</div>
-<p>Passing through the Sigmoid activation logit <span class="arithmatex">\(z_j\)</span> (<span class="arithmatex">\(p_j = \sigma(z_j)\)</span>):</p>
-<div class="arithmatex">\[\frac{\partial \mathcal{L}_{\text{Dice}}}{\partial z_j} = \frac{\partial \mathcal{L}_{\text{Dice}}}{\partial p_j} \cdot \frac{\partial p_j}{\partial z_j} = \frac{p_j (1 - p_j)}{\left(\sum_{i=1}^N p_i + 1\right)^2}\]</div>
-<h3 id="the-gradient-asymmetry">The Gradient Asymmetry:</h3>
-<ol>
-<li><strong>When stray noise pixels appear (<span class="arithmatex">\(\sum p_i &gt; 0\)</span>):</strong> The gradient produces an aggressive, non-linear restoring force penalizing false alarms. However, because <span class="arithmatex">\(\sum p_i\)</span> sits in the denominator squared, if the noise increases further, the gradient magnitude actually <em>attenuates</em> (shrinks), making it harder for gradient descent to recover from large false-alarm bursts.</li>
-<li><strong>When predictions are completely clean (<span class="arithmatex">\(\sum p_i \to 0\)</span>):</strong> The loss is zero, and its gradient vanishes entirely. Soft Dice provides zero further guidance or margin enforcement once probabilities drop below the noise threshold.</li>
-</ol>
-<h3 id="how-bce-anchors-optimization">How BCE Anchors Optimization</h3>
-<p>In contrast, consider the gradient of Binary Cross-Entropy on a clean image:</p>
-<div class="arithmatex">\[\mathcal{L}_{\text{BCE}} = -\frac{1}{N} \sum_{i=1}^N \log(1 - p_i)\]</div>
-<p>The gradient with respect to logit <span class="arithmatex">\(z_j\)</span> is:</p>
-<div class="arithmatex">\[\frac{\partial \mathcal{L}_{\text{BCE}}}{\partial z_j} = \frac{1}{N} \big(p_j - y_j\big) = \frac{1}{N} p_j\]</div>
-<ul>
-<li>BCE computes an independent, linear restoring gradient proportional to <span class="arithmatex">\(p_j\)</span>.</li>
-<li>It does not suffer from denominator coupling across pixels.</li>
-<li>It provides continuous, well-conditioned background suppression across all <span class="arithmatex">\(102{,}400\)</span> pixels simultaneously.</li>
-</ul>
-<hr />
-<h2 id="4-why-compound-loss-is-strictly-superior-to-dice-alone">4. Why Compound Loss is Strictly Superior to Dice Alone</h2>
-<p>Training semantic segmentation models with Soft Dice alone on highly imbalanced manufacturing datasets leads to severe optimization instability:</p>
-<ol>
-<li><strong>Dice Alone Vulnerability:</strong> On batches dominated by clean sheets, tiny false-positive noise causes severe loss spikes and erratic gradient oscillations. Without a localized background anchor, the optimizer struggles to converge smoothly.</li>
-<li><strong>Compound Loss Synergy:</strong> Combining BCE with Soft Dice creates a complementary division of labor:<ul>
-<li><strong>Soft Dice term:</strong> Enforces global intersection overlap, preventing the model from collapsing to zero on sparse hairline defects.</li>
-<li><strong>BCE term:</strong> Acts as a smooth, convex regularizer, providing well-conditioned pixel-wise gradients that suppress background noise and stabilize training across clean sheets.</li>
-</ul>
-</li>
-</ol>
-<hr />
-<h2 id="5-guiding-hints-for-question-7">5. Guiding Hints for Question 7</h2>
-<p>To solve Question 7 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
-<ul>
-<li><strong>Hint 1 (Describe Gradient Behavior):</strong> In 1 concise sentence, describe how the gradient of <span class="arithmatex">\(\mathcal{L}_{\text{Dice}}\)</span> behaves when stray noise pixels appear on a clean image versus when predictions are clean. Note that stray noise produces an aggressive, non-linear loss spike and steep gradient penalty, whereas clean predictions yield zero loss and vanishing gradients.</li>
-<li><strong>Hint 2 (Justify Compound Loss):</strong> In 1 to 2 concise sentences, explain why combining BCE with Soft Dice is superior to Soft Dice alone on datasets with many clean images. Mention that BCE provides smooth, stable pixel-level gradients that suppress background false alarms and prevent optimization oscillations, while Soft Dice directly optimizes foreground overlap on sparse defects.</li>
-</ul>
-<hr />
-<h2 id="6-your-assignment-task">6. Your Assignment Task</h2>
-<ol>
-<li>Open <a href="milestone-3.html#question-7-compound-loss-behavior-on-defect-vs-clean-images">Milestone 3 Assessment: Question 7</a>.</li>
-<li>Write a concise description of Soft Dice gradient behavior on clean images.</li>
-<li>Write a concise justification explaining why Compound Loss is strictly superior to Soft Dice alone.</li>
-<li>Enter your response in the specified format: <code>brief_gradient_explanation; brief_compound_justification</code>.</li>
-</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_output_heads_and_target_semantics.html">← Q6 · Output Heads &amp; Target Semantics</a><a href="guide_08_scratch_vs_pretrained_convergence.html">Q8 · Scratch vs. Pretrained Convergence →</a></nav>
+<h2 id="1-why-compare-bce-and-dice">1. Why Compare BCE and Dice?</h2>
+<p>BCE supplies local pixel-wise classification signals; Soft Dice couples pixels through an overlap ratio. A weighted sum can balance these signals, but its performance depends on reduction, weights, data and optimization. It is a hypothesis to test, not a theorem that the combination always wins.</p>
+<p>The assessment fixes:</p>
+<div class="arithmatex">\[L=0.5L_{BCE}+0.5L_D.\]</div>
+<p>Pass raw logits to <code>BCEWithLogitsLoss</code> and to the provided <code>SoftDiceLoss</code>. The latter applies sigmoid internally. Do not threshold predictions during training.</p>
+<h2 id="2-define-the-reduction-before-discussing-a-clean-image">2. Define the Reduction Before Discussing a Clean Image</h2>
+<p>The starter's Dice flattens the <strong>entire batch and all four channels</strong>. The following all-empty derivation applies when every target in that reduction is zero, or when Dice is deliberately computed on one isolated clean image. It does not describe a clean sample's contribution inside a mixed positive/clean batch: positives elsewhere affect that sample's numerator and denominator derivatives.</p>
+<p>Let <span class="arithmatex">\(S=\sum_i p_i\)</span>, and let all <span class="arithmatex">\(y_i=0\)</span>. With smoothing <span class="arithmatex">\(\epsilon\)</span>:</p>
+<div class="arithmatex">\[L_D=1-\frac{\epsilon}{S+\epsilon}=\frac{S}{S+\epsilon}.\]</div>
+<p>The loss is zero at <span class="arithmatex">\(S=0\)</span> and approaches one as predicted mass grows. For a <strong>toy mass of 9</strong> with <span class="arithmatex">\(\epsilon=1\)</span>, the loss is <span class="arithmatex">\(9/10=0.9\)</span>. This is a large loss value; it says nothing by itself about the size of a parameter update.</p>
+<h2 id="3-follow-the-derivative-through-sigmoid">3. Follow the Derivative through Sigmoid</h2>
+<p>For a probability <span class="arithmatex">\(p_j\)</span>:</p>
+<div class="arithmatex">\[\frac{\partial L_D}{\partial p_j}=\frac{\epsilon}{(S+\epsilon)^2}.\]</div>
+<p>For its logit <span class="arithmatex">\(z_j\)</span>, the sigmoid chain rule gives:</p>
+<div class="arithmatex">\[\frac{\partial L_D}{\partial z_j}=\frac{\epsilon p_j(1-p_j)}{(S+\epsilon)^2}.\]</div>
+<p>As total mass increases, the shared denominator grows. A saturated positive probability also makes <span class="arithmatex">\(p_j(1-p_j)\)</span> small. Consequently a nearly maximal loss can coexist with weak logit gradients. For the toy mass <span class="arithmatex">\(S=9\)</span>, <span class="arithmatex">\(\epsilon=1\)</span> and <span class="arithmatex">\(p_j=0.5\)</span>, the logit derivative is <span class="arithmatex">\(0.25/100=0.0025\)</span>.</p>
+<p>As all probabilities approach zero, the probability derivative approaches <span class="arithmatex">\(1/\epsilon\)</span>, whereas the <strong>logit derivative</strong> approaches zero through the sigmoid factor. There is no positive noise threshold where this differentiable loss stops working: for finite logits and positive smoothing, its all-empty logit derivative remains positive, though floating-point saturation can produce numerical zeros.</p>
+<h2 id="4-how-bce-contributes">4. How BCE Contributes</h2>
+<p>With mean reduction over <span class="arithmatex">\(N\)</span> elements:</p>
+<div class="arithmatex">\[\frac{\partial L_{BCE}}{\partial z_j}=\frac{p_j-y_j}{N}.\]</div>
+<p>On a clean target this is <span class="arithmatex">\(p_j/N\)</span>. It does not contain Dice's shared probability-mass denominator or sigmoid derivative factor. A confidently wrong background prediction therefore still receives a BCE logit signal. Near <span class="arithmatex">\(p_j=0\)</span>, BCE's signal also tends toward zero; it is not a promise of permanent margin enforcement.</p>
+<p>BCE is convex as a function of individual logits, but a neural network trained with it is not generally convex in its parameters. The relative size of the BCE/Dice contributions depends on <span class="arithmatex">\(N\)</span>, smoothing and reduction. Compare gradients or controlled validation runs rather than assuming equal coefficients imply equal effects.</p>
+<h2 id="5-a-small-autograd-check">5. A Small Autograd Check</h2>
+<pre class="highlight"><code class="language-python">import torch
+z = torch.tensor([0.0, 0.0], dtype=torch.float64, requires_grad=True)
+p = z.sigmoid()
+eps = 1.0
+loss = 1 - eps / (p.sum() + eps)  # all-zero target
+loss.backward()
+expected = eps * p.detach() * (1 - p.detach()) / (p.detach().sum() + eps)**2
+torch.testing.assert_close(z.grad, expected)
+print(z.grad)</code></pre>
+<details>
+<summary>Practice: Is a high Dice loss evidence of exploding gradients?</summary>
+<p>No. The scalar loss and its derivative answer different questions. Inspect the derivative with respect to the quantity actually optimized: logits are further transformed through network parameters. The all-empty formula above shows why a large predicted mass can raise loss while suppressing the logit gradient.</p>
+</details>
+<h2 id="6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</h2>
+<p>Read <a href="milestone-3.html#question-7-compound-loss-behavior-on-defect-vs-clean-images">Question 7</a>. Derive the all-empty loss, distinguish probability and logit derivatives, and describe how they change with predicted mass and sigmoid saturation. Explain what signal BCE adds and one limitation of claiming the combination must always outperform Dice alone. State whether your argument concerns an all-empty reduction or a mixed batch.</p>
+<p>Report <code>brief_gradient_explanation; brief_compound_justification</code> in your own words.</p></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_06_output_heads_and_target_semantics.html">← Q6 · Output Heads &amp; Target Semantics</a><a href="guide_08_scratch_vs_pretrained_convergence.html">Q8 · Scratch vs. Pretrained Convergence →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>

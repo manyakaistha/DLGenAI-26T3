@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -76,14 +85,15 @@
 <p>A common beginner trap is computing the channel-wise average:</p>
 <div class="arithmatex">\[W_{\text{mean}} = \frac{1}{3} \big(W_R + W_G + W_B\big)\]</div>
 <p>If you use the mean, the output activation is:</p>
-<div class="arithmatex">\[\mathbf{Y}_{\text{mean}} = \frac{1}{3} \mathbf{Y}_A\]</div>
-<p>Every pre-activation value in the first layer is attenuated by a factor of 3. When this attenuated signal passes into the downstream Batch Normalization layer (<code>BatchNorm2d</code>), the activation magnitude does not match the running mean and variance statistics learned during ImageNet pretraining, degrading early feature representations.</p>
+<div class="arithmatex">\[\mathbf{Y}_{\text{mean}} = \frac{\mathbf{Y}_A-\mathbf{b}}{3}+\mathbf{b}.\]</div>
+<p>The convolution contribution is scaled by one third; the copied bias is unchanged. Only with zero bias does the entire output equal <span class="arithmatex">\(\mathbf{Y}_A/3\)</span>. A changed scale can affect a downstream BatchNorm using pretrained running statistics; its effect after fine-tuning must be measured. The equivalence proof assumes identical channel inputs, padding and copied biases. Separate RGB mean/std normalization after duplication generally makes the channels unequal and breaks that assumption.</p>
 <p>In PyTorch <code>segmentation_models_pytorch</code>, passing <code>in_channels=1</code> automatically implements Strategy B using <strong>channel summation</strong>:
-<div class="highlight"><pre><span></span><code><span class="c1"># SMP internal implementation when in_channels=1:</span>
-<span class="n">new_weight</span> <span class="o">=</span> <span class="n">pretrained_weight</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">conv1</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">new_weight</span>
-</code></pre></div></p>
+<pre class="highlight"><code class="language-python"># SMP internal implementation when in_channels=1:
+new_weight = pretrained_weight.sum(dim=1, keepdim=True)
+model.encoder.conv1.weight.data = new_weight</code></pre></p>
 <hr />
+<p><img alt="Repeat channels, replace the stem, or learn an input adapter" src="assets/fig03_grayscale_adaptation_clear.svg" /></p>
+<p><em>These are alternative input strategies. The weight-combination rule and normalization assumptions must be stated explicitly; an average and a sum are not activation-equivalent.</em></p>
 <h2 id="3-hardware-memory-bandwidth-host-to-device-pcie-transfer">3. Hardware &amp; Memory Bandwidth: Host-to-Device (PCIe) Transfer</h2>
 <p>Beyond mathematical equivalence, input channel selection has direct implications for training throughput and hardware resource consumption.</p>
 <p>In modern deep learning training workflows:</p>
@@ -92,10 +102,9 @@
 <li>Batches are transferred from host RAM across the <strong>PCIe bus</strong> (e.g., PCIe 4.0 x16 at ~31.5 GB/s) to GPU VRAM via <code>batch.to(device)</code>.</li>
 <li>The forward and backward passes execute on the GPU Tensor Cores.</li>
 </ol>
-<div class="highlight"><pre><span></span><code>Host CPU (RAM) ──────── PCIe Bus Transfer ────────► GPU Device (VRAM)
+<pre class="highlight"><code class="language-text">Host CPU (RAM) ──────── PCIe Bus Transfer ────────► GPU Device (VRAM)
 Strategy A: [B, 3, 128, 800] (Float32: 3 × 400 KB = 1.2 MB / strip)
-Strategy B: [B, 1, 128, 800] (Float32: 1 × 400 KB = 0.4 MB / strip)  &lt;--- 3x Less Data!
-</code></pre></div>
+Strategy B: [B, 1, 128, 800] (Float32: 1 × 400 KB = 0.4 MB / strip)  &lt;--- 3x Less Data!</code></pre>
 <h3 id="memory-bandwidth-scaling-factor">Memory Bandwidth Scaling Factor</h3>
 <p>Let <span class="arithmatex">\(B\)</span> be the batch size, and <span class="arithmatex">\((H, W) = (128, 800)\)</span>. For 32-bit floating-point tensors (<code>torch.float32</code>, 4 bytes per element):</p>
 <ul>
@@ -109,7 +118,7 @@ Strategy B: [B, 1, 128, 800] (Float32: 1 × 400 KB = 0.4 MB / strip)  &lt;--- 3x
 </li>
 </ul>
 <div class="arithmatex">\[\text{Transfer Reduction Factor} = \frac{\text{Bytes}_A}{\text{Bytes}_B} = \frac{3}{1} = 3\times\]</div>
-<p>Strategy B reduces the volume of image data transferred across the PCIe bus by an exact factor of <strong><span class="arithmatex">\(3\times\)</span></strong> (a <span class="arithmatex">\(66.7\%\)</span> reduction). On multi-GPU distributed clusters or bandwidth-constrained systems, this eliminates host-to-device I/O bottlenecks and reduces peak GPU memory allocation.</p>
+<p>Strategy B reduces the volume of image data transferred across the PCIe bus by an exact factor of <strong><span class="arithmatex">\(3\times\)</span></strong> (a <span class="arithmatex">\(66.7\%\)</span> reduction). On multi-GPU distributed clusters or bandwidth-constrained systems, this reduces input-transfer bytes, but does not guarantee that I/O is the bottleneck or that total peak VRAM falls by the same factor. Downstream activations, optimizer state and device-side repetition also matter.</p>
 <hr />
 <h2 id="4-guiding-hints-for-question-3">4. Guiding Hints for Question 3</h2>
 <p>To solve Question 3 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
@@ -117,20 +126,20 @@ Strategy B: [B, 1, 128, 800] (Float32: 1 × 400 KB = 0.4 MB / strip)  &lt;--- 3x
 <li><strong>Hint 1 (Recall Cross-Correlation Linearity):</strong> Re-read the derivation in Section 2 above. Convolution is a linear operator: <span class="arithmatex">\(W \ast X = \sum_c W_c \ast X_c\)</span>. When <span class="arithmatex">\(X_0 = X_1 = X_2 = I\)</span>, the three operations combine into a single convolution by summing the kernel weights. Choose between <code>sum</code> and <code>mean</code>.</li>
 <li>
 <p><strong>Hint 2 (Verify in PyTorch):</strong> You can verify this identity empirically in PyTorch on CPU:
-  <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+  <pre class="highlight"><code class="language-python">import torch
+import torch.nn as nn
 
-<span class="n">conv_rgb</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">conv_gray</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">conv_gray</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">conv_rgb</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">conv_gray</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">conv_rgb</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span>
+conv_rgb = nn.Conv2d(3, 16, kernel_size=3, bias=True)
+conv_gray = nn.Conv2d(1, 16, kernel_size=3, bias=True)
+conv_gray.weight.data = conv_rgb.weight.data.sum(dim=1, keepdim=True)
+conv_gray.bias.data = conv_rgb.bias.data
 
-<span class="n">x_gray</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>
-<span class="n">x_rgb</span> <span class="o">=</span> <span class="n">x_gray</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+x_gray = torch.randn(2, 1, 128, 800)
+x_rgb = x_gray.repeat(1, 3, 1, 1)
 
-<span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="n">conv_rgb</span><span class="p">(</span><span class="n">x_rgb</span><span class="p">)</span> <span class="o">-</span> <span class="n">conv_gray</span><span class="p">(</span><span class="n">x_gray</span><span class="p">))</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Max absolute difference:"</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>  <span class="c1"># &lt; 1e-6 (machine precision!)</span>
-</code></pre></div></p>
+diff = (conv_rgb(x_rgb) - conv_gray(x_gray)).abs().max().item()
+print("Max absolute difference:", diff)  # small floating-point rounding differences are expected
+torch.testing.assert_close(conv_rgb(x_rgb), conv_gray(x_gray), rtol=1e-5, atol=1e-6)</code></pre></p>
 </li>
 <li>
 <p><strong>Hint 3 (Compute Memory Factor):</strong> Determine the ratio of input tensor elements between a 3-channel batch <code>[B, 3, 128, 800]</code> and a 1-channel batch <code>[B, 1, 128, 800]</code>. Express the reduction factor in the standard multiplier format (e.g., <code>2x</code> or <code>3x</code>).</p>

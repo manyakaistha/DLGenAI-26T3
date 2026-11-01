@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="true" data-ai-help="study">
@@ -32,7 +41,7 @@
 <ul>
 <li><a href="#transfer-learning-stronger-segmentation-models">Transfer Learning &amp; Stronger Segmentation Models</a></li>
 <li><a href="#curriculum-map-questions-guided-learning-modules">Curriculum Map: Questions &amp; Guided Learning Modules</a></li>
-<li><a href="#official-starter-code-parameter-reference">🛠️ Official Starter Code &amp; Parameter Reference</a></li>
+<li><a href="#official-starter-code-setup-and-benchmark-contract">Official Starter Code, Setup and Benchmark Contract</a></li>
 <li><a href="#how-to-work-through-milestone-3">How to Work Through Milestone 3:</a></li>
 </ul>
 </div>
@@ -40,14 +49,14 @@
 <article><h1 id="milestone-3-student-study-guides">Milestone 3 Student Study Guides</h1>
 <h2 id="transfer-learning-stronger-segmentation-models">Transfer Learning &amp; Stronger Segmentation Models</h2>
 <p>Welcome to Milestone 3! In Milestone 1, you inspected raw annotations, unraveled Run-Length Encoding (RLE) memory layouts, explored line-scan sensor geometry, and studied metric sensitivity. In Milestone 2, you moved from analytical observation to active systems engineering: building custom PyTorch <code>Dataset</code> and <code>DataLoader</code> pipelines, implementing industrial geometric augmentations, establishing leakage-free validation splits, and training a baseline from-scratch U-Net.</p>
-<p>In <strong>Milestone 3</strong>, you elevate your modeling capability to industrial production standards:</p>
+<p>In <strong>Milestone 3</strong>, you study stronger segmentation models through controlled experiments:</p>
 <ul>
 <li><strong>Spatial Geometry &amp; Bottleneck Compression:</strong> Tracing feature map dimensions through progressive stride-2 downsampling, understanding receptive field expansion, and diagnosing odd-dimension tensor parity mismatches along anisotropic (<span class="arithmatex">\(128 \times 800\)</span>) ribbons.</li>
 <li><strong>Transfer Learning with Pretrained Vision Backbones:</strong> Leveraging generic visual primitives (edges, gradients, textures) learned from ImageNet (<span class="arithmatex">\(1.2\text{M}\)</span> natural images) across ResNet and EfficientNet architectures, auditing model parameters, and mastering feature-extractor freezing dynamics.</li>
 <li><strong>Grayscale Sensor Adaptation:</strong> Solving the impedance mismatch between 3-channel RGB pretrained weights and 1-channel monochromatic industrial cameras, proving activation equivalence between channel duplication and first-layer weight collapse, and evaluating PCIe memory bandwidth efficiency.</li>
-<li><strong>Multi-Scale Context via Atrous (Dilated) Convolutions:</strong> Analyzing DeepLabV3+ with Atrous Spatial Pyramid Pooling (ASPP) to detect both microscopic hairline cracks (1–3 pixels wide) and massive diffuse patches without sacrificing spatial resolution or multiplying parameters.</li>
-<li><strong>Differentiable Soft Dice &amp; Compound Loss Formulations:</strong> Taming extreme foreground sparsity (&gt;97% clean canvas) using smoothed Soft Dice loss (<span class="arithmatex">\(\epsilon = 1.0\)</span>), analyzing gradient behavior on clean sheets, and anchoring training dynamics with Compound Loss (<span class="arithmatex">\(\alpha \text{BCE} + \beta \text{Dice}\)</span>).</li>
-<li><strong>Output Head Semantics &amp; Structural Partitioning:</strong> Evaluating 4-channel independent Sigmoid multi-label detection against 5-channel mutually exclusive Softmax partitions, and identifying catastrophic failure modes under label overlap.</li>
+<li><strong>Multi-Scale Context via Atrous (Dilated) Convolutions:</strong> Analyzing DeepLabV3+ with Atrous Spatial Pyramid Pooling (ASPP) to detect both microscopic hairline cracks (1–3 pixels wide) and massive diffuse patches with wider context at a fixed feature resolution, while accounting for extra branches and sampling limitations.</li>
+<li><strong>Differentiable Soft Dice &amp; Compound Loss Formulations:</strong> Studying sparse-foreground objectives using smoothed Soft Dice loss (<span class="arithmatex">\(\epsilon = 1.0\)</span>), analyzing gradient behavior on clean sheets, and anchoring training dynamics with Compound Loss (<span class="arithmatex">\(\alpha \text{BCE} + \beta \text{Dice}\)</span>).</li>
+<li><strong>Output Head Semantics &amp; Structural Partitioning:</strong> Evaluating 4-channel independent Sigmoid multi-label detection against 5-channel mutually exclusive Softmax partitions, and checking representational limits under label overlap.</li>
 <li><strong>Empirical Benchmarking &amp; Architecture Trade-offs:</strong> Systematically measuring convergence speed, generalization gaps, parameter throughput, and memory trade-offs between scratch baselines, ResNet-34, and EfficientNet-B0.</li>
 </ul>
 <hr />
@@ -90,14 +99,14 @@
 <tr>
 <td style="text-align: left;"><strong>Question 5</strong></td>
 <td style="text-align: left;"><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html">Guide 5: Differentiable Soft Dice Loss &amp; Numerical Smoothing</a></td>
-<td style="text-align: left;">Extreme background imbalance (&gt;97% clean canvas), differentiable continuous relaxation of Dice, Laplace additive smoothing (<span class="arithmatex">\(\epsilon=1.0\)</span>), false-positive background penalties.</td>
+<td style="text-align: left;">Foreground/background imbalance, differentiable continuous relaxation of Dice, Laplace additive smoothing (<span class="arithmatex">\(\epsilon=1.0\)</span>), false-positive background penalties.</td>
 <td style="text-align: left;">Computing Soft Dice step-by-step on synthetic patches, Lazy Model vs. Accurate Model loss dynamics.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Question 6</strong></td>
 <td style="text-align: left;"><a href="guide_06_output_heads_and_target_semantics.html">Guide 6: Output Head Semantics &amp; Loss Formulations</a></td>
 <td style="text-align: left;">4-channel independent Sigmoid (<code>BCEWithLogitsLoss</code>) vs. 5-channel mutually exclusive Softmax (<code>CrossEntropyLoss</code>), spatial disjointness vs. pixel-level overlap failure modes.</td>
-<td style="text-align: left;">Evaluating spatial co-occurrence across disjoint regions, identifying catastrophic suppression under annotation collisions.</td>
+<td style="text-align: left;">Evaluating spatial co-occurrence across disjoint regions, checking label preservation under annotation collisions.</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Question 7</strong></td>
@@ -108,7 +117,7 @@
 <tr>
 <td style="text-align: left;"><strong>Question 8</strong></td>
 <td style="text-align: left;"><a href="guide_08_scratch_vs_pretrained_convergence.html">Guide 8: Scratch Baseline vs. Pretrained Transfer Learning</a></td>
-<td style="text-align: left;">Empirical fine-tuning dynamics, generic visual feature acquisition, Epoch 1 convergence acceleration, generalization gap $</td>
+<td style="text-align: left;">Empirical fine-tuning dynamics, generic visual feature acquisition, measured Epoch 1 convergence, generalization gap $</td>
 <td style="text-align: left;">L_{\text{val}} - L_{\text{train}}</td>
 </tr>
 <tr>
@@ -120,61 +129,11 @@
 </tbody>
 </table>
 <hr />
-<h2 id="official-starter-code-parameter-reference">🛠️ Official Starter Code &amp; Parameter Reference</h2>
-<p>All models and loss functions throughout Milestone 3 use the standardized definitions below:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">segmentation_models_pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smp</span>
-
-<span class="c1"># 1. Model Definitions (SMP)</span>
-<span class="n">model_resnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
-    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>
-    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span>
-
-<span class="n">model_effnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
-    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"efficientnet-b0"</span><span class="p">,</span>
-    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span>
-
-<span class="c1"># 2. Differentiable Soft Dice &amp; Compound Loss</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">SoftDiceLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span> <span class="o">=</span> <span class="n">smooth</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
-        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
-        <span class="n">probs_flat</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">targets_flat</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">intersection</span> <span class="o">=</span> <span class="p">(</span><span class="n">probs_flat</span> <span class="o">*</span> <span class="n">targets_flat</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="n">dice</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">intersection</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">probs_flat</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">targets_flat</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">dice</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">CompoundLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">smooth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bce</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dice</span> <span class="o">=</span> <span class="n">SoftDiceLoss</span><span class="p">(</span><span class="n">smooth</span><span class="o">=</span><span class="n">smooth</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bce</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dice</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-
-<span class="c1"># 3. Standard Benchmarking Hyperparameters</span>
-<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">16</span>
-<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">3e-4</span>
-<span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-2</span>
-<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">ALPHA</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">BETA</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">SMOOTH</span> <span class="o">=</span> <span class="mf">1.0</span>
-</code></pre></div>
+<h2 id="official-starter-code-setup-and-benchmark-contract">Official Starter Code, Setup and Benchmark Contract</h2>
+<p>Use the <a href="milestone-3.html#official-starter-code-default-parameters-reference">assessment's model/loss definitions and common protocol</a> as the single source of truth. It pins SMP/PyTorch versions, fixes decoder settings and distinguishes Q2's freeze audit from Q8/Q9's fully trainable models. The loss reduction is global across batch, channels and pixels; Q7's empty-target derivation must be interpreted accordingly.</p>
+<p>Q8 compares random and pretrained initialization of the <strong>same</strong> ResNet-34 U-Net. Q9 changes backbone. Use the saved Milestone 2 split, fixed seeds, native grayscale [0,1] inputs, no augmentations, five float32 epochs, and the declared hard-mask evaluation rule. Report measured results, ties, CUDA-unavailable measurements and OOMs honestly. No model ranking or score-improvement interval is supplied by these guides.</p>
+<p>The official score uses the 70/20/10 foreground/false-positive/empty-accuracy components; Guide 8 links the definitions and explains aggregation. Practice examples use distinct synthetic values. Derivations teach concepts, not competition findings.</p>
+<p>Legacy synthetic <a href="walkthrough-notebook.html">notebook and script downloads</a> remain available for practice. They demonstrate a small CPU model and are <strong>not</strong> the Q8/Q9 training implementation or benchmark settings.</p>
 <hr />
 <h2 id="how-to-work-through-milestone-3">How to Work Through Milestone 3:</h2>
 <ol>

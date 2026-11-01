@@ -28,7 +28,7 @@ Each channel is passed through an independent Sigmoid function:
 $$P_c(y, x) = \sigma\big(z_c(y, x)\big) = \frac{1}{1 + e^{-z_c(y, x)}} \in [0, 1]$$
 - **Target Representation:** Dense binary floating-point tensor of shape `[B, 4, H, W]`.
 - **Loss Function:** `nn.BCEWithLogitsLoss()` computed independently across all 4 channels and all pixels.
-- **Semantic Freedom:** Channel $c_1$ exerts zero mathematical suppression on channel $c_2$. A pixel $(y, x)$ can simultaneously have high probabilities for multiple defect categories (e.g., $P_a(y, x) = 0.92$ and $P_c(y, x) = 0.88$). If all channels are zero ($P_c < \tau$), the pixel is implicitly classified as background.
+- **Semantic Freedom:** Changing one output logit does not change another channel's sigmoid value; shared network parameters can still couple training updates. A pixel $(y, x)$ can simultaneously have high probabilities for multiple defect categories (e.g., $P_a(y, x) = 0.92$ and $P_c(y, x) = 0.88$). If all four channels are below the decision threshold ($P_c < \tau$), the pixel is implicitly classified as background.
 
 ### Formulation B: 5-Channel Mutually Exclusive Softmax
 In Formulation B, an explicit **Background Class (Channel 0)** is added, creating 5 total output channels:
@@ -39,15 +39,17 @@ $$P_c(y, x) = \frac{e^{z_c(y, x)}}{\sum_{k=0}^4 e^{z_k(y, x)}}$$
 - **Loss Function:** `nn.CrossEntropyLoss()`.
 - **Probability Simplex Constraint:** At every single pixel coordinate $(y, x)$, the channel probabilities strictly sum to 1:
   $$\sum_{c=0}^4 P_c(y, x) = 1.0$$
-  By definition, an increase in the probability of one defect class *strictly forces* a mathematical decrease in all other classes.
+  If one class probability increases, the sum of the remaining probabilities must decrease. If only that class logit is increased while other logits stay fixed, each other probability decreases; under arbitrary simultaneous logit changes, some other individual probabilities may still increase.
 
 ---
 
 ## 3. Spatial Disjointness vs. Pixel-Level Overlap
 
-In Milestone 1 (Question 3), your data audit verified an empirical property of the training dataset:
-$$\text{Overlapping Defect Pixels in Training Set} = 0$$
-Across all 11,393 training images, whenever multiple defect classes appeared on the same steel sheet, they occurred at **distinct, non-overlapping spatial locations** (e.g., a scratch on the left edge and an oxide patch on the right edge).
+Use your own Milestone 1 Q3 overlap audit to decide whether a mutually exclusive target map preserves all observed labels. Image-level co-occurrence alone does not answer that question. A finding on the training set also does not guarantee that future annotations have the same property.
+
+![Synthetic logits compared under sigmoid and softmax](assets/fig04_output_head_semantics.png)
+
+*This single-pixel toy example illustrates activation rules, not an empirical finding about the competition data.*
 
 ### Can Softmax Segment Multiple Defects on the Same Sheet?
 A frequent misconception is that Softmax restricts a model to predicting only one defect class per image. **This is false.**
@@ -70,7 +72,7 @@ Suppose a hairline scratch (Defect A) cuts across a large oxide inclusion (Defec
 - Softmax Probabilities: sum(P_c) = 1.0. If P_A = 0.8, P_C CANNOT exceed 0.2!
 ```
 
-If test data, re-annotated batches, or real-world production runs contain even a single pixel where two defects overlap, Formulation B experiences **catastrophic mutual suppression**: the model is forced into a winner-take-all competition, guaranteeing missed detections (false negatives) for whichever defect loses the competition at that pixel.
+With an integer class target and argmax prediction, an overlapping pixel must be assigned only one class, so at least one true label is lost there. This is a representational limitation at overlapping pixels; it does not imply failure across an entire image. Softmax probabilities alone do not force argmax decoding, but this particular single-label formulation does.
 
 ---
 
@@ -82,7 +84,7 @@ If test data, re-annotated batches, or real-world production runs contain even a
 | **Loss Function** | `BCEWithLogitsLoss` / Compound Loss | `CrossEntropyLoss` |
 | **Target Tensor Format** | Float `[B, 4, 128, 800]` | Long `[B, 128, 800]` (integers 0..4) |
 | **Spatially Disjoint Defects** | Fully supported | Fully supported |
-| **Overlapping Pixel Annotations** | Fully supported (each channel independent) | **Catastrophic failure** (winner-take-all suppression) |
+| **Overlapping Pixel Annotations** | Fully supported (each channel independent) | Cannot preserve multiple labels with a single integer/argmax output |
 | **Background Representation** | Implicit (all 4 channels $< \tau$) | Explicit (dedicated Channel 0) |
 
 ---

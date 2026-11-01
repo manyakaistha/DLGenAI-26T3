@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -44,12 +53,11 @@
 <hr />
 <h2 id="1-the-core-architectural-choice-sigmoid-vs-softmax">1. The Core Architectural Choice: Sigmoid vs. Softmax</h2>
 <p>When configuring the final output layer of a semantic segmentation model, deep learning practitioners face a foundational design choice:</p>
-<div class="highlight"><pre><span></span><code>               ┌──► Formulation A: 4-Channel Independent Sigmoid (Multi-Label)
+<pre class="highlight"><code class="language-text">               ┌──► Formulation A: 4-Channel Independent Sigmoid (Multi-Label)
 Decoder Logits │    Shape: [B, 4, H, W]  │  Trained with BCEWithLogitsLoss
                │
                └──► Formulation B: 5-Channel Mutually Exclusive Softmax (Multi-Class)
-                    Shape: [B, 5, H, W]  │  Trained with CrossEntropyLoss
-</code></pre></div>
+                    Shape: [B, 5, H, W]  │  Trained with CrossEntropyLoss</code></pre>
 <p>This choice governs not only the loss function and activation mathematics, but also the fundamental representational capacity of your inspection system.</p>
 <hr />
 <h2 id="2-mathematical-principles-activation-target-semantics">2. Mathematical Principles: Activation &amp; Target Semantics</h2>
@@ -61,7 +69,7 @@ Decoder Logits │    Shape: [B, 4, H, W]  │  Trained with BCEWithLogitsLoss
 <ul>
 <li><strong>Target Representation:</strong> Dense binary floating-point tensor of shape <code>[B, 4, H, W]</code>.</li>
 <li><strong>Loss Function:</strong> <code>nn.BCEWithLogitsLoss()</code> computed independently across all 4 channels and all pixels.</li>
-<li><strong>Semantic Freedom:</strong> Channel <span class="arithmatex">\(c_1\)</span> exerts zero mathematical suppression on channel <span class="arithmatex">\(c_2\)</span>. A pixel <span class="arithmatex">\((y, x)\)</span> can simultaneously have high probabilities for multiple defect categories (e.g., <span class="arithmatex">\(P_a(y, x) = 0.92\)</span> and <span class="arithmatex">\(P_c(y, x) = 0.88\)</span>). If all channels are zero (<span class="arithmatex">\(P_c &lt; \tau\)</span>), the pixel is implicitly classified as background.</li>
+<li><strong>Semantic Freedom:</strong> Changing one output logit does not change another channel's sigmoid value; shared network parameters can still couple training updates. A pixel <span class="arithmatex">\((y, x)\)</span> can simultaneously have high probabilities for multiple defect categories (e.g., <span class="arithmatex">\(P_a(y, x) = 0.92\)</span> and <span class="arithmatex">\(P_c(y, x) = 0.88\)</span>). If all four channels are below the decision threshold (<span class="arithmatex">\(P_c &lt; \tau\)</span>), the pixel is implicitly classified as background.</li>
 </ul>
 <h3 id="formulation-b-5-channel-mutually-exclusive-softmax">Formulation B: 5-Channel Mutually Exclusive Softmax</h3>
 <p>In Formulation B, an explicit <strong>Background Class (Channel 0)</strong> is added, creating 5 total output channels:</p>
@@ -74,14 +82,14 @@ Decoder Logits │    Shape: [B, 4, H, W]  │  Trained with BCEWithLogitsLoss
 <li>
 <p><strong>Probability Simplex Constraint:</strong> At every single pixel coordinate <span class="arithmatex">\((y, x)\)</span>, the channel probabilities strictly sum to 1:</p>
 <div class="arithmatex">\[\sum_{c=0}^4 P_c(y, x) = 1.0\]</div>
-<p>By definition, an increase in the probability of one defect class <em>strictly forces</em> a mathematical decrease in all other classes.</p>
+<p>If one class probability increases, the sum of the remaining probabilities must decrease. If only that class logit is increased while other logits stay fixed, each other probability decreases; under arbitrary simultaneous logit changes, some other individual probabilities may still increase.</p>
 </li>
 </ul>
 <hr />
 <h2 id="3-spatial-disjointness-vs-pixel-level-overlap">3. Spatial Disjointness vs. Pixel-Level Overlap</h2>
-<p>In Milestone 1 (Question 3), your data audit verified an empirical property of the training dataset:</p>
-<div class="arithmatex">\[\text{Overlapping Defect Pixels in Training Set} = 0\]</div>
-<p>Across all 11,393 training images, whenever multiple defect classes appeared on the same steel sheet, they occurred at <strong>distinct, non-overlapping spatial locations</strong> (e.g., a scratch on the left edge and an oxide patch on the right edge).</p>
+<p>Use your own Milestone 1 Q3 overlap audit to decide whether a mutually exclusive target map preserves all observed labels. Image-level co-occurrence alone does not answer that question. A finding on the training set also does not guarantee that future annotations have the same property.</p>
+<p><img alt="Synthetic logits compared under sigmoid and softmax" src="assets/fig04_output_head_semantics.png" /></p>
+<p><em>This single-pixel toy example illustrates activation rules, not an empirical finding about the competition data.</em></p>
 <h3 id="can-softmax-segment-multiple-defects-on-the-same-sheet">Can Softmax Segment Multiple Defects on the Same Sheet?</h3>
 <p>A frequent misconception is that Softmax restricts a model to predicting only one defect class per image. <strong>This is false.</strong></p>
 <ul>
@@ -98,14 +106,13 @@ Decoder Logits │    Shape: [B, 4, H, W]  │  Trained with BCEWithLogitsLoss
 <p>Because spatial coordinates are decoupled, Formulation B can cleanly segment multiple defect instances across disjoint regions of the same steel sheet without mutual interference.</p>
 <h3 id="the-operational-failure-mode-of-formulation-b">The Operational Failure Mode of Formulation B</h3>
 <p>However, Formulation B has a critical operational vulnerability: <strong>it fundamentally cannot represent overlapping annotations at the same spatial pixel</strong>.</p>
-<div class="highlight"><pre><span></span><code>The Overlap Breakdown:
+<pre class="highlight"><code class="language-text">The Overlap Breakdown:
 Suppose a hairline scratch (Defect A) cuts across a large oxide inclusion (Defect C) at pixel (y, x):
 - True physical reality: Both Defect A and Defect C are present simultaneously.
 - Integer Class Target: Target tensor must choose ONE integer: y(y, x) = 1 OR y(y, x) = 3.
                         Whichever defect is omitted is treated as FALSE (loss penalizes it!).
-- Softmax Probabilities: sum(P_c) = 1.0. If P_A = 0.8, P_C CANNOT exceed 0.2!
-</code></pre></div>
-<p>If test data, re-annotated batches, or real-world production runs contain even a single pixel where two defects overlap, Formulation B experiences <strong>catastrophic mutual suppression</strong>: the model is forced into a winner-take-all competition, guaranteeing missed detections (false negatives) for whichever defect loses the competition at that pixel.</p>
+- Softmax Probabilities: sum(P_c) = 1.0. If P_A = 0.8, P_C CANNOT exceed 0.2!</code></pre>
+<p>With an integer class target and argmax prediction, an overlapping pixel must be assigned only one class, so at least one true label is lost there. This is a representational limitation at overlapping pixels; it does not imply failure across an entire image. Softmax probabilities alone do not force argmax decoding, but this particular single-label formulation does.</p>
 <hr />
 <h2 id="4-comparative-decision-matrix">4. Comparative Decision Matrix</h2>
 <table>
@@ -140,7 +147,7 @@ Suppose a hairline scratch (Defect A) cuts across a large oxide inclusion (Defec
 <tr>
 <td style="text-align: left;"><strong>Overlapping Pixel Annotations</strong></td>
 <td style="text-align: left;">Fully supported (each channel independent)</td>
-<td style="text-align: left;"><strong>Catastrophic failure</strong> (winner-take-all suppression)</td>
+<td style="text-align: left;">Cannot preserve multiple labels with a single integer/argmax output</td>
 </tr>
 <tr>
 <td style="text-align: left;"><strong>Background Representation</strong></td>

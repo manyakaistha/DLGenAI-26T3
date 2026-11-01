@@ -2,6 +2,8 @@
 # # Milestone 3: Transfer Learning & Stronger Segmentation Models
 # ## Synthetic Educational Walkthrough (CPU-Only, Zero Competition Data)
 #
+# This is a synthetic CPU practice model, not the SMP Q8/Q9 benchmark.
+# Its learning rate, batch size and architecture are illustrative.
 # This notebook demonstrates the core concepts of Milestone 3:
 # 1. Synthesizing an industrial strip ($128 \times 800$) and simulating defect masks
 # 2. Extracting multi-scale feature hierarchies through an encoder-decoder
@@ -169,7 +171,7 @@ sig_probs = torch.sigmoid(logits)
 
 bce_val = bce_fn(logits, target_tensor)
 dice_val = soft_dice_loss(sig_probs, target_tensor)
-compound_loss = bce_val + 1.0 * dice_val
+compound_loss = 0.5 * bce_val + 0.5 * dice_val
 
 print(f"Batch BCE Loss:       {bce_val.item():.4f}")
 print(f"Batch Soft Dice Loss: {dice_val.item():.4f}")
@@ -184,7 +186,7 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
 optimizer.zero_grad()
 
 logits = model(image_tensor)
-loss = bce_fn(logits, target_tensor) + soft_dice_loss(torch.sigmoid(logits), target_tensor)
+loss = 0.5 * bce_fn(logits, target_tensor) + 0.5 * soft_dice_loss(torch.sigmoid(logits), target_tensor)
 loss.backward()
 optimizer.step()
 

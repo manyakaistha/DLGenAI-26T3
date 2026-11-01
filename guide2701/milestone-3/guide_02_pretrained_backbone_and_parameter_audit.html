@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -42,8 +51,8 @@
 <p><em>(Milestone 3 · Question 2 Study Guide)</em></p>
 <hr />
 <h2 id="1-the-core-concept-the-transfer-learning-advantage">1. The Core Concept: The Transfer Learning Advantage</h2>
-<p>Training deep semantic segmentation networks from scratch requires tens of thousands of diverse, annotated samples. On specialized industrial datasets like surface anomaly inspection, annotations are scarce, expensive to produce, and heavily skewed toward clean background material.</p>
-<p>When a convolutional network is initialized randomly (e.g., via Kaiming/He normal initialization), the earliest convolutional filters possess no prior concept of visual reality. The network must spend dozens of epochs learning basic image processing primitives:</p>
+<p>Training deep semantic segmentation networks from scratch can require substantial labeled data, depending on the task and architecture. On specialized industrial datasets like surface anomaly inspection, annotations are scarce, expensive to produce, and heavily skewed toward clean background material.</p>
+<p>When a convolutional network is initialized randomly (e.g., via Kaiming/He normal initialization), the earliest convolutional filters possess no prior concept of visual reality. The network must learn useful image processing primitives during training:</p>
 <ul>
 <li>Directional edge filters (horizontal, vertical, diagonal)</li>
 <li>Color and intensity gradients</li>
@@ -60,11 +69,11 @@
 <hr />
 <h2 id="2-theoretical-principles-resnet-vs-efficientnet-architectures">2. Theoretical Principles: ResNet vs. EfficientNet Architectures</h2>
 <p>In modern semantic segmentation toolkits like <code>segmentation_models_pytorch</code> (SMP), a standard segmentation model decomposes into three distinct structural modules:</p>
-<div class="arithmatex">\[\text{Model} = \underbrace{\text{Encoder (Backbone)}}_{\text{Pretrained ImageNet Features}} + \underbrace{\text{Decoder}}_{\text{Feature Upsampling \&amp; Skip Fusion}} + \underbrace{\text{Segmentation Head}}_{1 \times 1 \text{ Conv to } K \text{ Defect Classes}}\]</div>
+<div class="arithmatex">\[\text{Model} = \underbrace{\text{Encoder (Backbone)}}_{\text{Pretrained ImageNet Features}} + \underbrace{\text{Decoder}}_{\text{Feature Upsampling \&amp; Skip Fusion}} + \underbrace{\text{Segmentation Head}}_{\text{Conv to } K \text{ Defect Classes}}\]</div>
 <h3 id="backbone-architecture-1-resnet-34-residual-networks">Backbone Architecture 1: ResNet-34 (Residual Networks)</h3>
 <p>ResNet-34 employs standard <span class="arithmatex">\(3 \times 3\)</span> convolutional layers organized into residual blocks with additive identity shortcut connections:</p>
 <div class="arithmatex">\[\mathbf{y} = \mathcal{F}(\mathbf{x}, \{W_i\}) + \mathbf{x}\]</div>
-<p>The identity shortcut eliminates vanishing gradients across deep stacks, allowing stable optimization. However, standard 2D convolutions apply dense spatial-channel matrix multiplications:</p>
+<p>The identity shortcut helps gradients propagate across deep stacks. However, standard 2D convolutions apply dense spatial-channel matrix multiplications:</p>
 <div class="arithmatex">\[\text{Parameters} = K_h \times K_w \times C_{\text{in}} \times C_{\text{out}}\]</div>
 <p>For <span class="arithmatex">\(3 \times 3\)</span> kernels across hundreds of channels, parameter counts scale quadratic with channel depth.</p>
 <h3 id="backbone-architecture-2-efficientnet-b0-compound-scaling-mbconv">Backbone Architecture 2: EfficientNet-B0 (Compound Scaling &amp; MBConv)</h3>
@@ -75,27 +84,31 @@
 <li><strong>Squeeze-and-Excitation (SE) Attention:</strong> Adaptively recalibrates channel-wise feature responses.</li>
 <li><strong><span class="arithmatex">\(1 \times 1\)</span> Pointwise Projection:</strong> Compresses channels back down to match linear bottlenecks.</li>
 </ol>
-<p>This factorization separates spatial filtering from channel mixing, slashing parameter count and FLOPs by <strong>over <span class="arithmatex">\(70\%\)</span></strong> while preserving representational capacity.</p>
+<p>This factorization separates spatial filtering from channel mixing. Count parameters for the complete model: decoder width, expansion layers and SE blocks also contribute, and parameter savings do not guarantee equal accuracy or lower peak activation memory.</p>
 <hr />
 <h2 id="3-parameter-accounting-freezing-dynamics-in-pytorch">3. Parameter Accounting &amp; Freezing Dynamics in PyTorch</h2>
 <p>In deep learning auditing, total parameters represent the storage footprint and parameter capacity of a model. In PyTorch, parameter tensors are queried using <code>model.parameters()</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Total parameters (weights + biases) across all layers:</span>
-<span class="n">total_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<pre class="highlight"><code class="language-python"># Total parameters (weights + biases) across all layers:
+total_params = sum(p.numel() for p in model.parameters())
 
-<span class="c1"># Trainable parameters (requiring gradient computation during backward pass):</span>
-<span class="n">trainable_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span>
-</code></pre></div>
+# Trainable parameters (requiring gradient computation during backward pass):
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)</code></pre>
 <h3 id="feature-extractor-fine-tuning-encoder-freezing">Feature-Extractor Fine-Tuning (Encoder Freezing)</h3>
 <p>In the first phase of transfer learning on small datasets, it is common practice to <strong>freeze the encoder backbone</strong>. Because ImageNet features are already well-conditioned, updating encoder weights with aggressive gradients can cause <strong>catastrophic forgetting</strong> (destabilizing generic edge priors).</p>
 <p>By setting <code>requires_grad = False</code> on the encoder:
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-    <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
-</code></pre></div></p>
+<pre class="highlight"><code class="language-python">for param in model.encoder.parameters():
+    param.requires_grad = False</code></pre></p>
 <ul>
-<li>The encoder acts as a fixed, frozen feature extractor.</li>
+<li>The encoder parameters no longer receive newly computed gradients. This alone does not freeze its running buffers or stochastic behavior.</li>
 <li>Only the randomly initialized decoder blocks and the segmentation head receive gradient updates.</li>
 <li>GPU VRAM consumption during training decreases because intermediate encoder activation gradients do not need to be retained in memory.</li>
 </ul>
+<p>If a fixed feature extractor is intended, call <code>model.encoder.eval()</code> <strong>after each <code>model.train()</code></strong>. BatchNorm running mean/variance otherwise update in training mode even when its affine parameters have <code>requires_grad=False</code>. <code>eval()</code> also changes dropout behavior; it does not disable gradients. Q2 asks only for parameter accounting; Q8/Q9 train all parameters with normal training-mode BatchNorm.</p>
+<pre class="highlight"><code class="language-python">model.train()             # sets all submodules to training mode
+model.encoder.eval()     # only for a deliberately fixed feature extractor</code></pre>
+<p>See <a href="https://docs.pytorch.org/docs/2.8/generated/torch.nn.BatchNorm2d.html">PyTorch BatchNorm2d</a> for the running-statistics contract and <a href="https://smp.readthedocs.io/en/v0.5.0/models.html">SMP 0.5.0 model settings</a> for encoder/decoder options. The assessment pins SMP 0.5.0 and explicitly fixes decoder settings so parameter counts are reproducible.</p>
+<p><img alt="Illustrative ResNet encoder stages and increasingly broad features" src="assets/fig02_pretrained_feature_hierarchies_clear.svg" /></p>
+<p><em>This is a five-stage ResNet feature trace, separate from Q1's four-pooling toy network. Feature meanings are illustrative, not measured activations.</em></p>
 <h3 id="trainable-parameter-ratio-formula">Trainable Parameter Ratio Formula</h3>
 <p>When the encoder is frozen, the percentage of remaining trainable parameters is:</p>
 <div class="arithmatex">\[\text{Trainable Percentage} = \frac{\sum_{p \in \text{trainable}} \text{numel}(p)}{\sum_{p \in \text{all}} \text{numel}(p)} \times 100\% = \frac{\text{Decoder Params} + \text{Head Params}}{\text{Total Model Params}} \times 100\%\]</div>
@@ -105,10 +118,9 @@
 <ul>
 <li>
 <p><strong>Hint 1 (Instantiate Models Consistently):</strong> Instantiate both <code>smp.Unet</code> models using the exact starter code parameters:
-  <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">segmentation_models_pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smp</span>
-<span class="n">model_resnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span><span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span> <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-<span class="n">model_effnet</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span><span class="n">encoder_name</span><span class="o">=</span><span class="s2">"efficientnet-b0"</span><span class="p">,</span> <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span> <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</code></pre></div></p>
+  <pre class="highlight"><code class="language-python">import segmentation_models_pytorch as smp
+model_resnet = smp.Unet(encoder_name="resnet34", encoder_weights="imagenet", in_channels=1, classes=4)
+model_effnet = smp.Unet(encoder_name="efficientnet-b0", encoder_weights="imagenet", in_channels=1, classes=4)</code></pre></p>
 </li>
 <li>
 <p><strong>Hint 2 (Compute Total Parameter Counts):</strong> For both <code>model_resnet</code> and <code>model_effnet</code>, write a helper function that iterates through <code>model.parameters()</code> and sums <code>p.numel()</code>. Compare the two totals to determine which model is more parameter-efficient, and compute the exact numerical difference:</p>

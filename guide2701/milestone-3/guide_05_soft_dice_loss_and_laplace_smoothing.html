@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -30,150 +39,57 @@
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 5 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">Concept guide 05 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
-<li><a href="#1-the-engineering-context-the-perils-of-extreme-class-imbalance">1. The Engineering Context: The Perils of Extreme Class Imbalance</a></li>
-<li><a href="#2-theoretical-principles-the-differentiable-soft-dice-loss">2. Theoretical Principles: The Differentiable Soft Dice Loss</a></li>
-<li><a href="#3-the-function-of-laplace-smoothing-epsilon-10">3. The Function of Laplace Smoothing (\(\epsilon = 1.0\))</a></li>
-<li><a href="#4-diagnostic-walkthrough-lazy-model-vs-accurate-model">4. Diagnostic Walkthrough: Lazy Model vs. Accurate Model</a></li>
-<li><a href="#5-guiding-hints-for-question-5">5. Guiding Hints for Question 5</a></li>
-<li><a href="#6-your-assignment-task">6. Your Assignment Task</a></li>
+<li><a href="#1-sparse-foreground-and-the-objective">1. Sparse Foreground and the Objective</a></li>
+<li><a href="#2-from-hard-overlap-to-a-differentiable-loss">2. From Hard Overlap to a Differentiable Loss</a></li>
+<li><a href="#3-what-smoothing-changes">3. What Smoothing Changes</a></li>
+<li><a href="#4-worked-practice-with-different-inputs">4. Worked Practice with Different Inputs</a></li>
+<li><a href="#5-verify-the-practice-calculation">5. Verify the Practice Calculation</a></li>
+<li><a href="#6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</a></li>
 </ul>
 </div>
 </details>
 <article><h1 id="differentiable-soft-dice-loss-numerical-smoothing">Differentiable Soft Dice Loss &amp; Numerical Smoothing</h1>
 <p><em>(Milestone 3 · Question 5 Study Guide)</em></p>
-<hr />
-<h2 id="1-the-engineering-context-the-perils-of-extreme-class-imbalance">1. The Engineering Context: The Perils of Extreme Class Imbalance</h2>
-<p>In automated steel inspection, defect anomalies are rare physical events. Across the entire training dataset:</p>
-<ul>
-<li>Over <strong><span class="arithmatex">\(97\%\)</span> of all pixel canvas mass</strong> consists of flawless, clean steel background (<span class="arithmatex">\(y_i = 0\)</span>).</li>
-<li>Less than <strong><span class="arithmatex">\(3\%\)</span> of pixels</strong> contain defect anomalies (<span class="arithmatex">\(y_i = 1\)</span>).</li>
-</ul>
-<p>If you train a neural network using standard, unweighted <strong>Binary Cross-Entropy (BCE)</strong>, the model quickly discovers a degenerate optimization shortcut: <strong>predict zero everywhere</strong>.</p>
-<div class="highlight"><pre><span></span><code>The BCE "Zero-Prediction" Failure Mode:
-Model predicts p_i = 0.00 for every single pixel on the sheet:
-- Background accuracy: 100% correct across 97% of pixels!
-- Global pixel-wise accuracy: &gt; 97%!
-- Actual defects detected: ZERO (Dice score = 0.00)!
-</code></pre></div>
-<p>Because BCE treats every pixel as an independent training sample and sums their errors, the overwhelming multitude of background pixels generates hundreds of times more cumulative gradient mass than the sparse defect pixels. The gradient updates push all output logits toward large negative values (<span class="arithmatex">\(z_i \to -\infty\)</span>), causing the network to ignore foreground anomalies completely.</p>
-<hr />
-<h2 id="2-theoretical-principles-the-differentiable-soft-dice-loss">2. Theoretical Principles: The Differentiable Soft Dice Loss</h2>
-<p>To optimize models directly for segmentation overlap rather than independent pixel classification, Milletari et al. (2016) proposed <strong>Soft Dice Loss</strong> (V-Net).</p>
-<p>The classical Sorensen–Dice coefficient between two binary sets <span class="arithmatex">\(P\)</span> and <span class="arithmatex">\(Y\)</span> is defined as:</p>
-<div class="arithmatex">\[\text{Dice}(P, Y) = \frac{2 |P \cap Y|}{|P| + |Y|}\]</div>
-<p>However, thresholding predicted logits into hard binary masks <span class="arithmatex">\(\hat{y}_i \in \{0, 1\}\)</span> uses a step function whose mathematical derivative is zero everywhere (and undefined at the boundary). You cannot backpropagate gradients through a step function.</p>
-<h3 id="soft-continuous-relaxation">Soft Continuous Relaxation</h3>
-<p>To make Dice fully differentiable, Soft Dice replaces discrete binary values <span class="arithmatex">\(\hat{y}_i\)</span> with <strong>continuous predicted probabilities <span class="arithmatex">\(p_i = \sigma(z_i) \in [0, 1]\)</span></strong>:</p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}}(P, Y) = 1 - \frac{2 \sum_{i=1}^N p_i y_i + \epsilon}{\sum_{i=1}^N p_i + \sum_{i=1}^N y_i + \epsilon}\]</div>
-<p>where:</p>
-<ul>
-<li><span class="arithmatex">\(N\)</span> is the total number of pixels in the patch or batch.</li>
-<li><span class="arithmatex">\(y_i \in \{0, 1\}\)</span> is the binary ground-truth annotation.</li>
-<li><span class="arithmatex">\(p_i \in [0, 1]\)</span> is the continuous Sigmoid probability predicted for pixel <span class="arithmatex">\(i\)</span>.</li>
-<li><span class="arithmatex">\(\sum_{i=1}^N p_i y_i\)</span> is the continuous relaxation of the intersection <span class="arithmatex">\(|P \cap Y|\)</span>.</li>
-<li><span class="arithmatex">\(\sum_{i=1}^N p_i\)</span> is the total predicted foreground probability volume.</li>
-<li><span class="arithmatex">\(\sum_{i=1}^N y_i\)</span> is the total true defect pixel mass.</li>
-<li><span class="arithmatex">\(\epsilon &gt; 0\)</span> is the <strong>Laplace additive smoothing parameter</strong>.</li>
-</ul>
-<hr />
-<h2 id="3-the-function-of-laplace-smoothing-epsilon-10">3. The Function of Laplace Smoothing (<span class="arithmatex">\(\epsilon = 1.0\)</span>)</h2>
-<p>The smoothing constant <span class="arithmatex">\(\epsilon\)</span> serves two vital mathematical purposes:</p>
-<h3 id="1-eliminating-division-by-zero-on-defect-free-strips">1. Eliminating Division by Zero on Defect-Free Strips</h3>
-<p>When processing a completely clean steel strip with zero defect pixels (<span class="arithmatex">\(|Y| = \sum y_i = 0\)</span>):</p>
-<ul>
-<li>If the model correctly predicts no defects (<span class="arithmatex">\(\sum p_i = 0\)</span>), the un-smoothed denominator evaluates to <span class="arithmatex">\(0 + 0 = 0\)</span>, causing a catastrophic <code>NaN</code> exception.</li>
-<li>
-<p>With Laplace smoothing (<span class="arithmatex">\(\epsilon = 1.0\)</span>), the quotient becomes:</p>
-<div class="arithmatex">\[\text{Dice} = \frac{2(0) + 1.0}{0 + 0 + 1.0} = \frac{1.0}{1.0} = 1.0 \implies \mathcal{L}_{\text{Dice}} = 1.0 - 1.0 = 0.0\]</div>
-<p>The model receives a perfect loss of 0 for accurately predicting an empty mask.</p>
-</li>
-</ul>
-<h3 id="2-gradient-regularization-on-microscopic-defects">2. Gradient Regularization on Microscopic Defects</h3>
-<p>When an anomaly occupies only a handful of pixels (e.g., <span class="arithmatex">\(|Y| = 5\)</span>), small fluctuations in predicted probability cause huge swings in the un-smoothed denominator. Additive smoothing anchors the denominator, preventing explosive gradient spikes during early training.</p>
-<hr />
-<h2 id="4-diagnostic-walkthrough-lazy-model-vs-accurate-model">4. Diagnostic Walkthrough: Lazy Model vs. Accurate Model</h2>
-<p>To understand how Soft Dice penalizes different failure modes, consider a synthetic image patch of <span class="arithmatex">\(N = 10{,}000\)</span> pixels containing:</p>
-<ul>
-<li><strong><span class="arithmatex">\(100\)</span> true defect pixels:</strong> <span class="arithmatex">\(y_i = 1\)</span></li>
-<li><strong><span class="arithmatex">\(9{,}900\)</span> clean background pixels:</strong> <span class="arithmatex">\(y_i = 0\)</span></li>
-<li><strong>Laplace smoothing:</strong> <span class="arithmatex">\(\epsilon = 1.0\)</span></li>
-</ul>
-<p>Let us analyze two contrasting model behaviors:</p>
-<h3 id="scenario-1-lazy-model-uniform-background-leakage">Scenario 1: Lazy Model (Uniform Background Leakage)</h3>
-<p>A lazy or under-trained model predicts a small constant probability of <span class="arithmatex">\(p_i = 0.01\)</span> everywhere across all <span class="arithmatex">\(10{,}000\)</span> pixels.</p>
-<ul>
-<li>
-<p><strong>Intersection Term:</strong> The model predicts <span class="arithmatex">\(0.01\)</span> on the 100 true defect pixels:</p>
-<div class="arithmatex">\[\sum_{i=1}^N p_i y_i = 100 \times 0.01 = 1.0\]</div>
-</li>
-<li>
-<p><strong>Predicted Probability Mass:</strong> The model predicts <span class="arithmatex">\(0.01\)</span> across all <span class="arithmatex">\(10{,}000\)</span> pixels:</p>
-<div class="arithmatex">\[\sum_{i=1}^N p_i = 10{,}000 \times 0.01 = 100.0\]</div>
-</li>
-<li>
-<p><strong>Ground Truth Mass:</strong></p>
-<div class="arithmatex">\[\sum_{i=1}^N y_i = 100 \times 1.0 = 100.0\]</div>
-</li>
-<li>
-<p><strong>Smoothed Dice Coefficient:</strong></p>
-<div class="arithmatex">\[\text{Dice} = \frac{2 \times 1.0 + 1.0}{100.0 + 100.0 + 1.0} = \frac{3.0}{201.0} \approx 0.014925\]</div>
-</li>
-<li>
-<p><strong>Soft Dice Loss:</strong></p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1.0 - \text{Dice} = 1.0 - 0.014925 = 0.985075 \approx 0.9851\]</div>
-</li>
-</ul>
-<p><strong>Key Takeaway:</strong> Notice how harshly Soft Dice punishes the lazy model! Even though the predicted probability is tiny (<span class="arithmatex">\(1\%\)</span>), accumulating <span class="arithmatex">\(0.01\)</span> across <span class="arithmatex">\(9{,}900\)</span> background pixels inflates the denominator by <span class="arithmatex">\(99.0\)</span>, driving the Dice score down near zero (<span class="arithmatex">\(\text{Loss} \approx 0.9851\)</span>).</p>
-<h3 id="scenario-2-accurate-model-high-precision-recall">Scenario 2: Accurate Model (High Precision &amp; Recall)</h3>
-<p>An accurate model predicts high probability <span class="arithmatex">\(p_i = 0.90\)</span> on all 100 defect pixels, and cleanly suppresses background noise with <span class="arithmatex">\(p_i = 0.00\)</span> on all <span class="arithmatex">\(9{,}900\)</span> background pixels.</p>
-<ul>
-<li>
-<p><strong>Intersection Term:</strong></p>
-<div class="arithmatex">\[\sum_{i=1}^N p_i y_i = 100 \times 0.90 = 90.0\]</div>
-</li>
-<li>
-<p><strong>Predicted Probability Mass:</strong></p>
-<div class="arithmatex">\[\sum_{i=1}^N p_i = 100 \times 0.90 + 9{,}900 \times 0.00 = 90.0\]</div>
-</li>
-<li>
-<p><strong>Ground Truth Mass:</strong></p>
-<div class="arithmatex">\[\sum_{i=1}^N y_i = 100.0\]</div>
-</li>
-<li>
-<p><strong>Smoothed Dice Coefficient:</strong></p>
-<div class="arithmatex">\[\text{Dice} = \frac{2 \times 90.0 + 1.0}{90.0 + 100.0 + 1.0} = \frac{181.0}{191.0} \approx 0.947644\]</div>
-</li>
-<li>
-<p><strong>Soft Dice Loss:</strong></p>
-<div class="arithmatex">\[\mathcal{L}_{\text{Dice}} = 1.0 - \text{Dice} = 1.0 - 0.947644 = 0.052356 \approx 0.0524\]</div>
-</li>
-</ul>
-<p><strong>Key Takeaway:</strong> By keeping background predictions strictly clean (<span class="arithmatex">\(\sum_{\text{bg}} p_i = 0\)</span>), the denominator remains tight and aligned with the true foreground mass, achieving an outstanding loss of <span class="arithmatex">\(\approx 0.0524\)</span>.</p>
-<hr />
-<h2 id="5-guiding-hints-for-question-5">5. Guiding Hints for Question 5</h2>
-<p>To solve Question 5 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
-<ul>
-<li><strong>Hint 1 (Break Down the Three Sums):</strong> For any model, calculate the three core components separately:<ol>
-<li><span class="arithmatex">\(\text{Intersection} = \sum p_i y_i\)</span></li>
-<li><span class="arithmatex">\(\text{Pred\_Sum} = \sum p_i\)</span></li>
-<li><span class="arithmatex">\(\text{Target\_Sum} = \sum y_i\)</span></li>
-</ol>
-</li>
-<li>
-<p><strong>Hint 2 (Apply Formula Faithfully):</strong> Formulate the quotient:</p>
-<div class="arithmatex">\[\mathcal{L} = 1.0 - \frac{2 \times \text{Intersection} + 1.0}{\text{Pred\_Sum} + \text{Target\_Sum} + 1.0}\]</div>
-</li>
-<li>
-<p><strong>Hint 3 (Precision &amp; Rounding):</strong> Compute each quotient to at least 6 decimal places before rounding the final loss values to <strong>4 decimal places</strong> (e.g., <code>0.XXXX, 0.YYYY</code>).</p>
-</li>
-</ul>
-<hr />
-<h2 id="6-your-assignment-task">6. Your Assignment Task</h2>
+<h2 id="1-sparse-foreground-and-the-objective">1. Sparse Foreground and the Objective</h2>
+<p>A model can attain high pixel accuracy on a sparse-defect dataset by predicting background too often. This does not make all-background prediction the mathematical optimum of BCE: a missed positive pixel still has a nonzero logit gradient. At an exactly zero predicted probability on a positive target, ideal BCE is unbounded. The practical concern is imbalance in aggregate contributions and shared-parameter updates, not an absence of a foreground penalty.</p>
+<p>Measure class and pixel distributions yourself. This guide's numerical examples are fictional and reveal no competition statistics.</p>
+<h2 id="2-from-hard-overlap-to-a-differentiable-loss">2. From Hard Overlap to a Differentiable Loss</h2>
+<p>Binary Dice compares a predicted set <span class="arithmatex">\(X\)</span> and target set <span class="arithmatex">\(Y\)</span>:</p>
+<div class="arithmatex">\[D(X,Y)=\frac{2|X\cap Y|}{|X|+|Y|}.\]</div>
+<p>Thresholding probabilities creates a step function, so hard Dice is unsuitable as a direct differentiable training loss. In the assessment's Soft Dice, use probabilities <span class="arithmatex">\(p_i=\sigma(z_i)\)</span>:</p>
+<div class="arithmatex">\[L_D=1-\frac{2\sum_i p_i y_i+\epsilon}{\sum_i p_i+\sum_i y_i+\epsilon}.\]</div>
+<p>Compute three quantities before substituting: intersection <span class="arithmatex">\(I=\sum p_i y_i\)</span>, predicted mass <span class="arithmatex">\(P=\sum p_i\)</span>, and target mass <span class="arithmatex">\(T=\sum y_i\)</span>. Then <span class="arithmatex">\(L_D=1-(2I+\epsilon)/(P+T+\epsilon)\)</span>.</p>
+<p><strong>Reduction matters.</strong> The supplied <code>SoftDiceLoss</code> flattens all batch, channel and spatial dimensions into one global ratio. It is not an average of per-image or per-class Dice losses. Document that reduction when comparing implementations; a clean image inside a mixed batch is coupled to positives elsewhere in the batch.</p>
+<h2 id="3-what-smoothing-changes">3. What Smoothing Changes</h2>
+<p>With <span class="arithmatex">\(\epsilon&gt;0\)</span>, an entirely empty reduction (<span class="arithmatex">\(P=T=0\)</span>) gives Dice 1 and loss 0. Without smoothing the ratio is undefined. Smoothing also changes losses and gradients for small objects; its numerical value is part of the objective, not just a harmless implementation detail.</p>
+<p>Smoothing does not guarantee stable optimization under every probability distribution. Read <a href="guide_07_compound_loss_and_clean_image_dynamics.html">Guide 7</a> to distinguish the value of a loss from its gradient.</p>
+<p><img alt="Toy loss curves for missed foreground, false positives and empty targets" src="assets/fig06_loss_landscapes_bce_vs_dice.png" /></p>
+<p><em>These are synthetic probability sweeps, not training results. The first two panels use different y-axis scales for BCE and Dice, so compare trends rather than line heights. A steep-looking loss curve does not establish a steep logit gradient.</em></p>
+<h2 id="4-worked-practice-with-different-inputs">4. Worked Practice with Different Inputs</h2>
+<p>Use a fictional <strong>20-pixel patch with 4 positives</strong>, smoothing <span class="arithmatex">\(\epsilon=1\)</span>.</p>
+<p><strong>Model U</strong> predicts 0.2 at every pixel. Then <span class="arithmatex">\(I=4\cdot0.2=0.8\)</span>, <span class="arithmatex">\(P=20\cdot0.2=4\)</span>, and <span class="arithmatex">\(T=4\)</span>. Thus:</p>
+<div class="arithmatex">\[L_D=1-\frac{2(0.8)+1}{4+4+1}=1-\frac{2.6}{9}\approx0.7111.\]</div>
+<p><strong>Model V</strong> predicts 0.75 at the four positives and 0.05 at the sixteen negatives. Then <span class="arithmatex">\(I=3\)</span>, <span class="arithmatex">\(P=3+0.8=3.8\)</span>, and <span class="arithmatex">\(T=4\)</span>:</p>
+<div class="arithmatex">\[L_D=1-\frac{2(3)+1}{3.8+4+1}=1-\frac{7}{8.8}\approx0.2045.\]</div>
+<p>Even small background probabilities contribute to <span class="arithmatex">\(P\)</span>. Foreground confidence contributes both to <span class="arithmatex">\(P\)</span> and to the overlap numerator. This explains the distinct effects of missed foreground and background leakage.</p>
+<details>
+<summary>Practice: Model V now predicts zero on background. How does the loss change?</summary>
+<p>Now <span class="arithmatex">\(P=3\)</span>, <span class="arithmatex">\(I=3\)</span>, <span class="arithmatex">\(T=4\)</span>, so <span class="arithmatex">\(L_D=1-7/8=0.125\)</span>. Removing background leakage improves overlap without changing foreground confidence. These practice values differ from the assessment.</p>
+</details>
+<h2 id="5-verify-the-practice-calculation">5. Verify the Practice Calculation</h2>
+<pre class="highlight"><code class="language-python">import torch
+p = torch.full((20,), 0.2, dtype=torch.float64)
+y = torch.zeros_like(p)
+y[:4] = 1
+loss = 1 - (2 * (p * y).sum() + 1) / (p.sum() + y.sum() + 1)
+print(float(loss))</code></pre>
+<p>This probability-based snippet is for arithmetic only. The official loss accepts raw logits and applies sigmoid internally. Applying sigmoid before calling that loss would apply it twice.</p>
+<h2 id="6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</h2>
 <ol>
-<li>Open <a href="milestone-3.html#question-5-differentiable-soft-dice-loss-numerical-smoothing">Milestone 3 Assessment: Question 5</a>.</li>
-<li>Calculate the exact Soft Dice Loss for Lazy Model 1 (<span class="arithmatex">\(p_i = 0.01\)</span> everywhere).</li>
-<li>Calculate the exact Soft Dice Loss for Accurate Model 2 (<span class="arithmatex">\(p_i = 0.90\)</span> on defects, <span class="arithmatex">\(p_i = 0.00\)</span> on background).</li>
-<li>Round both results to 4 decimal places and enter your response: <code>loss_model1, loss_model2</code>.</li>
+<li>Read <a href="milestone-3.html#question-5-differentiable-soft-dice-loss-numerical-smoothing">Question 5</a>.</li>
+<li>For each assessment model, calculate <span class="arithmatex">\(I\)</span>, <span class="arithmatex">\(P\)</span> and <span class="arithmatex">\(T\)</span> using the question's own population and probabilities.</li>
+<li>Substitute into the specified smoothed formula; retain precision until the final rounding to four decimal places.</li>
+<li>Report <code>loss_model1, loss_model2</code>. Do not reuse the practice patch's losses.</li>
 </ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html">← Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_06_output_heads_and_target_semantics.html">Q6 · Output Heads &amp; Target Semantics →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>

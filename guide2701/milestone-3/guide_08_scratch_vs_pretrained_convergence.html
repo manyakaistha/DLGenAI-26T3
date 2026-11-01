@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -30,100 +39,62 @@
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 8 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
 <span class="section-label">Concept guide 08 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
 <ul>
-<li><a href="#1-the-core-concept-controlled-empirical-benchmarking">1. The Core Concept: Controlled Empirical Benchmarking</a></li>
-<li><a href="#2-theoretical-principles-convergence-dynamics-generalization">2. Theoretical Principles: Convergence Dynamics &amp; Generalization</a></li>
-<li><a href="#3-implementation-workflow-in-pytorch">3. Implementation Workflow in PyTorch</a></li>
-<li><a href="#4-guiding-hints-for-question-8">4. Guiding Hints for Question 8</a></li>
-<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+<li><a href="#1-ask-a-question-the-experiment-can-answer">1. Ask a Question the Experiment Can Answer</a></li>
+<li><a href="#2-fix-the-protocol-before-looking-at-results">2. Fix the Protocol Before Looking at Results</a></li>
+<li><a href="#3-use-the-official-weighted-metric">3. Use the Official Weighted Metric</a></li>
+<li><a href="#4-read-learning-curves-without-predicting-their-outcome">4. Read Learning Curves without Predicting Their Outcome</a></li>
+<li><a href="#5-worked-practice-on-fictional-logs">5. Worked Practice on Fictional Logs</a></li>
+<li><a href="#6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</a></li>
 </ul>
 </div>
 </details>
 <article><h1 id="scratch-baseline-vs-pretrained-transfer-learning">Scratch Baseline vs. Pretrained Transfer Learning</h1>
 <p><em>(Milestone 3 · Question 8 Study Guide)</em></p>
-<hr />
-<h2 id="1-the-core-concept-controlled-empirical-benchmarking">1. The Core Concept: Controlled Empirical Benchmarking</h2>
-<p>In Milestone 2, you trained a basic convolutional U-Net from scratch. In Milestone 3, you introduce transfer learning by integrating an ImageNet-pretrained <strong>ResNet-34</strong> backbone into your segmentation model.</p>
-<p>To establish the empirical value of transfer learning scientifically, you must conduct a <strong>controlled comparison</strong>: keeping all dataset splits, augmentations, optimizers, learning rates, loss functions, and batch sizes strictly identical, altering <strong>only the weight initialization (from-scratch vs. ImageNet-pretrained)</strong>.</p>
-<div class="highlight"><pre><span></span><code>Fair Benchmarking Protocol:
-- Architecture:          U-Net
-- Backbones Compared:    From-Scratch (Random Init) vs. Pretrained ResNet-34 (ImageNet)
-- Input Adaptation:      Grayscale in_channels=1
-- Loss Function:         Compound Loss (0.5 * BCE + 0.5 * SoftDice, smooth=1.0)
-- Optimizer:             AdamW (lr=3e-4, weight_decay=1e-2)
-- Batch Size:            16
-- Training Horizon:      5 Epochs
-</code></pre></div>
-<hr />
-<h2 id="2-theoretical-principles-convergence-dynamics-generalization">2. Theoretical Principles: Convergence Dynamics &amp; Generalization</h2>
-<p>When evaluating learning curves across epochs, machine learning engineers track three primary diagnostic phenomena:</p>
-<h3 id="1-feature-acquisition-speed-epoch-1-dynamics">1. Feature Acquisition Speed (Epoch 1 Dynamics)</h3>
-<ul>
-<li><strong>From-Scratch Model:</strong> Starts from Gaussian or uniform random noise (e.g., Kaiming/He normal initialization). During Epoch 1, gradients must first organize basic orientation filters, edge detectors, and localized texture responses. Loss starts high, predictions are near zero or noisy, and foreground Dice on rare defects is close to 0.0.</li>
-<li><strong>Pretrained ResNet-34:</strong> Enters training with over 21 million parameters already tuned to detect universal visual boundaries, ridges, and contrast gradients. Within the very first epoch, the decoder learns to tap into these pre-existing representations, achieving immediate foreground feature activation and substantially higher Epoch 1 Dice scores.</li>
-</ul>
-<h3 id="2-generalization-gap-l_textval-l_texttrain">2. Generalization Gap (<span class="arithmatex">\(|L_{\text{val}} - L_{\text{train}}|\)</span>)</h3>
-<p>The <strong>generalization gap</strong> measures the difference between training loss and validation loss:</p>
-<div class="arithmatex">\[\Delta_{\text{gen}} = |L_{\text{val}} - L_{\text{train}}|\]</div>
-<ul>
-<li>In from-scratch training on small, sparse defect datasets, models are susceptible to memorizing idiosyncratic background noise or specific training sheet artifacts, leading to divergence between training and validation trajectories (overfitting).</li>
-<li>Pretrained weights act as a powerful form of <strong>implicit inductive regularization</strong>: because the feature representations were shaped on over 1.2 million natural images, the network is constrained to robust visual primitives that generalize more reliably to unseen validation splits, yielding a <strong>tighter generalization gap</strong>.</li>
-</ul>
-<h3 id="3-asymptotic-performance-competition-score-gains">3. Asymptotic Performance &amp; Competition Score Gains</h3>
-<p>By Epoch 5:</p>
-<ul>
-<li>The scratch model is still struggling to optimize both low-level filters and high-level segmentation heads simultaneously.</li>
-<li>The pretrained model converges to a substantially lower validation loss and a markedly higher official competition score (mean Dice over classes with empty-mask evaluation). On typical industrial defect benchmarks, transfer learning delivers an immediate jump of <strong><span class="arithmatex">\(+0.02\text{ to }+0.08\)</span></strong> in competition score over a scratch baseline.</li>
-</ul>
-<hr />
-<h2 id="3-implementation-workflow-in-pytorch">3. Implementation Workflow in PyTorch</h2>
-<p>To train and evaluate both models consistently:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">segmentation_models_pytorch</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smp</span>
+<h2 id="1-ask-a-question-the-experiment-can-answer">1. Ask a Question the Experiment Can Answer</h2>
+<p>Pretraining can supply useful visual features, but a domain shift, different normalization or a short training budget can change the outcome. Faster convergence, a smaller generalization gap and a higher score are <strong>hypotheses to measure</strong>. There is no predetermined winner or score-improvement band.</p>
+<p>For Q8, compare the <strong>same SMP ResNet-34 U-Net architecture</strong> with random versus ImageNet encoder initialization. This isolates encoder initialization; comparing a different basic U-Net from Milestone 2 would also change architecture and would not isolate pretraining.</p>
+<p>A useful experiment matrix has one row per run and columns for initialization, backbone, split, seed, loss, training settings and evaluation rules. Mark the one column allowed to change before training. This prevents accidental changes such as freezing only one model or applying a threshold sweep to only one result.</p>
+<h2 id="2-fix-the-protocol-before-looking-at-results">2. Fix the Protocol Before Looking at Results</h2>
+<p>Use the <a href="milestone-3.html#3-common-training-protocol-for-questions-8-9">assessment protocol</a>: the same saved split, image preprocessing, augmentation policy, sample order, batch size, optimizer, epochs and metric. The assessment fixes native single-channel [0,1] input, no augmentations, full precision, all parameters trainable, normal training-mode BatchNorm, and threshold 0.5 with no area filter. Q2's frozen encoder is a parameter-count exercise, not the training configuration for Q8.</p>
+<pre class="highlight"><code class="language-python">import torch
+import segmentation_models_pytorch as smp
 
-<span class="c1"># Scratch U-Net (random initialization):</span>
-<span class="n">model_scratch</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
-    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>
-    <span class="n">encoder_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># None = Train from scratch!</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+def make_model(weights):
+    torch.manual_seed(42)
+    return smp.Unet(
+        encoder_name="resnet34", encoder_weights=weights,
+        encoder_depth=5, decoder_channels=(256, 128, 64, 32, 16),
+        decoder_use_norm="batchnorm", decoder_interpolation="nearest",
+        in_channels=1, classes=4, activation=None,
+    )
 
-<span class="c1"># Pretrained U-Net (ImageNet initialization):</span>
-<span class="n">model_pretrained</span> <span class="o">=</span> <span class="n">smp</span><span class="o">.</span><span class="n">Unet</span><span class="p">(</span>
-    <span class="n">encoder_name</span><span class="o">=</span><span class="s2">"resnet34"</span><span class="p">,</span>
-    <span class="n">encoder_weights</span><span class="o">=</span><span class="s2">"imagenet"</span><span class="p">,</span> <span class="c1"># ImageNet weights!</span>
-    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">classes</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-</code></pre></div>
-<p>Run both models through the standard 5-epoch training loop using the official <code>CompoundLoss</code> and <code>AdamW</code> settings from <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>. At the end of each epoch, record:</p>
-<ol>
-<li>Training Loss (<span class="arithmatex">\(L_{\text{train}}\)</span>)</li>
-<li>Validation Loss (<span class="arithmatex">\(L_{\text{val}}\)</span>)</li>
-<li>Validation Foreground Dice</li>
-<li>Competition Metric Score</li>
-</ol>
-<hr />
-<h2 id="4-guiding-hints-for-question-8">4. Guiding Hints for Question 8</h2>
-<p>To solve Question 8 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
+scratch = make_model(None)
+pretrained = make_model("imagenet")
+# Match decoder/head initialization explicitly to remove another source of variation.
+pretrained.decoder.load_state_dict(scratch.decoder.state_dict())
+pretrained.segmentation_head.load_state_dict(scratch.segmentation_head.state_dict())</code></pre>
+<p>Train one model at a time with a fresh optimizer. Reset the data-order generator and RNGs before each run. Do not reuse optimizer state or carry forward the Q2 freeze. Record library versions and the saved split; GPU kernels can still introduce small run-to-run differences.</p>
+<h2 id="3-use-the-official-weighted-metric">3. Use the Official Weighted Metric</h2>
+<p>Follow <a href="../../milestones/milestone-1/milestone-1.html#question-8-official-competition-weighted-metric-toy-batch-calculation">Milestone 1 Q8's definitions</a>:</p>
+<div class="arithmatex">\[Score=0.70\,ForegroundDice+0.20\,FalsePositiveScore+0.10\,EmptyAccuracy.\]</div>
 <ul>
-<li><strong>Hint 1 (Identify Winning Model at Epoch 5):</strong> Review your recorded validation curves at Epoch 5. Compare the validation loss and competition score between <code>model_pretrained</code> and <code>model_scratch</code>. Choose between <code>pretrained</code> and <code>scratch</code>.</li>
-<li><strong>Hint 2 (Epoch 1 Acquisition):</strong> Inspect your Epoch 1 logs. Which model achieved a substantially higher foreground Dice and lower loss in the first epoch? Choose between <code>pretrained</code> and <code>scratch</code>.</li>
-<li><strong>Hint 3 (Generalization Gap):</strong> Compute <span class="arithmatex">\(|L_{\text{val}} - L_{\text{train}}|\)</span> at Epoch 5 for both models. Does the pretrained model achieve a smaller difference (tighter gap) between training and validation loss compared to the scratch model? Choose <code>Yes</code> or <code>No</code>.</li>
-<li>
-<p><strong>Hint 4 (Score Improvement Range):</strong> Calculate the difference in competition score:</p>
-<div class="arithmatex">\[\Delta_{\text{score}} = \text{Score}_{\text{pretrained}} - \text{Score}_{\text{scratch}}\]</div>
-<p>Select the matching range from the provided options: <code>[&lt; +0.02, +0.02 to +0.08, &gt; +0.10]</code>.</p>
-</li>
+<li><strong>ForegroundDice:</strong> mean binary Dice over image-class pairs with a nonempty target.</li>
+<li><strong>FalsePositiveScore:</strong> one minus mean predicted-positive pixel fraction over ground-truth empty image-class pairs.</li>
+<li><strong>EmptyAccuracy:</strong> fraction of ground-truth empty pairs predicted completely empty.</li>
 </ul>
-<hr />
-<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
-<ol>
-<li>Open <a href="milestone-3.html#question-8-scratch-baseline-vs-pretrained-transfer-learning-empirical-training-convergence">Milestone 3 Assessment: Question 8</a>.</li>
-<li>Train both models for 5 epochs under identical hyperparameters.</li>
-<li>Compare Epoch 5 winning performance, Epoch 1 convergence speed, generalization gaps, and competition score improvements.</li>
-<li>Enter your response in the specified format: <code>winning_model; faster_epoch1_model; tighter_gap_yes_no; score_improvement_range</code>.</li>
-</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_compound_loss_and_clean_image_dynamics.html">← Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_09_backbone_architecture_tradeoffs.html">Q9 · Backbone Architecture Trade-offs →</a></nav>
+<p>Accumulate these components over the <strong>whole validation set</strong>, not equally over uneven batches. Check that the split contains positive and empty pairs; report a missing denominator rather than inventing a score. Do not substitute average Dice over all pairs or Soft Dice training loss for this weighted metric.</p>
+<p>Use sigmoid followed by <code>&gt;= 0.5</code> on every channel, with no connected-component filtering for this comparison. Compute the official score and foreground Dice from those binary masks.</p>
+<h2 id="4-read-learning-curves-without-predicting-their-outcome">4. Read Learning Curves without Predicting Their Outcome</h2>
+<p>At epochs 1 and 5 record foreground Dice, official score and validation loss. A higher score and lower loss need not select the same model: they measure different properties. Report the two winners separately, including ties.</p>
+<p>For the generalization comparison, evaluate <strong>both the training split and validation split in eval mode</strong> after the epoch, without augmentation. Average loss using the same fixed batch size and sample-weighted batch aggregation on both splits. This avoids comparing online training losses (collected while weights change and BatchNorm uses batch statistics) directly with an eval-mode loss. The Dice term is batch-coupled, so record the batching as well.</p>
+<p>Compute:</p>
+<div class="arithmatex">\[G=|L_{val,eval}-L_{train,eval}|.\]</div>
+<p>A smaller gap alone does not prove a better model: an underfit model can be equally poor on both sets. Read the gap alongside validation quality.</p>
+<h2 id="5-worked-practice-on-fictional-logs">5. Worked Practice on Fictional Logs</h2>
+<p>Suppose a toy experiment gives model R score 0.41 and model S score 0.40. Then <span class="arithmatex">\(\Delta Score=0.01\)</span> for R minus S. If R's train/validation eval losses are 0.30/0.34, its gap is 0.04. If S's are 0.33/0.35, its gap is 0.02. R has the better score but S has the tighter gap. These invented logs do not predict the assessment's outcome.</p>
+<h2 id="6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</h2>
+<p>Read <a href="milestone-3.html#question-8-scratch-baseline-vs-pretrained-transfer-learning-empirical-training-convergence">Question 8</a>. Keep a small per-epoch table containing model, seed, split ID, eval losses, foreground Dice and all three score components. At epoch 5 compute pretrained score minus scratch score, then choose the exhaustive band listed in the question.</p>
+<p>Report the measured loss winner, score winner, epoch-1 foreground-Dice winner, gap comparison and signed score difference. Unexpected results are valid when your setup and measurements are documented. Do not select an answer based on a theoretical expectation.</p></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_07_compound_loss_and_clean_image_dynamics.html">← Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_09_backbone_architecture_tradeoffs.html">Q9 · Backbone Architecture Trade-offs →</a></nav>
 <footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
 <path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
 <g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>

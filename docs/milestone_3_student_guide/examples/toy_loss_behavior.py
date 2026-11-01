@@ -35,7 +35,7 @@ def run_toy_loss_experiments():
     bce_val_1 = bce_fn(logits_missed, target_1).item()
     dice_val_1 = soft_dice_loss(probs_missed, target_1).item()
     print("Scenario 1: Missed Small Defect (1 px defect on 16 px canvas)")
-    print(f"  • BCE Loss:       {bce_val_1:.4f}  (dominated by 15 background pixels!)")
+    print(f"  • BCE Loss:       {bce_val_1:.4f}  (mean includes missed-positive and background penalties)")
     print(f"  • Soft Dice Loss: {dice_val_1:.4f}  (heavily penalizes low overlap ratio)")
     print()
 
@@ -69,7 +69,7 @@ def run_toy_loss_experiments():
     print("Scenario 3: All-Empty Mask with Subtle Noise (prob ~ 0.12 across canvas)")
     print(f"  • BCE Loss:       {bce_val_3:.4f}")
     print(f"  • Soft Dice Loss: {dice_val_3:.4f}")
-    print(f"    (Soft Dice acts as L1-penalty: sum(P) / (sum(P) + eps) = {probs_empty.sum().item():.2f} / ({probs_empty.sum().item():.2f} + 1))")
+    print(f"    (All-empty Dice is a saturating function of total probability: sum(P) / (sum(P) + eps) = {probs_empty.sum().item():.2f} / ({probs_empty.sum().item():.2f} + 1))")
 
 
 if __name__ == "__main__":

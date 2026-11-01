@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="site.css">
 <link rel="stylesheet" href="styles/generative/theme.css">
 <link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
 <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
@@ -44,18 +53,17 @@
 <h2 id="1-the-engineering-dilemma-hairline-cracks-vs-massive-diffuse-patches">1. The Engineering Dilemma: Hairline Cracks vs. Massive Diffuse Patches</h2>
 <p>In industrial surface defect inspection, anomalies exhibit extreme scale divergence across classes:</p>
 <ul>
-<li><strong><code>defect_a</code> (Hairline Scratches):</strong> High-frequency, sub-millimeter cracks that are only <strong>1 to 3 pixels wide</strong>, requiring precise sub-pixel boundary localization.</li>
-<li><strong><code>defect_c</code> (Diffuse Inclusions &amp; Oxide Patches):</strong> Low-frequency, sprawling textures that span <strong>hundreds of pixels</strong> across the <span class="arithmatex">\(128 \times 800\)</span> steel ribbon, requiring extensive contextual awareness to distinguish subtle discolored sheen from normal surface reflection.</li>
+<li><strong>Fictional thin scratch:</strong> High-frequency, sub-millimeter cracks that are only <strong>1 to 3 pixels wide</strong>, requiring precise sub-pixel boundary localization.</li>
+<li><strong>Fictional diffuse patch:</strong> Low-frequency, sprawling textures that span <strong>hundreds of pixels</strong> across the <span class="arithmatex">\(128 \times 800\)</span> steel ribbon, requiring extensive contextual awareness to distinguish subtle discolored sheen from normal surface reflection.</li>
 </ul>
-<p>In standard convolutional architectures (like traditional U-Nets), the network expands its receptive field solely through <strong>aggressive spatial downsampling</strong> (pooling and strided convolutions).</p>
-<div class="highlight"><pre><span></span><code>The Traditional Downsampling Paradox:
+<p>In a U-Net, both stacked convolutions and spatial downsampling expand the receptive field. Skip connections carry higher-resolution features around the bottleneck. Atrous convolution offers another way to gather wider context without another downsampling operation.</p>
+<pre class="highlight"><code class="language-text">The Traditional Downsampling Paradox:
 Input (128x800) ──► Pooling (32x) ──► Receptive field is large enough for Defect C,
                                        BUT spatial resolution drops to (4x25).
-                                       Hairline scratches (1-3 px) are completely obliterated!
-</code></pre></div>
+                                       Fine boundaries may become harder to localize from this coarse tensor alone.</code></pre>
 <p>If you do not downsample, the receptive field of standard <span class="arithmatex">\(3 \times 3\)</span> convolutions grows linearly and slowly:</p>
 <div class="arithmatex">\[\text{Receptive Field} = 1 + L \times (k - 1)\]</div>
-<p>To achieve a receptive field of 100 pixels with standard <span class="arithmatex">\(3 \times 3\)</span> convolutions without downsampling, you would need over 50 stacked convolutional layers, causing prohibitive latency, memory bloat, and vanishing gradients.</p>
+<p>To achieve a receptive field of 100 pixels with standard <span class="arithmatex">\(3 \times 3\)</span> convolutions without downsampling, you would need 50 stacked convolutional layers, which can be expensive; actual latency and optimization depend on the implementation.</p>
 <hr />
 <h2 id="2-mathematical-principles-atrous-dilated-convolutions">2. Mathematical Principles: Atrous (Dilated) Convolutions</h2>
 <p>To break this fundamental trade-off between <strong>receptive field size</strong> and <strong>spatial resolution</strong>, Chen et al. introduced <strong>Atrous (Dilated) Convolutions</strong> in the DeepLab family of architectures (<em>atrous</em> is derived from the French <em>à trous</em>, meaning "with holes").</p>
@@ -64,11 +72,10 @@ Input (128x800) ──► Pooling (32x) ──► Receptive field is large enoug
 <li>When <span class="arithmatex">\(r = 1\)</span>, the convolution is a standard dense convolution with adjacent kernel taps.</li>
 <li>When <span class="arithmatex">\(r &gt; 1\)</span>, the kernel expands its spatial footprint by inserting <span class="arithmatex">\(r - 1\)</span> spaces ("holes") between consecutive filter weights along each spatial axis.</li>
 </ul>
-<div class="highlight"><pre><span></span><code>1D Visual Schematic of Kernel Dilation (k=3):
+<pre class="highlight"><code class="language-text">1D Visual Schematic of Kernel Dilation (k=3):
 r = 1 (Standard):    [ W0 ] [ W1 ] [ W2 ]                 Footprint = 3 pixels
 r = 2 (Dilation=2):  [ W0 ]   ·   [ W1 ]   ·   [ W2 ]     Footprint = 5 pixels
-r = 3 (Dilation=3):  [ W0 ]   ·     ·   [ W1 ]   ·     ·   [ W2 ] Footprint = 7 pixels
-</code></pre></div>
+r = 3 (Dilation=3):  [ W0 ]   ·     ·   [ W1 ]   ·     ·   [ W2 ] Footprint = 7 pixels</code></pre>
 <h3 id="derivation-of-the-effective-spatial-footprint-k">Derivation of the Effective Spatial Footprint (<span class="arithmatex">\(k'\)</span>)</h3>
 <p>Consider a 1D or 2D convolutional filter with kernel size <span class="arithmatex">\(k\)</span> and dilation rate <span class="arithmatex">\(r\)</span>:</p>
 <ol>
@@ -86,20 +93,20 @@ r = 3 (Dilation=3):  [ W0 ]   ·     ·   [ W1 ]   ·     ·   [ W2 ] Footprint 
 <li>If <span class="arithmatex">\(k = 3, r = 2\)</span>: <span class="arithmatex">\(k' = 3 + (3 - 1)(2 - 1) = 3 + 2 = 5\)</span>.</li>
 <li>If <span class="arithmatex">\(k = 3, r = 3\)</span>: <span class="arithmatex">\(k' = 3 + (3 - 1)(3 - 1) = 3 + 4 = 7\)</span>.</li>
 </ul>
-<h3 id="the-computational-miracle-zero-parameter-flop-penalty">The Computational Miracle: Zero Parameter &amp; FLOP Penalty</h3>
-<p>Notice a crucial architectural property: <strong>the number of trainable parameters and arithmetic multiply-accumulate operations (MACs) remains strictly identical regardless of <span class="arithmatex">\(r\)</span>!</strong></p>
+<h3 id="parameter-count-at-fixed-feature-resolution">Parameter Count at Fixed Feature Resolution</h3>
+<p>For equal input/output channels, groups, kernel size and <strong>output feature dimensions</strong>, changing dilation leaves the parameter count and nominal MAC count unchanged. Appropriate padding is needed to preserve output dimensions. Actual latency can differ, and parallel ASPP branches add work compared with one branch.</p>
 <ul>
 <li>A standard <span class="arithmatex">\(3 \times 3\)</span> kernel contains <span class="arithmatex">\(3 \times 3 = 9\)</span> weights.</li>
-<li>A dilated <span class="arithmatex">\(3 \times 3\)</span> kernel with <span class="arithmatex">\(r = 12\)</span> covers an effective footprint of <span class="arithmatex">\(25 \times 25\)</span> pixels (<span class="arithmatex">\(625\)</span> canvas locations), but it still contains <strong>only 9 non-zero weights</strong>.</li>
-<li>A dense <span class="arithmatex">\(25 \times 25\)</span> convolution would require <span class="arithmatex">\(625\)</span> weights—an increase of nearly <strong><span class="arithmatex">\(70\times\)</span> in parameters and computation</strong>. Atrous convolution captures the exact same macroscopic spatial span with zero parameter overhead!</li>
+<li>A toy dilated <span class="arithmatex">\(3 \times 3\)</span> kernel with <span class="arithmatex">\(r = 4\)</span> has a <span class="arithmatex">\(9 \times 9\)</span> footprint, but still samples <strong>9 locations per input/output channel pair</strong>.</li>
+<li>A dense <span class="arithmatex">\(9 \times 9\)</span> kernel samples 81 locations per channel pair. The dilated kernel spans the same extent but does not inspect every location; sparse sampling can miss small structures.</li>
 </ul>
 <hr />
 <h2 id="3-deeplabv3-atrous-spatial-pyramid-pooling-aspp">3. DeepLabV3+ &amp; Atrous Spatial Pyramid Pooling (ASPP)</h2>
 <p>Rather than choosing a single dilation rate, <strong>DeepLabV3+</strong> captures multi-scale context simultaneously using an <strong>Atrous Spatial Pyramid Pooling (ASPP)</strong> module placed at the encoder bottleneck.</p>
-<div class="highlight"><pre><span></span><code>DeepLabV3+ ASPP Architecture:
+<pre class="highlight"><code class="language-text">DeepLabV3+ ASPP Architecture:
 Bottleneck Features [C_in, H, W]
        │
-       ├──► 1x1 Conv (r=1)                     ──────────► [C_out, H, W] (Local details / 1-3 px cracks)
+       ├──► 1x1 Conv (r=1)                     ──────────► [C_out, H, W] (Local feature mixing)
        ├──► 3x3 Dilated Conv (r=6)             ──────────► [C_out, H, W] (Intermediate scratch context)
        ├──► 3x3 Dilated Conv (r=12)            ──────────► [C_out, H, W] (Large diffuse defect context)
        ├──► 3x3 Dilated Conv (r=18)            ──────────► [C_out, H, W] (Global ribbon context)
@@ -109,14 +116,13 @@ Bottleneck Features [C_in, H, W]
                                                                  │
                                                        1x1 Projection Conv
                                                                  ▼
-                                                  Multi-Scale Fused Representation
-</code></pre></div>
-<h3 id="why-aspp-outperforms-traditional-pooling-bottlenecks">Why ASPP Outperforms Traditional Pooling Bottlenecks</h3>
+                                                  Multi-Scale Fused Representation</code></pre>
+<h3 id="what-aspp-adds-to-a-bottleneck">What ASPP Adds to a Bottleneck</h3>
 <ol>
 <li><strong>Parallel Multi-Scale Processing:</strong> Instead of forcing all features through a single bottleneck scale, ASPP queries the feature representation at multiple sampling rates in parallel.</li>
-<li><strong>Preservation of Fine Details:</strong> Small dilation branches (<span class="arithmatex">\(r=1, r=6\)</span>) maintain fine, localized spatial gradients to segment hairline scratches (<code>defect_a</code>).</li>
-<li><strong>Macroscopic Texture Aggregation:</strong> Large dilation branches (<span class="arithmatex">\(r=12, r=18\)</span>) gather contextual contrast across hundreds of pixels to confirm diffuse anomalies (<code>defect_c</code>).</li>
-<li><strong>Resolution Retention:</strong> The entire operation is performed without further spatial downsampling, avoiding boundary degradation.</li>
+<li><strong>Preservation of Fine Details:</strong> Small-dilation branches sample nearby features. They cannot recover fine information already lost in the encoder; DeepLabV3+ also uses lower-level features in its decoder.</li>
+<li><strong>Macroscopic Texture Aggregation:</strong> Larger dilation branches sample farther-apart features. Their useful context depends on output stride, feature size and padding; on short strips some taps may fall outside the feature map.</li>
+<li><strong>Resolution Retention:</strong> The entire operation is performed without further spatial downsampling inside ASPP. This alone does not guarantee better boundaries or scores.</li>
 </ol>
 <hr />
 <h2 id="4-guiding-hints-for-question-4">4. Guiding Hints for Question 4</h2>
@@ -129,8 +135,8 @@ Bottleneck Features [C_in, H, W]
 <ul>
 <li>Substitute <span class="arithmatex">\(r = 6\)</span> to find <span class="arithmatex">\(k'_{\text{r6}}\)</span>.</li>
 <li>Substitute <span class="arithmatex">\(r = 12\)</span> to find <span class="arithmatex">\(k'_{\text{r12}}\)</span>.</li>
-<li>Express your answers as 2D spatial dimensions: <code>k'xk'</code> (e.g., <code>13x13</code> or <code>25x25</code>).</li>
-<li><strong>Hint 2 (Formulate the Architectural Advantage):</strong> In 1 to 2 concise sentences, summarize why ASPP is superior to pooling for surface defect inspection. Your sentence should mention:</li>
+<li>Express your answers as 2D spatial dimensions: <code>k'xk'</code>; calculate both numbers yourself.</li>
+<li><strong>Hint 2 (Formulate the Architectural Advantage):</strong> In 1 to 2 concise sentences, describe the potential benefit and one limitation of ASPP compared with a single-scale pooling bottleneck. Your sentence should mention:</li>
 <li>Capturing <strong>multi-scale context</strong> across diverse anomaly scales (microscopic cracks vs. large patches).</li>
 <li>Preserving <strong>spatial feature resolution</strong> without aggressive downsampling.</li>
 </ul>

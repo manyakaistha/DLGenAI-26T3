@@ -1,92 +1,64 @@
 # Pretrained Backbone Architecture Trade-off
 *(Milestone 3 · Question 9 Study Guide)*
 
----
+## 1. Separate Capacity, Memory and Accuracy
 
-## 1. The Engineering Context: High-Speed Edge Deployment
+Model selection involves several different quantities: parameter storage, activation memory, training optimizer state, latency and validation quality. A lower parameter count proves a smaller parameter tensor budget at the same dtype; it does not prove lower peak VRAM, faster inference or better segmentation.
 
-In modern manufacturing facilities, defect detection algorithms must execute on embedded industrial PCs (IPCs) or edge accelerators (such as NVIDIA Jetson Orin or embedded GPUs) mounted directly onto rolling mill sensor gantries.
+For Q9 compare ImageNet-initialized ResNet-34 and EfficientNet-B0 U-Nets under the [same five-epoch protocol](../../MILESTONE_3.md#3-common-training-protocol-for-questions-8-9). Change the encoder architecture, keeping the decoder settings and training/evaluation rules fixed. This compares the two complete recipes, not a universal ranking of backbone families.
 
-In these operational environments, engineering decisions are constrained by strict physical budgets:
-- **Peak GPU Memory (VRAM):** Edge appliances often possess only 4 GB to 8 GB of shared unified memory.
-- **Inference Latency:** A line moving at 15 m/s requires frames ($128 \times 800$) to be processed in under 15 milliseconds.
-- **Power & Thermal Throttling:** Fanless industrial enclosures require power-efficient computation.
+## 2. Audit Parameters Yourself
 
-Therefore, selecting a segmentation architecture is not merely about maximizing raw validation score—it requires balancing **model capacity, parameter count, memory footprint, and inference throughput**.
+Use Q2's counts for the complete model, including encoder, decoder and segmentation head:
+$$R=\frac{P_{ResNet}}{P_{EfficientNet}}.$$
 
-In Milestone 3 (Question 9), you compare two premier vision backbones:
-1. **ResNet-34:** A classical residual network with standard $3 \times 3$ convolutions.
-2. **EfficientNet-B0:** A lightweight, compound-scaled network with inverted residual blocks.
+Round only the final ratio. The parameter reduction of model B relative to model A is $100(1-P_B/P_A)\%$; it is a different quantity from the ratio. Neither calculation tells you how much peak GPU memory will change.
 
----
+### Fictional Practice
 
-## 2. Theoretical Principles: Parameter Scaling & Depthwise Separable Convolutions
+If two toy models have 9 million and 3 million parameters, their ratio is 3 and the smaller model has about 66.7% fewer parameters. Float32 parameter storage alone is count × 4 bytes. Gradients, buffers, AdamW moments, activations and temporary workspaces are additional allocations.
 
-### Parameter Count Accounting
-In Question 2, you audited the exact parameter counts of both U-Net architectures:
-- **ResNet-34 U-Net:** $\approx 24.4\text{M}$ total parameters.
-- **EfficientNet-B0 U-Net:** $\approx 6.25\text{M}$ total parameters.
+## 3. Why Depthwise Convolution Can Save Parameters
 
-To find the approximate parameter ratio:
-$$\text{Ratio} = \frac{\text{Params}_{\text{resnet34}}}{\text{Params}_{\text{effnet\_b0}}} = \frac{24{,}430{,}532}{6{,}251{,}328} \approx 3.908 \approx 4\times$$
+A standard $k\times k$ convolution with $C_{in}$ inputs and $C_{out}$ outputs has $k^2C_{in}C_{out}$ kernel weights. A depthwise convolution followed by a pointwise projection has:
+$$k^2C_{in}+C_{in}C_{out}.$$
 
-ResNet-34 contains approximately **$4\times$ more parameters** than EfficientNet-B0.
+For a toy $3\times3$ layer from 8 to 16 channels, these counts are 1152 and 200. This simplified comparison excludes biases and normalization.
 
-### The Architectural Secret: Depthwise Separable Convolutions
-Why does EfficientNet-B0 possess $74\%$ fewer parameters while achieving comparable or superior representational capacity?
+EfficientNet's MBConv blocks additionally include channel expansion, squeeze-and-excitation and projection. Count the complete block to estimate actual savings. Expanded intermediate activations may still be large. ResNet's residual additions aid optimization; they do not by themselves determine the full model's memory footprint.
 
-The foundational mechanism is **Depthwise Separable Convolution** (introduced in MobileNet and scaled in EfficientNet's MBConv blocks).
+## 4. Measure GPU Memory under a Defined Workload
 
-```text
-Standard Convolution (ResNet):
-Input [C_in, H, W] ──► Dense 3x3 Conv [C_out, C_in, 3, 3] ──► Output [C_out, H, W]
-Parameters: C_out × C_in × 3 × 3 = 9 × C_in × C_out
+For Q9 report **training peak allocated CUDA memory** at batch size 16, native resolution and float32. Run each model in a fresh process on the same GPU. Initialize its optimizer, warm up two full optimizer steps (including AdamW state creation), synchronize, reset peak statistics, and measure one more complete step:
 
-Depthwise Separable Convolution (EfficientNet MBConv):
-Step 1 (Depthwise):  Input [C_in, H, W] ──► 3x3 Conv per channel ──► [C_in, H, W]
-                     Parameters: C_in × 1 × 3 × 3 = 9 × C_in
-Step 2 (Pointwise):  [C_in, H, W] ──► 1x1 Conv [C_out, C_in, 1, 1] ──► [C_out, H, W]
-                     Parameters: C_out × C_in × 1 × 1 = C_in × C_out
-
-Total Parameters: 9 × C_in + C_in × C_out
-Parameter Reduction Factor: (9 * C_in + C_in * C_out) / (9 * C_in * C_out) ≈ 1 / C_out + 1 / 9 ≈ 1/9!
+```python
+# After warm-up steps, before the measured zero_grad/forward/backward/step:
+torch.cuda.synchronize()
+torch.cuda.reset_peak_memory_stats()
+# Run a complete optimizer step here with the fixed batch/protocol.
+torch.cuda.synchronize()
+peak_mib = torch.cuda.max_memory_allocated() / 2**20
 ```
 
-By decoupling spatial filtering (depthwise convolution across $H \times W$) from cross-channel feature fusion (pointwise $1 \times 1$ convolution), depthwise separable convolutions eliminate dense cross-channel parameter redundancy.
+Report allocated memory rather than reserved caching-allocator memory, and use the same measurement boundaries for both models. If either model runs out of memory, report that outcome; do not silently reduce its batch size. On a CPU-only runtime report `not_measured` for CUDA memory.
 
----
+Inference is a separate workload: no gradients or AdamW state, usually a deployment-specific batch size and dtype. A training memory measurement alone is insufficient to certify suitability for an edge device. Measure inference memory and latency on the target device before making that claim.
 
-## 3. Resource Footprint & Edge Feasibility
+## 5. Compare Scores without a Preset Winner
 
-### Peak GPU VRAM Footprint
-During training and high-throughput inference:
-- ResNet-34 maintains wide feature channels ($64 \to 128 \to 256 \to 512$) throughout the encoder, resulting in large intermediate activation tensors stored in GPU cache.
-- EfficientNet-B0 uses aggressive channel bottlenecks and parameter-efficient inverted residual connections, consuming significantly less peak GPU VRAM during batch forward passes.
-- **Edge Deployment Verdict:** `efficientnet-b0` is strictly superior for memory-constrained edge deployment.
+Use [Guide 8's official metric](guide_08_scratch_vs_pretrained_convergence.md#3-use-the-official-weighted-metric). Record both epoch-5 scores and their signed difference. For this assessment, “competitive” means the EfficientNet score is no more than 0.01 below the ResNet score; this is a declared comparison tolerance, not an expected result. A higher score also meets that definition.
 
-### Segmentation Performance Parity
-Does a model with $74\%$ fewer parameters sacrifice defect segmentation quality?
-- **Empirical Finding:** On industrial surface defect inspection, EfficientNet-B0 achieves competitive, and often slightly higher, validation Dice and official competition scores compared to ResNet-34 (`Yes`).
-- The addition of **Squeeze-and-Excitation (SE) attention gates** inside each MBConv block enables EfficientNet to adaptively recalibrate channel responses, focusing attention on subtle defect textures despite its compact parameter budget.
+A smaller model can generalize well, but it can also underfit or need a different training schedule. Five epochs do not establish a model's eventual best performance. Repeat seeds or train longer only as a separately labeled follow-up.
 
----
+<details>
+<summary>Practice: Model A has fewer weights but a larger activation tensor. Which has lower peak VRAM?</summary>
 
-## 4. Guiding Hints for Question 9
+The parameter counts alone are insufficient. Measure the complete workload; activations, temporary workspaces, gradients and optimizer state can change the ranking.
 
-To solve Question 9 in [`MILESTONE_3.md`](../../MILESTONE_3.md):
+</details>
 
-- **Hint 1 (Parameter Ratio):** Divide the total parameter count of ResNet-34 by that of EfficientNet-B0. Round the quotient to the nearest whole integer (e.g., `4x`).
-- **Hint 2 (Resource Footprint):** Identify which backbone is more lightweight, uses less peak GPU memory, and is best suited for deployment on memory-constrained edge hardware (`resnet34` or `efficientnet-b0`).
-- **Hint 3 (Competitive Performance):** Evaluate whether the lightweight EfficientNet-B0 can achieve competitive or higher validation scores compared to the larger ResNet-34 (`Yes` or `No`).
-- **Hint 4 (Convolution Technique):** Name the specific architectural convolution technique that factorizes standard 2D convolution into separate depthwise spatial filtering and $1 \times 1$ pointwise channel projection (e.g., `depthwise separable convolutions`).
+## 6. Guiding Hints and Assignment Task
 
----
+Read [Question 9](../../MILESTONE_3.md#question-9-pretrained-backbone-architecture-trade-off-resnet-34-vs-efficientnet-b0). Reuse your Q2 counts, measure both training memory peaks when CUDA is available, and compare epoch-5 scores with the stated tolerance. Explain the relevant convolution mechanism and one limitation of using parameter count as a proxy for deployment cost.
 
-## 5. Your Assignment Task
-
-1. Open [Milestone 3 Assessment: Question 9](../../MILESTONE_3.md#question-9-pretrained-backbone-architecture-trade-off-resnet-34-vs-efficientnet-b0).
-2. Calculate the approximate integer parameter ratio between ResNet-34 and EfficientNet-B0.
-3. Identify the superior edge deployment backbone.
-4. Confirm whether EfficientNet-B0 achieves competitive performance (`Yes` / `No`).
-5. Name the specific convolution technique utilized.
-6. Enter your response in the specified format: `param_ratio; edge_backbone; competitive_yes_no; convolution_technique`.
+Report the ratio, memory measurements, observed score comparison and architectural explanation. Use `tie`, `not_measured` or `oom` where appropriate; do not infer an unmeasured GPU result.

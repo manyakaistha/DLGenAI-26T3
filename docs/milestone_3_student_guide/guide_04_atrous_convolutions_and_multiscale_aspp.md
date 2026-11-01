@@ -6,21 +6,21 @@
 ## 1. The Engineering Dilemma: Hairline Cracks vs. Massive Diffuse Patches
 
 In industrial surface defect inspection, anomalies exhibit extreme scale divergence across classes:
-- **`defect_a` (Hairline Scratches):** High-frequency, sub-millimeter cracks that are only **1 to 3 pixels wide**, requiring precise sub-pixel boundary localization.
-- **`defect_c` (Diffuse Inclusions & Oxide Patches):** Low-frequency, sprawling textures that span **hundreds of pixels** across the $128 \times 800$ steel ribbon, requiring extensive contextual awareness to distinguish subtle discolored sheen from normal surface reflection.
+- **Fictional thin scratch:** High-frequency, sub-millimeter cracks that are only **1 to 3 pixels wide**, requiring precise sub-pixel boundary localization.
+- **Fictional diffuse patch:** Low-frequency, sprawling textures that span **hundreds of pixels** across the $128 \times 800$ steel ribbon, requiring extensive contextual awareness to distinguish subtle discolored sheen from normal surface reflection.
 
-In standard convolutional architectures (like traditional U-Nets), the network expands its receptive field solely through **aggressive spatial downsampling** (pooling and strided convolutions).
+In a U-Net, both stacked convolutions and spatial downsampling expand the receptive field. Skip connections carry higher-resolution features around the bottleneck. Atrous convolution offers another way to gather wider context without another downsampling operation.
 
 ```text
 The Traditional Downsampling Paradox:
 Input (128x800) ──► Pooling (32x) ──► Receptive field is large enough for Defect C,
                                        BUT spatial resolution drops to (4x25).
-                                       Hairline scratches (1-3 px) are completely obliterated!
+                                       Fine boundaries may become harder to localize from this coarse tensor alone.
 ```
 
 If you do not downsample, the receptive field of standard $3 \times 3$ convolutions grows linearly and slowly:
 $$\text{Receptive Field} = 1 + L \times (k - 1)$$
-To achieve a receptive field of 100 pixels with standard $3 \times 3$ convolutions without downsampling, you would need over 50 stacked convolutional layers, causing prohibitive latency, memory bloat, and vanishing gradients.
+To achieve a receptive field of 100 pixels with standard $3 \times 3$ convolutions without downsampling, you would need 50 stacked convolutional layers, which can be expensive; actual latency and optimization depend on the implementation.
 
 ---
 
@@ -55,11 +55,11 @@ Let us verify this formula:
 - If $k = 3, r = 2$: $k' = 3 + (3 - 1)(2 - 1) = 3 + 2 = 5$.
 - If $k = 3, r = 3$: $k' = 3 + (3 - 1)(3 - 1) = 3 + 4 = 7$.
 
-### The Computational Miracle: Zero Parameter & FLOP Penalty
-Notice a crucial architectural property: **the number of trainable parameters and arithmetic multiply-accumulate operations (MACs) remains strictly identical regardless of $r$!**
+### Parameter Count at Fixed Feature Resolution
+For equal input/output channels, groups, kernel size and **output feature dimensions**, changing dilation leaves the parameter count and nominal MAC count unchanged. Appropriate padding is needed to preserve output dimensions. Actual latency can differ, and parallel ASPP branches add work compared with one branch.
 - A standard $3 \times 3$ kernel contains $3 \times 3 = 9$ weights.
-- A dilated $3 \times 3$ kernel with $r = 12$ covers an effective footprint of $25 \times 25$ pixels ($625$ canvas locations), but it still contains **only 9 non-zero weights**.
-- A dense $25 \times 25$ convolution would require $625$ weights—an increase of nearly **$70\times$ in parameters and computation**. Atrous convolution captures the exact same macroscopic spatial span with zero parameter overhead!
+- A toy dilated $3 \times 3$ kernel with $r = 4$ has a $9 \times 9$ footprint, but still samples **9 locations per input/output channel pair**.
+- A dense $9 \times 9$ kernel samples 81 locations per channel pair. The dilated kernel spans the same extent but does not inspect every location; sparse sampling can miss small structures.
 
 ---
 
@@ -71,7 +71,7 @@ Rather than choosing a single dilation rate, **DeepLabV3+** captures multi-scale
 DeepLabV3+ ASPP Architecture:
 Bottleneck Features [C_in, H, W]
        │
-       ├──► 1x1 Conv (r=1)                     ──────────► [C_out, H, W] (Local details / 1-3 px cracks)
+       ├──► 1x1 Conv (r=1)                     ──────────► [C_out, H, W] (Local feature mixing)
        ├──► 3x3 Dilated Conv (r=6)             ──────────► [C_out, H, W] (Intermediate scratch context)
        ├──► 3x3 Dilated Conv (r=12)            ──────────► [C_out, H, W] (Large diffuse defect context)
        ├──► 3x3 Dilated Conv (r=18)            ──────────► [C_out, H, W] (Global ribbon context)
@@ -84,11 +84,11 @@ Bottleneck Features [C_in, H, W]
                                                   Multi-Scale Fused Representation
 ```
 
-### Why ASPP Outperforms Traditional Pooling Bottlenecks
+### What ASPP Adds to a Bottleneck
 1. **Parallel Multi-Scale Processing:** Instead of forcing all features through a single bottleneck scale, ASPP queries the feature representation at multiple sampling rates in parallel.
-2. **Preservation of Fine Details:** Small dilation branches ($r=1, r=6$) maintain fine, localized spatial gradients to segment hairline scratches (`defect_a`).
-3. **Macroscopic Texture Aggregation:** Large dilation branches ($r=12, r=18$) gather contextual contrast across hundreds of pixels to confirm diffuse anomalies (`defect_c`).
-4. **Resolution Retention:** The entire operation is performed without further spatial downsampling, avoiding boundary degradation.
+2. **Preservation of Fine Details:** Small-dilation branches sample nearby features. They cannot recover fine information already lost in the encoder; DeepLabV3+ also uses lower-level features in its decoder.
+3. **Macroscopic Texture Aggregation:** Larger dilation branches sample farther-apart features. Their useful context depends on output stride, feature size and padding; on short strips some taps may fall outside the feature map.
+4. **Resolution Retention:** The entire operation is performed without further spatial downsampling inside ASPP. This alone does not guarantee better boundaries or scores.
 
 ---
 
@@ -101,8 +101,8 @@ To solve Question 4 in [`MILESTONE_3.md`](../../MILESTONE_3.md):
   For a standard $3 \times 3$ kernel ($k=3$):
   - Substitute $r = 6$ to find $k'_{\text{r6}}$.
   - Substitute $r = 12$ to find $k'_{\text{r12}}$.
-  - Express your answers as 2D spatial dimensions: `k'xk'` (e.g., `13x13` or `25x25`).
-- **Hint 2 (Formulate the Architectural Advantage):** In 1 to 2 concise sentences, summarize why ASPP is superior to pooling for surface defect inspection. Your sentence should mention:
+  - Express your answers as 2D spatial dimensions: `k'xk'`; calculate both numbers yourself.
+- **Hint 2 (Formulate the Architectural Advantage):** In 1 to 2 concise sentences, describe the potential benefit and one limitation of ASPP compared with a single-scale pooling bottleneck. Your sentence should mention:
   - Capturing **multi-scale context** across diverse anomaly scales (microscopic cracks vs. large patches).
   - Preserving **spatial feature resolution** without aggressive downsampling.
 
