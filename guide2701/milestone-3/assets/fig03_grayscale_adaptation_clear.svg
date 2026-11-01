@@ -16,7 +16,7 @@
 <text x="463" y="191" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
 <text x="492" y="192" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Replace first conv</text>
 <text x="450" y="232" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Input: [1,H,W]</text>
-<text x="450" y="260" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Average RGB kernel weights.</text>
+<text x="450" y="260" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Choose a weight-combination rule.</text>
 <text x="450" y="288" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">Fine-tune the adapted stem.</text>
 <path d="M778 260 L813 260" fill="none" stroke="#52635d" stroke-width="3"/>
 <path d="M804.2 266.6 L813 260 L804.2 253.4" fill="none" stroke="#52635d" stroke-width="3"/>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q5 · Soft Dice Loss &amp; Laplace Smoothing · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning, pretrained vision backbones, grayscale adaptation, ASPP, and compound loss.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Milestone 3<br>Study Guides</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html" aria-current="page"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 3</summary><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html" aria-current="page"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Student learning resources</span><a href="milestone-3.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 5 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 05 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-sparse-foreground-and-the-objective">1. Sparse Foreground and the Objective</a></li>
+<li><a href="#2-from-hard-overlap-to-a-differentiable-loss">2. From Hard Overlap to a Differentiable Loss</a></li>
+<li><a href="#3-what-smoothing-changes">3. What Smoothing Changes</a></li>
+<li><a href="#4-worked-practice-with-different-inputs">4. Worked Practice with Different Inputs</a></li>
+<li><a href="#5-verify-the-practice-calculation">5. Verify the Practice Calculation</a></li>
+<li><a href="#6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="differentiable-soft-dice-loss-numerical-smoothing">Differentiable Soft Dice Loss &amp; Numerical Smoothing</h1>
+<p><em>(Milestone 3 · Question 5 Study Guide)</em></p>
+<h2 id="1-sparse-foreground-and-the-objective">1. Sparse Foreground and the Objective</h2>
+<p>A model can attain high pixel accuracy on a sparse-defect dataset by predicting background too often. This does not make all-background prediction the mathematical optimum of BCE: a missed positive pixel still has a nonzero logit gradient. At an exactly zero predicted probability on a positive target, ideal BCE is unbounded. The practical concern is imbalance in aggregate contributions and shared-parameter updates, not an absence of a foreground penalty.</p>
+<p>Measure class and pixel distributions yourself. This guide's numerical examples are fictional and reveal no competition statistics.</p>
+<h2 id="2-from-hard-overlap-to-a-differentiable-loss">2. From Hard Overlap to a Differentiable Loss</h2>
+<p>Binary Dice compares a predicted set <span class="arithmatex">\(X\)</span> and target set <span class="arithmatex">\(Y\)</span>:</p>
+<div class="arithmatex">\[D(X,Y)=\frac{2|X\cap Y|}{|X|+|Y|}.\]</div>
+<p>Thresholding probabilities creates a step function, so hard Dice is unsuitable as a direct differentiable training loss. In the assessment's Soft Dice, use probabilities <span class="arithmatex">\(p_i=\sigma(z_i)\)</span>:</p>
+<div class="arithmatex">\[L_D=1-\frac{2\sum_i p_i y_i+\epsilon}{\sum_i p_i+\sum_i y_i+\epsilon}.\]</div>
+<p>Compute three quantities before substituting: intersection <span class="arithmatex">\(I=\sum p_i y_i\)</span>, predicted mass <span class="arithmatex">\(P=\sum p_i\)</span>, and target mass <span class="arithmatex">\(T=\sum y_i\)</span>. Then <span class="arithmatex">\(L_D=1-(2I+\epsilon)/(P+T+\epsilon)\)</span>.</p>
+<p><strong>Reduction matters.</strong> The supplied <code>SoftDiceLoss</code> flattens all batch, channel and spatial dimensions into one global ratio. It is not an average of per-image or per-class Dice losses. Document that reduction when comparing implementations; a clean image inside a mixed batch is coupled to positives elsewhere in the batch.</p>
+<h2 id="3-what-smoothing-changes">3. What Smoothing Changes</h2>
+<p>With <span class="arithmatex">\(\epsilon&gt;0\)</span>, an entirely empty reduction (<span class="arithmatex">\(P=T=0\)</span>) gives Dice 1 and loss 0. Without smoothing the ratio is undefined. Smoothing also changes losses and gradients for small objects; its numerical value is part of the objective, not just a harmless implementation detail.</p>
+<p>Smoothing does not guarantee stable optimization under every probability distribution. Read <a href="guide_07_compound_loss_and_clean_image_dynamics.html">Guide 7</a> to distinguish the value of a loss from its gradient.</p>
+<p><img alt="Toy loss curves for missed foreground, false positives and empty targets" src="assets/fig06_loss_landscapes_bce_vs_dice.png" /></p>
+<p><em>These are synthetic probability sweeps, not training results. The first two panels use different y-axis scales for BCE and Dice, so compare trends rather than line heights. A steep-looking loss curve does not establish a steep logit gradient.</em></p>
+<h2 id="4-worked-practice-with-different-inputs">4. Worked Practice with Different Inputs</h2>
+<p>Use a fictional <strong>20-pixel patch with 4 positives</strong>, smoothing <span class="arithmatex">\(\epsilon=1\)</span>.</p>
+<p><strong>Model U</strong> predicts 0.2 at every pixel. Then <span class="arithmatex">\(I=4\cdot0.2=0.8\)</span>, <span class="arithmatex">\(P=20\cdot0.2=4\)</span>, and <span class="arithmatex">\(T=4\)</span>. Thus:</p>
+<div class="arithmatex">\[L_D=1-\frac{2(0.8)+1}{4+4+1}=1-\frac{2.6}{9}\approx0.7111.\]</div>
+<p><strong>Model V</strong> predicts 0.75 at the four positives and 0.05 at the sixteen negatives. Then <span class="arithmatex">\(I=3\)</span>, <span class="arithmatex">\(P=3+0.8=3.8\)</span>, and <span class="arithmatex">\(T=4\)</span>:</p>
+<div class="arithmatex">\[L_D=1-\frac{2(3)+1}{3.8+4+1}=1-\frac{7}{8.8}\approx0.2045.\]</div>
+<p>Even small background probabilities contribute to <span class="arithmatex">\(P\)</span>. Foreground confidence contributes both to <span class="arithmatex">\(P\)</span> and to the overlap numerator. This explains the distinct effects of missed foreground and background leakage.</p>
+<details>
+<summary>Practice: Model V now predicts zero on background. How does the loss change?</summary>
+<p>Now <span class="arithmatex">\(P=3\)</span>, <span class="arithmatex">\(I=3\)</span>, <span class="arithmatex">\(T=4\)</span>, so <span class="arithmatex">\(L_D=1-7/8=0.125\)</span>. Removing background leakage improves overlap without changing foreground confidence. These practice values differ from the assessment.</p>
+</details>
+<h2 id="5-verify-the-practice-calculation">5. Verify the Practice Calculation</h2>
+<pre class="highlight"><code class="language-python">import torch
+p = torch.full((20,), 0.2, dtype=torch.float64)
+y = torch.zeros_like(p)
+y[:4] = 1
+loss = 1 - (2 * (p * y).sum() + 1) / (p.sum() + y.sum() + 1)
+print(float(loss))</code></pre>
+<p>This probability-based snippet is for arithmetic only. The official loss accepts raw logits and applies sigmoid internally. Applying sigmoid before calling that loss would apply it twice.</p>
+<h2 id="6-guiding-hints-and-assignment-task">6. Guiding Hints and Assignment Task</h2>
+<ol>
+<li>Read <a href="milestone-3.html#question-5-differentiable-soft-dice-loss-numerical-smoothing">Question 5</a>.</li>
+<li>For each assessment model, calculate <span class="arithmatex">\(I\)</span>, <span class="arithmatex">\(P\)</span> and <span class="arithmatex">\(T\)</span> using the question's own population and probabilities.</li>
+<li>Substitute into the specified smoothed formula; retain precision until the final rounding to four decimal places.</li>
+<li>Report <code>loss_model1, loss_model2</code>. Do not reuse the practice patch's losses.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html">← Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_06_output_heads_and_target_semantics.html">Q6 · Output Heads &amp; Target Semantics →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

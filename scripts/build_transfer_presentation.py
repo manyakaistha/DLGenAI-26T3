@@ -9,15 +9,15 @@ SOURCE = ROOT / 'docs/transfer_learning_presentation'
 
 def build(out: Path):
     out.mkdir(parents=True, exist_ok=True)
-    page = (SOURCE / 'index.html').read_text()
-    css = (SOURCE / 'presentation.css').read_text()
-    js = (SOURCE / 'presentation.js').read_text()
+    page = (SOURCE / 'index.html').read_text(encoding='utf-8')
+    css = (SOURCE / 'presentation.css').read_text(encoding='utf-8')
+    js = (SOURCE / 'presentation.js').read_text(encoding='utf-8')
     figure = ROOT / 'docs/transfer_learning_live_session/figures/mri_sequences.png'
     data_url = 'data:image/png;base64,' + base64.b64encode(figure.read_bytes()).decode()
     js = js.replace('__MRI_IMAGE__', data_url)
     page = page.replace('/* PRESENTATION_CSS */', css).replace('/* PRESENTATION_JS */', js)
     target = out / 'index.html'
-    target.write_text(page)
+    target.write_text(page, encoding='utf-8')
     print(f'Built self-contained presentation → {target}')
     return target
 

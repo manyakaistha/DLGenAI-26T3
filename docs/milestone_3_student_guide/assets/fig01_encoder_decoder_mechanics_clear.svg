@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-label="U-Net: context down, location back up">
+<rect width="1200" height="700" fill="#fffaf0"/>
+<text x="48" y="62" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#202522">U-Net: context down, location back up</text>
+<text x="48" y="94" font-family="Arial,sans-serif" font-size="17" fill="#52635d">Illustrative 4-level network for a 128 × 800 single-channel strip.</text>
+<rect x="120" y="165" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="136" y="182" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="153" y="206" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="182" y="207" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Encoder 1</text>
+<text x="140" y="247" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">64 ch · 128 × 800</text>
+<rect x="860" y="165" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="876" y="182" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="893" y="206" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">1</text>
+<text x="922" y="207" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Decoder 1</text>
+<text x="880" y="247" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">64 ch · 128 × 800</text>
+<path d="M344 212 L848 212" fill="none" stroke="#255a9b" stroke-width="3" stroke-dasharray="9 7"/>
+<path d="M839.2 218.6 L848 212 L839.2 205.4" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M232 259 L302 262" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M292.9 268.2 L302 262 L293.5 255.0" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M972 262 L902 259" fill="none" stroke="#d88836" stroke-width="3"/>
+<path d="M911.1 252.8 L902 259 L910.5 266.0" fill="none" stroke="#d88836" stroke-width="3"/>
+<rect x="190" y="270" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="206" y="287" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="223" y="311" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="252" y="312" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Encoder 2</text>
+<text x="210" y="352" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">128 ch · 64 × 400</text>
+<rect x="790" y="270" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="806" y="287" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="823" y="311" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">2</text>
+<text x="852" y="312" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Decoder 2</text>
+<text x="810" y="352" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">128 ch · 64 × 400</text>
+<path d="M414 317 L778 317" fill="none" stroke="#255a9b" stroke-width="3" stroke-dasharray="9 7"/>
+<path d="M769.2 323.6 L778 317 L769.2 310.4" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M302 364 L372 367" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M362.9 373.2 L372 367 L363.5 360.0" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M902 367 L832 364" fill="none" stroke="#d88836" stroke-width="3"/>
+<path d="M841.1 357.8 L832 364 L840.5 371.0" fill="none" stroke="#d88836" stroke-width="3"/>
+<rect x="260" y="375" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="276" y="392" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="293" y="416" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">3</text>
+<text x="322" y="417" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Encoder 3</text>
+<text x="280" y="457" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">256 ch · 32 × 200</text>
+<rect x="720" y="375" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="736" y="392" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="753" y="416" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">3</text>
+<text x="782" y="417" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Decoder 3</text>
+<text x="740" y="457" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">256 ch · 32 × 200</text>
+<path d="M484 422 L708 422" fill="none" stroke="#255a9b" stroke-width="3" stroke-dasharray="9 7"/>
+<path d="M699.2 428.6 L708 422 L699.2 415.4" fill="none" stroke="#255a9b" stroke-width="3"/>
+<path d="M372 469 L442 472" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M432.9 478.2 L442 472 L433.5 465.0" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M832 472 L762 469" fill="none" stroke="#d88836" stroke-width="3"/>
+<path d="M771.1 462.8 L762 469 L770.5 476.0" fill="none" stroke="#d88836" stroke-width="3"/>
+<rect x="330" y="480" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="346" y="497" width="34" height="34" rx="9" fill="#087e83" stroke="#087e83" stroke-width="2"/>
+<text x="363" y="521" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">4</text>
+<text x="392" y="522" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Encoder 4</text>
+<text x="350" y="562" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">512 ch · 16 × 100</text>
+<rect x="650" y="480" width="224" height="94" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="666" y="497" width="34" height="34" rx="9" fill="#d88836" stroke="#d88836" stroke-width="2"/>
+<text x="683" y="521" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">4</text>
+<text x="712" y="522" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Decoder 4</text>
+<text x="670" y="562" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">512 ch · 16 × 100</text>
+<path d="M554 527 L638 527" fill="none" stroke="#255a9b" stroke-width="3" stroke-dasharray="9 7"/>
+<path d="M629.2 533.6 L638 527 L629.2 520.4" fill="none" stroke="#255a9b" stroke-width="3"/>
+<rect x="470" y="585" width="260" height="90" rx="16" fill="#ffffff" stroke="#d6d8cb" stroke-width="2"/>
+<rect x="486" y="602" width="34" height="34" rx="9" fill="#d95a40" stroke="#d95a40" stroke-width="2"/>
+<text x="503" y="626" fill="white" font-size="19" font-weight="700" text-anchor="middle" font-family="Arial,sans-serif">•</text>
+<text x="532" y="627" fill="#202522" font-size="21" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Bottleneck</text>
+<text x="490" y="667" fill="#52635d" font-size="17" font-weight="400" text-anchor="start" font-family="Arial,sans-serif">512 ch · 8 × 50</text>
+<path d="M500 574 L545 577" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M535.8 583.0 L545 577 L536.6 569.8" fill="none" stroke="#087e83" stroke-width="3"/>
+<path d="M655 577 L715 574" fill="none" stroke="#d88836" stroke-width="3"/>
+<path d="M706.5 581.0 L715 574 L705.9 567.9" fill="none" stroke="#d88836" stroke-width="3"/>
+<text x="40" y="145" fill="#087e83" font-size="17" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">INPUT  [1,128,800]</text>
+<text x="953" y="145" fill="#d95a40" font-size="17" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">OUTPUT  [K,128,800]</text>
+<text x="510" y="150" fill="#255a9b" font-size="17" font-weight="700" text-anchor="start" font-family="Arial,sans-serif">Dashed paths = skip features</text>
+</svg>

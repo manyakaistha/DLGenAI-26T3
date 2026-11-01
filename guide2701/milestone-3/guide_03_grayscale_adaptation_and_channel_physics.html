@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q3 · Grayscale Adaptation &amp; Channel Physics · Industrial Surface Anomaly Segmentation</title>
+<meta name="description" content="Milestone 3 student study guides: transfer learning, pretrained vision backbones, grayscale adaptation, ASPP, and compound loss.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script>try { const t=localStorage.getItem('guide-garden-theme'); if(['paper','midnight','moss','butter','blush','mono'].includes(t)) document.documentElement.dataset.theme=t; } catch {}</script>
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="styles/generative/theme.css">
+<link rel="stylesheet" href="styles/generative/navigation.css">
+<style>
+.garden-hero{height:auto;min-height:185px}
+body[data-overview="true"] .garden-hero{height:auto;min-height:285px}
+@media(max-width:850px){
+  .garden-hero{min-height:160px}
+  .hero-copy{max-width:74%}
+  body[data-overview="true"] .garden-hero{min-height:215px}
+}
+</style>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},options:{ignoreHtmlClass:'tex2jax_ignore',processHtmlClass:'arithmatex'}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script defer src="site.js"></script><script defer src="styles/generative/theme.js"></script></head><body data-overview="false" data-ai-help="study">
+<div class="reading-progress" aria-hidden="true"></div>
+<a class="skip" href="#main">Skip to content</a><div class="layout">
+<aside class="sidebar"><span class="eyebrow">DLGenAI · 26T3 · Milestone 3</span><a class="brand" href="index.html">Milestone 3<br>Study Guides</a>
+<p>Transfer learning, pretrained backbones, output heads, and compound loss objectives.</p>
+<details class="palette-panel" open><summary>Choose your palette</summary><div class="theme-options">
+<button class="theme-option" data-palette="paper" aria-pressed="true" style="--swatch:#f3eee4;--dot:#e7462b"><span aria-hidden="true"></span>Paper</button>
+<button class="theme-option" data-palette="midnight" aria-pressed="false" style="--swatch:#101b38;--dot:#ff7568"><span aria-hidden="true"></span>Midnight</button>
+<button class="theme-option" data-palette="moss" aria-pressed="false" style="--swatch:#133a2a;--dot:#ffb7c5"><span aria-hidden="true"></span>Moss</button>
+<button class="theme-option" data-palette="butter" aria-pressed="false" style="--swatch:#ffe9a8;--dot:#d72d43"><span aria-hidden="true"></span>Butter</button>
+<button class="theme-option" data-palette="blush" aria-pressed="false" style="--swatch:#fad4d8;--dot:#bd2348"><span aria-hidden="true"></span>Blush</button>
+<button class="theme-option" data-palette="mono" aria-pressed="false" style="--swatch:#141414;--dot:#f2f2f2"><span aria-hidden="true"></span>Mono</button>
+</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
+<div class="desktop-nav"><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html" aria-current="page"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></div><details class="mobile-menu"><summary>Browse Milestone 3</summary><input class="search" aria-label="Search Milestone 3 guides" placeholder="Search Milestone 3…" type="search"><div class="results" aria-live="polite"></div><nav class="nav" aria-label="Milestone 3 study guide"><a href="index.html"><span class="num">START HERE</span>Milestone 3 Overview</a><a href="milestone-3.html"><span class="num">ASSESSMENT · 9 QUESTIONS</span>Milestone 3 questions</a><a href="guide_01_feature_map_geometry_and_downsampling.html"><span class="num">GUIDE 01</span>Q1 · Feature Map Geometry &amp; Downsampling</a><a href="guide_02_pretrained_backbone_and_parameter_audit.html"><span class="num">GUIDE 02</span>Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_03_grayscale_adaptation_and_channel_physics.html" aria-current="page"><span class="num">GUIDE 03</span>Q3 · Grayscale Adaptation &amp; Channel Physics</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html"><span class="num">GUIDE 04</span>Q4 · Atrous Convolutions &amp; ASPP</a><a href="guide_05_soft_dice_loss_and_laplace_smoothing.html"><span class="num">GUIDE 05</span>Q5 · Soft Dice Loss &amp; Laplace Smoothing</a><a href="guide_06_output_heads_and_target_semantics.html"><span class="num">GUIDE 06</span>Q6 · Output Heads &amp; Target Semantics</a><a href="guide_07_compound_loss_and_clean_image_dynamics.html"><span class="num">GUIDE 07</span>Q7 · Compound Loss &amp; Clean Image Dynamics</a><a href="guide_08_scratch_vs_pretrained_convergence.html"><span class="num">GUIDE 08</span>Q8 · Scratch vs. Pretrained Convergence</a><a href="guide_09_backbone_architecture_tradeoffs.html"><span class="num">GUIDE 09</span>Q9 · Backbone Architecture Trade-offs</a></nav><nav class="nav section-exits" aria-label="Leave Milestone 3"><a href="../index.html">← All milestone guides</a><a href="../../index.html">← App homepage</a></nav></details>
+<footer><a href="https://github.com/manyakaistha/DLGenAI-26T3">View study materials on GitHub ↗</a></footer></aside>
+<main id="main"><div class="content"><div class="topline"><span>Milestone 3 · Student learning resources</span><a href="milestone-3.html">View questions ↗</a></div>
+<div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">Question 3 Guided Study</span><p class="hero-title">Transfer learning.<br>Stronger models.</p><p class="hero-caption">Observe. Understand. Experiment.</p></div></div>
+<span class="section-label">Concept guide 03 / 09</span><details class="toc"><summary>On this page</summary><div class="toc">
+<ul>
+<li><a href="#1-the-core-dilemma-monochromatic-sensors-vs-pretrained-rgb-backbones">1. The Core Dilemma: Monochromatic Sensors vs. Pretrained RGB Backbones</a></li>
+<li><a href="#2-mathematical-principles-activation-equivalence-proof">2. Mathematical Principles: Activation Equivalence Proof</a></li>
+<li><a href="#3-hardware-memory-bandwidth-host-to-device-pcie-transfer">3. Hardware &amp; Memory Bandwidth: Host-to-Device (PCIe) Transfer</a></li>
+<li><a href="#4-guiding-hints-for-question-3">4. Guiding Hints for Question 3</a></li>
+<li><a href="#5-your-assignment-task">5. Your Assignment Task</a></li>
+</ul>
+</div>
+</details>
+<article><h1 id="grayscale-input-adaptation-channel-physics">Grayscale Input Adaptation &amp; Channel Physics</h1>
+<p><em>(Milestone 3 · Question 3 Study Guide)</em></p>
+<hr />
+<h2 id="1-the-core-dilemma-monochromatic-sensors-vs-pretrained-rgb-backbones">1. The Core Dilemma: Monochromatic Sensors vs. Pretrained RGB Backbones</h2>
+<p>Every standard pretrained vision backbone on PyTorch Hub and torchvision (ResNet, EfficientNet, ConvNeXt, ViT) is configured with a 3-channel input layer:</p>
+<div class="arithmatex">\[\text{Input Tensor: } \mathbf{X} \in \mathbb{R}^{B \times 3 \times H \times W} \quad (\text{Red, Green, Blue})\]</div>
+<p>In high-speed manufacturing environments, optical line-scan cameras operate with monochromatic CCD or CMOS sensors. Monochromatic sensors deliver higher spatial resolution, greater dynamic range, and faster shutter speeds than Bayer-filtered color sensors because every photodiode captures full-spectrum luminescence without chromatic filtering:</p>
+<div class="arithmatex">\[\text{Industrial Strip: } \mathbf{I} \in \mathbb{R}^{B \times 1 \times H \times W} \quad (\text{Single Grayscale Intensity Channel})\]</div>
+<p>This creates an immediate architectural impedance mismatch: <strong>how do you feed a single-channel grayscale image into a neural network whose very first layer expects three input channels?</strong></p>
+<p>Two primary strategies exist in production computer vision:</p>
+<ol>
+<li><strong>Strategy A (Channel Duplication):</strong> Replicate the grayscale image across three channels in the data pipeline.</li>
+<li><strong>Strategy B (First-Layer Weight Collapse):</strong> Mathematically adapt the pretrained 3-channel convolutional weights to a 1-channel kernel.</li>
+</ol>
+<hr />
+<h2 id="2-mathematical-principles-activation-equivalence-proof">2. Mathematical Principles: Activation Equivalence Proof</h2>
+<p>To evaluate the mathematical difference between Strategy A and Strategy B, let us derive the exact forward activation of the first convolutional layer (<code>conv1</code>).</p>
+<p>Let <span class="arithmatex">\(\mathbf{I} \in \mathbb{R}^{H \times W}\)</span> denote an arbitrary single-channel grayscale image. Let <span class="arithmatex">\(W_{\text{rgb}} \in \mathbb{R}^{C_{\text{out}} \times 3 \times k_h \times k_w}\)</span> denote the pretrained convolutional weights of <code>conv1</code>, which can be decomposed channel-wise into three separate sub-kernels:</p>
+<div class="arithmatex">\[W_{\text{rgb}} = [W_R, \, W_G, \, W_B]\]</div>
+<p>where each <span class="arithmatex">\(W_c \in \mathbb{R}^{C_{\text{out}} \times 1 \times k_h \times k_w}\)</span> represents the filter weights acting on the Red, Green, and Blue channels respectively, with shared bias vector <span class="arithmatex">\(\mathbf{b} \in \mathbb{R}^{C_{\text{out}}}\)</span>.</p>
+<h3 id="strategy-a-channel-duplication">Strategy A: Channel Duplication</h3>
+<p>In Strategy A, the DataLoader duplicates the single grayscale image across all three channels:</p>
+<div class="arithmatex">\[\mathbf{X}_{\text{rep}} = [\mathbf{I}, \, \mathbf{I}, \, \mathbf{I}] \in \mathbb{R}^{3 \times H \times W}\]</div>
+<p>Passing <span class="arithmatex">\(\mathbf{X}_{\text{rep}}\)</span> through the original 3-channel convolution yields the output feature map <span class="arithmatex">\(\mathbf{Y}_A\)</span>:</p>
+<div class="arithmatex">\[\mathbf{Y}_A = W_{\text{rgb}} \ast \mathbf{X}_{\text{rep}} + \mathbf{b} = (W_R \ast \mathbf{I}) + (W_G \ast \mathbf{I}) + (W_B \ast \mathbf{I}) + \mathbf{b}\]</div>
+<p>By the distributive property of 2D cross-correlation (convolution):</p>
+<div class="arithmatex">\[\mathbf{Y}_A = \big(W_R + W_G + W_B\big) \ast \mathbf{I} + \mathbf{b} = \left(\sum_{c \in \{R, G, B\}} W_c \right) \ast \mathbf{I} + \mathbf{b}\]</div>
+<h3 id="strategy-b-first-layer-weight-collapse">Strategy B: First-Layer Weight Collapse</h3>
+<p>In Strategy B, we modify <code>conv1</code> so its input channels <span class="arithmatex">\(C_{\text{in}} = 1\)</span>. The new weight tensor is <span class="arithmatex">\(W_{\text{gray}} \in \mathbb{R}^{C_{\text{out}} \times 1 \times k_h \times k_w}\)</span>. Passing the single-channel image <span class="arithmatex">\(\mathbf{I}\)</span> through this layer yields:</p>
+<div class="arithmatex">\[\mathbf{Y}_B = W_{\text{gray}} \ast \mathbf{I} + \mathbf{b}\]</div>
+<h3 id="the-strict-activation-equivalence-condition">The Strict Activation Equivalence Condition</h3>
+<p>For Strategy B to produce <strong>strictly identical</strong> feature representations to Strategy A for every possible input image (<span class="arithmatex">\(\mathbf{Y}_B \equiv \mathbf{Y}_A \ \forall \ \mathbf{I}\)</span>):</p>
+<div class="arithmatex">\[W_{\text{gray}} \ast \mathbf{I} + \mathbf{b} \equiv \left(\sum_{c \in \{R, G, B\}} W_c \right) \ast \mathbf{I} + \mathbf{b}\]</div>
+<div class="arithmatex">\[W_{\text{gray}} = \sum_{c \in \{R, G, B\}} W_c = \text{sum}\big(W_{\text{rgb}}, \, \text{dim}=1\big)\]</div>
+<h3 id="why-the-channel-mean-fails-equivalence">Why the Channel Mean Fails Equivalence</h3>
+<p>A common beginner trap is computing the channel-wise average:</p>
+<div class="arithmatex">\[W_{\text{mean}} = \frac{1}{3} \big(W_R + W_G + W_B\big)\]</div>
+<p>If you use the mean, the output activation is:</p>
+<div class="arithmatex">\[\mathbf{Y}_{\text{mean}} = \frac{\mathbf{Y}_A-\mathbf{b}}{3}+\mathbf{b}.\]</div>
+<p>The convolution contribution is scaled by one third; the copied bias is unchanged. Only with zero bias does the entire output equal <span class="arithmatex">\(\mathbf{Y}_A/3\)</span>. A changed scale can affect a downstream BatchNorm using pretrained running statistics; its effect after fine-tuning must be measured. The equivalence proof assumes identical channel inputs, padding and copied biases. Separate RGB mean/std normalization after duplication generally makes the channels unequal and breaks that assumption.</p>
+<p>In PyTorch <code>segmentation_models_pytorch</code>, passing <code>in_channels=1</code> automatically implements Strategy B using <strong>channel summation</strong>:
+<pre class="highlight"><code class="language-python"># SMP internal implementation when in_channels=1:
+new_weight = pretrained_weight.sum(dim=1, keepdim=True)
+model.encoder.conv1.weight.data = new_weight</code></pre></p>
+<hr />
+<p><img alt="Repeat channels, replace the stem, or learn an input adapter" src="assets/fig03_grayscale_adaptation_clear.svg" /></p>
+<p><em>These are alternative input strategies. The weight-combination rule and normalization assumptions must be stated explicitly; an average and a sum are not activation-equivalent.</em></p>
+<h2 id="3-hardware-memory-bandwidth-host-to-device-pcie-transfer">3. Hardware &amp; Memory Bandwidth: Host-to-Device (PCIe) Transfer</h2>
+<p>Beyond mathematical equivalence, input channel selection has direct implications for training throughput and hardware resource consumption.</p>
+<p>In modern deep learning training workflows:</p>
+<ol>
+<li>Data augmentations and preprocessing run on the host CPU.</li>
+<li>Batches are transferred from host RAM across the <strong>PCIe bus</strong> (e.g., PCIe 4.0 x16 at ~31.5 GB/s) to GPU VRAM via <code>batch.to(device)</code>.</li>
+<li>The forward and backward passes execute on the GPU Tensor Cores.</li>
+</ol>
+<pre class="highlight"><code class="language-text">Host CPU (RAM) ──────── PCIe Bus Transfer ────────► GPU Device (VRAM)
+Strategy A: [B, 3, 128, 800] (Float32: 3 × 400 KB = 1.2 MB / strip)
+Strategy B: [B, 1, 128, 800] (Float32: 1 × 400 KB = 0.4 MB / strip)  &lt;--- 3x Less Data!</code></pre>
+<h3 id="memory-bandwidth-scaling-factor">Memory Bandwidth Scaling Factor</h3>
+<p>Let <span class="arithmatex">\(B\)</span> be the batch size, and <span class="arithmatex">\((H, W) = (128, 800)\)</span>. For 32-bit floating-point tensors (<code>torch.float32</code>, 4 bytes per element):</p>
+<ul>
+<li>
+<p><strong>Strategy A Batch Size in Bytes:</strong></p>
+<div class="arithmatex">\[\text{Bytes}_A = B \times 3 \times 128 \times 800 \times 4\text{ bytes} = B \times 1{,}228{,}800\text{ bytes}\]</div>
+</li>
+<li>
+<p><strong>Strategy B Batch Size in Bytes:</strong></p>
+<div class="arithmatex">\[\text{Bytes}_B = B \times 1 \times 128 \times 800 \times 4\text{ bytes} = B \times 409{,}600\text{ bytes}\]</div>
+</li>
+</ul>
+<div class="arithmatex">\[\text{Transfer Reduction Factor} = \frac{\text{Bytes}_A}{\text{Bytes}_B} = \frac{3}{1} = 3\times\]</div>
+<p>Strategy B reduces the volume of image data transferred across the PCIe bus by an exact factor of <strong><span class="arithmatex">\(3\times\)</span></strong> (a <span class="arithmatex">\(66.7\%\)</span> reduction). On multi-GPU distributed clusters or bandwidth-constrained systems, this reduces input-transfer bytes, but does not guarantee that I/O is the bottleneck or that total peak VRAM falls by the same factor. Downstream activations, optimizer state and device-side repetition also matter.</p>
+<hr />
+<h2 id="4-guiding-hints-for-question-3">4. Guiding Hints for Question 3</h2>
+<p>To solve Question 3 in <a href="milestone-3.html"><code>MILESTONE_3.md</code></a>:</p>
+<ul>
+<li><strong>Hint 1 (Recall Cross-Correlation Linearity):</strong> Re-read the derivation in Section 2 above. Convolution is a linear operator: <span class="arithmatex">\(W \ast X = \sum_c W_c \ast X_c\)</span>. When <span class="arithmatex">\(X_0 = X_1 = X_2 = I\)</span>, the three operations combine into a single convolution by summing the kernel weights. Choose between <code>sum</code> and <code>mean</code>.</li>
+<li>
+<p><strong>Hint 2 (Verify in PyTorch):</strong> You can verify this identity empirically in PyTorch on CPU:
+  <pre class="highlight"><code class="language-python">import torch
+import torch.nn as nn
+
+conv_rgb = nn.Conv2d(3, 16, kernel_size=3, bias=True)
+conv_gray = nn.Conv2d(1, 16, kernel_size=3, bias=True)
+conv_gray.weight.data = conv_rgb.weight.data.sum(dim=1, keepdim=True)
+conv_gray.bias.data = conv_rgb.bias.data
+
+x_gray = torch.randn(2, 1, 128, 800)
+x_rgb = x_gray.repeat(1, 3, 1, 1)
+
+diff = (conv_rgb(x_rgb) - conv_gray(x_gray)).abs().max().item()
+print("Max absolute difference:", diff)  # small floating-point rounding differences are expected
+torch.testing.assert_close(conv_rgb(x_rgb), conv_gray(x_gray), rtol=1e-5, atol=1e-6)</code></pre></p>
+</li>
+<li>
+<p><strong>Hint 3 (Compute Memory Factor):</strong> Determine the ratio of input tensor elements between a 3-channel batch <code>[B, 3, 128, 800]</code> and a 1-channel batch <code>[B, 1, 128, 800]</code>. Express the reduction factor in the standard multiplier format (e.g., <code>2x</code> or <code>3x</code>).</p>
+</li>
+</ul>
+<hr />
+<h2 id="5-your-assignment-task">5. Your Assignment Task</h2>
+<ol>
+<li>Open <a href="milestone-3.html#question-3-grayscale-input-adaptation-the-single-channel-dilemma">Milestone 3 Assessment: Question 3</a>.</li>
+<li>State the exact mathematical operation (<code>sum</code> or <code>mean</code>) that preserves identical first-layer activations.</li>
+<li>State the exact factor by which Strategy B reduces host-to-device memory transfer size compared to Strategy A.</li>
+<li>Enter your response in the specified format: <code>sum_or_mean, memory_factor</code>.</li>
+</ol></article><nav class="pagination" aria-label="Previous and next page"><a href="guide_02_pretrained_backbone_and_parameter_audit.html">← Q2 · Pretrained Backbones &amp; Parameter Audit</a><a href="guide_04_atrous_convolutions_and_multiscale_aspp.html">Q4 · Atrous Convolutions &amp; ASPP →</a></nav>
+<footer class="endnote"><span class="author-credit"><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg><span>Created by manaykaistha.</span><svg class="credit-flowers" viewBox="0 0 48 32" width="48" height="32" aria-hidden="true" focusable="false">
+<path class="credit-stems" d="M5 30 Q13 25 12 13 M18 31 Q25 21 25 8 M29 30 Q34 24 38 15 M12 24 Q3 17 5 24 Q8 27 12 24 M25 21 Q33 14 32 21 Q28 25 25 21"/>
+<g class="credit-petals"><path d="M12 6 Q16 4 16 8 Q22 8 18 12 Q19 17 14 16 Q10 20 8 15 Q2 14 6 10 Q5 5 12 6Z"/>
+<path d="M25 2 Q29 0 29 4 Q35 4 31 8 Q32 13 27 12 Q23 16 21 11 Q15 10 19 6 Q18 1 25 2Z"/>
+<path d="M38 10 Q42 8 42 12 Q48 12 44 16 Q45 21 40 20 Q36 24 34 19 Q28 18 32 14 Q31 9 38 10Z"/></g>
+<g class="credit-centers"><path d="M9 11 Q14 7 16 11 Q17 15 12 14 Q9 12 13 11 M22 7 Q27 3 29 7 Q30 11 25 10 Q22 8 26 7 M35 15 Q40 11 42 15 Q43 19 38 18 Q35 16 39 15"/></g></svg></span><br>Study the concepts. Practice on toy examples. Compute your own assessment results.</footer></div></main></div></body></html>

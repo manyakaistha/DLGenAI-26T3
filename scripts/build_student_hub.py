@@ -20,6 +20,8 @@ MILESTONES = [
      'Nine concept guides on annotations, masks, evaluation and modeling, with 12 assessment questions and a Q11–Q12 starter notebook.'),
     ('milestones/milestone-2/index.html', 'Milestone 2', 'Build the segmentation pipeline & first submission',
      'Eight question-wise concept guides on RLE encoding and decoding, class prevalence, co-occurrence, correlation, spatial overlap, PyTorch datasets and training dynamics, with 8 assessment questions.'),
+    ('milestones/milestone-3/index.html', 'Milestone 3', 'Transfer learning & stronger segmentation models',
+     'Nine question-wise concept guides on downsampling geometry, pretrained backbones, grayscale adaptation, ASPP atrous convolutions, Soft Dice loss, output head semantics, compound loss, and convergence dynamics, with 9 assessment questions.'),
 ]
 SESSIONS = [
     ('session/index.html', '12 October 2026 · Session 1', 'Pixels, Masks & Experiments',
