@@ -293,6 +293,8 @@ def build(output: Path):
     build_transfer_session(output / "session-3")
     from build_efficiency_session import build as build_efficiency_session
     build_efficiency_session(output / "session-4")
+    from build_inference_session import build as build_inference_session
+    build_inference_session(output / "session-5")
     build_hub(output)
     review_source = ROOT / "guide2701"
     if review_source.is_dir():

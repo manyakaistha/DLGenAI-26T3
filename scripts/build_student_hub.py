@@ -24,6 +24,8 @@ MILESTONES = [
      'Nine question-wise concept guides on downsampling geometry, pretrained backbones, grayscale adaptation, ASPP atrous convolutions, Soft Dice loss, output head semantics, compound loss, and convergence dynamics, with 9 assessment questions.'),
 ]
 SESSIONS = [
+    ('session-5/index.html', '9 November 2026 · Session 5 · 60 minutes', 'Inference You Can Explain',
+     'TTA alignment, EMA and SWA, probability ensembles, threshold decisions, component filtering and reproducible submission, with a synthetic CPU notebook.'),
     ('session/index.html', '12 October 2026 · Session 1', 'Pixels, Masks & Experiments',
      'Revisit label counts, output heads and run-length encoding. Practice experiment tracking in the W&B notebook lab.'),
     ('session-2/index.html', '19 October 2026 · Session 2', 'Dataset, DataLoader & Augmentations',
@@ -51,7 +53,9 @@ def cards(items, current, action):
         + (f'<p><a href="{relative("session-3/presentation/index.html", current)}">Present the 26 October session · interactive slides →</a></p>'
            if url == 'session-3/index.html' else '')
         + (f'<p><a href="{relative("session-4/presentation/index.html", current)}">Present the 29 October session · interactive slides →</a></p>'
-           if url == 'session-4/index.html' else '') + '</div>'
+           if url == 'session-4/index.html' else '')
+        + (f'<p><a href="{relative("session-5/presentation/index.html", current)}">Present the 9 November session · interactive slides →</a></p>'
+           if url == 'session-5/index.html' else '') + '</div>'
         for url, meta, title, description in items) + '</div>'
 
 

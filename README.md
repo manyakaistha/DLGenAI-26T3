@@ -69,3 +69,7 @@ Notes, activities, and an end-to-end cloud training walkthrough on automatic mix
 - [Notebook](docs/efficient_training_session/cloud_training.ipynb)
 
 The notebook demonstrates mixed-precision training and checkpoint validation on GPU.
+
+## 9 November · Inference techniques
+
+[Interactive slides](https://manyakaistha.github.io/DLGenAI-26T3/session-5/presentation/) and [session notes with a synthetic CPU notebook](https://manyakaistha.github.io/DLGenAI-26T3/session-5/) cover TTA, EMA/SWA, prediction ensembles, thresholds, component filtering and verified submission.
