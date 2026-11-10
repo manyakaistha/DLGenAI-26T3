@@ -22,6 +22,10 @@ MILESTONES = [
      'Eight question-wise concept guides on RLE encoding and decoding, class prevalence, co-occurrence, correlation, spatial overlap, PyTorch datasets and training dynamics, with 8 assessment questions.'),
     ('milestones/milestone-3/index.html', 'Milestone 3', 'Transfer learning & stronger segmentation models',
      'Nine question-wise concept guides on downsampling geometry, pretrained backbones, grayscale adaptation, ASPP atrous convolutions, Soft Dice loss, output head semantics, compound loss, and convergence dynamics, with 9 assessment questions.'),
+    ('milestones/milestone-4/index.html', 'Milestone 4', 'Optimize training & audit the evidence',
+     'Seven study guides covering all 10 questions: imbalance, sampling, schedules, checkpointing, AMP, metrics, error analysis and controlled experiments, with synthetic practice and audit checklists.'),
+    ('milestones/milestone-5/index.html', 'Milestone 5', 'Post-process predictions & build reliable inference',
+     'Seven study guides covering all 9 questions: thresholds, connected components, TTA alignment, ensembling, memory and time budgets, and submission audits.'),
 ]
 SESSIONS = [
     ('session-5/index.html', '9 November 2026 · Session 5 · 60 minutes', 'Inference You Can Explain',

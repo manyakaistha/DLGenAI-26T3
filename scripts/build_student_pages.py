@@ -277,6 +277,10 @@ def build(output: Path):
     if (ROOT / "guide2701/milestone-3").is_dir():
         build_milestone_three(ROOT / "guide2701/milestone-3",
                               milestone_one_url="../../milestones/milestone-1/milestone-1.html")
+    from build_milestone_four import build_milestone_four
+    build_milestone_four(output / "milestones/milestone-4")
+    from build_milestone_five import build_milestone_five
+    build_milestone_five(output / "milestones/milestone-5")
     from build_live_session import build as build_session
     build_session(output / "session")
     import build_live_session as session_renderer
