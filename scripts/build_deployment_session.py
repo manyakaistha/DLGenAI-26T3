@@ -12,9 +12,9 @@ from build_student_hub import validate_site
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs/deployment_guide'
-MODULES = ['README', '01_prepare', '02_publish']
-TITLES = ['Overview', '1 · Prepare the files', '2 · Publish on Hugging Face']
-URLS = ['index.html', '01_prepare.html', '02_publish.html']
+MODULES = ['README', '01_prepare', '02_publish', '03_have_a_pth']
+TITLES = ['Overview', '1 · Prepare the files', '2 · Publish on Hugging Face', '3 · I have a .pth file']
+URLS = ['index.html', '01_prepare.html', '02_publish.html', '03_have_a_pth.html']
 ZIP = 'surface_defect_space.zip'
 
 
@@ -33,7 +33,7 @@ def build(out):
     out = Path(out)
     make_zip()
     render_session(
-        out, source_dir=SOURCE, modules=MODULES, titles=TITLES, urls=URLS, downloads=(ZIP,),
+        out, source_dir=SOURCE, modules=MODULES, titles=TITLES, urls=URLS, downloads=(ZIP,), extra_files=('convert_to_weights.py',),
         identity=dict(
             title='Deploy Your Model on Hugging Face', brand='Deploy your<br>model.',
             description='A minimal Gradio app on a free ZeroGPU Hugging Face Space: upload an image and see the predicted masks overlaid.',

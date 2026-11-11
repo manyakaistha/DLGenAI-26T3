@@ -16,6 +16,8 @@ torch.save(model.state_dict(), "weights.pt")
 
 Save the `state_dict` only. Do not save the optimizer or the whole model object. The file is smaller and loads on any machine.
 
+**Already have a `model.pth`?** The name does not matter, but what is inside does. See [page 3 · I already have a `.pth` file](03_have_a_pth.md) for a two-minute fix and a converter.
+
 ## Step 2 · `model.py`: your architecture
 
 Copy your model class here and add a function that builds it **without downloading anything**:

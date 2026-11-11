@@ -4,7 +4,7 @@
 
 You have trained a segmentation model. Now give it a web page: a visitor uploads an image and gets the same image back with the **predicted defect masks drawn on top**.
 
-[Prepare the files](01_prepare.md) · [Publish on Hugging Face](02_publish.md)
+[Prepare the files](01_prepare.md) · [Publish on Hugging Face](02_publish.md) · [I have a `.pth` file](03_have_a_pth.md)
 
 ![The finished app: an input strip and the same strip with coloured predicted masks](figures/overlay_example.png)
 
@@ -33,7 +33,7 @@ You do **not** need the competition data. Never upload it. The Space needs only 
 
 ## The route
 
-1. [Prepare five small files](01_prepare.md) and test them on your own computer.
+1. [Prepare five small files](01_prepare.md) and test them on your own computer. Have a `.pth` file instead of `weights.pt`? See [page 3](03_have_a_pth.md).
 2. [Create a Space and upload them](02_publish.md). Hugging Face builds and runs the app for you.
 3. Open your link, drop in an image, and check the overlay.
 
