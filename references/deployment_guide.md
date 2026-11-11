@@ -11,3 +11,4 @@ Student-facing, 20-minute guide: turn trained weights into a Gradio app on a fre
 - The page has no Ask-AI controls. Published to GitHub Pages at /deployment/ on the user's instruction (11 Nov 2026).
 - `convert_to_weights.py` verified 11 Nov 2026 on five save forms (state_dict, training checkpoint, `module.` prefix, whole pickled model, TorchScript): all load into a fresh model with identical outputs; a missing class gives a plain-language error.
 - `01_prepare.md` explains `app.py` in eight numbered sections (imports, @gpu marker, settings, load once, preprocess, predict 6a–6c, Interface, launch) for beginners (added 11 Nov 2026).
+- The student homepage also has a third card (Deploy Your Model) linking to /deployment/; defined in the `index.html` entry of `directories` in `scripts/build_student_hub.py`.
