@@ -36,7 +36,7 @@ def build(out):
         out, source_dir=SOURCE, modules=MODULES, titles=TITLES, urls=URLS, downloads=(ZIP,),
         identity=dict(
             title='Deploy Your Model on Hugging Face', brand='Deploy your<br>model.',
-            description='A minimal Gradio app on a free Hugging Face Space: upload an image and see the predicted masks overlaid.',
+            description='A minimal Gradio app on a free ZeroGPU Hugging Face Space: upload an image and see the predicted masks overlaid.',
             intro='A 20-minute hands-on guide. Five small files, one free Space.',
             topline='Hands-on guide · Deployment', kicker='Prepare. Publish. Share.',
             hero='From weights<br>to a web page.', caption='Upload an image. See the masks.',

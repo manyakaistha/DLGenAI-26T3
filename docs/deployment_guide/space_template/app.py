@@ -5,13 +5,21 @@ from PIL import Image
 
 from model import build_model          # your model class lives in model.py
 
+try:                                   # free accounts run on ZeroGPU, which provides `spaces`
+    import spaces
+    gpu = spaces.GPU(duration=20)
+except ImportError:                    # on your own computer this does nothing
+    def gpu(fn):
+        return fn
+
 THRESHOLD = 0.5                        # use the value you tuned on validation
 NAMES = ["defect_a", "defect_b", "defect_c", "defect_d"]
 COLORS = np.array([[230, 57, 70], [42, 157, 143], [69, 123, 255], [244, 162, 97]], dtype=np.float32)
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model = build_model()
 model.load_state_dict(torch.load("weights.pt", map_location="cpu"))
-model.eval()
+model.to(device).eval()
 
 
 def preprocess(gray):
@@ -21,10 +29,11 @@ def preprocess(gray):
     return torch.from_numpy(x)[None, None]            # (1, 1, 128, 800)
 
 
+@gpu
 def predict(image):
     gray = image.convert("L").resize((800, 128))       # width 800, height 128
     with torch.no_grad():
-        probs = torch.sigmoid(model(preprocess(gray)))[0].numpy()   # (4, 128, 800)
+        probs = torch.sigmoid(model(preprocess(gray).to(device)))[0].cpu().numpy()   # (4, 128, 800)
 
     canvas = np.stack([np.asarray(gray, dtype=np.float32)] * 3, axis=-1)
     for c in range(4):

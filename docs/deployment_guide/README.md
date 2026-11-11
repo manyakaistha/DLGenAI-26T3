@@ -14,7 +14,7 @@ You have trained a segmentation model. Now give it a web page: a visitor uploads
 | --- | --- |
 | **Hugging Face Spaces** | Free hosting for small apps, with a public link you can share. |
 | **Gradio** | One `gr.Interface(...)` call builds the whole upload-and-show page. No HTML, no server code. |
-| **CPU only** | One 128 × 800 image is small. A free CPU Space is enough. |
+| **ZeroGPU (free)** | Free accounts run Gradio apps on a shared GPU that is lent to your function only while it runs. One 128 × 800 image needs a second or two. |
 
 ## What the app does
 
@@ -27,7 +27,7 @@ Steps 2 to 4 are the same three things you already do at validation time: prepar
 - A trained model's **weights file** (`weights.pt`) and the **Python class** that builds the same architecture.
 - The **preprocessing** used in training (resize, normalisation).
 - Your chosen **threshold**.
-- A free account on [huggingface.co](https://huggingface.co).
+- A free account on [huggingface.co](https://huggingface.co) with a verified email. ZeroGPU hosting needs an account older than 30 days.
 
 You do **not** need the competition data. Never upload it. The Space needs only code and weights.
 

@@ -46,13 +46,21 @@ from PIL import Image
 
 from model import build_model          # your model class lives in model.py
 
+try:                                   # free accounts run on ZeroGPU, which provides `spaces`
+    import spaces
+    gpu = spaces.GPU(duration=20)
+except ImportError:                    # on your own computer this does nothing
+    def gpu(fn):
+        return fn
+
 THRESHOLD = 0.5                        # use the value you tuned on validation
 NAMES = ["defect_a", "defect_b", "defect_c", "defect_d"]
 COLORS = np.array([[230, 57, 70], [42, 157, 143], [69, 123, 255], [244, 162, 97]], dtype=np.float32)
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model = build_model()
 model.load_state_dict(torch.load("weights.pt", map_location="cpu"))
-model.eval()
+model.to(device).eval()
 
 
 def preprocess(gray):
@@ -62,10 +70,11 @@ def preprocess(gray):
     return torch.from_numpy(x)[None, None]            # (1, 1, 128, 800)
 
 
+@gpu
 def predict(image):
     gray = image.convert("L").resize((800, 128))       # width 800, height 128
     with torch.no_grad():
-        probs = torch.sigmoid(model(preprocess(gray)))[0].numpy()   # (4, 128, 800)
+        probs = torch.sigmoid(model(preprocess(gray).to(device)))[0].cpu().numpy()   # (4, 128, 800)
 
     canvas = np.stack([np.asarray(gray, dtype=np.float32)] * 3, axis=-1)
     for c in range(4):
@@ -91,10 +100,14 @@ if __name__ == "__main__":
 
 | Chunk | What it does |
 | --- | --- |
-| **Load once** | Builds the model, loads `weights.pt`, calls `eval()`. This runs when the Space starts, not on every upload. |
+| **Load once** | Builds the model, loads `weights.pt`, calls `eval()` and puts it on the GPU if there is one. This runs when the Space starts, not on every upload. |
 | **`preprocess`** | Turns a grayscale picture into a `(1, 1, 128, 800)` tensor. **Copy your training recipe here.** |
 | **`predict`** | Resizes to 800 × 128, runs the model, applies `sigmoid`, keeps pixels above the threshold. |
 | **Overlay** | For each defect, blends 50 % of its colour into the masked pixels. `canvas[hit]` selects only the defect pixels. |
+
+### Why the `@gpu` line?
+
+Free Hugging Face accounts run Gradio apps on **ZeroGPU**: a shared GPU that is lent to your function only while it runs. ZeroGPU insists that at least one function is marked with `@spaces.GPU`, otherwise the Space stops with *"No @spaces.GPU function detected"*. The `try / except` at the top gives you that marker on Hugging Face and quietly does nothing on your own computer, so the same file works in both places.
 
 `gr.Interface` then connects `predict` to an upload box and an output image. That one call *is* the web app.
 
@@ -116,17 +129,16 @@ if __name__ == "__main__":
 ## Step 4 · `requirements.txt`
 
 ```text
---extra-index-url https://download.pytorch.org/whl/cpu
-torch
+torch==2.8.0
 numpy
 pillow
 ```
 
-The first line asks for the smaller CPU build of PyTorch, so the Space builds faster. Gradio is installed automatically from the version named in `README.md`; do not list it here.
+ZeroGPU supports PyTorch **2.8.0 or newer**, so pin 2.8.0 or higher. Do **not** add a CPU-only PyTorch line: ZeroGPU needs the normal build with GPU support. Gradio is installed automatically from the version named in `README.md`; do not list it here. The `spaces` library is already installed on Hugging Face.
 
 ## Step 5 · `README.md`: the Space settings
 
-Hugging Face reads this short header to know how to run your app:
+Hugging Face reads this short header to know how to run your app. ZeroGPU only supports Python `3.12.12` and `3.10.13`, so keep the `python_version` line:
 
 ```yaml
 ---
@@ -136,6 +148,7 @@ colorFrom: blue
 colorTo: green
 sdk: gradio
 sdk_version: 6.31.0
+python_version: "3.12.12"
 app_file: app.py
 pinned: false
 ---

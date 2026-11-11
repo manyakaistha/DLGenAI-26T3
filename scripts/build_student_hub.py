@@ -29,7 +29,7 @@ MILESTONES = [
 ]
 SESSIONS = [
     ('deployment/index.html', 'Hands-on guide · 20 minutes', 'Deploy Your Model on Hugging Face',
-     'Turn your trained weights into a web app: upload an image, get the predicted masks overlaid. Gradio and a free CPU Space, with a starter folder to download.'),
+     'Turn your trained weights into a web app: upload an image, get the predicted masks overlaid. Gradio on a free ZeroGPU Space, with a starter folder to download.'),
     ('session-5/index.html', '9 November 2026 · Session 5 · 60 minutes', 'Inference You Can Explain',
      'TTA alignment, EMA and SWA, probability ensembles, threshold decisions, component filtering and reproducible submission, with a synthetic CPU notebook.'),
     ('session/index.html', '12 October 2026 · Session 1', 'Pixels, Masks & Experiments',

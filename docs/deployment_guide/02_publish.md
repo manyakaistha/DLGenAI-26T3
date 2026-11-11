@@ -7,7 +7,7 @@ Your folder works locally. Now put it online.
 1. Sign in at [huggingface.co](https://huggingface.co) and open **New Space** from the profile menu, or go to `huggingface.co/new-space`.
 2. Give it a name, for example `surface-defects`.
 3. Choose **Gradio** as the SDK and the **Blank** template.
-4. Keep the hardware as **CPU basic** (free).
+4. Choose **ZeroGPU** as the hardware. It is the free option for Gradio apps on a free account (the **CPU basic** card is greyed out unless you have PRO).
 5. Choose **Public** to share a link, or **Private** to keep it to yourself. Press **Create Space**.
 
 ## Step 2 · Upload the five files
@@ -20,7 +20,7 @@ Replace the README that Hugging Face generated. Press **Commit changes to main**
 
 ## Step 3 · Wait for the build
 
-Open the **App** tab. The status badge goes **Building → Running**. The first build installs PyTorch, so give it a few minutes. Press **Logs** to watch.
+Open the **App** tab. The status badge goes **Building → Running**. The first build installs PyTorch, which is large, so give it a few minutes. Press **Logs** to watch.
 
 When the badge says **Running**, your app appears on the page and at `https://huggingface.co/spaces/<your-username>/<space-name>`.
 
@@ -43,7 +43,10 @@ Open **Logs** first. The last red line usually names the problem.
 | `FileNotFoundError: weights.pt` | The weights were not uploaded | Upload the file to the root of the Space |
 | Output shows no colour at all | Threshold too high, or wrong activation | Print `probs.max()` locally. Check `sigmoid` versus `softmax` |
 | The whole image is coloured | Preprocessing differs from training, or the threshold is too low | Compare `preprocess` with the training pipeline |
-| CUDA error | The model was loaded on a GPU | Keep `map_location="cpu"` |
+| `No @spaces.GPU function detected` | ZeroGPU is selected but no function carries the marker | Use the template `app.py`: it has `@gpu` above `predict` |
+| `Expected all tensors to be on the same device` | The model and the image are on different devices | Keep `.to(device)` on the input and `.cpu()` on the output, as in the template |
+| `Python version ... not supported` | Wrong `python_version` for ZeroGPU | Use `3.12.12` (or `3.10.13`) in the `README.md` header |
+| `You have exceeded your GPU quota` | The daily free GPU time is used up | Wait for it to reset, or log in. It resets 24 hours after first use |
 
 ## Optional · Upload from the command line
 
@@ -57,6 +60,12 @@ hf upload <your-username>/surface-defects . . --repo-type=space
 ```
 
 The last command uploads the current folder. Run it again after every edit, and the Space rebuilds.
+
+## Free-account limits
+
+- A free account can host **2 ZeroGPU Spaces**, and only if the account is more than **30 days old** with a **verified email**.
+- GPU time is a daily quota per visitor: about **5 minutes** for a logged-in free account, **2 minutes** for a visitor who is not logged in. One image takes a second or two, so this is plenty.
+- If you cannot create a ZeroGPU Space, check your email verification and account age first.
 
 ## Keep your deployment honest
 
