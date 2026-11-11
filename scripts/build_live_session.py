@@ -148,6 +148,8 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
             assert (out/path).is_file(),f'Broken link: {url}: {link}'
             if p.fragment and path in pages: assert unquote(p.fragment) in pages[path].ids,(url,link)
     version_theme_assets(out)
-    print(f'Built and link-checked {len(pages)} session pages; notebook: {len(json.loads((source_dir/downloads[0]).read_text(encoding="utf-8"))["cells"])} cells → {out}')
+    first=source_dir/downloads[0]
+    detail=f'notebook: {len(json.loads(first.read_text(encoding="utf-8"))["cells"])} cells' if first.suffix=='.ipynb' else f'download: {first.name}'
+    print(f'Built and link-checked {len(pages)} session pages; {detail} → {out}')
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,default=ROOT/'runs/live_session_preview');build(ap.parse_args().output.resolve())
