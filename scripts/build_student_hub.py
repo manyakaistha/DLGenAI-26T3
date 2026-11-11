@@ -93,6 +93,7 @@ def build_hub(output):
         nav_items += [('live-sessions/index.html', 'Live Session Resources')]
         if current == 'live-sessions/index.html':
             nav_items += [(url, title) for url, _, title, _ in SESSIONS]
+        nav_items += [('deployment/index.html', 'Deploy Your Model')]
         nav = '<nav class="nav" aria-label="Resource navigation">' + ''.join(
             f'<a href="{relative(url, current)}"' + (' aria-current="page"' if url == current else '') + f'>{html.escape(label)}</a>' for url, label in nav_items) + '</nav>'
         page = re.sub(r'<div class="desktop-nav">.*?</details>\s*<footer>', lambda _: f'<div class="desktop-nav">{nav}</div><details class="mobile-menu"><summary>Browse resources</summary>{nav}</details><footer>', page, count=1, flags=re.S)
