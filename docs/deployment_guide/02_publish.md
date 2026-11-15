@@ -2,6 +2,8 @@
 
 Your folder works locally. Now put it online.
 
+**Account too new for ZeroGPU?** Use the separate [Streamlit Community Cloud route](04_new_account.md). The steps below remain the Hugging Face route for eligible accounts.
+
 ## Step 1 · Create the Space
 
 1. Sign in at [huggingface.co](https://huggingface.co) and open **New Space** from the profile menu, or go to `huggingface.co/new-space`.

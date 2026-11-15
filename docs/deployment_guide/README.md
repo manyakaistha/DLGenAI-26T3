@@ -6,6 +6,8 @@ You have trained a segmentation model. Now give it a web page: a visitor uploads
 
 [Prepare the files](01_prepare.md) · [Publish on Hugging Face](02_publish.md) · [I have a `.pth` file](03_have_a_pth.md)
 
+**Hugging Face account under 30 days old?** Follow [page 4 · Deploy free with Streamlit Community Cloud](04_new_account.md). It provides a hosted image-to-overlay demo on CPU using GitHub, with no Hugging Face account needed.
+
 ![The finished app: an input strip and the same strip with coloured predicted masks](figures/overlay_example.png)
 
 ## Why this is the simplest route

@@ -12,3 +12,10 @@ Student-facing, 20-minute guide: turn trained weights into a Gradio app on a fre
 - `convert_to_weights.py` verified 11 Nov 2026 on five save forms (state_dict, training checkpoint, `module.` prefix, whole pickled model, TorchScript): all load into a fresh model with identical outputs; a missing class gives a plain-language error.
 - `01_prepare.md` explains `app.py` in eight numbered sections (imports, @gpu marker, settings, load once, preprocess, predict 6a–6c, Interface, launch) for beginners (added 11 Nov 2026).
 - The student homepage also has a third card (Deploy Your Model) linking to /deployment/; defined in the `index.html` entry of `directories` in `scripts/build_student_hub.py`.
+
+## New-account fallback · 15 November 2026
+
+- Added `04_new_account.md` → `/deployment/04_new_account.html`: free Streamlit Community Cloud CPU hosting via GitHub for students ineligible for HF ZeroGPU. Existing HF instructions/template retained; overview and publish page link the fallback.
+- `streamlit_template/{app.py,model.py,requirements.txt}` → deterministic `surface_defect_streamlit.zip`, included by `scripts/build_deployment_session.py`. No weights/data shipped. CPU torch 2.8.0, Streamlit 1.51.0, Python 3.12; cached model, upload, Predict button, four sigmoid overlays. Model/preprocessing/postprocessing must match each student's training; aspect ratio checked before resizing to native 800×128.
+- Guide covers public GitHub deployment, Git LFS for large checkpoints, CPU memory/speed limits, hibernation and cached-model reboot. Official Streamlit/HF docs checked 15 Nov. This is hosted CPU inference, not a temporary Gradio tunnel or a free GPU promise.
+- Validation: all 193 publication HTML pages pass local link/anchor checks; Streamlit AppTest exercises upload, Predict/image output and aspect-ratio rejection; synthetic pixel checks verify overlays and model caching. Existing HF starter archive remains byte-identical. No live Streamlit account deployment was performed.
