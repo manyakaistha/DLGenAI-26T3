@@ -122,6 +122,7 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
                     pager += f'<a href="{urls[0]}">Back to session overview →</a>'
                 else:
                     pager += f'<a href="{urls[i+1]}">{html.escape(titles[i+1])} →</a>'
+        top_action = f'<a href="{downloads[0]}" download>{html.escape(design["download_label"])}</a>' if downloads else f'<a href="presentation/index.html">{html.escape(design["download_label"] or "Interactive slides ↗")}</a>'
         page=f'''<!doctype html><html lang="en" data-theme="paper"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · {html.escape(design["title"])}</title>
 <meta name="description" content="{html.escape(design["description"], quote=True)}">
 <link rel="stylesheet" href="{asset('site.css')}"><link rel="stylesheet" href="{asset('styles/generative/theme.css')}"><link rel="stylesheet" href="{asset('styles/generative/navigation.css')}">
@@ -133,7 +134,7 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
 <body data-overview="{str(i==0).lower()}"><div class="reading-progress" aria-hidden="true"></div><a class="skip" href="#main">Skip to content</a><div class="layout"><aside class="sidebar"><span class="eyebrow">DLGenAI · live lab</span><a class="brand" href="index.html">{design["brand"]}</a><p>{html.escape(design["intro"])}</p>
 <details class="palette-panel"><summary>Choose your palette</summary><div class="theme-options">{palette}</div><button class="motion-toggle" aria-pressed="true">Pause header motion</button></details>
 <div class="desktop-nav"><input class="search" type="search" aria-label="Search session" placeholder="Search session…"><div class="results" aria-live="polite"></div>{nav}</div><details class="mobile-menu"><summary>Browse session</summary>{nav}</details><footer><a href="https://manyakaistha.github.io/DLGenAI-26T3/">Milestone study guides ↗</a></footer></aside>
-<main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span><a href="{downloads[0]}" download>{html.escape(design["download_label"])}</a></div>
+<main id="main"><div class="content"><div class="topline"><span>{html.escape(design["topline"])}</span>{top_action}</div>
 <div class="garden-hero"><canvas aria-hidden="true"></canvas><div class="hero-copy"><span class="hero-kicker">{html.escape(design["kicker"])}</span><p class="hero-title">{design["hero"]}</p><p class="hero-caption">{html.escape(design["caption"])}</p></div></div>
 <span class="section-label">{html.escape(title)}</span><details class="toc"><summary>On this page</summary>{md.toc}</details><article>{body}</article><nav class="pagination">{pager}</nav><footer class="endnote"><span class="author-credit">{CREDIT_ART}<span>Created by manaykaistha.</span>{CREDIT_ART}</span></footer></div></main></div></body></html>'''
         (out/url).write_text(page, encoding="utf-8")
@@ -148,8 +149,11 @@ def build(out, *, source_dir=None, modules=None, titles=None, urls=None,
             assert (out/path).is_file(),f'Broken link: {url}: {link}'
             if p.fragment and path in pages: assert unquote(p.fragment) in pages[path].ids,(url,link)
     version_theme_assets(out)
-    first=source_dir/downloads[0]
-    detail=f'notebook: {len(json.loads(first.read_text(encoding="utf-8"))["cells"])} cells' if first.suffix=='.ipynb' else f'download: {first.name}'
+    if downloads:
+        first=source_dir/downloads[0]
+        detail=f'notebook: {len(json.loads(first.read_text(encoding="utf-8"))["cells"])} cells' if first.suffix=='.ipynb' else f'download: {first.name}'
+    else:
+        detail='slides-only session'
     print(f'Built and link-checked {len(pages)} session pages; {detail} → {out}')
 if __name__=='__main__':
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,default=ROOT/'runs/live_session_preview');build(ap.parse_args().output.resolve())

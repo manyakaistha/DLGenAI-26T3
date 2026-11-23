@@ -299,6 +299,8 @@ def build(output: Path):
     build_efficiency_session(output / "session-4")
     from build_inference_session import build as build_inference_session
     build_inference_session(output / "session-5")
+    from build_distillation_session import build as build_distillation_session
+    build_distillation_session(output / "session-6")
     from build_deployment_session import build as build_deployment_session
     build_deployment_session(output / "deployment")
     build_hub(output)
