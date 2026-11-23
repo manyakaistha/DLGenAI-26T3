@@ -46,13 +46,13 @@ def build(out):
         downloads=(),
         identity=dict(
             title='Session 6 · Distillation, Pseudo-Labeling & Data Tricks · 23 November 2026',
-            brand='Teach smaller.<br>Label smarter.',
+            brand='Ensemble distillation &amp; pseudo-labeling',
             description='Ensemble distillation, pseudo-labeling, domain shift, resolution, copy-paste augmentation and probability calibration.',
-            intro='23 November 2026 · 40 minutes · interactive animated slides.',
+            intro='23 November 2026 · Interactive slides and study guides',
             topline='Live Session 6 · 23 November 2026',
-            kicker='Distill. Pseudo. Clean. Calibrate.',
-            hero='Teach smaller.<br>Label smarter.',
-            caption='A focused 40-minute tour of distillation, pseudo-labeling, and data-centric habits.',
+            kicker='Segmentation',
+            hero='Ensemble distillation<br>and pseudo-labeling',
+            caption='Training targets, unlabeled images, and data quality.',
             download_label='',
         ),
     )

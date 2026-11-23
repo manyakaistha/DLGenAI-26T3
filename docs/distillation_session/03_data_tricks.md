@@ -1,6 +1,6 @@
-# Data-centric tricks that move the needle
+# Data quality and augmentation
 
-Swapping one backbone for another often gives a tiny bump. Understanding what is actually happening *inside the data*—shift, scale, rarity, and label noise—often gives a much bigger jump. Here are four data-centric habits that consistently matter in industrial segmentation.
+A model can miss defects because the camera changed, the input lost detail, the class has too few examples, or annotators drew different boundaries. Check which problem shows up in your validation errors.
 
 ## 1. Domain shift and source mix
 

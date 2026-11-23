@@ -4,8 +4,8 @@
 
 | Technique | Main goal | Extra training data? | Inference cost | Main pitfall |
 | --- | --- | --- | --- | --- |
-| **Ensemble** | Higher accuracy & lower variance | No | $M \times$ slower | Heavy to deploy |
-| **Distillation** | Compress ensemble into 1 fast student | No (uses OOF soft maps) | $1 \times$ (single model) | In-fold teacher leakage or overconfident teacher |
+| **Ensemble** | Higher accuracy & lower variance | No | $M$ forward passes per view | Heavy to deploy |
+| **Distillation** | Compress ensemble into 1 fast student | No (uses OOF soft maps) | $1 \times$ (single model) | Teacher overconfidence or validation leakage |
 | **Pseudo-labeling** | Learn from unlabeled / target-domain images | Yes (unlabeled pool) | $1 \times$ (single model) | Confirmation bias & validation leakage |
 | **Copy-paste** | Boost rare-class recall | Synthetic combinations | $1 \times$ (single model) | Visible paste seams / edge-halo shortcuts |
 | **Calibration (Platt / $T$)** | Honest probabilities for blending & gating | No (fit on OOF) | Negligible | Fitting on training data instead of OOF |

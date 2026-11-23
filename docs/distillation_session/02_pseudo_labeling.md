@@ -5,7 +5,7 @@
 In real projects, collecting raw images is cheap, while drawing pixel-accurate masks is slow and expensive. You often end up with:
 
 - A **labeled** training set (images + ground-truth masks).
-- An **unlabeled** pool (extra factory strips, or test-domain images without labels).
+- An **unlabeled** pool (such as extra factory strips from the deployment camera).
 
 **Pseudo-labeling** (also called **self-training**) uses your best current model or ensemble—the *teacher*—to predict masks on those unlabeled images, then trains a new *student* model on **labeled + pseudo-labeled** data together.
 
@@ -16,14 +16,14 @@ When it works, pseudo-labeling does two things at once:
 
 ## The self-training loop (Noisy Student intuition)
 
-A clean, modern self-training round looks like this:
+A Noisy Student training round has four steps.
 
 1. **Train a strong teacher** (ideally a diverse ensemble) on the labeled training set.
 2. **Predict on the unlabeled pool** using your best inference setup (e.g., ensemble + TTA).
-3. **Filter or soften the predictions** so noisy guesses do not poison the student.
+3. **Filter the predictions** by confidence or keep them as soft targets.
 4. **Train a fresh student** on the combined dataset—using **stronger data augmentation** (flips, brightness/contrast jitter, random crops, dropout) on the student than on the teacher.
 
-Why add noise/augmentation to the student? Because the teacher predicted on a *clean* image (with TTA), while the student has to match that same mask on a *harder, augmented* version of the image. That forces the student to generalize beyond the teacher instead of just memorizing it.
+Why add noise/augmentation to the student? Because the teacher predicted on a *clean* image (with TTA), while the student has to match that same mask on a *harder, augmented* version of the image. Apply each geometric transform to both the image and the target mask.
 
 ## Hard vs. soft pseudo-labels
 
@@ -45,9 +45,7 @@ Two simple guards keep confirmation bias in check:
 - **Confidence filtering**: only keep unlabeled images (or pixels) where the teacher is clearly confident—for example, high max probability for positive masks, or very low max probability for clean masks—and ignore the ambiguous middle band.
 - **Controlled mixing ratio**: do not let pseudo-labeled images overwhelm real human labels. Start with a modest mix (e.g., 20–30% of each batch or a lower loss weight like `0.5×` on pseudo-labeled samples) and verify on your held-out validation set.
 
-## Validation discipline: never leak your ruler
-
-Your validation set is your ruler. Never bend it:
+## Keep validation separate
 
 - **Never** include validation images in the unlabeled pseudo-labeling pool.
 - **Never** use a model trained on fold $k$'s validation images to generate pseudo-labels for fold $k$.

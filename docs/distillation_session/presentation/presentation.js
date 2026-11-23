@@ -12,13 +12,13 @@
   const reset = () => btn('Reset', 'reset');
   const panel = (content, cls='') => `<div class="panel ${cls}">${content}</div>`;
   const callout = text => `<div class="callout">${text}</div>`;
-  const quiz = (question, options, correct, explanation) => `<div data-lab="quiz" data-correct="${correct}" data-explanation="${escape(explanation)}"><div class="question">${question}</div><div class="quiz-options" style="margin-top:18px">${options.map((text,i)=>btn(text,`answer-${i}`,'answer-button')).join('')}</div><div class="answer" role="status">Choose an answer, then explain your reasoning.</div>${reset()}</div>`;
+  const quiz = (question, options, correct, explanation) => `<div data-lab="quiz" data-correct="${correct}" data-explanation="${escape(explanation)}"><div class="question">${question}</div><div class="quiz-options" style="margin-top:18px">${options.map((text,i)=>btn(text,`answer-${i}`,'answer-button')).join('')}</div><div class="answer" role="status">Choose an answer.</div>${reset()}</div>`;
   // Explanations have a deliberate reading order: takeaway, reasoning, then caveat.
   const lesson = (label, title, rows, foot='') => `<aside class="lesson-notes"><div class="notes-kicker">${label}</div><h3 class="notes-title">${title}</h3><dl class="notes-reasoning">${rows.map(([label,text])=>`<div><dt>${label}</dt><dd>${text}</dd></div>`).join('')}</dl>${foot?`<div class="notes-foot">${foot}</div>`:''}</aside>`;
 /* SESSION_CONTENT */
   $('#slides').innerHTML=slides.map((s,i)=>`<section id="${s.id}" class="slide ${s.hero?'hero':''}" aria-labelledby="title-${i}" ${i?'hidden inert':''}>${s.hero?'':`<div class="eyebrow">${escape(s.chapter)}</div><h2 id="title-${i}" tabindex="-1">${escape(s.title)}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:''}`} ${s.body}</section>`).join('');
   $('#start h1').id='title-0'; $('#start h1').tabIndex=-1;
-  const chapters=[['01','TTA','tta'],['02','EMA','ema'],['03','Decisions','thresholds'],['04','Evidence','validation']];
+  const chapters=[['01','Distillation','dark-knowledge'],['02','Pseudo-labeling','pseudo-intro'],['03','Data quality','data-shift'],['04','Calibration','calibration']];
   $('#chapter').classList.add('sr-only');
   $('#chapter').insertAdjacentHTML('afterend',`<nav class="chapter-nav" aria-label="Jump to a chapter">${chapters.map(([n,label,id])=>`<button data-jump="${id}"><span>${n}</span> ${label}</button>`).join('')}</nav>`);
   const themes=['paper','midnight','moss','butter','blush','mono'];
@@ -73,7 +73,7 @@
   const dialog=$('#index-dialog');
   $('#contents').onclick=()=>{settle();$('#slide-search').value='';filterIndex();dialog.showModal();$('#slide-search').focus();};$('#close-index').onclick=()=>dialog.close();
   $('#include-optional').onchange=e=>{includeOptional=e.target.checked;go(current,false);};
-  const indexGroups=[['Opening',[slides[0]]],...chapters.map(([n,label])=>[`${n} / ${label}`,slides.filter(s=>s.chapter.startsWith(n))]),['Optional / Beyond the core',slides.filter(s=>s.optional)]];
+  const indexGroups=[['Opening',[slides[0]]],...chapters.map(([n,label])=>[`${n} / ${label}`,slides.filter(s=>s.chapter.startsWith(n))]),['Further reading',slides.filter(s=>s.optional)]];
   $('#index-list').innerHTML=indexGroups.map(([label,items])=>`<section class="index-group"><h3>${label}</h3><div>${items.map(s=>`<button type="button" data-jump="${s.id}" data-search="${escape((s.title+' '+s.chapter+' '+(s.lede||'')+' '+s.body.replace(/<[^>]*>/g,' ')).toLowerCase())}" class="${s.optional?'optional':''}"><span>${String(slides.indexOf(s)+1).padStart(2,'0')}</span><strong>${escape(s.title)}</strong><i aria-hidden="true">↗</i></button>`).join('')}</div></section>`).join('');
   function filterIndex(){
     const terms=$('#slide-search').value.trim().toLowerCase().split(/\s+/).filter(Boolean);

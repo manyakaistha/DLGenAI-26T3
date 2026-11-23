@@ -1,6 +1,6 @@
 # Calibration, confirmation bias & when to stop
 
-Distillation, pseudo-labeling, and ensembling all share one quiet assumption: **the probabilities coming out of your models actually mean what they say.**
+Calibration measures how often predictions at a given confidence level are correct.
 
 ## Why calibration matters
 
@@ -21,7 +21,7 @@ You do not need a complex post-processor to calibrate a segmentation model. On a
 - **Platt scaling** (2 parameters per class—slope $a$ and bias $b$):
   $$p_{\text{cal}} = \sigma(a \cdot z + b)$$
 
-Both are monotonic (they preserve the ranking of pixels within a class), fast to fit on OOF logits, and cheap to apply at inference time. Always fit them **out-of-fold** so you do not overfit the calibration parameters themselves.
+With positive $T$ and $a$, both methods preserve pixel ranking within a class. Fit the parameters on out-of-fold predictions and measure calibration on separate data.
 
 ## Guarding against confirmation bias
 
@@ -35,7 +35,7 @@ When you combine pseudo-labeling with multiple rounds (Gen 1 → Gen 2 → Gen 3
 
 Before you trust any distillation, pseudo-labeling, or data-centric change:
 
-1. **Lock your validation ruler**: same held-out folds, never touched by teachers or pseudo-labels, evaluated on the target-like slice if domain shift exists.
+1. **Keep validation fixed**: same held-out folds, never touched by teachers or pseudo-labels, evaluated on the target-like slice if domain shift exists.
 2. **Check calibration first**: inspect whether teacher probabilities are overconfident before blending or distilling.
 3. **Change one thing at a time**: test distillation *or* pseudo-labeling *or* copy-paste separately so you know what actually helped.
 4. **Check both sides of the metric**: track positive-mask Dice *and* empty-image false positives (and per-class recall for rare defects).

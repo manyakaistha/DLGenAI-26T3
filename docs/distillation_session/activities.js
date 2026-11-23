@@ -41,10 +41,10 @@ function renderTemp(el) {
     });
     const gap = (ps[2] - ps[3]).toFixed(3);
     status.textContent = T < 1
-      ? `Sharp (T=${T.toFixed(1)}): smudge vs clean gap is only ${gap}. Soft signal vanishes.`
+      ? `Sharp (T=${T.toFixed(1)}): smudge vs clean gap is ${gap}.`
       : T <= 1.2
         ? `Standard (T=${T.toFixed(1)}): smudge=${ps[2].toFixed(2)}, clean=${ps[3].toFixed(2)} (gap ${gap}).`
-        : `Softened (T=${T.toFixed(1)}): smudge=${ps[2].toFixed(2)} vs clean=${ps[3].toFixed(2)} (gap ${gap}) — dark knowledge is clearly visible!`;
+        : `Softened (T=${T.toFixed(1)}): smudge=${ps[2].toFixed(2)} vs clean=${ps[3].toFixed(2)} (gap ${gap}).`;
   };
   slider.oninput = draw;
   el.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => { slider.value = b.dataset.preset; draw(); });
@@ -55,10 +55,10 @@ function renderTemp(el) {
 function renderDistillFlow(el) {
   let step = 0, timer = null;
   const stages = [
-    { label: 'Ready', desc: 'Click Animate to trace 1 image through a 3-model teacher ensemble into 1 fast student.' },
-    { label: 'Step 1 · Ensemble teachers', desc: '3 diverse teachers (ConvNeXt, SegFormer, UNet++) each run on the OOF image: 3× compute.' },
-    { label: 'Step 2 · Soft average', desc: 'Teacher probability maps average into one smooth soft target — preserving boundary uncertainty.' },
-    { label: 'Step 3 · Single student', desc: '1 fast student learns from soft target + ground truth. At test time: 1× latency, ~3× faster!' }
+    { label: 'Ready', desc: 'Play the animation or advance one step at a time.' },
+    { label: 'Step 1 · Ensemble teachers', desc: 'Three teachers each predict a probability map for the same held-out image.' },
+    { label: 'Step 2 · Soft average', desc: 'Average the three probability maps to form a soft target.' },
+    { label: 'Step 3 · Single student', desc: 'Train the student on the soft target and the human mask. Deploy the student on its own.' }
   ];
   el.innerHTML = `
     <div class="inf-controls">
@@ -67,15 +67,15 @@ function renderDistillFlow(el) {
       <button type="button" data-reset>Reset</button>
     </div>
     <div class="d6-flow">
-      <div class="d6-node" data-stage="1"><strong>3 Teachers</strong><small>3× latency · OOF</small></div>
+      <div class="d6-node" data-stage="1"><strong>3 Teachers</strong><small>3 forward passes</small></div>
       <div class="d6-arrow" data-stage="2">→</div>
       <div class="d6-node" data-stage="2"><strong>Soft Map</strong><small>0.94 / 0.62 / 0.18</small></div>
       <div class="d6-arrow" data-stage="3">→</div>
-      <div class="d6-node d6-student" data-stage="3"><strong>1 Student</strong><small>1× latency · Shipped</small></div>
+      <div class="d6-node d6-student" data-stage="3"><strong>1 Student</strong><small>1 forward pass</small></div>
     </div>
     <div class="d6-metrics">
       <div><span>Inference passes</span><strong data-m="passes">3 → 1</strong></div>
-      <div><span>VRAM at deploy</span><strong data-m="vram">3× → 1×</strong></div>
+      <div><span>Deployed models</span><strong>1</strong></div>
       <div><span>Boundary signal</span><strong data-m="sig">Soft OOF</strong></div>
     </div>
     <p class="inf-readout" role="status"></p>`;
@@ -132,9 +132,9 @@ function renderPseudo(el) {
       const pass = s.p >= tau;
       if (pass) { kept++; if (!s.ok) wrong++; }
       const cls = pass ? (s.ok ? 'is-good' : 'is-bad') : 'is-skip';
-      return `<div class="d6-strip ${cls}"><span>${s.id}</span><strong>${s.p.toFixed(2)}</strong><small>${pass ? (s.ok ? '✓ kept' : '✗ FP!') : 'skip'}</small></div>`;
+      return `<div class="d6-strip ${cls}"><span>${s.id}</span><strong>${s.p.toFixed(2)}</strong><small>${pass ? (s.ok ? '✓ kept' : 'false positive') : 'skip'}</small></div>`;
     }).join('');
-    const risk = kept === 0 ? 'None (0 kept)' : wrong === 0 ? 'Low (clean)' : wrong === 1 ? 'Moderate (1 FP)' : `High (${wrong} FPs amplified!)`;
+    const risk = kept === 0 ? 'None (0 kept)' : wrong === 0 ? 'Low (clean)' : wrong === 1 ? 'Moderate (1 FP)' : `High (${wrong} false positives)`;
     status.textContent = `Kept ${kept}/${strips.length} unlabeled strips · Wrong pseudo-labels: ${wrong} · Confirmation bias risk: ${risk}.`;
   };
   slider.oninput = draw;
@@ -153,7 +153,7 @@ function renderCalib(el) {
   ];
   el.innerHTML = `
     <div class="inf-controls">
-      <label><input type="checkbox"> Apply OOF Platt / T calibration</label>
+      <label><input type="checkbox"> Apply example calibration</label>
       <button type="button" data-reset>Reset</button>
     </div>
     <div class="d6-bars"></div>
@@ -176,8 +176,8 @@ function renderCalib(el) {
       bars.querySelector(`[data-val="${i}"]`).textContent = p.toFixed(2);
     });
     status.textContent = calibrated
-      ? 'Calibrated: smudge drops to 0.24 (below 0.50 threshold) and the uncertain edge shows honest 0.61 confidence.'
-      : 'Overconfident: smudge scores 0.62 (triggers a false positive at 0.50!) and the fuzzy edge looks 0.91 certain.';
+      ? 'Calibrated: smudge drops to 0.24 (below 0.50 threshold). The edge scores 0.61.'
+      : 'Overconfident: smudge scores 0.62 and passes the 0.50 threshold. The edge scores 0.91.';
   };
   cb.onchange = e => { calibrated = e.target.checked; draw(); };
   el.querySelector('[data-reset]').onclick = () => { calibrated = false; cb.checked = false; draw(); };
@@ -195,7 +195,7 @@ root.addEventListener('click', e => {
   if (!b) return;
   const q = b.closest('[data-lab="quiz"]'), answer = q.querySelector('.answer');
   if (b.dataset.action === 'reset') {
-    answer.textContent = 'Choose an answer, then explain your reasoning.';
+    answer.textContent = 'Choose an answer.';
     answer.classList.remove('wrong');
     q.querySelectorAll('.answer-button').forEach(x => x.removeAttribute('aria-pressed'));
     return;

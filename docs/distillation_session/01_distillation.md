@@ -2,11 +2,11 @@
 
 ## The ensemble dilemma
 
-Ensembling three or five diverse models almost always beats any single model. Different architectures make different mistakes, so averaging their probability maps cancels out noise and sharpens boundaries.
+Averaging probability maps can improve segmentation when the models make different errors.
 
 The catch is **cost**. If you combine 5 models with 4-view test-time augmentation (TTA), every single image requires **20 forward passes**. That is fine for an offline batch job, but painful if you have a tight latency budget, a small GPU, or a live factory camera.
 
-**Knowledge distillation** gives you a way out: keep the ensemble as a **teacher** during training, and train one fast **student** model to imitate the teacher's output maps. At deployment time, you throw the heavy teacher away and ship only the student.
+**Knowledge distillation** gives you a way out: keep the ensemble as a **teacher** during training, and train one fast **student** model to imitate the teacher's output maps. Deploy the student on its own.
 
 ## Why soft targets beat hard 0/1 masks
 
@@ -58,12 +58,12 @@ loss_soft = F.binary_cross_entropy(student_probs_T, teacher_probs) * (T * T)
 loss = alpha * loss_hard + (1.0 - alpha) * loss_soft
 ```
 
-Notice the $T^2$ factor on the soft loss: dividing logits by $T$ scales gradients down by $1/T^2$, so multiplying by $T^2$ keeps the relative weight of the two losses stable as you tune $T$.
+Notice the $T^2$ factor on the soft loss: it helps compensate for smaller soft-loss gradients at higher temperatures.
 
-## One rule you cannot break: out-of-fold teachers
+## Out-of-fold teacher predictions
 
-Suppose you build a 5-fold ensemble and use *all 5 folds* to generate teacher maps on your training set. Then fold 0's teacher already memorized fold 0's training images—its predictions on those images are artificially overconfident and leak validation information.
+If you average all five teachers to label a training image, some teachers will have trained on that image. An out-of-fold target uses only teachers that held the image out.
 
-Always generate distillation targets **out-of-fold (OOF)**: for any training image in fold $k$, only teachers that did **not** train on fold $k$ are allowed to produce its soft target.
+For a training image in fold $k$, generate its out-of-fold target with a teacher that held out fold $k$. When evaluating a student, also keep its validation fold out of the teachers’ training data.
 
 **Check yourself:** If you distill a 4-model ensemble into a single student, how many forward passes does the student need at inference time? What is the main thing the student learns from soft maps that binary masks hide?

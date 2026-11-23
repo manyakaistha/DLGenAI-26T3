@@ -28,7 +28,7 @@ MILESTONES = [
      'Seven study guides covering all 9 questions: thresholds, connected components, TTA alignment, ensembling, memory and time budgets, and submission audits.'),
 ]
 SESSIONS = [
-    ('session-6/index.html', '23 November 2026 · Session 6 · 40 minutes', 'Teach Smaller, Label Smarter',
+    ('session-6/index.html', '23 November 2026 · Session 6', 'Ensemble Distillation and Pseudo-Labeling',
      'Ensemble distillation, pseudo-labeling, domain shift, resolution, copy-paste augmentation and probability calibration, with interactive animated slides.'),
     ('deployment/index.html', 'Hands-on guide · 20 minutes', 'Deploy Your Model on Hugging Face',
      'Turn your trained weights into a web app: upload an image, get the predicted masks overlaid. Gradio on a free ZeroGPU Space, with a starter folder to download.'),
@@ -64,7 +64,7 @@ def cards(items, current, action):
            if url == 'session-4/index.html' else '')
         + (f'<p><a href="{relative("session-5/presentation/index.html", current)}">Present the 9 November session · interactive slides →</a></p>'
            if url == 'session-5/index.html' else '')
-        + (f'<p><a href="{relative("session-6/presentation/index.html", current)}">Present the 23 November session · interactive slides →</a></p>'
+        + (f'<p><a href="{relative("session-6/presentation/index.html", current)}">Open interactive slides →</a></p>'
            if url == 'session-6/index.html' else '') + '</div>'
         for url, meta, title, description in items) + '</div>'
 
