@@ -10,7 +10,7 @@ from build_student_hub import validate_site
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'docs/distillation_session'
-MODULES = ['README', '01_distillation', '02_pseudo_labeling', '03_data_tricks', '04_calibration_and_safety', '05_reference']
+MODULES = ['README', '01_distillation', '02_pseudo_labeling', '03_data_tricks', '04_calibration_and_safety', '05_reference', 'ensemble-evidence']
 TITLES = [
     'Session 6 overview',
     '1 · Ensemble distillation',
@@ -18,6 +18,7 @@ TITLES = [
     '3 · Data-centric tricks',
     '4 · Calibration & safety',
     '5 · Quick reference',
+    '6 · Ensemble evidence',
 ]
 
 

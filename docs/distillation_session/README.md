@@ -22,3 +22,4 @@ The interactive examples use synthetic scores and masks.
 3. [Data quality and augmentation](03_data_tricks.md)
 4. [Calibration, confirmation bias and safety](04_calibration_and_safety.md)
 5. [Quick reference and further reading](05_reference.md)
+6. [Ensemble diversity · results and comparisons](ensemble-evidence.md)

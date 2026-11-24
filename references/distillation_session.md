@@ -3,6 +3,7 @@
 Session 6 is a live lesson covering ensemble distillation (soft targets, temperature scaling, OOF teacher rule), pseudo-labeling & Noisy Student self-training (confidence gating, confirmation bias, leakage rules), data-centric tricks (domain shift, resolution/aspect ratio, copy-paste augmentation & edge-halo trap, annotation jitter), and probability calibration (temperature / Platt scaling).
 
 - Sources: `docs/distillation_session/README.md`, `01_distillation.md`–`05_reference.md`, `activities.js`, `presentation/{index.html,presentation.css,presentation.js,content.js}`.
+- Ensemble evidence: `docs/distillation_session/ensemble-evidence.md` builds to `/session-6/ensemble-evidence.html` and is linked from the overview and session navigation. It contains five static SVG charts and anonymized leaderboard and held-out results.
 - Deck: 18 core slides + 1 optional multi-generation slide, using the shared Type Garden 6-palette 16:9 shell, keyboard/index/fullscreen/offline-save controls, 4 animated interactive labs (temperature slider, teacher→student flow animation, confidence-gate simulator, calibration toggle), and exit quiz.
 - Local instructor script: `docs/distillation_session/presentation/SPEAKER_SCRIPT.md` (excluded from the public repository and build). Timing, spoken questions, and discussion cues belong here. The public deck, slide index, guides, and hub entry use student-facing copy.
 - Standalone build: `uv run --no-project scripts/build_distillation_session.py` (default `runs/distillation_preview/`).
